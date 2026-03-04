@@ -66,6 +66,9 @@
 % Remove indentation for sections
 \cftsetindents{section}{0em}{0em}
 
+% Remove indentation for paragraphs
+\setlength{\parindent}{0pt}
+
 % Set font size (\large) for table of contents title
 \renewcommand{\cfttoctitlefont}{\large\bfseries}
 
@@ -193,7 +196,7 @@
 \fancyhead[R]{\small\textit{\nouppercase{\rightmark}}}
 
 % Left header text: Short course title, hyperlinked to table of contents
-\fancyhead[L]{\hyperref[sec:contents]{\small Short title of document}}
+\fancyhead[L]{\hyperref[sec:contents]{\small Robotics 2}}
 
 % --- Document starts here ---
 
@@ -201,12 +204,12 @@
 
 % --- Main title and subtitle ---
 
-\title{Title here \\[1em]
+\title{Robotics 2 \\[1em]
 \normalsize Subtitle here}
 
 % --- Author and date of last update ---
 
-\author{\normalsize Your name here}
+\author{\normalsize Flavio Massaroni}
 \date{\normalsize\vspace{-1ex} Last updated: \today}
 
 % --- Add title and table of contents ---
@@ -217,19 +220,22 @@
 % --- Main content: import lectures as subfiles ---
 
 \input{Lectures/Lecture1}
+\input{Lectures/Lecture2}
 
 % --- Bibliography ---
 
 % Start a bibliography with one item.
 % Citation example: "\cite{williams}".
 
-\begin{thebibliography}{1}
+% --- References ---
 
-\bibitem{williams}
-   Williams, David.
-   \textit{Probability with Martingales}.
-   Cambridge University Press, 1991.
-   Print.
+%\begin{thebibliography}{1}
+
+%\bibitem{williams}
+%   Williams, David.
+%   \textit{Probability with Martingales}.
+%   Cambridge University Press, 1991.
+%   Print.
 
 % Uncomment the following lines to include a webpage
 % \bibitem{webpage1}
@@ -238,7 +244,7 @@
 %   Online; accessed Month Date, Year.\\
 %   \texttt{www.URLhere.com}
 
-\end{thebibliography}
+%\end{thebibliography}
 
 % --- Document ends here ---
 
