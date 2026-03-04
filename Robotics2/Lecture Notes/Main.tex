@@ -205,7 +205,7 @@
 % --- Main title and subtitle ---
 
 \title{Robotics 2 \\[1em]
-\normalsize Subtitle here}
+\normalsize Lecture Notes} % Ho messo un sottotitolo di esempio
 
 % --- Author and date of last update ---
 
@@ -217,34 +217,43 @@
 \maketitle
 \tableofcontents\label{sec:contents}
 
-% --- Main content: import lectures as subfiles ---
+\newpage % Va alla pagina successiva dopo l'indice
 
+% --- Prefazione / Disclaimer ---
+\section*{Preface \& Acknowledgments}
+\addcontentsline{toc}{section}{Preface \& Acknowledgments} % Aggiunge la prefazione all'indice senza numerarla
+
+These lecture notes are based entirely on the concepts, lectures, and slide materials provided by \textbf{Prof. Alessandro De Luca} for the \textit{Robotics 2} course at Sapienza University of Rome (Academic Year 2025/2026).
+
+Unless otherwise specified, all equations, algorithms, and figures are directly adapted from the official course slides. The primary reference textbook for this course is:
+\begin{itemize}
+    \item B. Siciliano, L. Villani, G. Oriolo, A. De Luca, \textit{Foundations of Robotics}, Springer, September 2025.
+\end{itemize}
+
+All original course materials are the ones disposed by the professor on the official course website:\\
+\url{https://www.diag.uniroma1.it/~deluca/rob2_en.php}.
+
+\vspace{2em}
+
+% --- Main content: import lectures as subfiles ---
 \input{Lectures/Lecture1}
 \input{Lectures/Lecture2}
 
 % --- Bibliography ---
+\begin{thebibliography}{9}
 
-% Start a bibliography with one item.
-% Citation example: "\cite{williams}".
+\bibitem{siciliano2025}
+   B. Siciliano, L. Villani, G. Oriolo, A. De Luca.
+   \textit{Foundations of Robotics}.
+   Springer, September 2025.
 
-% --- References ---
+\bibitem{deluca_course}
+   A. De Luca.
+   ``Robotics 2 Course Material and Slides''.
+   Sapienza University of Rome, Academic Year 2025/2026.
+   \url{https://www.diag.uniroma1.it/~deluca/rob2_en.php}.
 
-%\begin{thebibliography}{1}
-
-%\bibitem{williams}
-%   Williams, David.
-%   \textit{Probability with Martingales}.
-%   Cambridge University Press, 1991.
-%   Print.
-
-% Uncomment the following lines to include a webpage
-% \bibitem{webpage1}
-%   LastName, FirstName. ``Webpage Title''.
-%   WebsiteName, OrganizationName.
-%   Online; accessed Month Date, Year.\\
-%   \texttt{www.URLhere.com}
-
-%\end{thebibliography}
+\end{thebibliography}
 
 % --- Document ends here ---
 
