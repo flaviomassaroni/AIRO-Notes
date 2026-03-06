@@ -66,6 +66,9 @@
 % Remove indentation for sections
 \cftsetindents{section}{0em}{0em}
 
+% Remove indentation for paragraphs
+\setlength{\parindent}{0pt}
+
 % Set font size (\large) for table of contents title
 \renewcommand{\cfttoctitlefont}{\large\bfseries}
 
@@ -193,7 +196,7 @@
 \fancyhead[R]{\small\textit{\nouppercase{\rightmark}}}
 
 % Left header text: Short course title, hyperlinked to table of contents
-\fancyhead[L]{\hyperref[sec:contents]{\small Short title of document}}
+\fancyhead[L]{\hyperref[sec:contents]{\small Computer Vision}}
 
 % --- Document starts here ---
 
@@ -202,11 +205,11 @@
 % --- Main title and subtitle ---
 
 \title{Computer Vision \\[1em]
-\normalsize Subtitle here}
+\normalsize Lecture Notes} % Ho messo un sottotitolo di esempio
 
 % --- Author and date of last update ---
 
-\author{\normalsize Your name here}
+\author{\normalsize Flavio Massaroni}
 \date{\normalsize\vspace{-1ex} Last updated: \today}
 
 % --- Add title and table of contents ---
@@ -214,29 +217,22 @@
 \maketitle
 \tableofcontents\label{sec:contents}
 
-% --- Main content: import lectures as subfiles ---
+\newpage % Va alla pagina successiva dopo l'indice
 
+% --- Prefazione / Disclaimer ---
+\section*{Preface \& Acknowledgments}
+\addcontentsline{toc}{section}{Preface \& Acknowledgments} % Aggiunge la prefazione all'indice senza numerarla
+
+
+
+\vspace{2em}
+
+% --- Main content: import lectures as subfiles ---
 \input{Lectures/Lecture1}
 
 % --- Bibliography ---
+\begin{thebibliography}{9}
 
-% Start a bibliography with one item.
-% Citation example: "\cite{williams}".
-
-\begin{thebibliography}{1}
-
-\bibitem{williams}
-   Williams, David.
-   \textit{Probability with Martingales}.
-   Cambridge University Press, 1991.
-   Print.
-
-% Uncomment the following lines to include a webpage
-% \bibitem{webpage1}
-%   LastName, FirstName. ``Webpage Title''.
-%   WebsiteName, OrganizationName.
-%   Online; accessed Month Date, Year.\\
-%   \texttt{www.URLhere.com}
 
 \end{thebibliography}
 
