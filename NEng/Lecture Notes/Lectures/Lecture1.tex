@@ -45,8 +45,73 @@ widely distributed neural networks.
 
 \subsection{Technical Specifications and Strumentation}
 
-Signal amplitude: microvolts (µV) – typically 5–50 µV, rarely up to 100 µV.
-Measured in a noisy environment → requires high‑gain, low‑noise amplifiers
-and careful filtering.
+The EEG is measured through an electrode, which is a very sensible voltmeter that captures changes in the electrical potential on the surface where it is placed.
+It is crucial to understand the sensibility and the precision of this tool. Indeed, the order of the signal is micro-Volts, around typically 5–50 µV, rarely up to 100 µV. 
+
+To obtain a measurement of the signal over time, more than one electrode are placed on the surface.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/More-Electrodes.png}
+    \caption{Map of the distribution of potential on the scalp at different times.}
+    \label{fig:Electrodes}
+\end{figure}
 
 
+By placing the electrods we can study the main part of the brain which is responsible for a determined rithym. In the following picture we can analyse the Alpha and Mu
+rithms, which many electrodes placed on the scalp surface.
+\begin{figure}[htbp]
+    \centering
+
+    \begin{subfigure}[b]{0.30\textwidth} 
+        \centering
+        \includegraphics[width=\textwidth]{Images/ElectrodesPlacement.png}
+        \caption{Positioning of the electrodes on a flattened scalp view (Red: frontal; Blue: motor cortex; Green: occipital).}
+        \label{fig:ElectrodesPos}
+    \end{subfigure}
+    \hfill 
+    \begin{subfigure}[b]{0.65\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/AlphavsMu.png}
+        \caption{Analysis of Alpha and Mu rhythms among different electrodes' placements.}
+        \label{fig:AlphaMu}
+    \end{subfigure}
+    
+    \caption{Rythm response depending on the electrodes' positions.}
+    \label{fig:main}
+\end{figure}
+
+We can notice, as we were explaining before, that the alpha rhythym is highly influenced by the eyes activity, which is expressed by the occipital region of the brain. 
+In the same way, we can notice that the motor cortex is the brain region which describes more the mu rhythm.
+
+The bars on the graphs are the so called \textit{calibration bars}, needed to show the scale of the timeline and the amplitudes of the signals.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Images/CalibrationBars.png}
+    \label{fig:CalibrationBar}
+\end{figure}
+By this bar we can notice the ERP ares in the order of micro-Volts $[\mu V]$, and there also is a positive [+] or negative [-] sign to better understand the sign of
+the oscillation with respect to the time (represented on the orizzontal bar). This process is called \textbf{Calibration}.
+
+\subsection{Brain Rhythms}
+
+Brain activity is characterized by oscillations at various frequencies, which are grouped into specific bands. Each rhythm is associated with particular brain regions and physiological or cognitive states.
+
+\begin{itemize}
+    \item \textbf{Alpha Rhythm (8--13 Hz):} Traditionally considered an ``idling'' rhythm, it is most prominent over the occipital lobe (visual cortex). 
+    Its amplitude is highly responsive to visual input: it increases (synchronizes) when the eyes are closed and decreases (desynchronizes) when the eyes are open. 
+    The amplitude typically waxes and wanes over seconds.
+    
+    \item \textbf{Mu Rhythm (8--13 Hz):} This is the motor-cortex counterpart of the alpha rhythm. It is located over the central (sensorimotor) cortex and is 
+    primarily visible on central electrodes (often the blue channels in topographic maps). It frequently exhibits a ``comb-shaped'' waveform with asymmetric peaks.
+    
+    \item \textbf{Beta Rhythm (14--30 Hz):} Associated with active motor and cognitive processing. It is observed across multiple cortical areas. 
+    The typical band is 15--30 Hz, though it is often cited around 20--25 Hz.
+    
+    \item \textbf{Theta Rhythm (4--7.5 Hz):} Linked to memory, workload, and stress. It is prominent in midline structures, such as the hippocampus and frontal 
+    midline, and its amplitude increases during demanding cognitive tasks.
+    
+    \item \textbf{Delta Rhythm ($<$ 3.5 Hz):} Characterized by very slow waves (typically $<$ 3.3 Hz). In healthy adults, these are rare during wakefulness and 
+    usually indicate deep sleep or pathological states.
+    
+    \item \textbf{Gamma Rhythm ($>$ 30 Hz):} 
+\end{itemize}

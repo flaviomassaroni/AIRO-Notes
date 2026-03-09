@@ -11,9 +11,12 @@
 
 \usepackage{
   amsmath, amsthm, amssymb, mathtools, dsfont, units,          % Math typesetting
-  graphicx, wrapfig, subfig, float,                            % Figures and graphics formatting
+  graphicx, wrapfig, float,                                     % Figures and graphics formatting
   listings, color, inconsolata, pythonhighlight,               % Code formatting
-  fancyhdr, sectsty, hyperref, enumerate, enumitem, framed }   % Headers/footers, section fonts, links, lists
+  fancyhdr, sectsty, hyperref, enumerate, enumitem, framed}   % Headers/footers, section fonts, links, lists
+
+\usepackage{caption}
+\usepackage{subcaption}
 
 % lipsum is just for generating placeholder text and can be removed
 \usepackage{hyperref, lipsum} 
@@ -58,7 +61,7 @@
 
 % --- Table of contents settings ---
 
-\usepackage[subfigure]{tocloft}
+\usepackage{tocloft}
 
 % Reduce spacing between sections in table of contents
 \setlength{\cftbeforesecskip}{.9ex}
