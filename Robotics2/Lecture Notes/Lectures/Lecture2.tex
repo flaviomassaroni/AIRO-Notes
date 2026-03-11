@@ -1,8 +1,193 @@
 % TeX root = ../Main.tex
 
 % First argument to \section is the title that will go in the table of contents. Second argument is the title that will be printed on the page.
-\section[Lecture 2 (4/03) -- {\it Lecture2}]{Lecture 2}
+\section[Lecture 2 -- {\it Kinematic Redundancy}]{Lecture 2}
 
 \subsection{Introduction}
-albero
-\subsection{Introduction}
+Defining the direct Kinematics of the task $y=k(q)$, which is the map between the task space and the configuration space
+$$
+k:\mathit{C} \rightarrow \mathit{T}
+$$
+where dim$(\mathit{C}) = n$ and dim$(\mathit{T}) = m$, a robot is said to be \textbf{Kinematically redundant} for the task if $n>m$ (i.e. there are more degrees 
+of fredom than strictly needed for executing the task). The redundancy concept is relative to a given task.
+A redundant robot have an \textit{infinite number of solution} for the inverse kinematics in the regular case, and this redundancy can be 
+used in many ways, such as:
+\begin{itemize}
+    \item to avoid collision with obstacles in Cartesian space;
+    \item to avoid kinematic singularities in Joint space;
+    \item to stay within the admissible joint ranges;
+    \item to increase manipulability in specified directions;
+    \item to uniformly distribute/limit joint velocities and/or accelerations;
+    \item to optimize energy consumption or needed motion torques;
+    \item to minimize execution time on a given Carthesian path;
+    \item to increase dependability with respecto to actuation faults
+    \item \dots
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Images/CollisionSolution.jpg}
+    \label{fig:CollisionSolution}
+\end{figure}
+
+\subsection{Deepening the math behind kinematic redundancy}
+
+For an extensive comprehension of the topic, let us consider the math behind the Kinematic redundancy.
+The jacobian matrix $J$ maps the joints' velocities $\dot{q} \in \R^n$ to the task velocities $\dot{y}\in \R^n$ as it follows:
+$$
+\dot{y}=J\dot{q}
+$$
+In a redundant situation, since $ m < n $, the jacobian matrix $J$ is a non squared matrix $m \times n$, thus the system is underdetermined and there exists infinite solutions
+for $\dot{q}$ for a same $\dot{y}$. The \textbf{Null Space} is the set of all the joints' velocities which produces $\dot{y} = 0$
+$$
+N(J) = \{\dot{q} : J\dot{q}=0\}
+$$
+
+Since m < n, $dim(N(J)) = m-n>0$, and it is said a \textbf{Non-trivial space}, which means it cannot be related to an all zeros-vector, thus it has linearly independent columns.
+
+We can generated the \textbf{Projection Matrix P}, an $n \times n$ matrix whom image (range) concides with $N(J)$, thus ${R}(P) \equiv N(J)$. 
+It means that every vector $P\dot{q}_N$, $\dot{q}_N \in \mathbb{R}^n$ is in the null space of J.
+$$
+J \cdot P = O \implies J(P\dot{q}_N) = 0 \quad \forall \dot{q}_N$$
+
+This mathematical statement illustrates why the projection matrix is crucial:
+it maps any generalized velocity vector into the null space of the Jacobian, ensuring that the resulting 
+motion does not affect the end-effector's primary task.
+
+The general solution for the joint velocities $\dot{q}$ that produce a desired task velocity $\dot{y}^*$ is given by:
+
+\begin{equation}
+    \dot{q} = \dot{q}^* + P \dot{q}_N
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $\dot{q}^*$ is a particular solution (e.g., the minimum-norm solution $\dot{q}^* = J^{\#} \dot{y}^*$).
+    \item $P \dot{q}_N$ is the orthogonal projection into the null space of the Jacobian, with $\dot{q}_N$ being an arbitrary joint velocity vector.
+\end{itemize}
+
+It has a strong physical meaning. The term $P\dot{q}_N$ generates \textbf{self-motions} or \textbf{internal motions}, which consists in the robot moving and changing the overall configuration, 
+yet the end-effector remains perfectly stationary in task space. And this is possible thanks to Kinematic Redundancy.
+From a control perspective, this property enables a fundamental \textit{decoupling between the primary task and the interal configuration} of the robot. While the particual
+solution $\dot{q}^*$ is responsible for executing the desired task velocity $\dot{y}^*$, the null space component $P\dot{q}_N$ can be chosen freely to pursue a \textit{secondary objective}
+which won't interfer with the primary task. A particular and common choice regards a manipulability measure $w(q)$, which steers the robot away from singular configurations.
+\begin{equation}
+    \dot{q}_N = k \nabla w(q)
+\end{equation}
+where:
+\begin{equation}
+    w(q) = \sqrt{\det(J J^T)}
+\end{equation}
+and $k > 0$ is a scalar gain.
+
+$\dot{q}_N$ can be also be chosen as a gradient-based penalty on joint proximity 
+to physical limits, which keeps each joint away from its mechanical stops and preserves future maneuverability. Or even as a and obstacle-aware terms that push
+ links away from detected objects in the environment, allowing the robot to reconfigure its elbow or intermediate links around an obstacle 
+ without perturbing the gripper trajectory at all.
+
+The \textbf{general solution} is always a particular solution plus a null space component, expressed as:
+
+\begin{equation}
+    \dot{q} = \dot{q}^* + P \dot{q}_N \label{eq:IKProbSol}
+\end{equation}
+
+which represents the foundations of kinematic redundancy.
+This rests on a rigorous theoretical foundation rooted in linear algebra, since linear ($\dot{y} = J\dot{q}$ is a system of linear equations). And it is also shown
+that since $JP =0$, 
+\begin{equation}
+J\dot{q} = J(\dot{q}^* + P\dot{q}_N) = J\dot{q}^* + JP\dot{q}_N = \dot{y}^* + 0 = \dot{y}^*    
+\end{equation}
+
+and $P\dot{q}_N$ does not disturb the movement of the principal task.
+From an optimization standpoint, this structure provides a clean separation of concerns: 
+$\dot{q}^*$ is entirely responsible for satisfying the primary task, while the remaining degrees of freedom, captured by the free vector $\dot{q}_N$,
+are available to optimize a secondary objective.
+
+\subsection{Inverse kinematics problem}
+The inverse kinematics problem for a redundant robot consists of finding $\mathbf{q}(t)$ such that $\mathbf{k}(\mathbf{q}(t)) = \mathbf{y}(t)$ for all times $t$. 
+Since the robot has more degrees of freedom than strictly needed for the task, infinitely many solutions exist---even when the task vector is kept constant, 
+$\mathbf{y}(t) = \bar{\mathbf{y}}$. The extra degrees of freedom give rise to joint displacements that are unobservable at the task level, 
+in the sense that they do not contribute to the end-effector motion: these are precisely the self-motions introduced earlier.
+Solutions to the inverse kinematics problem are mainly sought at the differential (velocity) level. By considering the Jacobian matrix, 
+which provides a linear mapping between the tangent spaces of the configuration manifold $\mathcal{C}$ and the task manifold $\mathcal{T}$, the problem is greatly simplified.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Images/MappingSpaceLinear.jpg}
+    \label{fig:TangentSpacesMapping}
+\end{figure}
+
+The torus $\mathcal{C} = S^1 \times S^1$ represents the configuration space of a 2R robot, where each joint varies in the interval $[-\pi, \pi]$ with periodic boundary conditions.
+The plane $T_\mathbf{q}\mathcal{C}$ represents the tangent space at a given configuration $\mathbf{q}$, which contains the joint velocity vectors $\dot{\mathbf{q}}$.
+
+On the right side, $\mathcal{T} = \mathbb{R}^2$ represents the task space (e.g., the position of the end-effector in the Cartesian plane), and $T_{\mathbf{y}}\mathcal{T}$ 
+is its corresponding tangent space containing the task velocities $\dot{\mathbf{r}}$ (or $\dot{\mathbf{y}}$).
+
+The Jacobian matrix $\mathbf{J}(\mathbf{q})$ acts as a linear mapping between these tangent spaces, $T_\mathbf{q}\mathcal{C} \to T_{\mathbf{y}}\mathcal{T}$. 
+Since the robot is non-redundant ($n = m = 2$), the inverse mapping is uniquely defined by $\mathbf{J}^{-1}(\mathbf{q})$, provided the robot is not in a singular configuration.
+
+Instead, in the following image it is described a redundant case of the same 2R planar robot, with the task described only for the ee position component $p_x$, thus 
+$n=2$ and $m=1$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Images/RedundantConfig.png}
+\end{figure}
+
+In this case we can solve the IK problem through the \textit{general redundancy resolution}, which is an optimization problem that can be solved offline (globally) or online (locally).
+The objective funcion is a general function of the state space $(\mathbf{q}\dot{\mathbf{q}})$, and the goal is to find a trajectory $\mathbf{q}(t)$ and $\dot{\mathbf{q}}$.
+
+Note: We are in the time domain, $\mathbf{q}(t)$ and $\dot{\mathbf{q}}$ are joints position and velocity with respect to t. $H$($\mathbf{q}(t)$ and $\dot{\mathbf{q}}$) is a \textbf{Goal Function},
+(that we can consider as a Cost function): it evaluates how good is a configuration or a movement. 
+The function $H$ can be seen in a more global way:
+\begin{itemize}
+    \item \textbf{Minimizing the energy consumption}: $H(\mathbf{q}, \dot{\mathbf{q}}) = \frac{1}{2}\dot{\mathbf{q}}^T\mathbf{M}(\mathbf{q})\dot{\mathbf{q}}$
+    \item \textbf{To get away from singularities}: $H(\mathbf{q}) = \sqrt{\det(\mathbf{J} \mathbf{J}^T)}$
+    \item \textbf{To avoid an Obstacle}: $H(\mathbf{q})$ can be the inverse of the distance between the robot arm and the obstacle;
+\end{itemize}  
+
+To better understand how this optimization is carried out, we introduce the two main methodologies:
+
+\begin{itemize}
+    \item \textbf{Global methods (Offline)}: This approach looks at the problem in its entirety. Given a desired task trajectory $\mathbf{y}(t)$ and an initial configuration $\mathbf{q}(t_0)$, 
+    finding an evolution over the entire time window $[t_0, t_0+T]$ involves a functional of the type:
+    \begin{equation}
+        \int_{t_0}^{t_0+T} H(\mathbf{q}, \dot{\mathbf{q}}) dt   
+    \end{equation}
+    which has to be minimized over the whole trajectory $\mathbf{q}(t)$. 
+    
+    \textit{Why is it difficult?} The mathematics behind this relies on the Calculus of Variations and produces a Two-Point Boundary Value (TPBV) problem, 
+    resulting in highly non-linear differential equations. Consequently, it cannot be computed in real-time while the robot is moving; the entire optimal trajectory must be pre-calculated 
+    offline before execution.
+    
+    \item \textbf{Local methods (Online)}: This is the approach used in the vast majority of real-world robotic applications. Instead of optimizing over the entire journey, 
+    the controller evaluates only the current time step $t = k T_s$ (where $T_s$ is the sampling time, e.g., $1$ ms). 
+    The objective becomes much simpler: given the instantaneous task velocity $\dot{\mathbf{y}}$ required right now, what is the joint velocity $\dot{\mathbf{q}}$ that realizes the 
+    task while simultaneously optimizing $H$ at this exact instant?
+
+    \textit{Why is it easier?} Mathematically, this reduces to a Linear-Quadratic (LQ) optimization problem, which modern processors can solve instantaneously. Once the optimal joint 
+    velocity $\dot{\mathbf{q}}(kT_s)$ is found, the joint positions are updated using Euler integration, see Appendix \ref{sec:euler_appendix}:
+    \begin{equation}
+        \mathbf{q}((k+1)T_s) = \mathbf{q}(kT_s) + T_s \dot{\mathbf{q}}(kT_s)
+    \end{equation}
+
+where $k$ is an integer index ($k = 0, 1, 2, \dots$) representing the current control cycle. 
+
+To better understand its physical meaning, we can break down the equation as follows:
+    \begin{itemize}
+        \item $\mathbf{q}((k+1)T_s)$: The joint configuration that the robot must reach at the \textbf{next time step}.
+        \item $\mathbf{q}(kT_s)$: The joint configuration at the \textbf{current time instant}.
+        \item $T_s \dot{\mathbf{q}}(kT_s)$: The small (angular) \textbf{displacement} the joints will undergo. 
+        This term is computed by taking the optimal velocity calculated right now ($\dot{\mathbf{q}}$) and multiplying it by the duration of the time interval 
+        until the next update ($T_s$).
+    \end{itemize}
+
+\end{itemize}
+
+\subsection{Local resolution methods}
+Three are the classes of methods for solving $J(q)\dot{q}=\dot{y}$
+\begin{itemize}
+    \item \textbf{Jacobian-based methods}: Among the infinite solutions, the one choses in the one that mininimizes a suitable (possibly weighted) norm;
+    \item \textbf{Null-space methods}: A term is added to the previous solution so as not to affect execution ot the task trajectory, i.e. that beloing to the null space $N(J(q))$
+    \item \textbf{Task augmentation methods}: redundancy is reduced/eliminated by adding $s \leq n-m$
+\end{itemize}

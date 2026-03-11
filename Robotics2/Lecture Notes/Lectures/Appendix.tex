@@ -1,0 +1,42 @@
+\section{Appendix} % o \appendix a seconda del template che stai usando
+
+\subsection{Euler Integration Method}
+\label{sec:euler_appendix}
+
+The Euler Integration Method is a first-order numerical procedure for solving ordinary differential equations (ODEs) with a given initial value.
+Being a first-order method, the local error (error per step) is proportional to the square of the step size, and the global error (error at a given time) is proportional to the step size.
+
+\subsubsection{How it works}
+
+Consider the problem of calculating the shape of an unknown continuous curve $y(t)$ which starts at a given initial point $y(t_0) = y_0$ and satisfies a given differential equation of the form:
+\begin{equation}
+    \dot{y}(t) = f(t, y(t))
+\end{equation}
+The function $f(t, y(t))$ can be thought of as a formula that provides the slope of the tangent line to the curve at any computed point. 
+
+While the exact analytical expression of the curve is initially unknown, its starting point $A_0 = (t_0, y_0)$ is known. Using the differential equation, we can compute the slope of the tangent line at $A_0$. 
+If we take a sufficiently small time step forward, denoted by $\Delta t$, the slope of the true curve does not change significantly. Therefore, we can move along the straight tangent line to find the next point $A_1 = (t_1, y_1)$, where $t_1 = t_0 + \Delta t$. 
+
+Assuming the new point $A_1$ is still an acceptable approximation of the true curve, we can repeat the same reasoning: we compute the new slope at $A_1$, take another small step $\Delta t$ along the new tangent line, and find $A_2$. 
+
+\begin{wrapfigure}{l}{0.4\textwidth}
+  \centering
+  \includegraphics[width=0.38\textwidth]{Images/Euler_method.png}
+  \caption{Didascalia}
+\end{wrapfigure}
+
+After several iterations, this process generates a polygonal curve $(A_0, A_1, A_2, \dots)$ that approximates the original unknown function. Mathematically, the forward projection rule at each discrete step $k$ is expressed as:
+\begin{equation}
+    y_{k+1} = y_k + \Delta t \cdot f(t_k, y_k)
+\end{equation}
+where $y_{k+1}$ is the estimated value at time $t_{k+1} = t_k + \Delta t$. In general, this polygonal curve does not diverge too far from the exact solution, and the integration error can be minimized by choosing a suitably small step size $\Delta t$.
+
+\subsubsection{Application to Robotic Kinematics}
+
+In the context of the \textit{local methods} for redundancy resolution discussed in the main text, the Euler method bridges the gap between differential kinematics and actual joint positions. 
+
+At each control cycle, the optimization algorithm provides the optimal joint velocities $\dot{\mathbf{q}}(t_k)$ based on the current state. In this scenario, our ODE is simply $\dot{\mathbf{q}} = f(t, \mathbf{q})$. By applying the Euler integration step using the controller's sampling time $T_s$ as the step size, the low-level controller can compute the reference joint positions to be sent to the motors for the next instant:
+\begin{equation}
+    \mathbf{q}((k+1)T_s) = \mathbf{q}(kT_s) + T_s \dot{\mathbf{q}}(kT_s)
+\end{equation}
+This straightforward projection allows the robotic system to seamlessly execute the computed velocities in real time.
