@@ -191,3 +191,82 @@ Three are the classes of methods for solving $J(q)\dot{q}=\dot{y}$
     \item \textbf{Null-space methods}: A term is added to the previous solution so as not to affect execution ot the task trajectory, i.e. that beloing to the null space $N(J(q))$
     \item \textbf{Task augmentation methods}: redundancy is reduced/eliminated by adding $s \leq n-m$ further auxiliary tasks (when $s = n-m$, the problem has been “squared”)
 \end{itemize}
+
+\subsubsection{Jacobian-based methods}
+These methods tackle the redundancy problem at a differential kinematics level:
+\begin{equation}
+    J(\mathbf{q})\dot{\mathbf{q}} = \dot{\mathbf{y}}
+\end{equation}
+where $J \in \mathbb{R}^{m \times n}$ is the Jacobian matrix with $n > m$. We seek local solutions in the linear form:
+\begin{equation}
+    \dot{\mathbf{q}} = K\dot{\mathbf{y}}
+\end{equation}
+where $K \in \mathbb{R}^{n \times m}$. Substituting this into the differential equation yields $J(K\dot{\mathbf{y}}) = \dot{\mathbf{y}}$. For this to hold for any arbitrary desired task velocity $\dot{\mathbf{y}}$ in the range of $J$ ($\dot{\mathbf{y}} \in \mathcal{R}(J)$), the matrix $K$ must satisfy the condition:
+\begin{equation}
+    JKJ = J
+\end{equation}
+Such a matrix $K$ is called a \textbf{generalized inverse} of $J$ (which depends on the current configuration $\mathbf{q}$). Because the system is underdetermined ($n > m$), there are infinitely many matrices that satisfy this condition.
+
+\paragraph{Right Inverse}
+A basic example of a generalized inverse is the \textit{right inverse}. Let the Jacobian be partitioned as $J = \begin{pmatrix} J_a & J_b \end{pmatrix}$, where $J_a \in \mathbb{R}^{m \times m}$ is a square, non-singular submatrix ($\det J_a \neq 0$). The right inverse is constructed as:
+\begin{equation}
+    K_r = \begin{pmatrix} J_a^{-1} \\ \mathbf{0} \end{pmatrix} \implies \dot{\mathbf{q}} = \begin{pmatrix} \dot{\mathbf{q}}_a \\ \dot{\mathbf{q}}_b \end{pmatrix} = \begin{pmatrix} J_a^{-1}\dot{\mathbf{y}} \\ \mathbf{0} \end{pmatrix}
+\end{equation}
+Physically, this approach corresponds to ''freezing'' $n-m$ degrees of freedom ($\dot{\mathbf{q}}_b = \mathbf{0}$) and using only the remaining $m$ joints to execute the task. This solution is trivial and rarely optimal, as it does not exploit the redundancy of the manipulator.
+
+\paragraph{Moore-Penrose Pseudoinverse}
+To actively exploit redundancy, we typically choose the \textbf{Moore-Penrose pseudoinverse}, denoted as $J^\#$ (see Appendix \ref{sec:Pseudoinverse}). 
+When the Jacobian is full row rank ($\text{rank}(J) = m$), it is computed as:
+\begin{equation}
+    J^\# = J^T(JJ^T)^{-1}
+\end{equation}
+yielding the joint velocity command $\dot{\mathbf{q}}_{PS} = J^\#\dot{\mathbf{y}}$. 
+Among all the infinite generalized inverses, the pseudoinverse is unique because it provides the \textbf{minimum norm solution} in a least-squares sense. 
+
+Specifically, the pseudoinverse solution $\dot{\mathbf{q}}_{PS}$ solves the following hierarchical optimization problem:
+\begin{equation}
+    \min_{\dot{\mathbf{q}}} \|\dot{\mathbf{q}}\|^2 \quad \text{subject to} \quad \dot{\mathbf{q}} \in \arg\min_{\dot{\mathbf{q}}} \|\dot{\mathbf{y}} - J\dot{\mathbf{q}}\|^2
+\end{equation}
+This means that:
+\begin{itemize}
+    \item If $\dot{\mathbf{y}} \in \mathcal{R}(J)$, it finds the solution that satisfies $J\dot{\mathbf{q}} = \dot{\mathbf{y}}$ exactly while minimizing $\|\dot{\mathbf{q}}\|^2$.
+    \item If $\dot{\mathbf{y}} \notin \mathcal{R}(J)$ (e.g., in a singularity), it first minimizes the task reconstruction error $\|\dot{\mathbf{y}} - J\dot{\mathbf{q}}\|^2$ and then, 
+    among the best approximants, picks the one with minimum norm.
+\end{itemize}
+
+If $J$ is singular and $JJ^T$ cannot be inverted, the closed-form $J^\# = J^T(JJ^T)^{-1}$ is not applicable. 
+In such cases, $J^\#$ must be computed through numerical methods such as the \textbf{Singular Value Decomposition} (SVD) of $J$ (see Appendix \ref{sec:SVD}).
+\begin{equation}
+    J = U \Sigma V^T
+\end{equation}
+
+
+
+The SVD has special properties. 
+
+The matrix $\Sigma$ has the folowing form:
+$$
+    \Sigma=\begin{pmatrix}
+        \sigma_1 & & & \\ 
+        & \ddots & & 0_{m\times (n-m)}\\ 
+        & & \sigma_m & 
+    \end{pmatrix}
+$$
+and
+$$ \sigma_1\ge\sigma_2\dots \ge \sigma_\rho>0 $$
+$$ \sigma_{\rho+1}= \sigma_{\rho+2}\dots = \sigma_{m}=0 $$
+
+where $\rho$ is the rank of $J$.
+The numbers $\sigma_1\dots ,\sigma_\rho$ are the \textbf{singular values} of $J$. 
+The eigen vectors of $JJ^T$ (columns of $U$) are associated to the eigen values $\sigma_1^2\dots,\sigma_\rho^2$.
+The last $n-\rho$ columns of $V$ are a basis for the null space of $J$.
+
+\paragraph{Handling Singularities}
+The pseudoinverse approach fails when the robot falls into a kinematic singularity 
+($\text{rank}(J) < m$), as the matrix $JJ^T$ becomes singular and non-invertible. 
+Furthermore, in the close vicinity of a singularity, the joint velocities computed by $J^\#$ tend to infinity. 
+To guarantee safe and bounded velocities, the exact tracking constraint is relaxed using the \textbf{Damped Least Squares (DLS)} method (Appendix \ref{sec:DLS}), 
+which introduces a damping factor to balance tracking accuracy and feasible joint speeds.
+
+\medskip
+\textit{Note: For the formal proof of the minimum norm property, the robust computation of $J^\#$ via Singular Value Decomposition (SVD), and the derivation of the DLS method, refer to Appendix sections.}
