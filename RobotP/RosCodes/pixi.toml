@@ -1,0 +1,15 @@
+[project]
+name = "RosCodes"
+channels = ["robostack-humble", "conda-forge"]
+platforms = ["linux-64"]
+
+[dependencies]
+# ROS 2 Humble Desktop (include ament_cmake, rclcpp, std_msgs, ecc.)
+ros-humble-desktop = "*"
+# Strumenti di compilazione Colcon
+colcon-common-extensions = "*"
+colcon-core = "*"
+# Compilatore C++ e CMake (spesso inclusi, ma meglio esplicitarli)
+gxx = "*"
+cmake = "*"
+make = "*"
