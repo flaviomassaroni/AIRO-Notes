@@ -1,13 +1,27 @@
 #include "rclcpp/rclcpp.hpp"
 #include "example_interfaces/srv/add_two_ints.hpp"
-
 #include <memory>
 
+// Firma corretta della callback: deve usare std::shared_ptr per Request e Response
 void add(const std::shared_ptr<example_interfaces::srv::AddTwoInts::Request> request,
-        std::shared_ptr<example_interfaces::stv::AddTwoInts::Response> response)
+         std::shared_ptr<example_interfaces::srv::AddTwoInts::Response> response)
 {
-    response->sum = request->a + request->b;
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Incoming request \na: %Id" "b:%Id", request->a, request->b);
+  response->sum = request->a + request->b;
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Incoming request\na: %ld" " b: %ld", request->a, request->b);
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending back response: [%ld]", response->sum);
+}
 
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("add_two_ints_server");
 
+  // Creazione del servizio
+  rclcpp::Service<example_interfaces::srv::AddTwoInts>::SharedPtr service =
+    node->create_service<example_interfaces::srv::AddTwoInts>("add_two_ints", &add);
+
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Ready to add two ints.");
+  rclcpp::spin(node);
+  rclcpp::shutdown();
+  return 0;
 }
