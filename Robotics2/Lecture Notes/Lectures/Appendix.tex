@@ -22,7 +22,6 @@ Assuming the new point $A_1$ is still an acceptable approximation of the true cu
 \begin{wrapfigure}{l}{0.4\textwidth}
   \centering
   \includegraphics[width=0.38\textwidth]{Images/Euler_method.png}
-  \caption{Didascalia}
 \end{wrapfigure}
 
 After several iterations, this process generates a polygonal curve $(A_0, A_1, A_2, \dots)$ that approximates the original unknown function. Mathematically, the forward projection rule at each discrete step $k$ is expressed as:
@@ -53,9 +52,17 @@ For any matrix $J \in \mathbb{R}^{m \times n}$, there exists a unique matrix $J^
 \end{enumerate}
 
 \subsubsection{Proof of the Minimum Norm Property}
-Given the kinematic constraint $J\dot{\mathbf{q}} = \dot{\mathbf{y}}$, the pseudoinverse solution $\dot{\mathbf{q}}_{PS} = J^\#\dot{\mathbf{y}}$ provides the velocity vector that minimizes the Euclidean norm $\|\dot{\mathbf{q}}\|^2$ among all possible exact solutions.
+For the kinematic constraint $J\dot{\mathbf{q}} = \dot{\mathbf{y}}$ with a full-rank matrix 
+$J \in \mathbb{R}^{m \times n}$ ($n > m$), the system is underdetermined. 
+Among the infinite possible solutions, the pseudoinverse solution 
+$\dot{\mathbf{q}}_{PS} = J^\#\dot{\mathbf{y}} = J^T(JJ^T)^{-1}\dot{\mathbf{y}}$ is 
+the unique one that minimizes the Euclidean norm $\|\dot{\mathbf{q}}\|^2$,
+effectively minimizing the joint velocity effort.
 
-\textbf{Proof:} Let $\dot{\mathbf{q}}^*$ be any generic solution that successfully realizes the task ($J\dot{\mathbf{q}}^* = \dot{\mathbf{y}}$). We must prove that $\|\dot{\mathbf{q}}^*\|^2 \ge \|\dot{\mathbf{q}}_{PS}\|^2$.
+
+\textbf{Proof} 
+
+Let $\dot{\mathbf{q}}^*$ be any generic solution that successfully realizes the task ($J\dot{\mathbf{q}}^* = \dot{\mathbf{y}}$). We must prove that $\|\dot{\mathbf{q}}^*\|^2 \ge \|\dot{\mathbf{q}}_{PS}\|^2$.
 Since both solutions achieve the same task velocity:
 \begin{equation}
     J\dot{\mathbf{q}}^* - J\dot{\mathbf{q}}_{PS} = \mathbf{0} \implies J(\dot{\mathbf{q}}^* - \dot{\mathbf{q}}_{PS}) = \mathbf{0}
@@ -74,6 +81,12 @@ Since the squared norm is always non-negative ($\|\dot{\mathbf{q}}^* - \dot{\mat
     \|\dot{\mathbf{q}}^*\|^2 \ge \|\dot{\mathbf{q}}_{PS}\|^2 \quad \blacksquare
 \end{equation}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{Images/OptimalSolPseudoInv.png}
+  \caption{Didascalia}
+\end{figure}
+
 \subsection{Singular Value Decomposition (SVD)}
 \label{sec:SVD}
 
@@ -89,8 +102,34 @@ where $\Sigma^\#$ is obtained by transposing $\Sigma$
 and replacing every non-zero singular value $\sigma_i$ with its reciprocal $1/\sigma_i$. 
 Zero singular values are left as zero, safely avoiding division by zero at exact singularities.
 
+\textbf{Proof} 
+
+Proving that since $J = U \Sigma V^T$  $\implies$  $ J^{\#} = V \Sigma^\# U^T$
+
+It can be done by checking the four defining properties of the (unique) pseudoinverse.
+
+\begin{align*}
+    \Sigma \Sigma^\# &= \begin{pmatrix} I_{\rho \times \rho} & \\ & 0_{(m-\rho) \times (m-\rho)} \end{pmatrix} \quad 
+    \Sigma^\# \Sigma = \begin{pmatrix} I_{\rho \times \rho} & \\ & 0_{(n-\rho) \times (n-\rho)} \end{pmatrix} \\
+\end{align*}
+
+Both the $\Sigma$ matrices are symmetric.    
+
+\begin{align*}
+    J J^\# J &= U \Sigma V^T (V \Sigma^\# U^T) U \Sigma V^T = U \Sigma \Sigma^\# \Sigma V^T = U \Sigma V^T = J \\
+    J^\# J J^\# &= (V \Sigma^\# U^T) U \Sigma V^T (V \Sigma^\# U^T) = V \Sigma^\# \Sigma \Sigma^\# U^T = V \Sigma^\# U^T = J^\# \\[5pt]
+    J J^\# &= U \Sigma V^T (V \Sigma^\# U^T) = U \Sigma \Sigma^\# U^T \\
+    J^\# J &= V \Sigma^\# \Sigma V^T \qquad \qquad \quad
+\end{align*}
+
+both are symmetric. $\blacksquare$
+
 \subsection{Damped Least Squares (DLS)}
 \label{sec:DLS}
+
+
+Il DLS (Damped Least Squares) è una tecnica di regolarizzazione che si usa per evitare che le velocità dei 
+giunti diventino infinite vicino alle singolarità. Si può applicare sia quando $n > m$ che quando $n < m$.
 
 While SVD handles exact singularities, algorithmic instability occurs in the \textit{neighborhood} of a 
 singularity, where a singular value $\sigma_i \approx 0$. Its reciprocal $1/\sigma_i \to \infty$ generates explosive joint velocities.
@@ -109,3 +148,11 @@ The addition of $\mu^2 I_m$ guarantees that the matrix $(J J^T + \mu^2 I_m)$ is
 strictly positive definite and invertible everywhere. When far from singularities, 
 $\mu \to 0$ and the solution converges to the pseudoinverse. Near singularities, $\mu$ dominates, 
 smoothly capping the joint velocities at the cost of a small, allowable task tracking error.
+
+Il DLS è un "trucco" matematico che serve a gestire il momento in cui la matrice che devi invertire ($JJ^T$ nel primo caso, o $J^TJ$ nel secondo) 
+diventa singolare o quasi singolare (ovvero quando il determinante è zero o molto piccolo).
+Senza DLS: Se sei vicino a una singolarità, un valore singolare $\sigma_i$ diventa quasi zero. 
+Poiché la pseudo-inversa contiene $1/\sigma_i$, la velocità dei giunti $\dot{q}$ "esplode" verso l'infinito.
+Con DLS: Introduci il fattore di smorzamento $\mu^2$. 
+La formula diventa:$$\dot{q}_{DLS} = (J^T J + \mu^2 I)^{-1} J^T \dot{y} \quad \text{(oppure la versione duale con } JJ^T\text{)}$$
+Anche se $J^TJ$ ha un autovalore zero, l'aggiunta di $\mu^2 I$ rende la matrice sempre invertibile.

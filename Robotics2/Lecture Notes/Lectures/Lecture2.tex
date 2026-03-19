@@ -30,6 +30,30 @@ used in many ways, such as:
     \label{fig:CollisionSolution}
 \end{figure}
 
+\subsection{Redundant vs. Non-Redundant Case}
+
+\begin{itemize}
+    \item \textbf{Redundant Case ($n > m$)}
+    \begin{itemize}
+        \item \textit{Scenario:} The robot possesses more degrees of freedom ($n$) than those strictly required by the task ($m$).
+        \item \textit{Problem:} The system is under-determined, leading to infinite solutions $\dot{\mathbf{q}}$ for a given task velocity $\dot{\mathbf{y}}$.
+        \item \textit{Standard Solution (Right Pseudo-inverse):} We employ $J^\# = J^T(JJ^T)^{-1}$. Among all possible solutions, this one minimizes the joint velocity norm ($\|\dot{\mathbf{q}}\|$).
+        \item \textit{Subspaces:} There exists a non-empty Null Space (dimension $n-m$) that can be exploited for secondary tasks (e.g., obstacle avoidance) without affecting the primary task execution.
+    \end{itemize}
+
+    \item \textbf{Non-Redundant or Over-constrained Case ($m \ge n$)}
+    \begin{itemize}
+        \item \textit{Scenario:} The number of joints ($n$) is less than or equal to the task variables ($m$).
+        \item \textit{Problem:} The system $J\dot{\mathbf{q}} = \dot{\mathbf{y}}$ is over-determined. In general, an exact solution does not exist as the robot cannot move in all task directions simultaneously.
+        \item \textit{Standard Solution (Left Pseudo-inverse):} We employ $J^\# = (J^T J)^{-1} J^T$. This solution does not satisfy the task exactly but finds the velocity $\dot{\mathbf{q}}$ that minimizes the tracking error ($\|\dot{\mathbf{y}} - J\dot{\mathbf{q}}\|$), consistent with the classical Least Squares method.
+        \item \textit{Subspaces:} The Null Space of $J$ is typically empty (dimension 0). However, there is a non-trivial Null Space of $J^T$, representing task-space directions that are physically unreachable for the robot.
+    \end{itemize}
+
+\end{itemize}
+
+To unify these cases and handle the transition through singularities where the rank of $J$ drops, 
+the Singular Value Decomposition (SVD) provides a robust framework.
+
 \subsection{Deepening the math behind kinematic redundancy}
 
 For an extensive comprehension of the topic, let us consider the math behind the Kinematic redundancy.
@@ -105,7 +129,7 @@ are available to optimize a secondary objective.
 
 \subsection{Inverse kinematics problem}
 The inverse kinematics problem for a redundant robot consists of finding $\mathbf{q}(t)$ such that $\mathbf{k}(\mathbf{q}(t)) = \mathbf{y}(t)$ for all times $t$. 
-Since the robot has more degrees of freedom than strictly needed for the task, infinitely many solutions exist---even when the task vector is kept constant, 
+Since the robot has more degrees of freedom than strictly needed for the task, infinitely many solutions exist even when the task vector is kept constant, 
 $\mathbf{y}(t) = \bar{\mathbf{y}}$. The extra degrees of freedom give rise to joint displacements that are unobservable at the task level, 
 in the sense that they do not contribute to the end-effector motion: these are precisely the self-motions introduced earlier.
 Solutions to the inverse kinematics problem are mainly sought at the differential (velocity) level. By considering the Jacobian matrix, 
@@ -240,8 +264,6 @@ In such cases, $J^\#$ must be computed through numerical methods such as the \te
     J = U \Sigma V^T
 \end{equation}
 
-
-
 The SVD has special properties. 
 
 The matrix $\Sigma$ has the folowing form:
@@ -259,7 +281,14 @@ $$ \sigma_{\rho+1}= \sigma_{\rho+2}\dots = \sigma_{m}=0 $$
 where $\rho$ is the rank of $J$.
 The numbers $\sigma_1\dots ,\sigma_\rho$ are the \textbf{singular values} of $J$. 
 The eigen vectors of $JJ^T$ (columns of $U$) are associated to the eigen values $\sigma_1^2\dots,\sigma_\rho^2$.
-The last $n-\rho$ columns of $V$ are a basis for the null space of $J$.
+The last $n-\rho$ columns of $V$ are a basis for the null space of $J$. 
+$$ Jv_i = \sigma_iu_i (i = 1, \dots, \rho)$$
+$$ Jv_i = 0 (i = \rho+1, \dots, n)$$
+
+\textit{Note: a similar SVD treatment holds also for $ m \geq n $ (exchanging indexes, transposing $\Sigma$, $\dots$)}
+
+
+
 
 \paragraph{Handling Singularities}
 The pseudoinverse approach fails when the robot falls into a kinematic singularity 

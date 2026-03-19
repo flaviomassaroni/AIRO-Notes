@@ -1,0 +1,7 @@
+# TODO: compile executable that will be run
+add_executable(many_object_in_stack_example many_object_in_stack_example.cpp)
+
+# TODO: link the executable against the core_library
+target_include_directories(many_object_in_stack_example PRIVATE ../src)
+
+target_link_libraries(many_object_in_stack_example core_library)
