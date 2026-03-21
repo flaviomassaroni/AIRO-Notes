@@ -1,0 +1,323 @@
+[A] L'uso di std::bind in questo contesto crea una copia per valore dell'oggetto MinimalSub, garantendo che la callback funzioni anche se il nodo originale nel main viene distrutto.
+FALSO. std::bind con this crea un "functor" che cattura il puntatore this per valore. Questo significa che viene memorizzato il puntatore this stesso (un raw pointer), non una copia indipendente dell'oggetto MinimalSub. Quando l'oggetto originale viene distrutto, this diventa un puntatore dangling.
+[B] Passare this (un raw pointer) a std::bind qui è considerato un pattern sicuro perché il membro subscription_ appartiene alla classe stessa: verrà distrutto insieme (o prima) dell'oggetto, deregistrando la callback prima che this diventi invalido.
+FALSO. Come spiegato sopra, la distruzione del membro subscription_ non garantisce la distruzione dell'oggetto MinimalSub prima che la callback venga eseguita. L'operazione di destroy_subscription (implicitamente gestita dalla distruzione di subscription_) potrebbe non avvenire prima di una chiamata asincrona alla callback. Il rischio di dangling pointer rimane.
+[C] Il placeholder _1 serve a indicare al compilatore che il metodo topic_callback fa parte della classe corrente e non è una funzione globale.
+FALSO. Il placeholder _1 indica la posizione del primo argomento che verrà passato alla funzione legata. L'appartenenza alla classe è gestita dal this catturato.
+[D] Nel main, l'uso di std::make_shared<MinimalSub>() è obbligatorio per la funzione rclcpp::spin. Passare l'oggetto allocato sullo stack (es. MinimalSub node; rclcpp::spin(node);) causerebbe un errore di compilazione in ROS 2.
+FALSO. rclcpp::spin accetta sia puntatori gestiti (std::shared_ptr) che puntatori grezzi (MinimalSub*). Tuttavia, std::make_shared è la pratica raccomandata in ROS 2 perché rclcpp::spin ha bisogno di un oggetto con un ciclo di vita gestito (tipicamente tramite shared_ptr) per assicurare che il nodo rimanga valido finché rclcpp::spin è attivo. Passare un oggetto sullo stack potrebbe portare a comportamenti indefiniti o crash quando lo stack frame viene deallocato. Quindi, pur non essendo un errore di compilazione diretto, è un errore di runtime o di design.
+[E] Se il nodo venisse eseguito all'interno di un Multi-Threaded Executor di ROS 2, passare this alla callback potrebbe causare una race condition o un segfault se il nodo venisse spento brutalmente mentre un altro thread sta eseguendo la callback. Sarebbe molto più sicuro ereditare da std::enable_shared_from_this e passare shared_from_this() al std::bind.
+VERO. Questa è la risposta più corretta e approfondita. L'ereditarietà da std::enable_shared_from_this permette di creare uno shared_ptr all'oggetto corrente (shared_from_this()) in modo sicuro, anche all'interno dei suoi metodi. Quando questo shared_ptr viene passato a std::bind, esso mantiene l'oggetto MinimalSub "vivo" finché c'è almeno uno shared_ptr che punta ad esso. Questo è cruciale in un ambiente multithread o con callback asincrone dove il ciclo di vita dell'oggetto non è strettamente legato al ciclo di vita del thread chiamante.
+
+Analisi Risposte Domanda 2
+[A] L'uso di std::unique_ptr per left e right nel TreeNode garantisce che la memoria allocata dinamicamente per i nodi figli venga automaticamente deallocata quando il nodo padre viene distrutto, prevenendo memory leak.
+[B] La funzione printTree riceve un puntatore grezzo (TreeNode*). Se la funzione find (o altri metodi) modificassero accidentalmente la catena di puntatori unique_ptr (ad esempio, spostando la proprietà), printTree potrebbe operare su puntatori non validi, causando un segfault.
+[C] Se volessimo archiviare questi nodi in una collezione STL (come std::vector<std::unique_ptr<TreeNode>>), la copia o lo spostamento di tale vettore sarebbe efficiente, dato che std::unique_ptr non è copiabile ma spostabile.
+[D] Se find ritornasse un std::unique_ptr<TreeNode> invece di un TreeNode*, la proprietà del nodo trovato verrebbe trasferita al chiamante, potenzialmente lasciando il puntatore right o left del nodo genitore come nullptr (se il nodo trovato fosse un figlio diretto).
+[E] La sintassi root->left.get() passata a printTree è sicura perché get() restituisce un raw pointer che verrà gestito dalla funzione printTree senza problemi di ownership.
+
+[A] VERA: È il cuore del concetto di RAII (Resource Acquisition Is Initialization). Quando il distruttore di root viene chiamato, esso distrugge i suoi membri left e right. Essendo unique_ptr, questi chiameranno automaticamente delete sui figli, scatenando una reazione a catena ricorsiva che pulisce tutto l'albero senza che tu debba scrivere una riga di codice nel distruttore.
+[B] VERA (L'avevi mancata): Questa è una sottigliezza da "esame cattivo". Se una funzione riceve un raw pointer (TreeNode*) ottenuto tramite .get(), quel puntatore è valido solo finché il unique_ptr originale lo possiede. Se nel frattempo un altro thread o una funzione chiamata sposta l'ownership (std::move) o resetta il puntatore, il raw pointer che stai usando diventa "dangling" (punta a memoria deallocata).
+[C] VERA (L'avevi mancata): I contenitori di unique_ptr sono fondamentali. Non puoi copiarli (perché unique_ptr proibisce la copia), ma puoi spostarli (std::move). Lo spostamento di un intero std::vector è efficientissimo: il compilatore si limita a scambiare i puntatori interni ai dati, senza riallocare nulla.
+[D] VERA: Esatto. Se find restituisse un unique_ptr, per farlo dovrebbe usare std::move(left). Questo atto trasferisce la proprietà: il nodo rimosso dall'albero finisce nelle mani di chi ha chiamato find, e l'albero si ritrova con un buco (nullptr) in quel punto. Per "cercare senza rubare", si usano sempre i raw pointer o i const shared_ptr&.
+[E] FALSA (Il tuo dubbio era corretto): Qui il tranello è la parola "gestito". In C++, "gestire" un puntatore significa occuparsi della sua deallocazione. Un raw pointer restituito da .get() non è gestito dalla funzione che lo riceve; è solo osservato. La funzione printTree non ha alcun potere sulla vita del nodo. Se dicesse "osservato senza problemi di ownership", sarebbe stata vera.
+Domanda 3
+A] La posizione del laser rispetto alla mappa si ottiene con: Isometry2f map_to_laser = map_to_robot * robot_to_laser;. L'ordine è fondamentale: le trasformazioni Eigen si applicano da destra verso sinistra.
+[B] Se volessi ottenere la posizione del Robot rispetto al Laser, l'operazione corretta sarebbe: Isometry2f laser_to_robot = robot_to_laser.inverse();.
+[C] Per trasformare il punto, il codice corretto è: Vec2f p_map = map_to_laser * p_laser;. Questo moltiplica internamente il punto per la matrice di rotazione e aggiunge il vettore di traslazione.
+[D] Se nel file MinimalPub (quello con gli errori di battitura) scrivessi publisher_->publish(message) ma message.data fosse un std::string di C++ e non un std_msgs::msg::String, il codice compilerebbe comunque perché ROS 2 effettua il casting automatico delle stringhe.
+[E] In Eigen, un oggetto Isometry2f memorizza internamente una matrice 3x3. Anche se lavoriamo in 2D, la terza riga è sempre [0, 0, 1] per permettere l'uso delle coordinate omogenee durante la moltiplicazione.
+[A] VERA (Tu l'avevi scartata): In robotica e in Eigen, le trasformazioni si compongono da sinistra a destra seguendo la catena dei frame. Se vuoi andare dalla Mappa al Laser passando per il Robot (
+M
+←
+R
+←
+L
+M←R←L
+), scrivi: 
+T
+M
+_
+L
+=
+T
+M
+_
+R
+⋅
+T
+R
+_
+L
+T 
+M_L
+​
+ =T 
+M_R
+​
+ ⋅T 
+R_L
+​
+ 
+.
+Perché è così? Immagina di applicarla a un punto 
+P
+L
+P 
+L
+​
+ 
+: 
+P
+M
+=
+T
+M
+_
+R
+⋅
+(
+T
+R
+_
+L
+⋅
+P
+L
+)
+P 
+M
+​
+ =T 
+M_R
+​
+ ⋅(T 
+R_L
+​
+ ⋅P 
+L
+​
+ )
+. Prima porti il punto dal Laser al Robot, poi dal Robot alla Mappa. L'ordine nel codice rispecchia questa logica.
+[B] VERA (L'hai indovinata!): Esatto. L'inversa di una trasformazione che va da A a B ti riporta da B ad A.
+[C] VERA (Tu l'avevi scartata): Eigen sovraccarica l'operatore * tra una Isometry e un Vector. Fare Isometry * Vector esegue automaticamente l'operazione di rotazione e traslazione (
+R
+⋅
+v
++
+t
+R⋅v+t
+). L'ordine Trasformazione * Punto è quello standard in Eigen.
+[D] FALSA (Ottimo intuito!): Hai ragione. ROS 2 è "strict" sui tipi. Se il publisher si aspetta un oggetto std_msgs::msg::String, non puoi passargli una std::string di C++. Devi prima creare il messaggio e assegnare la stringa al campo .data. Non c'è casting automatico tra tipi C++ e tipi ROS.
+[E] VERA (L'hai indovinata!): Perfetto. Eigen usa internamente matrici omogenee. Per il 2D usa una 3x3, per il 3D una 4x4. Questo trucco permette di trattare traslazioni e rotazioni come un'unica moltiplicazione matriciale.
+
+Analysis question 4
+[A] Invece di usare std::bind, qui è stata usata una funzione lambda ([this]() { ... }). Questo approccio è equivalente a std::bind e cattura il puntatore this per permettere l'accesso ai membri privati della classe.
+[B] Se il publisher_->publish(message) richiedesse molto tempo (es. rete lenta o buffer pieno), il timer di ROS 2 garantisce comunque che la prossima esecuzione di timer_callback inizi esattamente dopo 500ms, eventualmente eseguendo le callback in parallelo.
+[C] In ROS 2, di default (usando SingleThreadedExecutor), le callback dei timer e dei subscriber non possono mai interrompersi a vicenda. Se timer_callback è in esecuzione, nessun'altra callback del nodo verrà eseguita finché essa non termina.
+[D] La variabile count_ non è protetta da un std::mutex. Se cambiassimo l'Executor nel main con un MultiThreadedExecutor, l'operazione count_++ diventerebbe thread-unsafe (pericolo di race condition).
+[E] Se distruggiamo l'oggetto MinimalPub mentre la lambda del timer sta per essere eseguita, la lambda protegge automaticamente il nodo dal crash perché ha "catturato" this.
+
+[A] VERA: Esatto. In C++ moderno (C++11 e successivi), le lambda sono preferite a std::bind perché sono più leggibili e spesso permettono al compilatore di ottimizzare meglio il codice. Catturare [this] permette alla lambda di accedere a tutto ciò che è privato nel nodo.
+[B] FALSA (Il tranello!): ROS 2 non garantisce l'esecuzione parallela della stessa callback se quella precedente non è finita. Di default, le callback appartengono a un MutuallyExclusiveCallbackGroup. Se la timer_callback dura 600ms e il timer è da 500ms, ROS 2 aspetterà che la prima finisca prima di lanciare la seconda (il timer "slitta"). Non c'è parallelismo automatico per la stessa funzione.
+[C] VERA (L'avevi mancata): Questa è fondamentale per capire ROS 2. Il SingleThreadedExecutor (quello che usi quando fai rclcpp::spin(node)) ha un solo thread. Se quel thread è occupato a fare i calcoli del timer, non può leggere i messaggi dei sensori. Le callback sono messe in coda e gestite una alla volta.
+[D] VERA: Ottimo. Se passi a un MultiThreadedExecutor e hai più callback (es. due diversi timer o un timer e un subscriber) che toccano count_, rischi che due thread facciano count_++ nello stesso istante, causando dati corrotti. Serve un std::mutex o un std::atomic<int>.
+[E] FALSA: Come abbiamo visto nella Domanda 1, catturare this (un puntatore grezzo) nella lambda non offre alcuna protezione. Se l'oggetto muore, la lambda proverà a usare un puntatore a memoria spazzatura e il programma esploderà (Segfault).
+Domanda 5
+[A] La classe Serializable è una Classe Astratta Pura perché contiene almeno un "pure virtual method" (= 0). Non è possibile istanziarla direttamente (es. Serializable s; darebbe errore).
+[B] In PoseMessage::serialize, la riga Identifiable::serialize(data, context); è necessaria per assicurarsi che anche l'id venga salvato. Se venisse omessa, verrebbe salvata solo la coordinata x.
+[C] Se nel distruttore di Serializable togliessimo la keyword virtual, distruggere un oggetto PoseMessage tramite un puntatore Serializable* (es. delete my_serializable_ptr;) causerebbe undefined behavior (molto probabilmente non verrebbero chiamati i distruttori delle classi derivate).
+[D] Grazie al polimorfismo, se abbiamo un std::vector<Serializable*>, possiamo chiamare .serialize() su ogni elemento del vettore e il C++ eseguirà automaticamente la versione corretta (quella di PoseMessage o Identifiable) a tempo di esecuzione (Late Binding).
+[E] Se cambiassimo override con virtual nella classe PoseMessage, il codice smetterebbe di compilare perché override è l'unico modo per indicare una sovrascrittura in C++11.
+
+[A] VERA (L'avevi scartata): È la definizione di Classe Astratta. Se una classe ha anche un solo metodo = 0 (pure virtual), il compilatore impedisce di creare oggetti di quel tipo. Serve solo come "interfaccia" o "contratto" per le classi figlie.
+[B] VERA (L'avevi scartata): Esatto. Quando fai l'override di un metodo, la versione della classe base viene "nascosta". Se PoseMessage non chiama esplicitamente Identifiable::serialize, il codice che salva l'ID non verrà mai eseguito.
+[C] VERA (Il tuo dubbio): Questa è la regola d'oro del C++: Se una classe ha metodi virtuali, deve avere il distruttore virtuale.
+Perché? Se fai Serializable* ptr = new PoseMessage(); delete ptr;, se il distruttore non è virtuale, il sistema chiamerà solo il distruttore di Serializable. Il distruttore di PoseMessage (che magari deve liberare memoria) non verrà mai chiamato. Risultato: Memory Leak o crash.
+[D] VERA (L'hai presa!): Questo è il Polimorfismo. Il contenitore tiene puntatori alla base, ma al runtime il C++ "sa" qual è l'oggetto reale e chiama la funzione giusta. È il concetto di VTable (tabella dei metodi virtuali).
+[E] FALSA (Il tranello): override (introdotto in C++11) è solo un aiuto per il programmatore. Se scrivi virtual invece di override, il codice compila benissimo. override serve solo a far sì che, se sbagli a scrivere il nome del metodo (es. serialze invece di serialize), il compilatore ti dia errore dicendo: "Ehi, mi hai detto che questo sovrascrive qualcosa, ma nella classe base non c'è niente con questo nome!".
+Lezione imparata: Il distruttore virtuale è fondamentale per la sopravvivenza della memoria, e override è il tuo migliore amico per evitare bug stupidi, ma non è obbligatorio per la compilazione.
+
+Domanda 6
+[A] La callback riceve std::shared_ptr. Questo significa che ROS 2 mantiene in vita i dati della richiesta finché la funzione non termina, anche se nel frattempo arrivano altre richieste.
+[B] Se nella callback scrivessimo response = std::make_shared<...>(); per inizializzare la risposta, il client non riceverebbe mai il risultato perché cambieremmo l'indirizzo locale del puntatore response invece di modificare l'oggetto puntato.
+[C] Il Client, per ricevere la risposta, deve usare rclcpp::spin_until_future_complete. Se usasse un semplice std::future::get() senza spin, il programma rimarrebbe bloccato per sempre perché le callback di rete non verrebbero mai processate.
+[D] I servizi di ROS 2 sono sincroni per definizione: quando il client chiama async_send_request, il thread del client si ferma finché il server non risponde.
+[E] Se il server crasha dopo aver ricevuto la richiesta ma prima di inviare la risposta, il client (usando wait_for_service) rimarrà bloccato all'infinito a meno che non sia stato impostato un timeout esplicito.
+
+[A] VERA: Esatto. Passare un std::shared_ptr per valore incrementa il reference count. Finché la callback è in esecuzione, l'oggetto è protetto dalla deallocazione.
+[B] VERA: Bravissimo. Questo è un errore in cui cadono in molti. Poiché response è passato per valore (è una copia del puntatore), se scrivi response = ... cambi solo a cosa punta la tua copia locale. Il "vero" oggetto risposta che ROS deve rispedire al client rimane vuoto. Per modificarlo, devi agire sui suoi campi (response->campo = ...).
+[C] VERA (L'avevi mancata): Questa è sottile. In ROS 2, se chiami future.get() su un thread che non sta "spinnando", quel thread si blocca. Ma poiché nessuno sta processando i messaggi in arrivo dalla rete (perché il thread è bloccato e non c'è uno spin), la risposta non verrà mai "iniettata" nel future. Il risultato è un deadlock. Ecco perché si usa spin_until_future_complete.
+[D] FALSA: async_send_request è asincrono. Restituisce subito il controllo al programma, permettendoti di fare altro mentre aspetti (o di spinnare, appunto).
+[E] VERA: Esatto. wait_for_service serve solo a vedere se il server è "vivo" prima di mandare la richiesta. Se il server muore dopo, la richiesta cade nel vuoto e il client aspetta un segnale che non arriverà mai.
+
+Domanda 7 Distance map e expansion algorithms
+[A] Questo algoritmo è una variante dell'algoritmo di Dijkstra (o BFS pesata) applicata a una griglia per calcolare una Euclidean Distance Transform (EDT).
+[B] L'uso di frontier.push(&neighbor) senza controllare se il neighbor è già presente nella coda (frontier) potrebbe portare a un'esplosione della memoria o a calcoli ridondanti, poiché la stessa cella può essere aggiunta più volte se viene trovato un percorso più breve.
+[C] Se la coda frontier fosse una std::priority_queue invece di una std::queue, l'algoritmo sarebbe matematicamente identico all'algoritmo di Dijkstra standard e garantirebbe la soluzione ottima visitando ogni cella una sola volta.
+[D] Nel calcolo di d2_neighbor, l'algoritmo memorizza il puntatore al parent (l'ostacolo più vicino). Questa è un'ottimizzazione fondamentale: permette di calcolare la distanza euclidea reale dall'ostacolo originale invece di sommare pesi tra celle adiacenti (che causerebbe errori di approssimazione come la distanza "Manhattan" o "Chessboard").
+[E] Se cambiassimo la condizione if (dr == 0 && dc == 0) continue; con if (abs(dr) + abs(dc) > 1) continue;, l'algoritmo diventerebbe più veloce ma considererebbe solo le 4-vicinanze (su, giù, destra, sinistra), ignorando le diagonali.
+
+[A] VERA: L'algoritmo "espande" un fronte partendo dagli ostacoli. È concettualmente una BFS (Breadth-First Search) se i pesi fossero unitari, ma poiché calcoliamo distanze diverse (diagonali vs ortogonali), ricade nella famiglia dei derivati di Dijkstra per il calcolo della Distance Transform.
+[B] VERA: Ottima osservazione. Se non hai un array booleano is_in_frontier o se non controlli prima di inserire, una cella può finire nella coda più volte. Questo non rompe il risultato finale (perché il dist < d_old filtra gli aggiornamenti peggiori), ma spreca memoria e tempo CPU.
+[C] VERA (L'avevi scartata): La differenza fondamentale tra una BFS generica e Dijkstra è proprio la Priority Queue. Usando la std::priority_queue (ordinata per distanza), estrai sempre la cella più vicina all'ostacolo. Questo garantisce che la prima volta che "chiudi" una cella, hai trovato la sua distanza minima assoluta.
+[D] VERA: Questo è il "trucco" presente nel tuo codice (neighbor.parent = cell->parent). Invece di fare dist_accumulata = dist_padre + 1.41, l'algoritmo dice: "Il mio ostacolo di riferimento è quello alle coordinate (X, Y)". Questo permette di calcolare la distanza Euclidea esatta 
+Δ
+x
+2
++
+Δ
+y
+2
+Δx 
+2
+ +Δy 
+2
+ 
+​
+ 
+ evitandone l'approssimazione discreta.
+[E] VERA: Esatto. Se abs(dr) + abs(dc) > 1, significa che entrambi sono diversi da zero (es. 1 + 1 = 2), ovvero le diagonali. Saltandole, rimani con la "4-vicinanza" (croce).
+
+
+
+1. ROS 2: Ciclo di Vita e std::bind
+Contesto: Implementazione di un Subscriber classico in ROS 2.
+Codice:
+code
+C++
+class MinimalSub : public rclcpp::Node {
+    // ... inside constructor ...
+    subscription_ = this->create_subscription<std_msgs::msg::String>(
+        "topic", 10, std::bind(&MinimalSub::topic_callback, this, _1));
+};
+[A] [FALSA] L'uso di std::bind crea una copia per valore dell'oggetto.
+Analisi: std::bind cattura this (un raw pointer). Se l'oggetto originale muore, il puntatore diventa "dangling".
+[B] [FALSA] Passare this è sicuro perché la sottoscrizione è un membro della classe.
+Analisi: Non c'è garanzia temporale. La callback potrebbe essere invocata mentre l'oggetto è in fase di distruzione.
+[C] [FALSA] Il placeholder _1 serve a indicare che il metodo è della classe e non globale.
+Analisi: _1 indica solo la posizione del primo argomento (il messaggio ROS) nella firma della funzione.
+[D] [FALSA] std::make_shared è obbligatorio per la compilazione di rclcpp::spin.
+Analisi: Non è un errore di compilazione, ma di design. spin vuole gestire il ciclo di vita, solitamente tramite shared pointer.
+[E] [VERA] In un Multi-Threaded Executor, this è pericoloso; meglio usare std::enable_shared_from_this.
+Analisi: shared_from_this() garantisce che il "reference count" dell'oggetto aumenti durante la callback, impedendone la distruzione prematura.
+2. C++: Gestione Memoria e Smart Pointers
+Contesto: Alberi binari e ownership della memoria.
+Codice:
+code
+C++
+struct TreeNode {
+    int value;
+    std::unique_ptr<TreeNode> left, right;
+    // ...
+    TreeNode* find(int value_) { /* ... returns raw pointer ... */ }
+};
+[A] [VERA] std::unique_ptr implementa il concetto di RAII per la deallocazione automatica dei figli.
+Analisi: Quando il padre viene distrutto, il distruttore di unique_ptr chiama automaticamente delete sui figli.
+[B] [VERA] Una funzione che riceve il raw pointer tramite .get() rischia un segfault se la ownership cambia.
+Analisi: Se il unique_ptr viene resettato o spostato, il vecchio raw pointer diventa non valido.
+[C] [VERA] Un std::vector<std::unique_ptr<T>> è efficiente da spostare (std::move).
+Analisi: Lo spostamento del vettore scambia solo i puntatori interni ai dati, senza copiare gli oggetti.
+[D] [VERA] Se find ritornasse un unique_ptr, "ruberebbe" il nodo dall'albero originale.
+Analisi: unique_ptr non può essere copiato. Ritornarlo implicherebbe un std::move, lasciando nullptr nell'albero.
+[E] [FALSA] .get() restituisce un puntatore che viene "gestito" dalla funzione ricevente.
+Analisi: Errore terminologico. Il raw pointer è solo "osservato", la gestione (ownership) resta al unique_ptr.
+3. Robotica: Eigen e Trasformazioni
+Contesto: Composizione di sistemi di riferimento (Frame).
+Codice:
+code
+C++
+Isometry2f map_to_robot, robot_to_laser;
+Vec2f p_laser(1.0, 0.0);
+[A] [VERA] La catena si ottiene con: map_to_laser = map_to_robot * robot_to_laser.
+Analisi: In Eigen, le trasformazioni si compongono da sinistra a destra: 
+T
+A
+→
+C
+=
+T
+A
+→
+B
+×
+T
+B
+→
+C
+T 
+A→C
+​
+ =T 
+A→B
+​
+ ×T 
+B→C
+​
+ 
+.
+[B] [VERA] Per invertire il senso (es. Robot rispetto a Laser) si usa .inverse().
+[C] [VERA] p_map = map_to_laser * p_laser trasforma il punto applicando rotazione e traslazione.
+Analisi: Eigen sovraccarica l'operatore * per gestire internamente 
+R
+⋅
+v
++
+t
+R⋅v+t
+.
+[D] [FALSA] ROS 2 converte automaticamente std::string in std_msgs::msg::String.
+Analisi: ROS 2 è a tipizzazione forte. Bisogna assegnare esplicitamente la stringa al campo .data del messaggio.
+[E] [VERA] Isometry2f usa internamente matrici 3x3 (coordinate omogenee).
+4. ROS 2: Executor e Concorrenza
+Contesto: Timer callback e thread safety.
+code
+C++
+timer_ = this->create_wall_timer(500ms, [this]() { this->timer_callback(); });
+[A] [VERA] Le lambda sono equivalenti a std::bind e più leggibili.
+[B] [FALSA] Se la callback è lenta, ROS 2 ne esegue una nuova in parallelo dopo 500ms.
+Analisi: Di default le callback sono MutuallyExclusive. ROS aspetta che la precedente finisca (il timer slitta).
+[C] [VERA] In un SingleThreadedExecutor, una callback lunga blocca tutte le altre.
+Analisi: C'è un solo thread per processare la coda: se è occupato, il nodo è "congelato".
+[D] [VERA] Un MultiThreadedExecutor richiede protezione (mutex) per variabili condivise come count_++.
+Analisi: L'incremento non è un'operazione atomica; senza mutex si hanno race condition.
+[E] [FALSA] La cattura di [this] nella lambda protegge l'oggetto dal crash.
+Analisi: Al contrario, non offre protezione. È solo un puntatore grezzo catturato per valore.
+5. OOP: Polimorfismo e Classi Astratte
+Contesto: Architettura di serializzazione (file serializable.h).
+[A] [VERA] Una classe con almeno un metodo = 0 è astratta e non istanziabile.
+[B] [VERA] Se l'override non chiama esplicitamente il metodo della base, il codice della base viene ignorato.
+[C] [VERA] Se il distruttore della base non è virtual, delete base_ptr non chiama i distruttori derivati.
+Analisi: È la causa principale di memory leak e undefined behavior nel polimorfismo.
+[D] [VERA] Il Late Binding (VTable) permette di eseguire il metodo corretto partendo da un puntatore alla base.
+[E] [FALSA] override è obbligatorio per la compilazione in C++11.
+Analisi: È facoltativo ma raccomandato per permettere al compilatore di rilevare errori di firma.
+6. ROS 2: Servizi e Deadlock
+Contesto: Callback di un Service server.
+code
+C++
+void callback(const shared_ptr<Req> req, shared_ptr<Res> res) { ... }
+[A] [VERA] Ricevere shared_ptr garantisce che i dati non vengano deallocati durante l'esecuzione.
+[B] [VERA] Scrivere res = make_shared<...> nella callback non modifica l'oggetto visto dal client.
+Analisi: Si modifica solo una copia locale del puntatore. Bisogna modificare i campi dell'oggetto esistente (res->sum = ...).
+[C] [VERA] Chiamare future.get() senza uno spin attivo può causare deadlock.
+Analisi: Il thread si blocca aspettando, ma non essendoci spin, nessuno legge la risposta dalla rete.
+[D] [FALSA] I servizi sono sincroni per definizione.
+Analisi: In ROS 2 i servizi sono asincroni (async_send_request).
+[E] [VERA] Se il server crasha, il client wait_for_service rimane bloccato senza un timeout.
+7. Algoritmi: Griglie e Mapping
+Contesto: Distance Map (Euclidean Distance Transform).
+[A] [VERA] L'espansione a ondate dagli ostacoli è una variante di Dijkstra/BFS.
+[B] [VERA] Inserire nella frontiera senza controllare duplicati spreca memoria e CPU.
+[C] [VERA] L'uso di una std::priority_queue trasforma l'espansione in Dijkstra puro (soluzione ottima).
+[D] [VERA] Memorizzare il puntatore all'ostacolo (parent) permette di calcolare la distanza Euclidea esatta.
+Analisi: Si evita l'errore di accumulazione discreta (tipico delle distanze Manhattan/L1).
+[E] [VERA] La condizione abs(dr) + abs(dc) > 1 filtra le diagonali, limitando l'espansione a 4 vicini.
+8. C++ Avanzato: Template e Keyword
+Contesto: Ottimizzazione e sintassi generica (file matrix.h).
+[A] [VERA] inline suggerisce al compilatore di sostituire la chiamata con il corpo della funzione.
+[B] [VERA] La doppia versione di un metodo (const e non-const) è necessaria per la Const-Correctness.
+[C] [VERA] Traits_ = DefaultTraits<T> è un Template Default Argument.
+[D] [FALSA] T& è una rvalue reference.
+Analisi: T& è lvalue reference. La rvalue reference richiede il doppio ampersand T&&.
+[E] [VERA] I template usano la "Lazy Instantiation": gli errori di sintassi nei metodi non usati non bloccano la compilazione.
