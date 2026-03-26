@@ -1,0 +1,877 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Guida Completa all'Esame di Machine Learning},
+    pdfauthor={Gemini AI},
+    pdfcreator={LaTeX}
+}
+
+\usepackage{enumitem} 
+\setlist[enumerate]{itemsep=0pt,topsep=5pt}
+\setlist[itemize]{itemsep=0pt,topsep=5pt}
+
+\title{Guida Preliminare alla Preparazione dell'Esame di Machine Learning}
+\author{Basato su dispense "La Sapienza" e testi d'esame}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Questo documento è una guida completa e discorsiva per la preparazione all'esame di Machine Learning, basata sulle dispense del corso dell'Università "La Sapienza" 
+e su un'analisi approfondita dei testi d'esame passati. 
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Introduzione al Machine Learning e Apprendimento di Concetti}
+
+Il Machine Learning (ML) è una disciplina che permette ai computer di apprendere da dati o esperienza passata, migliorando le proprie prestazioni su un compito specifico senza essere esplicitamente programmati. È utile quando l'esperienza umana è limitata, la logica è troppo complessa da definire o le soluzioni devono adattarsi a casi specifici.
+
+\subsection{Tipi di Apprendimento}
+Il ML si divide principalmente in:
+\begin{itemize}
+    \item \textbf{Supervised Learning (Apprendimento Supervisionato):} Il modello apprende da un dataset di esempi etichettati $\mathcal{D} = \{(\mathbf{x}_i, y_i)\}_{i=1}^N$, dove $\mathbf{x}_i$ sono i dati di input e $y_i$ sono le etichette di output desiderate. L'obiettivo è apprendere una funzione $f: \mathcal{X} \to \mathcal{Y}$ che possa prevedere correttamente l'output per nuovi input.
+    \begin{itemize}
+        \item \textbf{Classificazione:} L'output $\mathcal{Y}$ è discreto (e.g., $\{0, 1\}$, $\{\text{sì, no}\}$, $\{\text{gatto, cane}\}$)
+        \item \textbf{Regressione:} L'output $\mathcal{Y}$ è continuo (e.g., un valore numerico)
+    \end{itemize}
+    \item \textbf{Unsupervised Learning (Apprendimento Non Supervisionato):} Il modello apprende da dati non etichettati $\mathcal{D} = \{\mathbf{x}_i\}_{i=1}^N$, cercando di scoprire pattern o strutture intrinseche nei dati.
+    \begin{itemize}
+        \item \textbf{Clustering:} Raggruppare i dati in base alla loro somiglianza.
+        \item \textbf{Dimensionality Reduction (Riduzione della Dimensionalità):} Trovare una rappresentazione a dimensione inferiore dei dati, preservando il più possibile le informazioni rilevanti.
+    \end{itemize}
+    \item \textbf{Reinforcement Learning (Apprendimento per Rinforzo):} Un agente apprende a prendere decisioni in un ambiente per massimizzare una ricompensa cumulativa. Non ci sono etichette esplicite, ma solo segnali di ricompensa/penalità.
+\end{itemize}
+
+\subsection{Componenti di un Problema di Apprendimento}
+Ogni problema di apprendimento è definito da:
+\begin{itemize}
+    \item \textbf{Compito (Task, $\mathcal{T}$):} Cosa si vuole che il sistema impari a fare (e.g., giocare a scacchi, riconoscere immagini).
+    \item \textbf{Esperienza ($\mathcal{E}$):} I dati o le interazioni da cui il sistema apprende.
+    \item \textbf{Misura di Performance ($\mathcal{P}$):} Come si valuta l'efficacia dell'apprendimento (e.g., accuratezza, tempo di vittoria).
+\end{itemize}
+
+\subsection{Apprendimento di Concetti}
+Un concetto è una funzione binaria $c: \mathcal{X} \to \{0,1\}$, dove $1$ indica l'appartenenza al concetto (esempi positivi) e $0$ la non appartenenza (esempi negativi). L'obiettivo è trovare un'ipotesi $h \in \mathcal{H}$ (spazio delle ipotesi) che approssimi al meglio $c$.
+
+\noindent\textbf{Rappresentazione di una Funzione Target}
+Spesso, la funzione target è rappresentata come una combinazione lineare di feature del dominio. Ad esempio, per la valutazione di uno stato in un gioco:
+\begin{equation}
+    \hat{V}(b) = w_0 + w_1 \cdot bp(b) + w_2 \cdot rp(b) + w_3 \cdot bk(b) + w_4 \cdot rk(b) + w_5 \cdot bt(b) + w_6 \cdot rt(b)
+\end{equation}
+dove $bp(b), rp(b), \dots$ sono feature del board $b$, e $w_i$ sono i pesi da apprendere. L'algoritmo \textbf{LMS (Least Mean Squares) Weight Update Rule} è un modo comune per aggiornare questi pesi:
+\begin{equation}
+    w_i \leftarrow w_i + c \cdot f_i \cdot error(b)
+\end{equation}
+dove $c$ è il learning rate, $f_i$ è la $i$-esima feature e $error(b)$ è l'errore di predizione.
+
+\subsection{Spazio delle Ipotesi e Consistenza}
+\textbf{Spazio delle Ipotesi ($\mathcal{H}$):} L'insieme di tutte le possibili funzioni che l'algoritmo può apprendere.
+Un'ipotesi $h$ è \textbf{consistente} con un dataset di training $\mathcal{D}$ se $h(\mathbf{x}) = c(\mathbf{x})$ per tutti gli esempi $(\mathbf{x}, c(\mathbf{x})) \in \mathcal{D}$.
+\noindent\textbf{Version Space ($VS_{\mathcal{H}, \mathcal{D}}$):} L'insieme di tutte le ipotesi in $\mathcal{H}$ che sono consistenti con $\mathcal{D}$.
+\begin{equation}
+    VS_{\mathcal{H},\mathcal{D}} \equiv \{h \in \mathcal{H} | Consistent(h, \mathcal{D})\}
+\end{equation}
+Gli algoritmi come LIST-THEN-ELIMINATE mirano a trovare tutte le ipotesi consistenti.
+
+\section{Valutazione delle Performance}
+
+La valutazione delle performance di un modello di ML è cruciale per capirne l'efficacia e generalizzabilità.
+
+\subsection{Definizioni di Errore}
+\noindent\textbf{True Error ($error_{\mathcal{D}}(h)$):} La probabilità che l'ipotesi $h$ misclassifichi un'istanza casuale estratta dalla distribuzione $\mathcal{D}$.
+\begin{equation}
+    error_{\mathcal{D}}(h) \equiv \Pr_{x \in \mathcal{D}}[f(x) \neq h(x)]
+\end{equation}
+\noindent\textbf{Sample Error ($error_S(h)$):} La proporzione di esempi che $h$ misclassifica nel dataset di training $S$.
+\begin{equation}
+    error_S(h) \equiv \frac{1}{n} \sum_{x \in S} \delta(f(x) \neq h(x))
+\end{equation}
+dove $\delta(\cdot)$ è 1 se l'argomento è vero, 0 altrimenti.
+
+\subsection{Problemi nella Stima del True Error}
+Il $true error$ non può essere calcolato direttamente perché $\mathcal{D}$ è sconosciuta. Il $sample error$ è una stima, ma può essere:
+\begin{itemize}
+    \item \textbf{Bias Ottimistico:} Se $S$ è lo stesso set usato per addestrare $h$, $error_S(h)$ sarà una stima ottimistica di $error_{\mathcal{D}}(h)$.
+    \item \textbf{Varianza:} Se $S$ è troppo piccolo, $error_S(h)$ può variare significativamente.
+\end{itemize}
+\noindent\textbf{Estimation Bias:}
+\begin{equation}
+    bias \equiv E_S[error_S(h)] - error_{\mathcal{D}}(h)
+\end{equation}
+
+\subsection{Intervalli di Confidenza}
+Per stimare $error_{\mathcal{D}}(h)$ in modo non distorto, $h$ e $S$ devono essere scelti indipendentemente. Per $n \ge 30$, con una probabilità $N\%$ (e.g., 95\%), $error_{\mathcal{D}}(h)$ si trova nell'intervallo:
+\begin{equation}
+    error_S(h) \pm z_N \sqrt{\frac{error_S(h)(1 - error_S(h))}{n}}
+\end{equation}
+dove $z_N$ dipende dal livello di confidenza.
+
+\subsection{K-Fold Cross Validation}
+Una tecnica robusta per stimare la performance di un algoritmo di apprendimento $L$ su un dataset $\mathcal{D}$:
+\begin{enumerate}
+    \item Partizionare $\mathcal{D}$ in $k$ sottoinsiemi disgiunti $S_1, \ldots, S_k$.
+    \item Per $i=1, \ldots, k$:
+    \begin{itemize}
+        \item Usare $S_i$ come set di test e $T_i = \mathcal{D} \setminus S_i$ come set di training.
+        \item Addestrare $h_i = L(T_i)$.
+        \item Calcolare $\delta_i = error_{S_i}(h_i)$.
+    \end{itemize}
+    \item L'errore stimato è la media dei $\delta_i$:
+\end{enumerate}
+
+    \begin{equation}
+    error_{L,\mathcal{D}} \equiv \frac{1}{k} \sum_{i=1}^k \delta_i
+\end{equation}
+
+Questo metodo può essere esteso per confrontare due algoritmi $L_A$ e $L_B$.
+
+\subsection{Matrice di Confusione e Metriche per la Classificazione}
+La \textbf{Matrice di Confusione} è una tabella che riassume le performance di un algoritmo di classificazione. Per una classificazione binaria (classi Positiva P, Negativa N):
+\begin{itemize}
+    \item \textbf{True Positive (TP):} Predetto P, Vero P.
+    \item \textbf{True Negative (TN):} Predetto N, Vero N.
+    \item \textbf{False Positive (FP):} Predetto P, Vero N (errore di tipo I).
+    \item \textbf{False Negative (FN):} Predetto N, Vero P (errore di tipo II).
+\end{itemize}
+Da essa si derivano:
+\begin{itemize}
+    \item \textbf{Error Rate:} Proporzione di misclassificazioni.
+    \begin{equation}
+        \text{Error rate} = \frac{FN + FP}{TP + TN + FP + FN}
+    \end{equation}
+    \item \textbf{Accuracy:} Proporzione di classificazioni corrette.
+    \begin{equation}
+        \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+    \end{equation}
+    \item \textbf{Recall (Sensibilità, True Positive Rate - TPR):} Capacità di trovare tutti gli esempi positivi.
+    \begin{equation}
+        \text{Recall} = \text{TPR} = \frac{TP}{P} = \frac{TP}{TP + FN}
+    \end{equation}
+    \item \textbf{Specificity (True Negative Rate - TNR):} Capacità di trovare tutti gli esempi negativi.
+    \begin{equation}
+        \text{TNR} = \frac{TN}{N} = \frac{TN}{TN + FP}
+    \end{equation}
+    \item \textbf{Precision:} Proporzione di predizioni positive corrette.
+    \begin{equation}
+        \text{Precision} = \frac{TP}{TP + FP}
+    \end{equation}
+    \item \textbf{F1-Score:} Media armonica tra Precision e Recall. Utile per dataset sbilanciati.
+    \begin{equation}
+        \text{F1-score} = 2 \frac{Precision \cdot Recall}{Precision + Recall}
+    \end{equation}
+    \item \textbf{False Positive Rate (FPR):} Proporzione di negativi classificati erroneamente come positivi.
+    \begin{equation}
+        \text{FPR} = \frac{FP}{N} = \frac{FP}{TN + FP}
+    \end{equation}
+    \item \textbf{False Negative Rate (FNR):} Proporzione di positivi classificati erroneamente come negativi.
+    \begin{equation}
+        \text{FNR} = \frac{FN}{P} = \frac{FN}{TP + FN}
+    \end{equation}
+\end{itemize}
+\textbf{Quando l'Accuracy non basta:} Per dataset sbilanciati (e.g., rilevazione di anomalie, malattie rare), l'accuracy può essere fuorviante. Precision, Recall e F1-Score offrono una visione più completa.
+
+\subsection{Metriche per la Regressione}
+\begin{itemize}
+    \item \textbf{Mean Absolute Error (MAE):} Media degli errori assoluti.
+    \begin{equation}
+        \text{MAE} = \frac{1}{n} \sum_{i=1}^n |\hat{f}(x_i) - t_i|
+    \end{equation}
+    \item \textbf{Mean Squared Error (MSE):} Media degli errori al quadrato, penalizza maggiormente gli errori grandi.
+    \begin{equation}
+        \text{MSE} = \frac{1}{n} \sum_{i=1}^n (\hat{f}(x_i) - t_i)^2
+    \end{equation}
+    \item \textbf{Root Mean Squared Error (RMSE):} Radice quadrata dell'MSE, nella stessa unità di misura dell'output.
+    \begin{equation}
+        \text{RMSE} = \sqrt{\text{MSE}}
+    \end{equation}
+    \item \textbf{Coefficiente di Determinazione ($R^2$):} Misura la proporzione della varianza nell'output prevedibile dal modello. $R^2=1$ indica predizione perfetta, $R^2=0$ predizione uguale alla media.
+    \begin{equation}
+        R^2 = 1 - \frac{\sum_{n=1}^N (y_n - t_n)^2}{\sum_{n=1}^N (t_n - \mu)^2}
+    \end{equation}
+\end{itemize}
+
+\subsection{Overfitting e Sottofitting}
+\textbf{Overfitting:} Un modello si adatta troppo bene ai dati di training, imparando anche il rumore. Risulta in alta accuratezza sul training set ma bassa sulla generalizzazione a nuovi dati.
+\begin{itemize}
+    \item $error_S(h) < error_S(h')$
+    \item $error_{\mathcal{D}}(h) > error_{\mathcal{D}}(h')$
+\end{itemize}
+\textbf{Sottofitting (Underfitting):} Un modello è troppo semplice per catturare la struttura sottostante dei dati. Risulta in bassa accuratezza sia sul training che sul test set.
+
+\section{Decision Trees (Alberi di Decisione)}
+
+I Decision Trees sono modelli non parametrici usati per classificazione e regressione, che rappresentano le decisioni in modo esplicito e interpretabile.
+
+\subsection{ID3 Algorithm}
+ID3 (Iterative Dichotomiser 3) è un algoritmo per costruire alberi di decisione.
+\begin{itemize}
+    \item \textbf{Input:} Esempi di training, Attributi disponibili, Attributo Target.
+    \item \textbf{Output:} Un albero di decisione.
+    \item \textbf{Passi Principali:}
+    \begin{enumerate}
+        \item Crea un nodo radice per l'albero.
+        \item Se tutti gli esempi sono positivi, il nodo radice diventa una foglia etichettata '+'.
+        \item Se tutti gli esempi sono negativi, il nodo radice diventa una foglia etichettata '-'.
+        \item Se non ci sono più attributi disponibili, il nodo radice diventa una foglia etichettata con la classe più comune tra gli esempi.
+        \item Altrimenti, seleziona l'attributo $A$ che massimizza il \textbf{Guadagno di Informazione (Information Gain)}.
+        \item Il nodo radice diventa un nodo di test per l'attributo $A$.
+        \item Per ogni valore $v_i$ dell'attributo $A$:
+        \begin{itemize}
+            \item Crea un nuovo ramo per il nodo radice corrispondente al test $A=v_i$.
+            \item Filtra gli esempi di training per includere solo quelli con $A=v_i$.
+            \item Applica ricorsivamente ID3 a questo sottoinsieme di esempi e attributi rimanenti.
+        \end{itemize}
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Criteri di Scelta degli Attributi}
+La scelta dell'attributo migliore per splittare i dati è fondamentale:
+\begin{itemize}
+    \item \textbf{Entropia ($Entropy(S)$):} Misura l'impurità o l'incertezza in un insieme di dati $S$. Per classi binarie ($p_\oplus, p_\ominus$):
+    \begin{equation}
+        Entropy(S) \equiv -p_{\oplus} \log_2 p_{\oplus} - p_{\ominus} \log_2 p_{\ominus}
+    \end{equation}
+    Per classi multiple:
+    \begin{equation}
+        Entropy(S) \equiv \sum_{i=1}^c -p_i \log_2 p_i
+    \end{equation}
+    \item \textbf{Information Gain ($Gain(S, A)$):} La riduzione attesa di entropia ottenuta splittando l'insieme $S$ usando l'attributo $A$. Si sceglie l'attributo con il $Gain$ più alto.
+    \begin{equation}
+        Gain(S, A) \equiv Entropy(S) - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} Entropy(S_v)
+    \end{equation}
+    \item \textbf{Gain Ratio:} Utilizzato per contrastare il bias dell'Information Gain verso attributi con molti valori.
+    \begin{equation}
+        SplitInformation(S, A) \equiv - \sum_{i=1}^c \frac{|S_i|}{|S|} \log_2 \frac{|S_i|}{|S|}
+    \end{equation}
+    \begin{equation}
+        GainRatio(S, A) \equiv \frac{Gain(S, A)}{SplitInformation(S, A)}
+    \end{equation}
+\end{itemize}
+
+\subsection{Overfitting e Pruning (Potatura)}
+Gli alberi di decisione sono soggetti a overfitting, specialmente se crescono troppo in profondità. Il \textbf{Pruning} è una tecnica per ridurre la complessità dell'albero e migliorare la generalizzazione.
+\begin{itemize}
+    \item \textbf{Pre-Pruning:} Fermare la crescita dell'albero prematuramente (e.g., quando il guadagno di informazione è sotto una certa soglia, o il numero di esempi in un nodo è troppo basso).
+    \item \textbf{Post-Pruning (e.g., Reduced-Error Pruning):}
+    \begin{enumerate}
+        \item Costruire un albero completo (potenzialmente in overfitting).
+        \item Dividere i dati in training e validation set.
+        \item Per ogni nodo interno, valutare l'effetto di sostituire il sottoalbero con una foglia (etichettata con la classe più comune del sottoalbero) sul validation set.
+        \item Sostituire iterativamente il sottoalbero che offre il maggior miglioramento (o minor deterioramento) della performance sul validation set, fino a quando non si osservano ulteriori benefici.
+    \end{enumerate}
+    \item \textbf{Rule Post-Pruning (e.g., C4.5):} Convertire l'albero in un insieme di regole, potare (generalizzare) ogni regola indipendentemente, e poi ordinarle. Questo può portare a migliore generalizzazione.
+\end{itemize}
+
+\section{Probabilità e Reti Bayesiane}
+
+Le probabilità forniscono un linguaggio formale per ragionare sull'incertezza. Le reti Bayesiane sono modelli grafici che rappresentano relazioni di dipendenza condizionale tra variabili.
+
+\subsection{Formule di Base della Probabilità}
+\begin{itemize}
+    \item \textbf{Probabilità Condizionale:} $P(A|B) = \frac{P(A \wedge B)}{P(B)}$ se $P(B) \neq 0$.
+    \item \textbf{Regola del Prodotto:} $P(A \wedge B) = P(A|B)P(B) = P(B|A)P(A)$.
+    \item \textbf{Regola della Somma (Marginalizzazione):} $P(X) = \sum_{y \in \mathcal{D}(Y)} P(X, Y=y)$.
+    \item \textbf{Teorema di Bayes:} $P(A|B) = \frac{P(B|A)P(A)}{P(B)}$.
+    \item \textbf{Regola della Catena:} $P(X_1, \ldots, X_n) = \prod_{i=1}^n P(X_i | X_1, \ldots, X_{i-1})$.
+\end{itemize}
+
+\subsection{Indipendenza Condizionale}
+$X$ è condizionalmente indipendente da $Y$ dato $Z$ se $P(X|Y, Z) = P(X|Z)$. Questo riduce la complessità della rappresentazione delle distribuzioni congiunte.
+\begin{equation}
+    P(X, Y | Z) = P(X|Y, Z)P(Y|Z) = P(X|Z)P(Y|Z)
+\end{equation}
+
+\subsection{Reti Bayesiane}
+\begin{itemize}
+    \item \textbf{Sintassi:} Un grafo diretto aciclico (DAG) dove i nodi sono variabili e gli archi rappresentano "influenze dirette". Ogni nodo $X_i$ ha una distribuzione di probabilità condizionale $P(X_i | Parents(X_i))$.
+    \item \textbf{Semantica:} La distribuzione congiunta di tutte le variabili è data da:
+    \begin{equation}
+        P(X_1, \ldots, X_n) = \prod_{i=1}^n P(X_i | Parents(X_i))
+    \end{equation}
+    \item \textbf{Compattezza:} Permettono una specificazione compatta delle distribuzioni congiunte, sfruttando l'indipendenza condizionale.
+\end{itemize}
+
+\section{Apprendimento Bayesiano}
+
+L'apprendimento Bayesiano integra la conoscenza a priori con l'evidenza dei dati per formare nuove credenze.
+
+\subsection{Ipotesi MAP e ML}
+Dato un dataset $D$ e uno spazio di ipotesi $\mathcal{H}$:
+\begin{itemize}
+    \item \textbf{Ipotesi Maximum A Posteriori ($h_{MAP}$):} L'ipotesi più probabile dato il dataset.
+    \begin{equation}
+        h_{MAP} \equiv \arg\max_{h \in \mathcal{H}} P(h|D) = \arg\max_{h \in \mathcal{H}} P(D|h)P(h)
+    \end{equation}
+    \item \textbf{Ipotesi Maximum Likelihood ($h_{ML}$):} L'ipotesi che rende più probabile l'osservazione del dataset $D$. Si usa quando non si ha conoscenza a priori (o si assume $P(h)$ uniforme).
+    \begin{equation}
+        h_{ML} = \arg\max_{h \in \mathcal{H}} P(D|h)
+    \end{equation}
+\end{itemize}
+
+\subsection{Bayes Optimal Classifier (BOC)}
+Il BOC fornisce la classificazione più probabile per una nuova istanza $x'$, considerando tutte le possibili ipotesi in $\mathcal{H}$, pesate dalla loro probabilità a posteriori.
+\begin{equation}
+    v_{OB} = \arg\max_{v_j \in V} \sum_{h_i \in \mathcal{H}} P(v_j | x', h_i) P(h_i | D)
+\end{equation}
+È l'ottimo teorico, ma spesso computazionalmente intrattabile se $\mathcal{H}$ è troppo grande.
+
+\subsection{Naive Bayes Classifier}
+Il Naive Bayes semplifica il BOC assumendo \textbf{indipendenza condizionale} delle feature dato la classe: $P(a_1, \dots, a_n | v_j, D) \approx \prod_i P(a_i | v_j, D)$.
+\noindent\textbf{Classificazione per Naive Bayes:}
+\begin{equation}
+    v_{NB} = \arg\max_{v_j \in V} P(v_j | D) \prod_i P(a_i | v_j, D)
+\end{equation}
+\textbf{Stima delle Probabilità (Laplace Smoothing):} Per evitare probabilità zero, si usa lo smoothing di Laplace:
+\begin{equation}
+    \hat{P}(a_i | v_j, D) = \frac{|\{ \ldots, a_i, \ldots, v_j \}| + m p}{|\{ \ldots, v_j \}| + m}
+\end{equation}
+dove $p$ è una stima a priori per $P(a_i | v_j, D)$ e $m$ è un peso (numero di esempi virtuali).
+\textbf{Assunzione di Indipendenza:} Sebbene l'assunzione di indipendenza sia spesso violata nella realtà, Naive Bayes si comporta sorprendentemente bene in pratica, specialmente per la classificazione di testi.
+
+\subsection{Distribuzioni di Probabilità Comuni}
+\begin{itemize}
+    \item \textbf{Bernoulli:} Per variabili binarie (0 o 1). $P(X=k; \theta) = \theta^k (1-\theta)^{1-k}$.
+    \item \textbf{Multivariata Bernoulli:} Per vettori di variabili binarie indipendenti.
+    \begin{equation}
+        P(X_1=k_1, \dots, X_n=k_n; \theta_1, \dots, \theta_n) = \prod_{i=1}^n \theta_i^{k_i} (1-\theta_i)^{1-k_i}
+    \end{equation}
+    \item \textbf{Binomiale:} Per $k$ successi in $n$ prove Bernoulli. $P(X=k; n, \theta) = \binom{n}{k} \theta^k (1-\theta)^{n-k}$.
+    \item \textbf{Multinomiale:} Per $k_j$ occorrenze di $d$ risultati diversi in $n$ prove.
+    \begin{equation}
+        P(X_1=k_1, \dots, X_d=k_d; n, \theta_1, \dots, \theta_d) = \frac{n!}{k_1! \dots k_d!} \theta_1^{k_1} \dots \theta_d^{k_d}
+    \end{equation}
+\end{itemize}
+
+\subsection{Naive Bayes per Classificazione di Testi}
+Per classificare documenti, si usa la Naive Bayes, assumendo che le parole nel documento siano condizionalmente indipendenti data la classe del documento.
+\begin{equation}
+    c_{NB} = \arg\max_{c_j \in C} P(c_j | D) \prod_{i=1}^{\text{length}(doc)} P(w_i | c_j)
+\end{equation}
+Tecniche come lo stemming e la rimozione di stop words sono usate per pre-processare il testo.
+
+\section{Modelli Probabilistici per la Classificazione}
+
+Questi modelli cercano di apprendere le probabilità di classe $P(C_k | \mathbf{x})$.
+
+\subsection{Modelli Generativi (es. Gaussian Mixture Model)}
+Stimano $P(\mathbf{x}|C_k)$ e $P(C_k)$, poi usano il teorema di Bayes per trovare $P(C_k|\mathbf{x})$.
+Per 2 classi e distribuzioni Gaussiane con stessa covarianza $\Sigma$:
+\begin{equation}
+    P(C_1 | \mathbf{x}) = \sigma(a) = \frac{1}{1 + \exp(-a)}
+\end{equation}
+dove $a = \ln \frac{P(\mathbf{x}|C_1)P(C_1)}{P(\mathbf{x}|C_2)P(C_2)} = \mathbf{w}^T \mathbf{x} + w_0$.
+I parametri $\mathbf{w}$ e $w_0$ dipendono dalle medie $\mu_1, \mu_2$, dalla covarianza $\Sigma$ e dalle probabilità a priori $\pi$.
+
+\subsection{Modelli Discriminativi (es. Logistic Regression)}
+Stimano $P(C_k|\mathbf{x})$ direttamente.
+\noindent\textbf{Logistic Regression:} Per 2 classi, usa una funzione sigmoide:
+\begin{equation}
+    P(C_1|\mathbf{x}) = \sigma(\mathbf{w}^T \mathbf{x} + w_0)
+\end{equation}
+Per $K$ classi, usa la funzione softmax:
+\begin{equation}
+    P(C_k | \mathbf{x}) = \frac{\exp(a_k)}{\sum_j \exp(a_j)} \quad \text{dove } a_k = \mathbf{w}_k^T \mathbf{x} + w_{k0}
+\end{equation}
+Il training avviene minimizzando la funzione di costo \textbf{Cross-Entropy} (log-likelihood negativa). Per 2 classi:
+\begin{equation}
+    E(\tilde{\mathbf{w}}) = - \sum_{n=1}^N[t_n \ln y_n + (1 - t_n) \ln(1 - y_n)]
+\end{equation}
+L'ottimizzazione spesso avviene con metodi iterativi come \textbf{Iterative Reweighted Least Squares (IRLS)}, che è una forma di Newton-Raphson:
+\begin{equation}
+    \tilde{\mathbf{w}} \leftarrow \tilde{\mathbf{w}} - \mathbf{H}(\tilde{\mathbf{w}})^{-1} \nabla E(\tilde{\mathbf{w}})
+\end{equation}
+
+\section{Modelli Lineari per la Classificazione}
+
+I modelli lineari cercano di trovare un iperpiano che separi le classi nello spazio delle feature.
+
+\subsection{Funzioni Discriminanti Lineari}
+L'output è una combinazione lineare delle feature:
+\begin{equation}
+    y(\mathbf{x}) = \mathbf{w}^T \mathbf{x} + w_0 = \tilde{\mathbf{w}}^T \tilde{\mathbf{x}}
+\end{equation}
+Per $K$ classi, si hanno $K$ funzioni discriminanti: $y_k(\mathbf{x}) = \mathbf{w}_k^T \mathbf{x} + w_{k0}$. La classe predetta è quella con il valore $y_k(\mathbf{x})$ più alto.
+
+\subsection{Metodi di Apprendimento}
+\begin{itemize}
+    \item \textbf{Least Squares:} Minimizza l'errore quadratico tra l'output desiderato e quello del modello. La soluzione in forma chiusa è:
+    \begin{equation}
+        \mathbf{W}^* = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{T}
+    \end{equation}
+    Non robusto agli outlier, assume distribuzioni Gaussiane.
+    \item \textbf{Perceptron:} Un algoritmo iterativo che aggiorna i pesi quando un esempio è misclassificato.
+    \begin{itemize}
+        \item Output: $o(\mathbf{x}) = \text{sign}(\mathbf{w}^T \mathbf{x})$.
+        \item Regola di aggiornamento: $\Delta w_i = \eta (t_n - o_n) x_{i,n}$.
+    \end{itemize}
+    Con dati linearmente separabili e $\eta$ sufficientemente piccolo, converge. Non robusto agli outlier (l'iperpiano può essere troppo vicino a una classe).
+    \item \textbf{Fisher's Linear Discriminant:} Trova una direzione $\mathbf{w}$ che massimizza la separazione tra le medie delle classi e minimizza la varianza intra-classe.
+    \begin{equation}
+        J(\mathbf{w}) = \frac{\mathbf{w}^T \mathbf{S}_B \mathbf{w}}{\mathbf{w}^T \mathbf{S}_W \mathbf{w}}
+    \end{equation}
+    La soluzione è $\mathbf{w}^* \propto \mathbf{S}_W^{-1} (\mathbf{m}_2 - \mathbf{m}_1)$.
+    \item \textbf{Support Vector Machines (SVM):} Cerca l'iperpiano che massimizza il \textbf{margine} tra le classi, rendendolo robusto agli outlier.
+    \begin{itemize}
+        \item \textbf{Problema di Ottimizzazione (Hard Margin):}
+        \begin{equation}
+            \min_{\mathbf{w}, w_0} \frac{1}{2} ||\mathbf{w}||^2 \quad \text{s.t.} \quad t_n(\mathbf{w}^T \mathbf{x}_n + w_0) \ge 1 \quad \forall n
+        \end{equation}
+        \item \textbf{Soft Margin (con Outlier):} Introduce variabili di slack $\xi_n \ge 0$ per permettere alcune violazioni del margine.
+        \begin{equation}
+            \min_{\mathbf{w}, w_0, \bm{\xi}} \frac{1}{2} ||\mathbf{w}||^2 + C \sum_{n=1}^N \xi_n \quad \text{s.t.} \quad t_n(\mathbf{w}^T \mathbf{x}_n + w_0) \ge 1 - \xi_n, \quad \xi_n \ge 0 \quad \forall n
+        \end{equation}
+        \item \textbf{Vettori di Supporto:} Solo gli esempi più vicini all'iperpiano (o che violano il margine) contribuiscono alla definizione dell'iperpiano.
+    \end{itemize}
+\end{itemize}
+
+\section{Modelli Lineari per la Regressione}
+
+Cercano di approssimare una funzione continua $f: \mathcal{X} \to \mathcal{R}$.
+
+\subsection{Modelli Lineari a Funzione Base}
+$y(\mathbf{x}; \mathbf{w}) = \sum_{j=0}^M w_j \phi_j(\mathbf{x}) = \mathbf{w}^T \phi(\mathbf{x})$
+dove $\phi_j(\mathbf{x})$ sono funzioni base non lineari (es. polinomiali, radiali, sigmoidali) che trasformano lo spazio di input in uno spazio feature. Il modello rimane lineare nei parametri $w$.
+
+\subsection{Maximum Likelihood e Least Squares}
+Assumendo rumore Gaussiano sull'output $t = y(\mathbf{x}; \mathbf{w}) + \epsilon$, l'ottimizzazione dei parametri $w$ si riduce alla minimizzazione dell'errore quadratico (Least Squares):
+\begin{equation}
+    E_D(\mathbf{w}) = \frac{1}{2} \sum_{n=1}^N [t_n - \mathbf{w}^T \phi(\mathbf{x}_n)]^2
+\end{equation}
+La soluzione in forma chiusa è:
+\begin{equation}
+    \mathbf{w}_{ML} = (\Phi^T \Phi)^{-1} \Phi^T \mathbf{t}
+\end{equation}
+dove $\Phi$ è la design matrix.
+
+\subsection{Regularization (Regolarizzazione)}
+Tecnica per prevenire l'overfitting, aggiungendo un termine di penalità alla funzione di errore.
+\begin{equation}
+    \min_{\mathbf{w}} E_D(\mathbf{w}) + \lambda E_W(\mathbf{w})
+\end{equation}
+dove $E_W(\mathbf{w})$ penalizza la complessità del modello (es. $L_1$ o $L_2$ norm dei pesi).
+
+\subsection{Apprendimento Sequenziale (Stochastic Gradient Descent - SGD)}
+Metodo iterativo per grandi dataset. L'aggiornamento avviene per ogni esempio o per mini-batch:
+$\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla E_S$
+dove $\eta$ è il learning rate. Varianti come SGD con momentum migliorano la convergenza.
+
+\section{Metodi Kernel}
+
+Estendono i modelli lineari a funzioni non lineari, operando in uno spazio feature ad alta dimensione (anche infinita) senza calcolare esplicitamente la trasformazione $\phi(\mathbf{x})$.
+
+\subsection{Kernel Trick}
+Se un algoritmo utilizza i vettori di input $\mathbf{x}$ solo sotto forma di prodotto interno $\mathbf{x}^T \mathbf{x}'$, possiamo sostituire questo prodotto interno con una \textbf{funzione kernel} $k(\mathbf{x}, \mathbf{x}')$. Questo ci permette di operare implicitamente nello spazio feature $\phi(\mathbf{x})$ dove $k(\mathbf{x}, \mathbf{x}') = \phi(\mathbf{x})^T \phi(\mathbf{x}')$.
+\textbf{Condizioni per un Kernel Valido:}
+\begin{itemize}
+    \item Simmetria: $k(\mathbf{x}, \mathbf{x}') = k(\mathbf{x}', \mathbf{x})$
+    \item Non-negatività (la matrice Gramiana deve essere semi-definita positiva).
+\end{itemize}
+
+\subsection{Funzioni Kernel Comuni}
+\begin{itemize}
+    \item \textbf{Lineare:} $k(\mathbf{x}, \mathbf{x}') = \mathbf{x}^T \mathbf{x}'$.
+    \item \textbf{Polinomiale:} $k(\mathbf{x}, \mathbf{x}') = (\beta \mathbf{x}^T \mathbf{x}' + \gamma)^d$.
+    \item \textbf{Radial Basis Function (RBF) / Gaussiano:} $k(\mathbf{x}, \mathbf{x}') = \exp(-\beta ||\mathbf{x} - \mathbf{x}'||^2)$.
+    \item \textbf{Sigmoide:} $k(\mathbf{x}, \mathbf{x}') = \tanh(\beta \mathbf{x}^T \mathbf{x}' + \gamma)$.
+\end{itemize}
+
+\subsection{Matrice Gramiana}
+La \textbf{Matrice Gramiana} $\mathbf{K}$ è una matrice $N \times N$ dove $K_{ij} = k(\mathbf{x}_i, \mathbf{x}_j)$. È un elemento chiave nei metodi kernel.
+\textbf{Kernelized Linear Models:} La soluzione dei modelli lineari in termini di $\alpha$ spesso coinvolge la matrice Gramiana. Ad esempio, per regressione:
+$\alpha = (\mathbf{K} + \lambda \mathbf{I}_N)^{-1} \mathbf{t}$
+La predizione diventa: $y(\mathbf{x}) = \sum_{n=1}^N \alpha_n k(\mathbf{x}_n, \mathbf{x})$.
+
+\subsection{Kernelized SVM}
+Nel contesto SVM, il kernel trick è applicato per risolvere problemi non linearmente separabili nello spazio originale. Il problema di ottimizzazione duale coinvolge direttamente il kernel:
+$\mathbf{w}^* = \sum_{n=1}^N a_n^* t_n \phi(\mathbf{x}_n)$, la predizione diventa $y(\mathbf{x}) = \sum_{n=1}^N a_n^* t_n k(\mathbf{x}_n, \mathbf{x}) + w_0^*$.
+\textbf{Kernelized SVM Regression:} Estende SVM per la regressione, usando un $\epsilon$-insensitive error function.
+
+\section{Apprendimento Basato su Istanza (Instance-Based Learning)}
+
+Questi modelli non apprendono un modello esplicito durante il training, ma memorizzano tutti i dati di training e fanno previsioni basate sulla somiglianza con nuove istanze.
+
+\subsection{K-Nearest Neighbors (K-NN)}
+\begin{itemize}
+    \item \textbf{Classificazione:} Per una nuova istanza $\mathbf{x}$, trova i $K$ vicini più prossimi nel training set. Assegna a $\mathbf{x}$ la classe più comune tra questi $K$ vicini.
+    \begin{equation}
+        p(c | \mathbf{x}, D, K) = \frac{1}{K} \sum_{\mathbf{x}_n \in N_K(\mathbf{x}, D)} \mathbb{I}(t_n = c)
+    \end{equation}
+    \item \textbf{Regressione:} Per una nuova istanza $\mathbf{x}$, la predizione è la media dei valori target dei $K$ vicini.
+    \item \textbf{Funzione di Distanza:} La scelta della metrica di distanza (es. Euclidea) è fondamentale.
+    \item \textbf{K:} Un valore basso di $K$ rende il modello sensibile al rumore e a overfitting; un valore alto di $K$ leviga i confini decisionali ma può causare underfitting.
+\end{itemize}
+\textbf{Kernelized K-NN:} Le funzioni di distanza possono essere kernelizzate.
+\textbf{Svantaggi:} Richiede la memorizzazione di tutto il dataset, computazionalmente costoso per dataset grandi.
+
+\section{Reti Neurali Artificiali (ANN)}
+
+Le ANN sono modelli parametrici ispirati alla struttura del cervello, capaci di approssimare funzioni complesse.
+
+\subsection{Modello Generale Feedforward Network (FNN)}
+Una FNN è una composizione di strati di neuroni. Ogni neurone in uno strato calcola una combinazione lineare degli output dello strato precedente e applica una funzione di attivazione non lineare.
+\begin{equation}
+    \mathbf{h}_{i+1} = f(\mathbf{W}_i^T \mathbf{h}_i + \mathbf{b}_i)
+\end{equation}
+dove $\mathbf{h}_i$ è l'output dello strato $i$, $\mathbf{W}_i$ è la matrice dei pesi, $\mathbf{b}_i$ è il bias, e $f$ è la funzione di attivazione.
+\textbf{Parametri Addestrabili:} I pesi $\mathbf{W}_i$ e i bias $\mathbf{b}_i$.
+
+\subsection{Architettura e Funzioni di Attivazione}
+\begin{itemize}
+    \item \textbf{Profondità (Depth):} Numero di strati nascosti. Reti "profonde" sono la base del Deep Learning.
+    \item \textbf{Ampiezza (Width):} Numero di unità (neuroni) per strato.
+    \item \textbf{Funzioni di Attivazione (Activation Functions):} Introducono non linearità, permettendo alla rete di apprendere relazioni complesse.
+    \begin{itemize}
+        \item \textbf{ReLU (Rectified Linear Unit):} $g(\alpha) = \max(0, \alpha)$. Veloce da calcolare, non satura per valori positivi.
+        \item \textbf{Sigmoide:} $g(\alpha) = \sigma(\alpha) = \frac{1}{1 + \exp(-\alpha)}$. Output tra 0 e 1, usata spesso per output binari. Satura (gradienti piccoli).
+        \item \textbf{Tanh (Hyperbolic Tangent):} $g(\alpha) = \tanh(\alpha) = 2\sigma(2\alpha) - 1$. Output tra -1 e 1, centrato a 0. Satura.
+    \end{itemize}
+    \item \textbf{Unità di Output e Funzioni di Costo:}
+    \begin{itemize}
+        \item \textbf{Regressione (output lineare):} $y = \mathbf{W}^T \mathbf{h} + \mathbf{b}$. Loss: Mean Squared Error (MSE).
+        \item \textbf{Classificazione Binaria (output sigmoide):} $y = \sigma(\mathbf{w}^T \mathbf{h} + b)$. Loss: Binary Cross-Entropy.
+        \item \textbf{Classificazione Multi-Classe (output softmax):} $y_i = \text{softmax}(\alpha^{(i)}) = \frac{\exp(\alpha^{(i)})}{\sum_j \exp(\alpha_j)}$. Loss: Categorical Cross-Entropy.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Gradient Computation (Backpropagation)}
+L'algoritmo di \textbf{Backpropagation} è il metodo standard per calcolare i gradienti della funzione di costo rispetto ai pesi della rete, sfruttando la regola della catena.
+\begin{equation}
+    \nabla_{\mathbf{x}} z = \left( \frac{\partial \mathbf{y}}{\partial \mathbf{x}} \right)^T \nabla_{\mathbf{y}} z
+\end{equation}
+\begin{itemize}
+    \item \textbf{Fase Forward:} L'input attraversa la rete, calcolando gli output di ogni strato fino all'output finale.
+    \item \textbf{Fase Backward:} Il gradiente dell'errore viene propagato all'indietro attraverso la rete, calcolando i gradienti per ogni peso e bias.
+\end{itemize}
+
+\subsection{Training Algorithms}
+\begin{itemize}
+    \item \textbf{Stochastic Gradient Descent (SGD):} Aggiorna i pesi usando il gradiente calcolato su un singolo esempio o un mini-batch di esempi.
+    $\theta^{(k+1)} \leftarrow \theta^{(k)} - \eta \mathbf{g}$
+    \item \textbf{SGD with Momentum:} Aggiunge un termine di momentum per accelerare la convergenza e ridurre le oscillazioni.
+    $\mathbf{v}^{(k+1)} \leftarrow \mu \mathbf{v}^{(k)} - \eta \mathbf{g}$ \\
+    $\theta^{(k+1)} \leftarrow \theta^{(k)} + \mathbf{v}^{(k+1)}$
+    \item \textbf{SGD with Nesterov Momentum:} Un'evoluzione del momentum.
+    \item \textbf{Algoritmi con Learning Rate Adattivo:} (e.g., AdaGrad, RMSProp, Adam) Adattano il learning rate per ogni parametro, spesso migliorando la convergenza.
+\end{itemize}
+
+\subsection{Regularization (Tecniche Anti-Overfitting)}
+\begin{itemize}
+    \item \textbf{Parameter Norm Penalties (L1/L2 Regularization):} Aggiunge un termine alla loss function che penalizza la grandezza dei pesi.
+    $\bar{J}(\theta) = J(\theta) + \lambda \sum_j |\theta_j|^q$ (con $q=1$ per L1, $q=2$ per L2).
+    \item \textbf{Dataset Augmentation:} Aumenta la quantità di dati di training con trasformazioni (e.g., rotazione, scaling di immagini) o aggiungendo rumore.
+    \item \textbf{Early Stopping:} Ferma il training quando la performance sul validation set inizia a peggiorare, anche se quella sul training set continua a migliorare.
+    \item \textbf{Dropout:} Durante il training, ignora casualmente (setta a zero) un sottoinsieme di neuroni con una certa probabilità. Questo previene che la rete si affidi eccessivamente a singoli neuroni.
+\end{itemize}
+
+\section{Convolutional Neural Networks (CNN)}
+
+Le CNN sono un tipo specializzato di ANN, particolarmente efficaci per dati con struttura griglia (e.g., immagini, video, audio), sfruttando convoluzioni.
+
+\subsection{Convoluzione}
+L'operazione fondamentale.
+\begin{itemize}
+    \item \textbf{Continua:} $(x * w)(t) \equiv \int_{-\infty}^{\infty} x(a) w(t - a) da$
+    \item \textbf{Discreta (2D):} $(I * K)(i, j) \equiv \sum_{m \in S_1} \sum_{n \in S_2} I(m, n)K(i - m, j - n)$
+\end{itemize}
+Nelle librerie ML, si implementa spesso la \textbf{cross-correlation} per efficienza, che è simile ma senza il flipping del kernel:
+$(I * K)(i, j) = \sum_{m \in S_1} \sum_{n \in S_2} I(i + m, j + n)K(m, n)$
+
+\subsection{Strati di una CNN}
+Una CNN tipica alterna strati convoluzionali, di attivazione e di pooling.
+\begin{itemize}
+    \item \textbf{Input Layer:} Immagine di input (e.g., $W_{in} \times H_{in} \times D_{in}$ dimensioni).
+    \item \textbf{Strato Convoluzionale (Convolutional Layer):}
+    \begin{itemize}
+        \item Applicazione di più \textbf{kernel} (filtri) all'input. Ogni kernel genera una \textbf{feature map}.
+        \item \textbf{Kernel Size ($W_k \times H_k \times D_k$):} Dimensioni del filtro.
+        \item \textbf{Stride ($s$):} Passo con cui il kernel scorre sull'input.
+        \item \textbf{Padding ($p$):} Aggiunta di valori (tipicamente zero) ai bordi per controllare la dimensione dell'output.
+        \item \textbf{Output Feature Map Size:} $W_{out} = \frac{W_{in} - W_k + 2p}{s} + 1$, $H_{out} = \frac{H_{in} - H_k + 2p}{s} + 1$.
+        \item \textbf{Numero di Parametri Addestrabili:} Ogni kernel ha pesi e un bias. $W_k \cdot H_k \cdot D_{in} \cdot D_{out} + D_{out}$.
+        \item \textbf{Sparse Connectivity (Connettività Sparsa):} Ogni neurone di output è connesso solo a una piccola regione dell'input (receptive field), non a tutto l'input.
+        \item \textbf{Parameter Sharing (Condivisione di Parametri):} Lo stesso kernel è applicato a diverse posizioni spaziali dell'input, riducendo il numero di parametri e introducendo invarianza alla traslazione.
+    \end{itemize}
+    \item \textbf{Strato di Attivazione (Detector Layer):} Applica una funzione di attivazione non lineare (spesso ReLU) ad ogni elemento della feature map.
+    \item \textbf{Strato di Pooling (Pooling Layer):} Riduce la dimensione spaziale della rappresentazione per ridurre la computazione e il numero di parametri, e per ottenere invarianza a piccole traslazioni.
+    \begin{itemize}
+        \item \textbf{Max Pooling:} Seleziona il valore massimo in una regione.
+        \item \textbf{Average Pooling:} Calcola la media in una regione.
+    \end{itemize}
+    \item \textbf{Fully Connected Layer:} Dopo diversi strati convoluzionali e di pooling, i dati vengono "appiattiti" (flatten) e passati a uno o più strati completamente connessi, come in una ANN tradizionale, per la classificazione o regressione finale.
+\end{itemize}
+
+\subsection{CNN Famose}
+Architetture come LeNet, AlexNet, VGG, GoogLeNet/Inception e ResNet hanno segnato pietre miliari nel campo, mostrando performance sempre migliori (e.g., in ILSVRC).
+
+\subsection{Transfer Learning}
+Riutilizzare un modello pre-addestrato (e.g., su ImageNet) per un nuovo compito o dominio, spesso con dataset più piccoli.
+\begin{itemize}
+    \item \textbf{Fine-tuning:} Adattare i pesi di un modello pre-addestrato sul nuovo dataset. Si può addestrare l'intera rete o solo gli ultimi strati.
+    \item \textbf{CNN come Feature Extractor:} Usare i primi strati della CNN pre-addestrata per estrarre feature, e poi addestrare un nuovo classificatore (e.g., SVM, rete neurale più piccola) su queste feature.
+\end{itemize}
+
+\section{Apprendimento Multiplo (Ensemble Methods)}
+
+Gli ensemble methods combinano più learner (modelli) per ottenere una performance migliore rispetto a un singolo modello.
+
+\subsection{Voting (Votazione)}
+Combina le predizioni di più modelli addestrati in parallelo.
+\begin{itemize}
+    \item \textbf{Regressione:} Media pesata degli output. $y_{voting}(\mathbf{x}) = \sum_{m=1}^M w_m y_m(\mathbf{x})$.
+    \item \textbf{Classificazione:} Maggioranza pesata delle classi predette. $y_{voting}(\mathbf{x}) = \arg\max_c \sum_{m=1}^M w_m \mathbb{I}(y_m(\mathbf{x}) = c)$.
+\end{itemize}
+
+\subsection{Bagging (Bootstrap Aggregating)}
+Addestra $M$ modelli indipendenti su $M$ sottoinsiemi di dati campionati con replacement (bootstrap) dal dataset originale.
+\begin{itemize}
+    \item \textbf{Training:} Genera $M$ dataset bootstrap $\mathcal{D}_1, \dots, \mathcal{D}_M$. Addestra un modello $y_m(\mathbf{x})$ su ogni $\mathcal{D}_m$.
+    \item \textbf{Predizione:} Media (regressione) o votazione a maggioranza (classificazione) degli output dei singoli modelli.
+    \begin{equation}
+        y_{bagging}(\mathbf{x}) = \frac{1}{M} \sum_{m=1}^M y_m(\mathbf{x})
+    \end{equation}
+    \item \textbf{Benefici:} Riduce la varianza (particolarmente efficace con modelli ad alta varianza come i Decision Trees).
+\end{itemize}
+
+\subsection{Boosting (es. AdaBoost)}
+Addestra $M$ "weak learners" (modelli semplici, leggermente migliori di una scelta casuale) in sequenza. Ogni learner si concentra sugli errori dei learner precedenti, dando maggior peso agli esempi misclassificati.
+\begin{itemize}
+    \item \textbf{Training Sequenziale:}
+    \begin{enumerate}
+        \item Inizializza pesi $w_n^{(1)} = 1/N$ per tutti gli esempi.
+        \item Per $m=1, \dots, M$:
+        \begin{itemize}
+            \item Addestra un weak learner $y_m(\mathbf{x})$ minimizzando l'errore pesato.
+            \item Calcola l'errore pesato $\epsilon_m = \frac{\sum w_n^{(m)} \mathbb{I}(y_m(\mathbf{x}_n) \neq t_n)}{\sum w_n^{(m)}}$.
+            \item Calcola il peso $\alpha_m$ del learner $m$: $\alpha_m = \ln \left( \frac{1 - \epsilon_m}{\epsilon_m} \right)$.
+            \item Aggiorna i pesi degli esempi: $w_n^{(m+1)} = w_n^{(m)} \exp[ \alpha_m \mathbb{I}(y_m(\mathbf{x}_n) \neq t_n) ]$.
+        \end{itemize}
+        \item Output il classificatore finale:
+        \begin{equation}
+            Y_M(\mathbf{x}) = \text{sign} \left( \sum_{m=1}^M \alpha_m y_m(\mathbf{x}) \right)
+        \end{equation}
+    \end{enumerate}
+    \item \textbf{Benefici:} Riduce il bias (efficace con modelli ad alto bias).
+\end{itemize}
+
+\subsection{Bias-Variance Decomposition}
+L'errore totale di un modello può essere decomposto in Bias, Varianza e Rumore irriducibile:
+\begin{equation}
+    MSE = Bias^2 + Variance + Noise
+\end{equation}
+\begin{itemize}
+    \item \textbf{Bias:} Errore dovuto a un modello troppo semplice che non può catturare la vera relazione nei dati (underfitting).
+    \item \textbf{Varianza:} Sensibilità del modello alle piccole fluttuazioni nel training set (overfitting).
+    \item \textbf{Rumore Irriducibile:} Errore intrinseco nei dati, non eliminabile dal modello.
+\end{itemize}
+Bagging riduce la varianza, Boosting riduce il bias.
+
+\section{Apprendimento Non Supervisionato}
+
+Trova strutture nascoste in dati non etichettati.
+
+\subsection{K-Means Algorithm}
+Algoritmo di clustering iterativo per partizionare $N$ osservazioni in $K$ cluster.
+\begin{itemize}
+    \item \textbf{Input:} Dataset $\mathcal{D} = \{\mathbf{x}_n\}$, numero di cluster $K$.
+    \item \textbf{Output:} I centroidi $\mu_1, \ldots, \mu_K$.
+    \item \textbf{Passi Principali:}
+    \begin{enumerate}
+        \item \textbf{Inizializzazione:} Scegliere $K$ centroidi iniziali (spesso casualmente tra i punti dati).
+        \item \textbf{Fase di Assegnazione:} Assegnare ogni punto dati al centroide più vicino.
+        \item \textbf{Fase di Aggiornamento:} Ricalcolare la posizione di ogni centroide come la media di tutti i punti assegnati a quel cluster.
+        \item \textbf{Terminazione:} Ripetere i passi 2 e 3 fino a quando i centroidi non cambiano più posizione in modo significativo (convergenza).
+    \end{enumerate}
+    \item \textbf{Svantaggi:} Sensibile all'inizializzazione dei centroidi e alla presenza di outlier, tende a formare cluster di forma circolare/sferica.
+\end{itemize}
+
+\subsection{Gaussian Mixture Models (GMM)}
+Assumono che i dati siano generati da una miscela di $K$ distribuzioni Gaussiane.
+\begin{equation}
+    P(\mathbf{x}) = \sum_{k=1}^K \pi_k \mathcal{N}(\mathbf{x}; \mu_k, \Sigma_k)
+\end{equation}
+I parametri ($\pi_k$ probabilità a priori del cluster, $\mu_k$ media, $\Sigma_k$ matrice di covarianza) sono stimati con l'algoritmo \textbf{Expectation-Maximization (EM)}.
+\begin{itemize}
+    \item \textbf{E-step (Expectation):} Calcola le "responsabilità" $\gamma(z_k)$, cioè la probabilità che un punto $\mathbf{x}$ appartenga al cluster $k$.
+    \begin{equation}
+        \gamma(z_k) \equiv P(z_k = 1 | \mathbf{x}) = \frac{\pi_k \mathcal{N}(\mathbf{x}; \mu_k, \Sigma_k)}{\sum_{j=1}^K \pi_j \mathcal{N}(\mathbf{x}; \mu_j, \Sigma_j)}
+    \end{equation}
+    \item \textbf{M-step (Maximization):} Aggiorna i parametri $\pi_k, \mu_k, \Sigma_k$ usando le responsabilità calcolate.
+\end{itemize}
+
+\section{Riduzione della Dimensionalità}
+
+Tecniche per ridurre il numero di feature, utili per visualizzazione, riduzione del rumore e miglioramento dell'efficienza computazionale.
+
+\subsection{Principal Component Analysis (PCA)}
+Tecnica lineare che trasforma i dati in un nuovo sistema di coordinate (componenti principali), ordinato per quantità di varianza spiegata.
+\begin{itemize}
+    \item \textbf{Obiettivo:} Trovare direzioni $\mathbf{u}_i$ (componenti principali) che massimizzano la varianza dei dati proiettati.
+    \item \textbf{Soluzione:} Le componenti principali sono gli autovettori della matrice di covarianza $\mathbf{S}$ dei dati, e la varianza corrispondente è data dagli autovalori.
+    \item \textbf{Matrice di Covarianza:} $\mathbf{S} = \frac{1}{N} \mathbf{X}^T \mathbf{X}$.
+    \item \textbf{High-Dimensional Data ($N < D$):} Si opera sulla matrice $\mathbf{X}\mathbf{X}^T$ (dimensione $N \times N$) invece di $\mathbf{X}^T \mathbf{X}$ (dimensione $D \times D$) per efficienza.
+\end{itemize}
+\textbf{PCA Probabilistica:} Una formulazione probabilistica di PCA, che assume un modello generativo lineare Gaussiano con variabili latenti.
+
+\subsection{Autoencoders (AE)}
+Reti neurali autoassociative che apprendono una rappresentazione a bassa dimensione (encoding) di un input, tale da poter ricostruire l'input originale.
+\begin{itemize}
+    \item \textbf{Architettura:} Composta da un \textbf{Encoder} (input $\to$ rappresentazione latente) e un \textbf{Decoder} (rappresentazione latente $\to$ ricostruzione dell'input). Lo strato nascosto più piccolo è chiamato "bottleneck".
+    \item \textbf{Scopo:} Apprendere feature importanti, riduzione non lineare della dimensionalità.
+    \item \textbf{Training:} Minimizzare una funzione di costo di ricostruzione (es. MSE) tra input e output.
+    \item \textbf{Convolutional Autoencoders:} Per immagini, usano strati convoluzionali e deconvoluzionali (trasposed convolutional layers).
+    \item \textbf{Anomaly Detection:} Addestrando l'AE su dati "normali", un'alta errore di ricostruzione per un nuovo input indica un'anomalia.
+\end{itemize}
+
+\subsection{Generative Adversarial Networks (GAN)}
+Un tipo di modello generativo che impara a produrre campioni realistici da una distribuzione di input data, attraverso una competizione tra due reti neurali.
+\begin{itemize}
+    \item \textbf{Architettura:}
+    \begin{itemize}
+        \item \textbf{Generatore (G):} Prende un vettore di rumore casuale e produce un campione (es. un'immagine).
+        \item \textbf{Discriminatore (D):} Prende un campione (vero o generato) e cerca di distinguere se è reale o falso.
+    \end{itemize}
+    \item \textbf{Training (Adversarial Training):} G e D competono: G cerca di ingannare D producendo campioni sempre più realistici, mentre D cerca di migliorare la sua capacità di distinguere i campioni reali da quelli generati.
+    \item \textbf{Scopo:} Generazione di dati realistici, aumento di dataset, transfer learning.
+\end{itemize}
+
+\section{Markov Decision Processes (MDP) e Reinforcement Learning (RL)}
+
+MDP sono framework matematici per modellare il processo decisionale in situazioni dove gli esiti sono parzialmente casuali e sotto il controllo di un decisore. RL si occupa di apprendere policy ottimali in ambienti MDP sconosciuti.
+
+\subsection{Proprietà di Markov}
+La proprietà di Markov afferma che la dinamica futura di un sistema dipende solo dal suo stato corrente, e non dall'intera storia degli stati, azioni e osservazioni precedenti.
+\begin{itemize}
+    \item \textbf{Processo di Markov:} Un processo che soddisfa la proprietà di Markov.
+    \item \textbf{HMM (Hidden Markov Model):} I processi sottostanti sono di Markov, ma lo stato attuale non è direttamente osservabile, solo le osservazioni dipendono dallo stato.
+    \item \textbf{MDP (Markov Decision Process):} Lo stato è completamente osservabile e l'agente può prendere decisioni che influenzano la transizione di stato.
+\end{itemize}
+\textbf{MDP vs HMM (Modelli Grafici):}
+\begin{itemize}
+    \item \textbf{HMM:} Stato ($X_t$) non osservabile, Osservazione ($Z_t$) dipende da $X_t$. $X_t \to Z_t$ e $X_{t-1} \to X_t$.
+    \item \textbf{MDP:} Stato ($X_t$) osservabile, Azione ($A_t$) influenza $X_{t+1}$. $X_t \to A_t \to X_{t+1}$.
+    \item \textbf{POMDP (Partially Observable MDP):} Combinazione, stato non osservabile, azione influenza lo stato, osservazione dipende dallo stato. $X_t \to A_t \to X_{t+1} \to Z_{t+1}$.
+\end{itemize}
+
+\subsection{MDP: Modello e Soluzione}
+Un MDP è definito da $\langle \mathcal{X}, \mathcal{A}, \delta, r \rangle$:
+\begin{itemize}
+    \item \textbf{Stato ($\mathcal{X}$):} Insieme finito di stati.
+    \item \textbf{Azioni ($\mathcal{A}$):} Insieme finito di azioni.
+    \item \textbf{Funzione di Transizione ($\delta$):} $P(x'|x, a)$ (probabilistica) o $x' = \delta(x, a)$ (deterministica).
+    \item \textbf{Funzione di Ricompensa ($r$):} $r(x, a, x')$ ricompensa per transizione $(x, a, x')$.
+\end{itemize}
+\textbf{Soluzione di un MDP:} Una \textbf{policy ottima} $\pi^*(x)$ che massimizza la ricompensa cumulativa scontata.
+\begin{equation}
+    V^\pi(x) \equiv \mathbb{E}[r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \dots]
+\end{equation}
+dove $\gamma \in [0,1]$ è il fattore di sconto.
+
+\subsection{Reinforcement Learning (RL)}
+Apprendere una policy ottima quando l'MDP è sconosciuto (cioè $\delta$ e $r$ non sono noti).
+\begin{itemize}
+    \item \textbf{Funzione di Valore Q ($Q(x, a)$):} Valore atteso di prendere azione $a$ nello stato $x$ e poi seguire una policy ottima.
+    \begin{equation}
+        Q(x, a) \equiv \mathbb{E}[r(x, a)] + \gamma \sum_{x'} P(x' | x, a) \max_{a'} Q(x', a')
+    \end{equation}
+    La policy ottima si deriva da Q: $\pi^*(x) = \arg\max_{a \in \mathcal{A}} Q(x, a)$.
+    \item \textbf{Q-Learning:} Algoritmo off-policy per apprendere la funzione $Q$.
+    \begin{equation}
+        \hat{Q}_n(x, a) \leftarrow (1 - \alpha)\hat{Q}_{n-1}(x, a) + \alpha \left[ r + \gamma \max_{a'} \hat{Q}_{n-1}(x', a') \right]
+    \end{equation}
+    \item \textbf{SARSA:} Algoritmo on-policy per apprendere la funzione $Q$.
+    \begin{equation}
+        \hat{Q}_n(x, a) \leftarrow \hat{Q}_{n-1}(x, a) + \alpha \left[ r + \gamma \hat{Q}_{n-1}(x', a') - \hat{Q}_{n-1}(x, a) \right]
+    \end{equation}
+    \item \textbf{Strategie di Esplorazione/Sfruttamento:}
+    \begin{itemize}
+        \item \textbf{$\epsilon$-greedy:} Con probabilità $\epsilon$ esplora (sceglie un'azione casuale), con probabilità $1-\epsilon$ sfrutta (sceglie l'azione migliore secondo $\hat{Q}$).
+        \item \textbf{Soft-max:} Sceglie azioni con probabilità proporzionale al loro valore Q, dando una chance a tutte le azioni.
+    \end{itemize}
+    \item \textbf{K-Armed Bandit Problem:} Un caso semplificato di MDP con un solo stato. L'agente deve scegliere tra $K$ azioni con ricompense stocastiche.
+    \item \textbf{Policy Gradient Methods:} Invece di apprendere una funzione di valore, apprendono direttamente una policy parametrica $\pi_\theta(x)$ e ottimizzano i parametri $\theta$ usando metodi basati sul gradiente.
+
+\end{itemize}
+
+\section{Modelli Lineari per la Regressione}
+
+Cercano di approssimare una funzione continua $f: \mathcal{X} \to \mathcal{R}$.
+
+\subsection{Modelli Lineari a Funzione Base}
+$y(\mathbf{x}; \mathbf{w}) = \sum_{j=0}^M w_j \phi_j(\mathbf{x}) = \mathbf{w}^T \phi(\mathbf{x})$
+dove $\phi_j(\mathbf{x})$ sono funzioni base non lineari (es. polinomiali, radiali, sigmoidali) che trasformano lo spazio di input in uno spazio feature. Il modello rimane lineare nei parametri $w$.
+
+\subsection{Maximum Likelihood e Least Squares}
+Assumendo rumore Gaussiano sull'output $t = y(\mathbf{x}; \mathbf{w}) + \epsilon$, l'ottimizzazione dei parametri $w$ si riduce alla minimizzazione dell'errore quadratico (Least Squares):
+\begin{equation}
+    E_D(\mathbf{w}) = \frac{1}{2} \sum_{n=1}^N [t_n - \mathbf{w}^T \phi(\mathbf{x}_n)]^2
+\end{equation}
+La soluzione in forma chiusa è:
+\begin{equation}
+    \mathbf{w}_{ML} = (\Phi^T \Phi)^{-1} \Phi^T \mathbf{t}
+\end{equation}
+dove $\Phi$ è la design matrix.
+
+\subsection{Regularization (Regolarizzazione)}
+Tecnica per prevenire l'overfitting, aggiungendo un termine di penalità alla funzione di errore.
+\begin{equation}
+    \min_{\mathbf{w}} E_D(\mathbf{w}) + \lambda E_W(\mathbf{w})
+\end{equation}
+dove $E_W(\mathbf{w})$ penalizza la complessità del modello (es. $L_1$ o $L_2$ norm dei pesi).
+
+\subsection{Apprendimento Sequenziale (Stochastic Gradient Descent - SGD)}
+Metodo iterativo per grandi dataset. L'aggiornamento avviene per ogni esempio o per mini-batch:
+$\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla E_S$
+dove $\eta$ è il learning rate. Varianti come SGD con momentum migliorano la convergenza.
+
+\section{Strategie per le Domande d'Esame}
+
+\subsection{Preparazione Generale}
+\begin{itemize}
+    \item \textbf{Formulario a Portata di Mano:} Avere il formulario delle equazioni (come quello che hai generato) ben organizzato e comprensibile è fondamentale.
+    \item \textbf{Comprendere i Concetti, Non Solo Memorizzare:} Le domande d'esame non chiedono solo definizioni, ma la comprensione profonda dei "perché" e dei "quando" applicare un certo metodo o perché una certa metrica è più adatta.
+    \item \textbf{Esempi Qualitativi e Grafici:} Essere in grado di disegnare un esempio (anche schematico) di dataset, soluzione e problematiche (e.g., overfitting, outlier) è spesso richiesto.
+    \item \textbf{Pseudocodice:} Molte domande chiedono di descrivere algoritmi in pseudocodice.
+\end{itemize}
+
+\subsection{Approccio alle Domande}
+\begin{enumerate}
+    \item \textbf{Leggi Attentamente la Domanda:} Identifica i verbi chiave (descrivi, formalizza, calcola, discuti, simula).
+    \item \textbf{Identifica il Problema di ML:} È classificazione, regressione, clustering, RL? Quali sono input, output, spazio degli stati/azioni?
+    \item \textbf{Specificare Tutti gli Elementi:} Se richiesto un modello (e.g., MDP, ANN, CNN), elenca e definisci tutti i suoi componenti (stati, azioni, reward, pesi, bias, funzioni di attivazione, kernel, strati, etc.) e le loro dimensioni.
+    \item \textbf{Formalizzazione Matematica:} Scrivi le formule rilevanti, spiegando il significato di ogni termine.
+    \item \textbf{Spiegazione Algoritmica:} Descrivi i passi dell'algoritmo (anche in pseudocodice), specificando input, output e condizioni di terminazione.
+    \item \textbf{Discussione Critica:} Se richiesto, analizza i pro e i contro di una scelta, discuti le assunzioni (e.g., Naive Bayes), le limitazioni (e.g., K-Means con outlier), o le implicazioni (e.g., overfitting).
+    \item \textbf{Esempi Numerici/Grafici:} Se una domanda chiede un esempio numerico, cerca di usarne uno semplice che evidenzi il concetto richiesto. Se chiede un grafico, assicurati che sia chiaro e etichettato correttamente.
+\end{enumerate}
+
+\subsection{Temi Ricorrenti dagli Esami Forniti}
+\begin{itemize}
+    \item \textbf{Fondamentali:} Definizione di ML, tipi di apprendimento, bias-variance.
+    \item \textbf{Valutazione:} Matrice di confusione, metriche (accuracy, precision, recall, F1, TPR, TNR, FPR, FNR), K-Fold Cross Validation, overfitting e mitigazione.
+    \item \textbf{Decision Trees:} ID3, Information Gain, Entropy, pruning, gestione attributi continui/molti valori.
+    \item \textbf{Bayesiano:} MAP, ML, Bayes Optimal Classifier (BOC), Naive Bayes (assunzioni, stima probabilità, classificazione testi).
+    \item \textbf{Lineari Classificazione/Regressione:} Modelli lineari, Perceptron (modello, training), SVM (max margin, soft margin, support vectors, why preferred), Fisher's Linear Discriminant.
+    \item \textbf{Kernel Methods:} Kernel trick, Gram matrix, kernel function (tipologie), kernelized linear models/SVM.
+    \item \textbf{ANN/CNN:} Architettura (strati, dimensioni, parametri), funzioni di attivazione (ReLU, Sigmoid, Tanh), backpropagation, SGD (momentum), loss functions (cross-entropy, MSE), tecniche di regolarizzazione (dropout, early stopping, data augmentation, parameter norm penalties).
+    \item \textbf{Unsupervised:} K-Means (algoritmo, pro/contro, inizializzazione), GMM (EM algorithm).
+    \item \textbf{Dimensionality Reduction:} PCA (variance maximization, error minimization, high-dim data), Autoencoders (architettura, scopo, anomaly detection), GANs.
+    \item \textbf{Reinforcement Learning:} MDP (modello, stati, azioni, transizioni, reward), Q-Learning/SARSA (algoritmi, esplorazione/sfruttamento), k-armed bandit.
+\end{itemize}
+
+\end{document}
