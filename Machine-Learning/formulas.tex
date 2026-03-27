@@ -1,0 +1,733 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{titlesec}
+\titleformat*{\section}{\fontsize{10}{10}\bfseries}   
+
+\title{Formulary for the Machine Learning exam}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+Formulary to group and understand all the topics taught during the machine learning course held at the university "La Sapienza".
+
+\section{Introduction and Concept Learning}
+
+\noindent{Target Function Representation}
+\begin{equation}
+    \hat{V}(b) = w_0 + w_1 \cdot bp(b) + w_2 \cdot rp(b) + w_3 \cdot bk(b) + w_4 \cdot rk(b) + w_5 \cdot bt(b) + w_6 \cdot rt(b)
+\end{equation}
+
+\noindent{LMS Weight Update Rule}
+\begin{equation}
+    w_i \leftarrow w_i + c \cdot f_i \cdot error(b)
+\end{equation}
+
+\noindent{Version Space}
+\begin{equation}
+    VS_{H,D} \equiv \{h \in H | Consistent(h, D)\}
+\end{equation}
+
+
+\section{Performance Evaluation}
+
+\noindent{True Error}
+\begin{equation}
+    error_{\mathcal{D}}(h) \equiv \Pr_{x \in \mathcal{D}}[f(x) \neq h(x)]
+\end{equation}
+
+\noindent{Sample Error}
+\begin{equation}
+    error_S(h) \equiv \frac{1}{n} \sum_{x \in S} \delta(f(x) \neq h(x))
+\end{equation}
+
+\noindent{Estimation Bias}
+\begin{equation}
+    bias \equiv E_S[error_S(h)] - error_{\mathcal{D}}(h)
+\end{equation}
+
+\noindent{Confidence Interval}
+\begin{equation}
+    error_S(h) \pm z_N \sqrt{\frac{error_S(h)(1 - error_S(h))}{n}}
+\end{equation}
+
+\noindent{K-Fold Cross Validation Error}
+\begin{equation}
+    error_{L,\mathcal{D}} \equiv \frac{1}{k} \sum_{i=1}^k \delta_i
+\end{equation}
+
+\noindent{Comparing Two Hypotheses}
+\begin{equation}
+    \hat{d} \equiv error_{S_1}(h_1) - error_{S_2}(h_2)
+\end{equation}
+
+\noindent{Error Rate}
+\begin{equation}
+    \text{Error rate} = \frac{FN + FP}{TP + TN + FP + FN}
+\end{equation}
+
+\noindent{Accuracy}
+\begin{equation}
+    \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+\end{equation}
+
+\noindent{Recall (True Positive Rate)}
+\begin{equation}
+    \text{Recall} = \frac{TP}{P} = \frac{TP}{TP + FN}
+\end{equation}
+
+\noindent{Precision}
+\begin{equation}
+    \text{Precision} = \frac{TP}{TP + FP}
+\end{equation}
+
+\noindent{F1-Score}
+\begin{equation}
+    \text{F1-score} = 2 \frac{Precision \cdot Recall}{Precision + Recall}
+\end{equation}
+
+\noindent{Recall, Sensitivity, True Positive Rate (TPR)}
+\begin{equation}
+    \text{TPR} = \frac{TP}{P} = \frac{TP}{TP + FN}
+\end{equation}
+
+\noindent{Specificity, True Negative Rate (TNR)}
+\begin{equation}
+    \text{TNR} = \frac{TN}{N} = \frac{TN}{TN + FP}
+\end{equation}
+
+\noindent{False Positive Rate (FPR)}
+\begin{equation}
+    \text{FPR} = \frac{FP}{N} = \frac{FP}{TN + FP}
+\end{equation}
+
+\noindent{False Negative Rate (FNR)}
+\begin{equation}
+    \text{FNR} = \frac{FN}{P} = \frac{FN}{TP + FN}
+\end{equation}
+
+\noindent{Mean Absolute Error (MAE)}
+\begin{equation}
+    \text{MAE} = \frac{1}{n} \sum_{i=1}^n |\hat{f}(x_i) - t_i|
+\end{equation}
+
+\noindent{Mean Squared Error (MSE)}
+\begin{equation}
+    \text{MSE} = \frac{1}{n} \sum_{i=1}^n (\hat{f}(x_i) - t_i)^2
+\end{equation}
+
+\noindent{Coefficient of Determination ($R^2$)}
+\begin{equation}
+    R^2 = 1 - \frac{\sum_{n=1}^N (y_n - t_n)^2}{\sum_{n=1}^N (t_n - \mu)^2}
+\end{equation}
+
+
+\section{Decision Trees}
+
+\noindent{Entropy (Binary)}
+\begin{equation}
+    Entropy(S) \equiv -p_{\oplus} \log_2 p_{\oplus} - p_{\ominus} \log_2 p_{\ominus}
+\end{equation}
+
+\noindent{Entropy (Multi-class)}
+\begin{equation}
+    Entropy(S) \equiv \sum_{i=1}^c -p_i \log_2 p_i
+\end{equation}
+
+\noindent{Information Gain}
+\begin{equation}
+    Gain(S, A) \equiv Entropy(S) - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} Entropy(S_v)
+\end{equation}
+
+\noindent{Split Information}
+\begin{equation}
+    SplitInformation(S, A) \equiv - \sum_{i=1}^c \frac{|S_i|}{|S|} \log_2 \frac{|S_i|}{|S|}
+\end{equation}
+
+\noindent{Gain Ratio}
+\begin{equation}
+    GainRatio(S, A) \equiv \frac{Gain(S, A)}{SplitInformation(S, A)}
+\end{equation}
+
+\noindent{Cost-penalized Gain (Tan and Schlimmer)}
+\begin{equation}
+    \frac{Gain^2(S, A)}{Cost(A)}
+\end{equation}
+
+\noindent{Cost-penalized Gain (Nunez)}
+\begin{equation}
+    \frac{2^{Gain(S, A)} - 1}{(Cost(A) + 1)^w}
+\end{equation}
+
+
+\section{Probability and Bayes Networks}
+
+\noindent{Product Rule}
+\begin{equation}
+    P(A \wedge B) = P(A|B)P(B) = P(B|A)P(A)
+\end{equation}
+
+\noindent{Sum Rule}
+\begin{equation}
+    P(A \vee B) = P(A) + P(B) - P(A \wedge B)
+\end{equation}
+
+\noindent{Theorem of Total Probability}
+\begin{equation}
+    P(B) = \sum_{i=1}^n P(B|A_i)P(A_i)
+\end{equation}
+
+\noindent{Bayes Theorem}
+\begin{equation}
+    P(A|B) = \frac{P(B|A)P(A)}{P(B)}
+\end{equation}
+
+\noindent{Marginalization}
+\begin{equation}
+    P(\phi) = \sum_{\omega : \omega \models \phi} P(\omega)
+\end{equation}
+
+\noindent{Chain Rule}
+\begin{equation}
+    P(X_1, \ldots, X_n) = \prod_{i=1}^n P(X_i | X_1, \ldots, X_{i-1})
+\end{equation}
+
+\noindent{Conditional Independence}
+\begin{equation}
+    P(X, Y | Z) = P(X|Z)P(Y|Z)
+\end{equation}
+
+
+\section{Bayesian Learning}
+
+\noindent{MAP Hypothesis}
+\begin{equation}
+    h_{MAP} \equiv \arg\max_{h \in H} P(h|D) = \arg\max_{h \in H} \frac{P(D|h)P(h)}{P(D)}
+\end{equation}
+
+\noindent{Maximum Likelihood Hypothesis}
+\begin{equation}
+    h_{ML} = \arg\max_{h \in H} P(D|h)
+\end{equation}
+
+\noindent{Bayes Optimal Classifier}
+\begin{equation}
+    v_{OB} = \arg\max_{v_j \in V} \sum_{h_i \in H} P(v_j | x, h_i) P(h_i | D)
+\end{equation}
+
+\noindent{Naive Bayes Classifier}
+\begin{equation}
+    v_{NB} = \arg\max_{v_j \in V} P(v_j | D) \prod_i P(a_i | v_j, D)
+\end{equation}
+
+\noindent{Naive Bayes Estimation (Laplace Smoothing)}
+\begin{equation}
+    \hat{P}(a_i | v_j, D) = \frac{|\{ \ldots, a_i, \ldots, v_j \}| + m p}{|\{ \ldots, v_j \}| + m}
+\end{equation}
+
+\noindent{Text Classification Naive Bayes}
+\begin{equation}
+    c_{NB} = \arg\max_{c_j \in C} P(c_j | D) P(doc | c_j, D) = \arg\max_{c_j \in C} P(c_j) \prod_{i=1}^{\text{length}(doc)} P(w_i | c_j)
+\end{equation}
+
+\noindent{Bernoulli Distribution}
+\begin{equation}
+    P(X = k; \theta) = \theta^k (1 - \theta)^{1 - k}
+\end{equation}
+
+\noindent{Multivariate Bernoulli Distribution}
+\begin{equation}
+    P(X_1 = k_1, \ldots ; \theta_1, \ldots, \theta_n) = \prod_{i=1}^n P(X_i = k_i; \theta_i) = \prod_{i=1}^n \theta_i^{k_i} (1 - \theta_i)^{1 - k_i}
+\end{equation}
+
+\noindent{Binomial Distribution}
+\begin{equation}
+    P(X = k; n, \theta) = \binom{n}{k} \theta^k (1 - \theta)^{n - k}
+\end{equation}
+
+\noindent{Multinomial Distribution}
+\begin{equation}
+    P(X_1 = k_1, \ldots, X_d = k_d; n, \theta_1, \ldots, \theta_d) = \frac{n!}{k_1! \ldots k_d!} \theta_1^{k_1} \ldots \theta_d^{k_d}
+\end{equation}
+
+\noindent{General Maximum Likelihood Estimation}
+\begin{equation}
+    \Theta_{ML} = \arg\max_{\Theta} \log P(D | \Theta)
+\end{equation}
+
+
+\section{Probabilistic Models for Classification}
+
+\noindent{Generative Model Posterior (2 classes)}
+\begin{equation}
+    P(C_1 | \mathbf{x}) = \sigma(a) = \frac{1}{1 + \exp(-a)}
+\end{equation}
+
+\noindent{Linear Argument (a)}
+\begin{equation}
+    a = \ln \frac{P(\mathbf{x}|C_1)P(C_1)}{P(\mathbf{x}|C_2)P(C_2)} = \mathbf{w}^T \mathbf{x} + w_0
+\end{equation}
+
+\noindent{Gaussian Linear Parameters}
+\begin{equation}
+    \begin{aligned}
+        \mathbf{w} &= \Sigma^{-1}(\mu_1 - \mu_2) \\
+        w_0 &= -\frac{1}{2} \mu_1^T \Sigma^{-1} \mu_1 + \frac{1}{2} \mu_2^T \Sigma^{-1} \mu_2 + \ln \frac{\pi}{1 - \pi}
+    \end{aligned}
+\end{equation}
+
+\noindent{Maximum Likelihood for Gaussian Parameters}
+\begin{equation}
+    \begin{aligned}
+        \hat{\pi} &= \frac{N_1}{N} \\
+        \hat{\mu}_1 &= \frac{1}{N_1} \sum_{n=1}^N t_n \mathbf{x}_n, \quad \hat{\mu}_2 = \frac{1}{N_2} \sum_{n=1}^N (1 - t_n) \mathbf{x}_n \\
+        \hat{\Sigma} &= \frac{N_1}{N} S_1 + \frac{N_2}{N} S_2
+    \end{aligned}
+\end{equation}
+
+\noindent{Generative Model Posterior (K classes)}
+\begin{equation}
+    P(C_k | \mathbf{x}) = \frac{\exp(a_k)}{\sum_j \exp(a_j)}
+\end{equation}
+
+\noindent{Logistic Regression Cross-Entropy}
+\begin{equation}
+    E(\tilde{\mathbf{w}}) \equiv - \ln p(\mathbf{t} | \tilde{\mathbf{w}}) = - \sum_{n=1}^N[t_n \ln y_n + (1 - t_n) \ln(1 - y_n)]
+\end{equation}
+
+\noindent{Logistic Regression Gradient}
+\begin{equation}
+    \nabla E(\tilde{\mathbf{w}}) = \sum_{n=1}^N (y_n - t_n) \tilde{\mathbf{x}}_n
+\end{equation}
+
+\noindent{Iterative Reweighted Least Squares (IRLS) Update}
+\begin{equation}
+    \begin{aligned}
+        \tilde{\mathbf{w}} &\leftarrow \tilde{\mathbf{w}} - \mathbf{H}(\tilde{\mathbf{w}})^{-1} \nabla E(\tilde{\mathbf{w}}) \\
+        \mathbf{H}(\tilde{\mathbf{w}}) &= \nabla \nabla E(\tilde{\mathbf{w}}) = \sum_{n=1}^N y_n (1 - y_n) \tilde{\mathbf{x}}_n \tilde{\mathbf{x}}_n^T = \tilde{\mathbf{X}}^T \mathbf{R} \tilde{\mathbf{X}}
+    \end{aligned}
+\end{equation}
+
+\noindent{Multiclass Logistic Regression Cross-Entropy}
+\begin{equation}
+    E(\tilde{\mathbf{w}}_1, \dots, \tilde{\mathbf{w}}_K) = - \sum_{n=1}^N \sum_{k=1}^K t_{nk} \ln y_{nk}
+\end{equation}
+
+
+\section{Linear Models for Classification}
+
+\noindent{Linear Discriminant Function}
+\begin{equation}
+    y(\mathbf{x}) = \mathbf{w}^T \mathbf{x} + w_0 = \tilde{\mathbf{w}}^T \tilde{\mathbf{x}}
+\end{equation}
+
+\noindent{Least Squares Error (Matrix Form)}
+\begin{equation}
+    E(\mathbf{W}) = \frac{1}{2} \text{Tr} \left\{ (\mathbf{X}\mathbf{W} - \mathbf{T})^T (\mathbf{X}\mathbf{W} - \mathbf{T}) \right\}
+\end{equation}
+
+\noindent{Least Squares Closed-Form Solution}
+\begin{equation}
+    \mathbf{W}^* = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{T} = \mathbf{X}^{\dagger} \mathbf{T}
+\end{equation}
+
+\noindent{Perceptron Output}
+\begin{equation}
+    o(\mathbf{x}) = \text{sign}(\mathbf{w}^T \mathbf{x})
+\end{equation}
+
+\noindent{Perceptron Squared Error}
+\begin{equation}
+    E(\mathbf{w}) \equiv \frac{1}{2} \sum_{n=1}^N (t_n - o_n)^2 = \frac{1}{2} \sum_{n=1}^N (t_n - \mathbf{w}^T \mathbf{x}_n)^2
+\end{equation}
+
+\noindent{Perceptron Weight Update}
+\begin{equation}
+    \Delta w_i = \eta \sum_{n=1}^N (t_n - \text{sign}(\mathbf{w}^T \mathbf{x}_n)) x_{i,n}
+\end{equation}
+
+\noindent{Fisher's Criterion}
+\begin{equation}
+    J(\mathbf{w}) = \frac{\mathbf{w}^T \mathbf{S}_B \mathbf{w}}{\mathbf{w}^T \mathbf{S}_W \mathbf{w}}
+\end{equation}
+
+\noindent{Fisher Linear Discriminant Solution}
+\begin{equation}
+    \mathbf{w}^* \propto \mathbf{S}_W^{-1} (\mathbf{m}_2 - \mathbf{m}_1)
+\end{equation}
+
+\noindent{Support Vector Machine Canonical Constraint}
+\begin{equation}
+    \mathbf{w}^*, w_0^* = \arg\min \frac{1}{2} ||\mathbf{w}||^2 \quad \text{subject to} \quad t_n(\mathbf{w}^T \mathbf{x}_n + w_0) \ge 1 \quad \forall n
+\end{equation}
+
+\noindent{Soft Margin SVM Objective}
+\begin{equation}
+    \mathbf{w}^*, w_0^* = \arg\min \frac{1}{2} ||\mathbf{w}||^2 + C \sum_{n=1}^N \xi_n \quad \text{subject to} \quad t_n(\mathbf{w}^T \mathbf{x}_n + w_0) \ge 1 - \xi_n
+\end{equation}
+
+\noindent{SVM Lagrangian Optimization Problem}
+\begin{equation}
+    \tilde{L}(\mathbf{a}) = \sum_{n=1}^N a_n - \frac{1}{2} \sum_{n=1}^N \sum_{m=1}^N a_n a_m t_n t_m \mathbf{x}_n^T \mathbf{x}_m
+\end{equation}
+
+\noindent{SVM Hyperplane Support Vectors}
+\begin{equation}
+    \mathbf{w}^* = \sum_{n=1}^N a_n^* t_n \mathbf{x}_n
+\end{equation}
+
+
+\section{Linear Models for Regression}
+
+\noindent{Linear Regression Basis Function Model}
+\begin{equation}
+    y(\mathbf{x}; \mathbf{w}) = \sum_{j=0}^M w_j \phi_j(\mathbf{x}) = \mathbf{w}^T \phi(\mathbf{x})
+\end{equation}
+
+\noindent{Linear Regression Log-Likelihood}
+\begin{equation}
+    \ln P(\mathbf{t} | \mathbf{X}, \mathbf{w}, \beta) = -\beta \frac{1}{2} \sum_{n=1}^N[t_n - \mathbf{w}^T \phi(\mathbf{x}_n)]^2 - \frac{N}{2} \ln(2\pi\beta^{-1})
+\end{equation}
+
+\noindent{Linear Regression Least Squares Solution}
+\begin{equation}
+    \mathbf{w}_{ML} = (\Phi^T \Phi)^{-1} \Phi^T \mathbf{t} = \Phi^\dagger \mathbf{t}
+\end{equation}
+
+\noindent{SGD Update}
+\begin{equation}
+    \hat{\mathbf{w}} \leftarrow \hat{\mathbf{w}} - \eta \nabla E_S
+\end{equation}
+
+\noindent{Linear Regression Regularized Error}
+\begin{equation}
+    \arg\min_{\mathbf{w}} E_D(\mathbf{w}) + \lambda E_W(\mathbf{w})
+\end{equation}
+
+
+\section{Kernel Methods}
+
+\noindent{Kernelized Linear Model Dual Solution}
+\begin{equation}
+    \alpha = (\mathbf{K} + \lambda \mathbf{I}_N)^{-1} \mathbf{t} \quad \text{where } \mathbf{K} = \mathbf{X} \mathbf{X}^T
+\end{equation}
+
+\noindent{Polynomial Kernel}
+\begin{equation}
+    k(\mathbf{x}, \mathbf{x}') = (\beta \mathbf{x}^T \mathbf{x}' + \gamma)^d
+\end{equation}
+
+\noindent{Radial Basis Function (RBF) Kernel}
+\begin{equation}
+    k(\mathbf{x}, \mathbf{x}') = \exp(-\beta ||\mathbf{x} - \mathbf{x}'||^2)
+\end{equation}
+
+\noindent{Sigmoid Kernel}
+\begin{equation}
+    k(\mathbf{x}, \mathbf{x}') = \tanh(\beta \mathbf{x}^T \mathbf{x}' + \gamma)
+\end{equation}
+
+\noindent{Kernelized SVM Regression Loss}
+\begin{equation}
+    E(\mathbf{w}) = C \sum_{n=1}^N E_\epsilon(y_n, t_n) + \frac{1}{2} ||\mathbf{w}||^2
+\end{equation}
+
+\noindent{Kernelized SVM Prediction}
+\begin{equation}
+    y(\mathbf{x}) = \sum_{n=1}^N (\hat{a}_n - \hat{a}_n') k(\mathbf{x}, \mathbf{x}_n) + \hat{w}_0
+\end{equation}
+
+
+\section{Instance Based Learning}
+
+\noindent{K-Nearest Neighbors Likelihood}
+\begin{equation}
+    p(c | \mathbf{x}, D, K) = \frac{1}{K} \sum_{\mathbf{x}_n \in N_K(\mathbf{x}, D)} \mathbb{I}(t_n = c)
+\end{equation}
+
+\noindent{Kernelized Distance}
+\begin{equation}
+    ||\mathbf{x} - \mathbf{x}_n||^2 = \mathbf{x}^T \mathbf{x} + \mathbf{x}_n^T \mathbf{x}_n - 2\mathbf{x}^T \mathbf{x}_n
+\end{equation}
+
+
+\section{Artificial Neural Networks}
+
+\noindent{Network Layer Activation}
+\begin{equation}
+    \mathbf{h}_{i+1} = f(\mathbf{W}_i^T \mathbf{h}_i + \mathbf{b}_i)
+\end{equation}
+
+\noindent{Cross-Entropy Loss}
+\begin{equation}
+    J(\theta) = \mathbb{E}_{\mathbf{x}, \mathbf{t} \sim \mathcal{D}}[ - \ln(p(\mathbf{t} | \mathbf{x}, \theta)) ]
+\end{equation}
+
+\noindent{Softmax Activation}
+\begin{equation}
+    y_i = \text{softmax}(\alpha^{(i)}) = \frac{\exp(\alpha^{(i)})}{\sum_j \exp(\alpha_j)}
+\end{equation}
+
+\noindent{Rectified Linear Unit (ReLU)}
+\begin{equation}
+    g(\alpha) = \max(0, \alpha)
+\end{equation}
+
+\noindent{Sigmoid Activation}
+\begin{equation}
+    g(\alpha) = \sigma(\alpha) = \frac{1}{1 + \exp(-\alpha)}
+\end{equation}
+
+\noindent{Hyperbolic Tangent Activation}
+\begin{equation}
+    g(\alpha) = \tanh(\alpha) = 2\sigma(2\alpha) - 1
+\end{equation}
+
+\noindent{Chain Rule}
+\begin{equation}
+    \nabla_{\mathbf{x}} z = \left( \frac{\partial \mathbf{y}}{\partial \mathbf{x}} \right)^T \nabla_{\mathbf{y}} z
+\end{equation}
+
+\noindent{SGD with Momentum Update}
+\begin{equation}
+    \begin{aligned}
+        \mathbf{v}^{(k+1)} &\leftarrow \mu \mathbf{v}^{(k)} - \eta \mathbf{g} \\
+        \theta^{(k+1)} &\leftarrow \theta^{(k)} + \mathbf{v}^{(k+1)}
+    \end{aligned}
+\end{equation}
+
+\noindent{Parameter Norm Penalty}
+\begin{equation}
+    \bar{J}(\theta) = J(\theta) + \lambda E_{reg}(\theta) \quad \text{with} \quad E_{reg}(\theta) = \sum_j |\theta_j|^q
+\end{equation}
+
+
+\section{Convolutional Neural Networks}
+
+\noindent{Continuous Convolution}
+\begin{equation}
+    (x * w)(t) \equiv \int_{-\infty}^{\infty} x(a) w(t - a) da
+\end{equation}
+
+\noindent{Discrete 2D Convolution}
+\begin{equation}
+    (I * K)(i, j) \equiv \sum_{m \in S_1} \sum_{n \in S_2} I(m, n)K(i - m, j - n)
+\end{equation}
+
+\noindent{Discrete 2D Cross-Correlation}
+\begin{equation}
+    (I * K)(i, j) = \sum_{m \in S_1} \sum_{n \in S_2} I(i + m, j + n)K(m, n)
+\end{equation}
+
+\noindent{Feature Map Dimensions}
+\begin{equation}
+    w_{out} = \frac{w_{in} - w_k + 2p}{s} + 1, \quad h_{out} = \frac{h_{in} - h_k + 2p}{s} + 1
+\end{equation}
+
+\noindent{Convolutional Layer Parameter Count}
+\begin{equation}
+    |\theta| = w_k \cdot h_k \cdot d_{in} \cdot d_{out} + d_{out}
+\end{equation}
+
+
+\section{Multiple Learners}
+
+\noindent{Voting (Regression)}
+\begin{equation}
+    y_{voting}(\mathbf{x}) = \sum_{m=1}^M w_m y_m(\mathbf{x})
+\end{equation}
+
+\noindent{Voting (Classification)}
+\begin{equation}
+    y_{voting}(\mathbf{x}) = \arg\max_c \sum_{m=1}^M w_m \mathbb{I}(y_m(\mathbf{x}) = c)
+\end{equation}
+
+\noindent{Bagging Prediction}
+\begin{equation}
+    y_{bagging}(\mathbf{x}) = \frac{1}{M} \sum_{m=1}^M y_m(\mathbf{x})
+\end{equation}
+
+\noindent{AdaBoost Final Classifier}
+\begin{equation}
+    Y_M(\mathbf{x}) = \text{sign} \left( \sum_{m=1}^M \alpha_m y_m(\mathbf{x}) \right)
+\end{equation}
+
+\noindent{AdaBoost Weighted Error}
+\begin{equation}
+    \epsilon_m = \frac{\sum_{n=1}^N w_n^{(m)} \mathbb{I}(y_m(\mathbf{x}_n) \neq t_n)}{\sum_{n=1}^N w_n^{(m)}}
+\end{equation}
+
+\noindent{AdaBoost Alpha Parameter}
+\begin{equation}
+    \alpha_m = \ln \left( \frac{1 - \epsilon_m}{\epsilon_m} \right)
+\end{equation}
+
+\noindent{AdaBoost Weight Update}
+\begin{equation}
+    w_n^{(m+1)} = w_n^{(m)} \exp[ \alpha_m \mathbb{I}(y_m(\mathbf{x}_n) \neq t_n) ]
+\end{equation}
+
+\noindent{Bias-Variance Decomposition}
+\begin{equation}
+    \begin{aligned}
+        MSE &= E_S[(y - \hat{f}(\mathbf{x}; D))^2] \\
+        &= Bias^2 + Variance + Noise \\
+        Bias &= E_S[\hat{f}(\mathbf{x}; D)] - f(\mathbf{x}) \\
+        Variance &= E_S[(\hat{f}(\mathbf{x}; D) - E_S[\hat{f}(\mathbf{x}; D)])^2]
+    \end{aligned}
+\end{equation}
+
+
+\section{Unsupervised Learning}
+
+\noindent{Gaussian Mixture Model}
+\begin{equation}
+    P(\mathbf{x}) = \sum_{k=1}^K \pi_k \mathcal{N}(\mathbf{x}; \mu_k, \Sigma_k)
+\end{equation}
+
+\noindent{GMM Posterior Responsibilities (E-step)}
+\begin{equation}
+    \gamma(z_k) \equiv P(z_k = 1 | \mathbf{x}) = \frac{\pi_k \mathcal{N}(\mathbf{x}; \mu_k, \Sigma_k)}{\sum_{j=1}^K \pi_j \mathcal{N}(\mathbf{x}; \mu_j, \Sigma_j)}
+\end{equation}
+
+\noindent{GMM Parameters Update (M-step)}
+\begin{equation}
+    \begin{aligned}
+        \mu_k &= \frac{1}{N_k} \sum_{n=1}^N \gamma(z_{nk}) \mathbf{x}_n \\
+        \Sigma_k &= \frac{1}{N_k} \sum_{n=1}^N \gamma(z_{nk}) (\mathbf{x}_n - \mu_k)(\mathbf{x}_n - \mu_k)^T \\
+        \pi_k &= \frac{N_k}{N}, \quad \text{with} \quad N_k = \sum_{n=1}^N \gamma(z_{nk})
+    \end{aligned}
+\end{equation}
+
+\noindent{General EM Algorithm}
+\begin{equation}
+    \begin{aligned}
+        \text{E-step: } & Q(\theta' | \theta) \leftarrow \mathbb{E}[\ln P(\mathbf{Y} | \theta') | \theta, \mathbf{X}] \\
+        \text{M-step: } & \theta \leftarrow \arg\max_{\theta'} Q(\theta' | \theta)
+    \end{aligned}
+\end{equation}
+
+
+\section{Dimensionality Reduction}
+
+\noindent{PCA Covariance Matrix}
+\begin{equation}
+    S = \frac{1}{N} \sum_{n=1}^N (\mathbf{x}_n - \bar{\mathbf{x}})(\mathbf{x}_n - \bar{\mathbf{x}})^T = \frac{1}{N} \mathbf{X}^T \mathbf{X}
+\end{equation}
+
+\noindent{PCA Projected Variance Maximization}
+\begin{equation}
+    \max_{\mathbf{u}_1} \mathbf{u}_1^T \mathbf{S} \mathbf{u}_1 \quad \text{subject to} \quad \mathbf{u}_1^T \mathbf{u}_1 = 1
+\end{equation}
+
+\noindent{PCA Approximation Error}
+\begin{equation}
+    J = \frac{1}{N} \sum_{n=1}^N ||\mathbf{x}_n - \tilde{\mathbf{x}}_n||^2 = \sum_{i=m+1}^d \mathbf{u}_i^T \mathbf{S} \mathbf{u}_i
+\end{equation}
+
+\noindent{PCA High-Dimensional Eigenvector}
+\begin{equation}
+    \frac{1}{N} \mathbf{X} \mathbf{X}^T \mathbf{v}_i = \lambda_i \mathbf{v}_i \implies \mathbf{u}_i = \frac{1}{\sqrt{N \lambda_i}} \mathbf{X}^T \mathbf{v}_i
+\end{equation}
+
+\noindent{Probabilistic PCA Model}
+\begin{equation}
+    P(\mathbf{x}|\mathbf{z}) = \mathcal{N}(\mathbf{x}; \mathbf{W}\mathbf{z} + \mu, \sigma^2 \mathbf{I})
+\end{equation}
+
+\noindent{Probabilistic PCA Marginal Distribution}
+\begin{equation}
+    P(\mathbf{x}) = \mathcal{N}(\mathbf{x}; \mu, \mathbf{C}) \quad \text{with} \quad \mathbf{C} = \mathbf{W}\mathbf{W}^T + \sigma^2 \mathbf{I}
+\end{equation}
+
+\noindent{Probabilistic PCA Posterior Distribution}
+\begin{equation}
+    P(\mathbf{z}|\mathbf{x}) = \mathcal{N}(\mathbf{z}; \mathbf{M}^{-1}\mathbf{W}^T(\mathbf{x} - \mu), \sigma^2 \mathbf{M}) \quad \text{with} \quad \mathbf{M} = \mathbf{W}^T \mathbf{W} + \sigma^2 \mathbf{I}
+\end{equation}
+
+
+\section{Markov Decision Processes and Reinforcement Learning}
+
+\noindent{HMM Joint Probability}
+\begin{equation}
+    P(x_{0:T}, z_{1:T}) = P(x_0)P(z_0|x_0)P(x_1|x_0)P(z_1|x_1) \dots
+\end{equation}
+
+\noindent{HMM Forward Step}
+\begin{equation}
+    \alpha_t^k \equiv P(x_t = k, z_{1:t}) = b_k(z_t) \sum_j \alpha_{t-1}^j A_{jk}
+\end{equation}
+
+\noindent{HMM Backward Step}
+\begin{equation}
+    \beta_t^k \equiv P(z_{t+1:T} | x_t = k) = \sum_j \beta_{t+1}^j A_{kj} b_j(z_{t+1})
+\end{equation}
+
+\noindent{HMM Smoothing}
+\begin{equation}
+    P(x_t = k | z_{1:T}) = \frac{\alpha_t^k \beta_t^k}{\sum_j \alpha_t^j \beta_t^j}
+\end{equation}
+
+\noindent{POMDP Belief State Update}
+\begin{equation}
+    b'(x') = \frac{o(x', a, z') \sum_{x \in X} \delta(x, a, x') b(x)}{P(z' | b, a)}
+\end{equation}
+
+\noindent{POMDP Value Function}
+\begin{equation}
+    V(b) = \max_{a \in A} \left[ \sum_{x \in X} b(x) r(x, a) + \gamma \sum_{z \in Z} P(z|b, a) V(b_z^a) \right]
+\end{equation}
+
+\noindent{MDP Value Function (Stochastic)}
+\begin{equation}
+    V^\pi(x) \equiv \mathbb{E}[r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \dots]
+\end{equation}
+
+\noindent{MDP Bellman Equation}
+\begin{equation}
+    V^\pi(x) = \sum_{x'} \delta(x' | x, \pi(x)) \left( r(x, \pi(x), x') + \gamma V^\pi(x') \right)
+\end{equation}
+
+\noindent{Q Function (Deterministic)}
+\begin{equation}
+    Q^\pi(x, a) \equiv r(x, a) + \gamma V^\pi(\delta(x, a))
+\end{equation}
+
+\noindent{Q Function (Stochastic)}
+\begin{equation}
+    Q(x, a) \equiv \mathbb{E}[r(x, a)] + \gamma \sum_{x'} P(x' | x, a) \max_{a'} Q(x', a')
+\end{equation}
+
+\noindent{Optimal Policy from Q}
+\begin{equation}
+    \pi^*(x) = \arg\max_{a \in A} Q(x, a)
+\end{equation}
+
+\noindent{Q-learning Update (Deterministic)}
+\begin{equation}
+    \hat{Q}_{(t)}(x, a) \leftarrow \bar{r} + \gamma \max_{a' \in A} \hat{Q}_{(t-1)}(x', a')
+\end{equation}
+
+\noindent{Q-learning Update (Non-Deterministic)}
+\begin{equation}
+    \hat{Q}_n(x, a) \leftarrow (1 - \alpha)\hat{Q}_{n-1}(x, a) + \alpha \left[ r + \gamma \max_{a'} \hat{Q}_{n-1}(x', a') \right]
+\end{equation}
+
+\noindent{SARSA Update}
+\begin{equation}
+    \hat{Q}_n(x, a) \leftarrow \hat{Q}_{n-1}(x, a) + \alpha \left[ r + \gamma \hat{Q}_{n-1}(x', a') - \hat{Q}_{n-1}(x, a) \right]
+\end{equation}
+
+\noindent{Soft-max Exploration Strategy}
+\begin{equation}
+    P(a_i | x) = \frac{k^{\hat{Q}(x, a_i)}}{\sum_j k^{\hat{Q}(x, a_j)}}
+\end{equation}
+
+\noindent{Policy Gradient Update}
+\begin{equation}
+    \theta \leftarrow \theta + \eta \Delta_\theta \rho(\theta)
+\end{equation}
+
+\end{document}
