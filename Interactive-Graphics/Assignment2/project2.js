@@ -5,6 +5,8 @@
 // You can use the MatrixMult function defined in project4.html to multiply two 4x4 matrices in the same format.
 function GetModelViewProjection( projectionMatrix, translationX, translationY, translationZ, rotationX, rotationY )
 {
+
+	// Column major order
 	var trans = [
 		1, 0, 0, 0,
 		0, 1, 0, 0,
@@ -42,6 +44,12 @@ class MeshDrawer
 {
 	constructor()
 	{
+		// attribute: dati che cambiano per ogni vertice
+		// uniform: variabili globali che restano identiche per tutto il draw (es uMVP, uShowTexture)
+		// verying: 
+
+
+		// Vertex Shader
 		const meshVS = `
 			attribute vec3 aPos;
 			attribute vec2 aTexCoord;
@@ -58,6 +66,9 @@ class MeshDrawer
 			}
 		`;
 
+
+
+		// Fragment Shader (applica la texture sull'oggetto)
 		const meshFS = `
 			precision mediump float;
 			uniform sampler2D uSampler;
@@ -67,7 +78,7 @@ class MeshDrawer
 				if (uShowTexture) {
 					gl_FragColor = texture2D(uSampler, fract(vTexCoord));
 				} else {
-					gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // Bianco se texture spenta
+					gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 				}
 			}
 		`;
@@ -91,6 +102,9 @@ class MeshDrawer
 		this.texCoordsBuffer = null;
 	}
 	
+	// vertPos lista dei vertici 3D
+	// texCoords coordinate 2d
+	// setMesh crea dei Buffer (spazi di memoria) e ci carica dentro questi dati per renderli disponibili alla scheda video
 	setMesh( vertPos, texCoords )
 	{
 		this.numTriangles = vertPos.length / 3;
@@ -111,6 +125,8 @@ class MeshDrawer
 		gl.uniform1i(this.swapYZLoc, swap ? 1 : 0);
 	}	
 	
+
+	// Passa agli shader nla matrice matematica aggiornata, e spiega come disegnare l'oggetto.
 	draw( trans )
 	{
 		if (!this.vertexBuffer || !this.texCoordsBuffer) return;
@@ -129,6 +145,7 @@ class MeshDrawer
 
 		if (this.posAttr >= 0) {
 			gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+			// Takes attribute this.posAttr, composto da 3 numeri (x,y,z), float 32 bits, non li normalizzare (false), 0 stride, 0 offset
 			gl.vertexAttribPointer(this.posAttr, 3, gl.FLOAT, false, 0, 0);
 			gl.enableVertexAttribArray(this.posAttr); 
 		}
@@ -140,12 +157,15 @@ class MeshDrawer
 		} else if (this.texAttr >= 0) {
 			gl.disableVertexAttribArray(this.texAttr);
 		}
-
+		//istruisce la scheda video a prendere tutti i vertici e collegarli a tre a tre,
+		// formando i triangoli che comporranno visivamente il tuo oggetto 3D
 		gl.drawArrays(gl.TRIANGLES, 0, this.numTriangles);
 	}
 	
 	// This method is called to set the texture of the mesh.
 	// The argument is an HTML IMG element containing the texture data.
+	
+	// riceve un immagine web e la converte in texture WebGL.
 	setTexture( img )
 	{
 		if (!img || !img.complete) return;
@@ -159,6 +179,7 @@ class MeshDrawer
 			return (value & (value - 1)) == 0;
 		}
 
+		// Mipmapping crea versioni rimpicciolite dell'immagine per quando l'oggetto e lontano, e permette la ripetizione dell'immagine.
 		if (isPowerOf2(img.width) && isPowerOf2(img.height)) {
 	
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
@@ -167,6 +188,8 @@ class MeshDrawer
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 			gl.generateMipmap(gl.TEXTURE_2D);
+
+		// con clamp_to_edge stai forzando i bordi della texture a non ripetersi quando l'immagine non e power of 2 (widthxhight)
 		} else {
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
