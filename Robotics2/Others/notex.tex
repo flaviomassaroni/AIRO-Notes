@@ -1018,13 +1018,13 @@ By changing the weight matrix $W$, we obtain the three classic dynamic resolutio
 % ==========================================
 % PART 2: HOW TO SOLVE EXERCISES
 % ==========================================
-\part*{Part 2: How to Solve Midterm Exercises}
+\section{How to Solve Midterm Exercises}
 \textit{This section provides step-by-step algorithms to solve the exact typologies of exercises found in the exams.}
 
 % ---------------------------------------------------------
-\section{Type A.1: Task Priority and Task Augmentation}
+\subsection{Type A.1: Task Priority and Task Augmentation}
 
- \textbf{Algorithm: Solving Task Priority (TP) Problems}
+\textbf{Algorithm: Solving Task Priority (TP) Problems}
 \textbf{Goal:} Execute a primary task $\dot{x}_1$ perfectly, and a secondary task $\dot{x}_2$ as best as possible using the remaining degrees of freedom.
 \begin{enumerate}
     \item Identify the Jacobians $J_1$ and $J_2$.
@@ -1036,9 +1036,68 @@ By changing the weight matrix $W$, we obtain the three classic dynamic resolutio
     \item The total solution is: $\dot{q}_{TP} = \dot{q}_1 + \tilde{J}_2^\# e_2$.
 \end{enumerate}
 
+% ---------------------------------------------------------
+\subsubsection{Example: Iterative Task Priority (3 or more tasks)}
+
+ \textbf{Algorithm: General Recursive Formulation (Siciliano-Slotine)}
+\textbf{Goal:} Execute multiple tasks strictly ordered by priority (Task 1 $>$ Task 2 $>$ Task 3). This is the exact algorithm to use when handling $N \ge 3$ tasks.
+\vspace{0.2cm}
+
+\textbf{1. Initialization:} Start with zero velocity and full available null-space (Identity matrix for an $n$-DOF robot).
+\begin{align*}
+    P_{A,0} &= I_{n \times n} \\
+    \dot{q}_0 &= 0
+\end{align*}
+
+\textbf{2. Task 1 (Primary):} Calculate the command for the first task and update the available null-space.
+\begin{align*}
+    P_{1|0} &= (J_1 P_{A,0})^\# \quad \left[ \text{which simplifies to } J_1^\# \right] \\
+    \dot{q}_1 &= \dot{q}_0 + P_{1|0} (\dot{r}_1 - J_1 \dot{q}_0) \quad \left[ \text{which simplifies to } J_1^\# \dot{r}_1 \right] \\
+    P_{A,1} &= P_{A,0} - P_{1|0} J_1 P_{A,0} \quad \left[ \text{which simplifies to } I - J_1^\# J_1 \right]
+\end{align*}
+
+\textbf{3. Task 2 (Secondary):} Project $J_2$ into the null-space left by Task 1.
+\begin{align*}
+    P_{2|1} &= (J_2 P_{A,1})^\# \\
+    \dot{q}_2 &= \dot{q}_1 + P_{2|1} (\dot{r}_2 - J_2 \dot{q}_1) \\
+    P_{A,2} &= P_{A,1} - P_{2|1} J_2 P_{A,1}
+\end{align*}
+
+\textbf{4. Task 3 (Tertiary):} Project $J_3$ into the null-space left by Tasks 1 and 2.
+\begin{align*}
+    P_{3|2} &= (J_3 P_{A,2})^\# \\
+    \dot{q}_{TP} &= \dot{q}_2 + P_{3|2} (\dot{r}_3 - J_3 \dot{q}_2)
+\end{align*}
+
+\begin{examtip}
+\textbf{Pattern Recognition:} Notice the repeating pattern? For any task $k$, you compute the projected inverse $P_{k|k-1}$, update the velocity $\dot{q}_k$ using the error $(\dot{r}_k - J_k \dot{q}_{k-1})$, and finally update the augmented null-space projector $P_{A,k}$. If an exam asks for $4$ tasks, you just add one more block following this exact same logic!
+\end{examtip}
+\textbf{Algorithm: Solving Task Augmentation (TA) Problems}
+\textbf{Goal:} Execute multiple tasks simultaneously by grouping them into a single, higher-dimensional augmented task, treating them with equal priority.
+\begin{enumerate}
+    \item Identify the Jacobians for the individual tasks: $J_1$ and $J_2$.
+    \item Identify the desired velocities for the tasks: $\dot{x}_1$ and $\dot{x}_2$.
+    \item Build the \textit{Augmented Jacobian} matrix by stacking the individual Jacobians: 
+    \begin{equation*}
+        J_A = \begin{bmatrix} J_1 \\ J_2 \end{bmatrix}
+    \end{equation*}
+    \item Build the \textit{Augmented Task Velocity} vector by stacking the desired velocities: 
+    \begin{equation*}
+        \dot{x}_A = \begin{bmatrix} \dot{x}_1 \\ \dot{x}_2 \end{bmatrix}
+    \end{equation*}
+    \item Calculate the pseudoinverse of the Augmented Jacobian: $J_A^\# = J_A^T(J_A J_A^T)^{-1}$ (assuming it has full row rank, otherwise use the general pseudoinverse).
+    \item The total joint velocity solution is directly given by: $\dot{q}_{TA} = J_A^\# \dot{x}_A$.
+\end{enumerate}
+
+\begin{examtip}
+\textbf{Task Priority (TP) vs Task Augmentation (TA):} 
+In \textbf{TP}, Task 1 is guaranteed to be executed perfectly (zero tracking error), while Task 2 is executed only in the null-space of Task 1 (it does not interfere). 
+In \textbf{TA}, both tasks are forced into one system with equal weight. If the tasks are kinematically incompatible (i.e., they conflict and the robot doesn't have enough DOFs to do both), the pseudoinverse $J_A^\#$ will find a Least Squares solution. This means it will distribute the error between \textit{both} tasks, so neither of them might be perfectly fulfilled!
+\end{examtip}
+
 
 % ---------------------------------------------------------
-\section{Type A.2: Projected and Reduced Gradient}
+\subsection{Type A.2: Projected and Reduced Gradient}
 
  \textbf{Algorithm: Projected Gradient (PG)}
 \textbf{Goal:} Execute a task $\dot{x}$ while maximizing/minimizing a scalar objective function $H(q)$.
@@ -1061,9 +1120,61 @@ By changing the weight matrix $W$, we obtain the three classic dynamic resolutio
     \item Solve for dependent joints to ensure task execution: $\dot{q}_a = J_a^{-1}(\dot{x} - J_b \dot{q}_b)$.
 \end{enumerate}
 
+\subsubsection{Addendum: Gradient for Obstacle Avoidance}
+ \textbf{Algorithm: Maximizing Distance from an Obstacle}
+\textbf{Goal:} Calculate the gradient $\nabla_q H$ rapidly when the objective function $H(q)$ is the distance between the robot and a generic obstacle.
+\begin{enumerate}
+    \item Identify the coordinates of the obstacle $O_m$ and the closest point on the robot $P_m(q)$.
+    \item Calculate the unit vector pointing from the obstacle to the robot: $u = \frac{P_m - O_m}{||P_m - O_m||}$.
+    \item Compute the Jacobian $J_m(q)$ specifically for the point $P_m$ (NOT the end-effector!).
+    \item The gradient is simply: $\nabla_q H = J_m^T(q) u$.
+    \item Use this gradient in the standard Projected Gradient (PG) formula.
+\end{enumerate}
+
+\vspace{0.3cm}
+\noindent \textbf{\large Example: Obstacle Avoidance with PG}
+\vspace{0.1cm}
+
+\noindent \textbf{Problem:} The end-effector must execute a velocity task $v_e$, while the robot must maximize its distance from a circular obstacle centered at $O_m$. The closest point on the robot is $P_m$.
+\begin{enumerate}
+    \item Compute $J_e$ (Jacobian of the end-effector) and $J_m$ (Jacobian of the point $P_m$).
+    \item Calculate the task velocity: $\dot{q}_{task} = J_e^\# v_e$.
+    \item Calculate the distance gradient: $\nabla_q H_{dist} = J_m^T \frac{P_m - O_m}{||P_m - O_m||}$.
+    \item Define the null-space velocity: $\dot{q}_0 = \alpha \nabla_q H_{dist}$ (use positive $\alpha$ to maximize).
+    \item Calculate the final command projecting into the null-space of the end-effector:
+    $$\dot{q} = \dot{q}_{task} + (I - J_e^\# J_e)\dot{q}_0$$
+\end{enumerate}
 
 % ---------------------------------------------------------
-\section{Type B: SNS Method (Hard Bounds)}
+\subsection{Type A.3: Singularity Robustness (DLS)}
+
+ \textbf{Algorithm: Damped Least Squares (DLS)}
+\textbf{Goal:} Find a safe joint velocity $\dot{q}$ to execute a task $\dot{x}$ when the robot is at or very close to a kinematic singularity, preventing the joint velocities from exploding to infinity.
+\begin{enumerate}
+    \item Identify the standard task Jacobian $J$.
+    \item Choose a damping factor $\lambda > 0$ (often given in the text, or activated only near the singularity).
+    \item Calculate the Damped Inverse (Levenberg-Marquardt approach):
+    $$J_{DLS} = J^T(JJ^T + \lambda^2 I)^{-1}$$
+    \item The joint velocity command is: $\dot{q} = J_{DLS} \dot{x}$.
+\end{enumerate}
+
+\vspace{0.3cm}
+\noindent \textbf{\large Example: DLS near a Singularity}
+\vspace{0.1cm}
+
+\noindent \textbf{Problem:} A planar robot is in an extended singular configuration. A task velocity $\dot{x}$ is commanded along the singular direction (which is physically impossible). Using standard $J^\#$ would result in division by zero. Calculate the DLS velocity.
+\begin{enumerate}
+    \item Evaluate $J$ at the singular configuration. The matrix $JJ^T$ will have determinant equal to $0$ (it is singular).
+    \item Compute $(JJ^T + \lambda^2 I)$. The addition of $\lambda^2$ on the diagonal shifts the eigenvalues, making the matrix strictly positive definite and therefore invertible.
+    \item Invert this new regularized matrix.
+    \item Multiply by $J^T$ to obtain $J_{DLS}$, and then multiply by the desired task $\dot{x}$:
+    $$\dot{q} = J^T(JJ^T + \lambda^2 I)^{-1} \dot{x}$$
+    \item \textit{Conceptual Result:} The robot will execute the feasible components of $\dot{x}$ perfectly, while the impossible (singular) components will result in a bounded tracking error instead of causing joint velocities to explode.
+\end{enumerate}
+
+
+% ---------------------------------------------------------
+\subsection{Type B: SNS Method (Hard Bounds)}
 
  \textbf{Algorithm: Saturation in the Null Space (SNS)}
 \textbf{Goal:} Find joint velocities that realize the task but strictly respect bounds $|\dot{q}_i| \leq V_{max}$.
@@ -1093,7 +1204,7 @@ By changing the weight matrix $W$, we obtain the three classic dynamic resolutio
 \end{examtip}
 
 % ---------------------------------------------------------
-\section{Type C: Deriving the Dynamic Model}
+\subsection{Type C.1: Deriving the Dynamic Model}
 
  \textbf{Algorithm: Deriving the Inertia Matrix M}
 \textbf{Goal:} Find the symmetric matrix $M(q)$ from kinetic energy $T = \frac{1}{2}\dot{q}^T M(q) \dot{q}$.
@@ -1122,9 +1233,99 @@ Stack the resulting scalars to get the vector $c(q, \dot{q})$.
     \item Differentiate: $g(q) = \left( \frac{\partial U(q)}{\partial q} \right)^T$.
 \end{enumerate}
 
+% ---------------------------------------------------------
+\subsection{Type C.2: Inverse Dynamics}
+
+ \textbf{Algorithm: Computing Inverse Dynamics Torque}
+\textbf{Goal:} Calculate the required joint torques $\tau_d(t)$ to perfectly track a given desired trajectory $q_d(t)$.
+\begin{enumerate}
+    \item \textbf{Derive Trajectory:} Given $q_d(t)$, compute its first derivative $\dot{q}_d(t)$ (velocity) and second derivative $\ddot{q}_d(t)$ (acceleration).
+    \item \textbf{Substitute into Model:} Take the symbolic dynamic model you found: $M(q)\ddot{q} + c(q,\dot{q}) + g(q) = \tau$.
+    \item \textbf{Evaluate:} Substitute $q = q_d(t)$, $\dot{q} = \dot{q}_d(t)$, and $\ddot{q} = \ddot{q}_d(t)$ into the equations.
+    \item \textbf{Alternative via Regressor:} If you have already computed the regressor $Y$ and parameters $\mathbf{a}$, you can simply compute $\tau_d(t) = Y(q_d, \dot{q}_d, \ddot{q}_d)\mathbf{a}$. This is often much faster and less prone to algebraic errors!
+\end{enumerate}
 
 % ---------------------------------------------------------
-\section{Type D: Skew-Symmetry and Factorizations}
+\subsubsection{Example: Computing Inverse Dynamics via Regressor}
+
+ \textbf{Problem:} Given the linear parameterization $Y(q, \dot{q}, \ddot{q})\mathbf{a} = \tau$ and a desired trajectory $q_d(t) = \begin{bmatrix} A \sin(\omega t) \\ B \cos(\omega t) \end{bmatrix}$, find the required joint torques $\tau_d(t)$.
+\vspace{0.2cm}
+
+\textbf{1. Calculate velocity and acceleration:}
+\begin{align*}
+    \dot{q}_d(t) &= \begin{bmatrix} A \omega \cos(\omega t) \\ -B \omega \sin(\omega t) \end{bmatrix} \\
+    \ddot{q}_d(t) &= \begin{bmatrix} -A \omega^2 \sin(\omega t) \\ -B \omega^2 \cos(\omega t) \end{bmatrix}
+\end{align*}
+
+\textbf{2. Evaluate the Regressor Matrix:} 
+Substitute $q_d(t)$, $\dot{q}_d(t)$, and $\ddot{q}_d(t)$ into your previously found symbolic matrix $Y(q, \dot{q}, \ddot{q})$ to obtain the time-dependent matrix $Y_d(t)$.
+\begin{equation*}
+    Y_d(t) = Y(q_d(t), \dot{q}_d(t), \ddot{q}_d(t))
+\end{equation*}
+
+\textbf{3. Compute the torques:} 
+Multiply the evaluated regressor by your vector of constant dynamic parameters $\mathbf{a}$ (which contains grouped terms like $m_1, I_1, m_2, I_2$).
+\begin{equation*}
+    \tau_d(t) = Y_d(t) \mathbf{a}
+\end{equation*}
+
+% ---------------------------------------------------------
+\textbf{\large Full Procedure for Linear Parameterization and Inverse Dynamics}
+
+\textbf{Problem:} Extract the regressor $Y$, the parameter vector $\mathbf{a}$, and compute the inverse dynamics torque $\tau_d(t)$ for a given trajectory $q_d(t)$.
+\vspace{0.2cm}
+
+\textbf{1. Expand the Dynamic Model:}
+Write out the full equations of motion for each joint ($\tau_1, \tau_2, \dots$) by expanding $M(q)\ddot{q} + c(q,\dot{q}) + g(q)$. For example, a generic first joint equation might look like:
+\begin{equation*}
+    \tau_1 = (I_1 + m_1 l_{c1}^2 + m_2 l_1^2)\ddot{q}_1 + (I_2 + m_2 l_{c2}^2)(\ddot{q}_1 + \ddot{q}_2) + m_2 l_1 l_{c2} \cos(q_2)(2\ddot{q}_1 + \ddot{q}_2) + \dots
+\end{equation*}
+
+\textbf{2. Define the Parameter Vector $\mathbf{a}$:}
+Identify the constant physical parameters (masses, inertias, lengths) that always appear grouped together. Define them as a new set of coefficients $a_i$.
+\begin{align*}
+    a_1 &= I_1 + m_1 l_{c1}^2 + m_2 l_1^2 \\
+    a_2 &= I_2 + m_2 l_{c2}^2 \\
+    a_3 &= m_2 l_1 l_{c2}
+\end{align*}
+So, your parameter vector is $\mathbf{a} = \begin{bmatrix} a_1 & a_2 & a_3 \end{bmatrix}^T$.
+
+\textbf{3. Build the Regressor Matrix $Y(q, \dot{q}, \ddot{q})$:}
+The Regressor Matrix $Y$ is an $n \times p$ matrix (number of joints $\times$ number of dynamic parameters) that contains exclusively the kinematic variables ($q, \dot{q}, \ddot{q}$) and the gravity constant $g_0$. It separates the motion from the mass/inertia properties.
+
+\textbf{How to construct it row by row:}
+\begin{itemize}
+    \item Look at the equation for $\tau_1$ (which corresponds to \textbf{Row 1} of $Y$).
+    \item Ask yourself: \textit{"What multiplies $a_1$?"} The answer is $\ddot{q}_1$. This goes into position $Y_{1,1}$.
+    \item Ask yourself: \textit{"What multiplies $a_2$?"} The answer is $(\ddot{q}_1 + \ddot{q}_2)$. This goes into position $Y_{1,2}$.
+    \item Repeat this process for the equation of $\tau_2$ (\textbf{Row 2} of $Y$). If a parameter $a_i$ does not appear in the equation for a specific joint, simply place a $0$ in that column (e.g., $a_1$ does not appear in $\tau_2$, so $Y_{2,1} = 0$).
+\end{itemize}
+
+Applying this logic, we factor out the vector $\mathbf{a}$ and obtain:
+\begin{equation*}
+    \begin{bmatrix} \tau_1 \\ \tau_2 \end{bmatrix} =
+    \underbrace{\begin{bmatrix}
+        \ddot{q}_1 & \ddot{q}_1 + \ddot{q}_2 & \cos(q_2)(2\ddot{q}_1 + \ddot{q}_2) - \sin(q_2)(2\dot{q}_1\dot{q}_2 + \dot{q}_2^2) \\
+        0 & \ddot{q}_1 + \ddot{q}_2 & \cos(q_2)\ddot{q}_1 + \sin(q_2)\dot{q}_1^2
+    \end{bmatrix}}_{Y(q, \dot{q}, \ddot{q})}
+    \underbrace{\begin{bmatrix} a_1 \\ a_2 \\ a_3 \end{bmatrix}}_{\mathbf{a}}
+\end{equation*}
+This $2 \times 3$ matrix is your Regressor $Y(q, \dot{q}, \ddot{q})$.
+
+\textbf{4. Compute Inverse Dynamics Torques $\tau_d(t)$:}
+Given a desired trajectory, e.g., $q_d(t) = \begin{bmatrix} A \sin(\omega t) \\ B \cos(\omega t) \end{bmatrix}$:
+\begin{itemize}
+    \item Compute velocities $\dot{q}_d(t)$ and accelerations $\ddot{q}_d(t)$ by taking the 1st and 2nd time derivatives of $q_d(t)$.
+    \item Substitute $q_d, \dot{q}_d, \ddot{q}_d$ directly into the matrix $Y$ to obtain the time-dependent matrix $Y_d(t)$.
+    \item Multiply by the constant vector $\mathbf{a}$ to get the required torques.
+\end{itemize}
+\begin{equation*}
+    \tau_d(t) = Y_d(t) \mathbf{a}
+\end{equation*}
+
+\textit{Note: Doing $\tau_d(t) = Y_d(t) \mathbf{a}$ directly outputs the torques without needing to re-evaluate the heavy $M$, $c$, and $g$ matrices individually, saving significant time during the exam.}
+% ---------------------------------------------------------
+\subsection{Type D: Skew-Symmetry and Factorizations}
 
  \textbf{Algorithm: Finding Factorizations S1 and S2}
 \textbf{Goal:} Find matrices $S$ such that $S \dot{q} = c$, one making $\dot{M} - 2S$ skew-symmetric ($S_1$), and one not ($S_2$).
@@ -1139,10 +1340,8 @@ Stack the resulting scalars to get the vector $c(q, \dot{q})$.
     $$ S_0(\dot{q}) = \begin{bmatrix} 0 & -\dot{q}_2 \\ \dot{q}_2 & 0 \end{bmatrix} $$
     Then $S_2 = S_1 + S_0$. Since $S_0 \dot{q} = 0$, $S_2 \dot{q} = c(q, \dot{q})$, but $\dot{M}-2S_2$ will NOT be skew-symmetric.
 \end{enumerate}
-
-
 % ---------------------------------------------------------
-\section{Type E: Linear Parameterization and Identification}
+\subsection{Type E: Linear Parameterization and Identification}
 
  \textbf{Algorithm: Extracting Regressor Y and parameters a}
 \textbf{Goal:} Rewrite $M\ddot{q} + c + g = \tau$ as $Y(q, \dot{q}, \ddot{q})\mathbf{a} = \tau$.
@@ -1161,10 +1360,8 @@ Once you have $Y\mathbf{a} = \tau$, to find the true parameters $\mathbf{a}$ exp
     \item Build the stacked Regressor Matrix $\bar{Y}$ ($nN \times p$) and Torque vector $\bar{\tau}$ ($nN \times 1$).
     \item Solve using Least Squares: $\hat{\mathbf{a}} = \bar{Y}^\# \bar{\tau} = (\bar{Y}^T \bar{Y})^{-1} \bar{Y}^T \bar{\tau}$.
 \end{enumerate}
-
-
 % ---------------------------------------------------------
-\section{Type F: Dynamic Redundancy Resolution (LQ Opt.)}
+\subsection{Type F: Dynamic Redundancy Resolution (LQ Opt.)}
 
  \textbf{Algorithm: Solving LQ Dynamic Redundancy}
 \textbf{Goal:} Find the joint torque $\tau$ that executes a Cartesian task $\ddot{y}$ while minimizing a specific physical effort $H(\tau)$.
@@ -1179,10 +1376,8 @@ Once you have $Y\mathbf{a} = \tau$, to find the true parameters $\mathbf{a}$ exp
         \item \textbf{Min $\| \tau \|^2_{M^{-1}}$}: $\tau_3 = J^T (J M^{-1} J^T)^{-1} b$.
     \end{itemize}
 \end{enumerate}
-
-
 % ---------------------------------------------------------
-\section{Type G: Time Scaling under Torque Bounds}
+\subsection{Type G: Time Scaling under Torque Bounds}
 
  \textbf{Algorithm: Uniform Time Scaling}
 \textbf{Goal:} Find scale factor $k \ge 1$ to satisfy torque bounds $|u_i| \le U_{max}$ without altering the geometric path.
@@ -1199,6 +1394,145 @@ Once you have $Y\mathbf{a} = \tau$, to find the true parameters $\mathbf{a}$ exp
     \end{equation}
     \item The new feasible execution time is $T_s = k \cdot T_{old}$.
 \end{enumerate}
+
+\newpage
+% ==========================================
+% PART 3: PROOFS
+% ==========================================
+
+\section{Proofs}
+
+\subsection{Minimum Norm Solution for Kinematic Redundancy}
+\textbf{Theorem:} Given a redundant manipulator with differential kinematic equation $\dot{y} = J(q)\dot{q}$, where $J$ has full row rank. Among all possible joint velocity solutions $\dot{q}$ that satisfy the task constraint, the one minimizing the quadratic norm of the joint velocities $\frac{1}{2} \|\dot{q}\|^2$ is given by $\dot{q} = J^\# \dot{y}$, where $J^\# = J^T(JJ^T)^{-1}$ is the Moore-Penrose right pseudoinverse.
+
+\subsubsection{Proof}
+We can find the solution by formulating a constrained optimization problem using Lagrange multipliers.
+The Lagrangian function is defined as:
+\[
+L(\dot{q}, \lambda) = \frac{1}{2} \dot{q}^T \dot{q} + \lambda^T (\dot{y} - J \dot{q})
+\]
+where $\lambda$ is the vector of Lagrange multipliers. 
+We compute the partial derivatives with respect to $\dot{q}$ and set them to zero to find the stationary point:
+\[
+\frac{\partial L}{\partial \dot{q}} = \dot{q}^T - \lambda^T J = 0 \implies \dot{q} = J^T \lambda
+\]
+Substituting this expression for $\dot{q}$ back into the original task constraint $\dot{y} = J\dot{q}$:
+\[
+\dot{y} = J (J^T \lambda) = (J J^T) \lambda
+\]
+Since $J$ has full row rank, the square matrix $(J J^T)$ is strictly positive definite and therefore invertible. We can solve for $\lambda$:
+\[
+\lambda = (J J^T)^{-1} \dot{y}
+\]
+Finally, substituting $\lambda$ into the expression for $\dot{q}$, we obtain the proof:
+\[
+\dot{q} = J^T (J J^T)^{-1} \dot{y} = J^\# \dot{y}
+\]
+
+
+\subsection{Null-Space Projection Matrix (Task Priority)}
+\textbf{Property:} The matrix $P(q) = I - J^\#(q)J(q)$ is an orthogonal projector that maps any arbitrary joint velocity vector $\dot{q}_0$ into the null-space of the Jacobian $J$, meaning it does not alter the execution of the primary task.
+
+\subsubsection{Proof}
+To prove that $P$ projects into the null-space of $J$, we must verify that the contribution of $P \dot{q}_0$ to the task $\dot{y}$ is strictly zero. We multiply the projector by the Jacobian matrix $J$:
+\[
+J P = J (I - J^\# J) = J - J J^\# J
+\]
+Substituting the definition of the right pseudoinverse $J^\# = J^T(JJ^T)^{-1}$:
+\[
+J J^\# J = J \left[ J^T(JJ^T)^{-1} \right] J = (JJ^T)(JJ^T)^{-1}J = I \cdot J = J
+\]
+Therefore:
+\[
+J P = J - J = 0
+\]
+Furthermore, an orthogonal projector must be idempotent ($P^2 = P$) and symmetric ($P^T = P$).
+Proving idempotence:
+\[
+P^2 = (I - J^\# J)(I - J^\# J) = I - 2J^\# J + J^\# J J^\# J = I - 2J^\# J + J^\# J = I - J^\# J = P
+\]
+
+
+\subsection{Linearization for Kinematic Calibration}
+\textbf{Derivation:} To identify the kinematic parameters (e.g., Denavit-Hartenberg parameters $\pi$), an iterative least-squares approach is used based on the first-order linearization of the direct kinematics equation.
+
+\subsubsection{Proof}
+Let $p = f(\pi, q)$ be the direct kinematics computing the end-effector pose as a function of the geometric parameters $\pi$ and the joint variables $q$. Considering the parameters affected by an error $\Delta \pi = \pi_{real} - \pi_{nom}$, we can expand $f$ in a first-order Taylor series around the nominal parameters $\pi_{nom}$:
+\[
+p_{real} \approx f(\pi_{nom}, q) + \left. \frac{\partial f}{\partial \pi} \right|_{\pi=\pi_{nom}} \Delta \pi
+\]
+Defining the measured pose error as $\Delta p = p_{real} - f(\pi_{nom}, q)$, we obtain a linear relationship with respect to the parameter variation:
+\[
+\Delta p \approx J_\pi(q) \Delta \pi
+\]
+where $J_\pi = \frac{\partial f}{\partial \pi}$ is the calibration (or identification) Jacobian. By stacking measurements for $m$ different configurations, an overdetermined linear system is built and solved via pseudoinverse:
+\[
+\Delta \pi = (J_{\pi, total}^\#) \Delta p_{total}
+\]
+
+
+\subsection{Symmetry and Positive Definiteness of the Inertia Matrix}
+\textbf{Property:} In the Lagrangian dynamic model, the robot inertia matrix $M(q)$ is always symmetric and positive definite for any configuration $q$.
+
+\subsubsection{Proof}
+The total kinetic energy of the manipulator is given by the quadratic form:
+\[
+T = \frac{1}{2} \dot{q}^T M(q) \dot{q}
+\]
+Since a physical system in motion ($\dot{q} \neq 0$) must possess strictly positive kinetic energy ($T > 0$), it directly follows that $M(q)$ is a positive definite matrix. 
+Its symmetry ($M(q) = M^T(q)$) derives from its structural definition via the dyadic expansion of the link Jacobians:
+\[
+M(q) = \sum_{i=1}^{n} \left( m_i J_{v,i}^T J_{v,i} + J_{\omega,i}^T R_i I_i R_i^T J_{\omega,i} \right)
+\]
+where each term in the summation is a symmetric matrix by construction.
+
+
+\subsection{Skew-Symmetry of the matrix $\dot{M} - 2C$}
+\textbf{Theorem (Passivity Property):} In the dynamic model $M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = u$, the matrix $N(q,\dot{q}) = \dot{M}(q) - 2C(q,\dot{q})$ is skew-symmetric if the elements of $C$ are defined using the Christoffel symbols of the first kind. This implies that for any arbitrary vector $x$, the quadratic form $x^T (\dot{M} - 2C) x = 0$.
+
+\subsubsection{Proof}
+The generic $(i,j)$ element of the inertia matrix is $m_{ij}(q)$. Its time derivative is:
+\[
+\dot{m}_{ij} = \sum_{k=1}^{n} \frac{\partial m_{ij}}{\partial q_k} \dot{q}_k
+\]
+The elements of the Coriolis and centrifugal matrix $C$ are defined as $c_{ij} = \sum_{k=1}^n c_{ijk} \dot{q}_k$, where $c_{ijk}$ are the Christoffel symbols:
+\[
+c_{ijk} = \frac{1}{2} \left( \frac{\partial m_{ij}}{\partial q_k} + \frac{\partial m_{ik}}{\partial q_j} - \frac{\partial m_{jk}}{\partial q_i} \right)
+\]
+Let us analyze the $(i,j)$ element of the matrix $N = \dot{M} - 2C$:
+\[
+n_{ij} = \dot{m}_{ij} - 2 c_{ij} = \sum_{k=1}^n \left[ \frac{\partial m_{ij}}{\partial q_k} - \left( \frac{\partial m_{ij}}{\partial q_k} + \frac{\partial m_{ik}}{\partial q_j} - \frac{\partial m_{jk}}{\partial q_i} \right) \right] \dot{q}_k
+\]
+Canceling out the terms $\frac{\partial m_{ij}}{\partial q_k}$:
+\[
+n_{ij} = \sum_{k=1}^n \left( \frac{\partial m_{jk}}{\partial q_i} - \frac{\partial m_{ik}}{\partial q_j} \right) \dot{q}_k
+\]
+Swapping the indices $i$ and $j$, we get:
+\[
+n_{ji} = \sum_{k=1}^n \left( \frac{\partial m_{ik}}{\partial q_j} - \frac{\partial m_{jk}}{\partial q_i} \right) \dot{q}_k = - n_{ij}
+\]
+This proves that the matrix $N$ is skew-symmetric ($N^T = -N$). 
+Consequently, the associated quadratic form is always zero:
+\[
+\frac{1}{2} \dot{q}^T (\dot{M} - 2C) \dot{q} = 0
+\]
+
+
+\subsection{Linearity in the Dynamic Parameters}
+\textbf{Derivation:} The rigid-body dynamic equations of a manipulator can be linearly parameterized with respect to a set of base dynamic parameters $\pi$ (masses, centers of mass, inertia tensor elements).
+
+\subsubsection{Proof}
+The kinetic energy $T_i$ and potential energy $U_i$ of each rigid link are linear functions of the link's 10 standard dynamic parameters (mass $m_i$, first moments of inertia $m_i c_{i}$, and second moments of inertia $I_i$). 
+Since the Lagrangian function $L = T - U$ is a linear combination of these energies, it is also linear in the dynamic parameters.
+The Euler-Lagrange operator:
+\[
+\frac{d}{dt}\left(\frac{\partial L}{\partial \dot{q}}\right) - \frac{\partial L}{\partial q} = \tau
+\]
+is a linear differential operator. Applying a linear operator to a function that is linear in a set of constant parameters $\pi$ yields equations of motion that are linearly parameterized. Therefore, the dynamic model can be rearranged as:
+\[
+\tau = Y(q, \dot{q}, \ddot{q}) \pi
+\]
+where $Y(q, \dot{q}, \ddot{q})$ is the dynamic regressor matrix, depending only on the kinematics and the motion state.
 
 
 \end{document}
