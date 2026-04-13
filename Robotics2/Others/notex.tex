@@ -1395,6 +1395,116 @@ Once you have $Y\mathbf{a} = \tau$, to find the true parameters $\mathbf{a}$ exp
     \item The new feasible execution time is $T_s = k \cdot T_{old}$.
 \end{enumerate}
 
+
+\subsection{Type H: Energy Dissipation and Optimal Torque Selection}
+\textbf{Problem:} Given the bounds on joint torques $|\tau_j| \le T_j$, determine the commanded torque $\tau$ that maximizes the instantaneous decrease of the total energy $E = T + U$ of the robot.
+
+\textbf{Algorithm: Maximizing Energy Decrease} \\
+\textbf{Goal:} Choose the joint torques $\tau$ to make the energy time derivative $\dot{E}$ (or its second derivative $\ddot{E}$ if the robot is completely at rest) as negative as possible.
+
+\begin{enumerate}
+    \item \textbf{Case 1: The robot is currently in motion ($\dot{q} \neq 0$)}
+    \begin{itemize}
+        \item Start from the power/energy variation formula: 
+        \begin{equation}
+            \dot{E} = \dot{q}^T \tau = \sum_{j=1}^n \dot{q}_j \tau_j
+        \end{equation}
+        \item To make $\dot{E}$ as negative as possible, apply the maximum available torque in the exact \emph{opposite} direction of the current velocity. For each joint $j$ where $\dot{q}_j \neq 0$, set:
+        \begin{equation}
+            \tau_{0,j} = -T_j \text{sign}(\dot{q}_j)
+        \end{equation}
+        \item If a joint is not moving ($\dot{q}_j = 0$), its torque does not contribute to $\dot{E}$ in this instant, so you can simply command $\tau_{0,j} = 0$.
+        \item The resulting guaranteed maximum energy decrease is:
+        \begin{equation}
+            \dot{E}_{max} = -\sum_{\dot{q}_j \neq 0} T_j |\dot{q}_j| < 0
+        \end{equation}
+    \end{itemize}
+
+    \item \textbf{Case 2: The robot is at rest ($\dot{q} = 0$) but not in equilibrium ($g(q_0) \neq 0$)}
+    \begin{itemize}
+        \item Since $\dot{q} = 0$, the first derivative is strictly zero: $\dot{E} = 0$ regardless of the torque chosen. To induce a decrease in the immediate future, we must force the second derivative $\ddot{E}$ to be negative.
+        \item Differentiate $\dot{E}$: $\ddot{E} = \ddot{q}^T \tau + \dot{q}^T \dot{\tau}$. Since $\dot{q} = 0$, it simplifies to:
+        \begin{equation}
+            \ddot{E} = \ddot{q}^T \tau
+        \end{equation}
+        \item Use the standard dynamic model $M(q)\ddot{q} + c(q,\dot{q}) + g(q) = \tau$. At $\dot{q}=0$, the Coriolis terms vanish ($c(q_0,0)=0$). Isolate the joint acceleration $\ddot{q}$:
+        \begin{equation}
+            \ddot{q} = M^{-1}(q_0)(\tau - g(q_0))
+        \end{equation}
+        \item Substitute $\ddot{q}$ into $\ddot{E}$ to obtain a complete quadratic function of the variable $\tau$:
+        \begin{equation}
+            \ddot{E}(\tau) = \tau^T M^{-1}(q_0) \tau - g^T(q_0) M^{-1}(q_0) \tau
+        \end{equation}
+        \item Find the theoretical minimum by taking the gradient of $\ddot{E}$ with respect to $\tau$ and setting it to zero:
+        \begin{equation}
+            \nabla_{\tau}\ddot{E} = 2 M^{-1}(q_0) \tau - M^{-1}(q_0) g(q_0) = \mathbf{0}
+        \end{equation}
+        \item Since $M^{-1}(q_0)$ is a positive definite (and therefore invertible) matrix, we can cleanly solve for $\tau$. The unique optimal torque to immediately dissipate energy is exactly half the gravity compensation vector:
+        \begin{equation}
+            \tau_{0} = \frac{g(q_0)}{2}
+        \end{equation}
+        \item \emph{Final Verification:} The Hessian matrix is $\nabla^2_{\tau}\ddot{E} = 2M^{-1}(q_0) > 0$, guaranteeing this is a global minimum. Evaluating the function yields a strictly negative energy acceleration:
+        \begin{equation}
+            \ddot{E}(\tau_0) = -\frac{1}{4} g^T(q_0) M^{-1}(q_0) g(q_0) < 0
+        \end{equation}
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{Deep Dive: Mathematical Proof for Case 2 ($\dot{q} = 0$)}
+To rigorously prove why $\tau_0 = \frac{g(q_0)}{2}$ minimizes the energy acceleration $\ddot{E}$, we can analyze the individual contributions of the kinetic energy $T$ and potential energy $U$.
+
+\textbf{0. Base Energy Definitions}
+\begin{itemize}
+    \item \textbf{Kinetic Energy:} $T(q, \dot{q}) = \frac{1}{2} \dot{q}^T M(q) \dot{q}$
+    \item \textbf{Potential Energy:} $U(q)$, whose gradient with respect to $q$ is the gravity vector: $\frac{\partial U}{\partial q} = g^T(q)$
+\end{itemize}
+
+\textbf{1. Joint Acceleration Mapping} \\
+Starting from the dynamic model at rest ($\dot{q} = 0$, so the Coriolis/centrifugal terms $c(q_0, 0) = \mathbf{0}$):
+\begin{equation}
+    M(q_0)\ddot{q} + g(q_0) = \tau
+\end{equation}
+Substituting our optimal torque $\tau = \frac{g(q_0)}{2}$ and solving for $\ddot{q}$:
+\begin{equation}
+    M(q_0)\ddot{q} = -\frac{1}{2}g(q_0) \implies \ddot{q} = -\frac{1}{2}M^{-1}(q_0)g(q_0)
+\end{equation}
+
+\textbf{2. Kinetic Energy Derivatives ($T$)}
+\begin{itemize}
+    \item $T = 0$ (since the robot is at rest, $\dot{q} = 0$).
+    \item $\dot{T} = 0$ (the net power depends linearly on $\dot{q}$, so it vanishes).
+    \item For $\ddot{T}$, evaluating the second time derivative at $\dot{q} = 0$ eliminates all complex velocity-dependent terms, leaving only the acceleration quadratic form:
+    \begin{equation}
+        \ddot{T} = \ddot{q}^T M(q_0) \ddot{q}
+    \end{equation}
+    Substituting $\ddot{q}$ from step 1 (and knowing $M^{-1}$ is symmetric):
+    \begin{equation}
+        \ddot{T} = \left(-\frac{1}{2}g^T M^{-1}\right) M \left(-\frac{1}{2}M^{-1}g\right) = \frac{1}{4}g^T M^{-1} g > 0
+    \end{equation}
+\end{itemize}
+
+\textbf{3. Potential Energy Derivatives ($U$)}
+\begin{itemize}
+    \item $U = U(q_0) \ge 0$
+    \item $\dot{U} = g^T(q) \dot{q} = 0$ (since $\dot{q} = 0$).
+    \item For $\ddot{U}$, taking the time derivative of $\dot{U}$ yields $\ddot{U} = \dot{q}^T \frac{\partial g}{\partial q} \dot{q} + g^T \ddot{q}$. At $\dot{q}=0$, the first term vanishes:
+    \begin{equation}
+        \ddot{U} = g^T(q_0) \ddot{q}
+    \end{equation}
+    Substituting $\ddot{q}$ from step 1:
+    \begin{equation}
+        \ddot{U} = g^T(q_0) \left(-\frac{1}{2}M^{-1}(q_0)g(q_0)\right) = -\frac{1}{2}g^T M^{-1} g < 0
+    \end{equation}
+\end{itemize}
+
+\textbf{4. Total Energy Balance ($E$)} \\
+Summing the derived second derivatives gives the total energy acceleration:
+\begin{equation}
+    \ddot{E} = \ddot{T} + \ddot{U} = \frac{1}{4}g^T M^{-1} g - \frac{1}{2}g^T M^{-1} g = -\frac{1}{4}g^T M^{-1} g < 0
+\end{equation}
+
+\textit{Physical insight:} Applying exactly half the required gravity compensation torque allows the robot to "fall" slightly, which immediately decreases its potential energy ($\ddot{U} < 0$) while it starts gaining some kinetic energy ($\ddot{T} > 0$). The mathematical catch is that the potential energy decreases exactly \emph{twice as fast} as the kinetic energy increases, resulting in the maximum possible net instantaneous dissipation of the total energy $E$.
+
 \newpage
 % ==========================================
 % PART 3: PROOFS
