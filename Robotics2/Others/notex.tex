@@ -1644,5 +1644,83 @@ is a linear differential operator. Applying a linear operator to a function that
 \]
 where $Y(q, \dot{q}, \ddot{q})$ is the dynamic regressor matrix, depending only on the kinematics and the motion state.
 
+\section*{Student Guidelines}
+%\addcontentsline{toc}{section}{Student Guidelines: Index by Exercise Type}
+
+\subsection*{1. Kinematic Calibration}
+\begin{itemize}
+    \item \textbf{Objective:} Estimate parameters (e.g., link lengths) and build the regressor matrix.
+    \item \textbf{Where to look in the PDF:}
+    \begin{itemize}
+        \item \textbf{Section 1:} Basic theory and procedures (``Kinematic Calibration'').
+        \item \textbf{Section 9.3:} Details for linearization (``Linearization for Kinematic Calibration'').
+    \end{itemize}
+\end{itemize}
+
+\subsection*{2. Redundancy Management (Task Priority \& Projected Gradient)}
+\begin{itemize}
+    \item \textbf{Objective:} Assign velocity commands for multiple tasks respecting hierarchies, or maximize distance from obstacles.
+    \item \textbf{Where to look in the PDF:}
+    \begin{itemize}
+        \item \textbf{Section 8.1 / 8.1.1:} Practical examples and theory to handle 3 or more hierarchical tasks (``Type A.1: Task Priority\dots'').
+        \item \textbf{Section 8.2 / 8.2.1:} Projected Gradient (PG) method for obstacle avoidance (``Type A.2: Projected and Reduced Gradient'').
+    \end{itemize}
+\end{itemize}
+
+\subsection*{3. Inverse Kinematics with Hard Bounds (SNS Method)}
+\begin{itemize}
+    \item \textbf{Objective:} Find the minimum-norm commands (usually accelerations) that respect strict joint velocity or acceleration limits.
+    \item \textbf{Where to look in the PDF:}
+    \begin{itemize}
+        \item \textbf{Section 8.4:} Practical guidelines (``Type B: SNS Method - Hard Bounds'').
+        \item \textbf{Sections 2.3.2, 2.4, and 3.3:} Basic theory on ``Resolution at Acceleration Level'' and ``Saturation in the Null Space''.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{4. Kinetic Energy, Inertia Matrices, and Properties}
+\begin{itemize}
+    \item \textbf{Objective:} Calculate the inertia matrix and kinetic energy (including recursive algorithms) or verify the validity of a given matrix.
+    \item \textbf{Where to look in the PDF:}
+    \begin{itemize}
+        \item \textbf{Section 5.3:} Recursive algorithm (``Moving Frames Algorithm for Kinetic Energy'').
+        \item \textbf{Sections 4.5 and 9.4:} Validity check for symmetry and positive definiteness of the matrix (``Fundamental Properties\dots'' / ``Symmetry and Positive Definiteness\dots'').
+    \end{itemize}
+\end{itemize}
+
+\subsection*{5. Deriving the Dynamic Model}
+\begin{itemize}
+    \item \textbf{Objective:} Derive the equations of motion $M(q)\ddot{q} + c(q,\dot{q}) + g(q) = u$ (kinetic energy, potential energy, Euler-Lagrange equations).
+    \item \textbf{Where to look in the PDF:}
+    \begin{itemize}
+        \item \textbf{Section 8.5:} Practical guidelines for deriving the model (``Type C.1: Deriving the Dynamic Model'').
+    \end{itemize}
+\end{itemize}
+
+\subsection*{6. Factorizations (Skew-Symmetry) and Coriolis Terms}
+\begin{itemize}
+    \item \textbf{Objective:} Derive the Coriolis matrix $S$ or $C$, or prove the skew-symmetry property for $\dot{M} - 2C$.
+    \item \textbf{Where to look in the PDF:}
+    \begin{itemize}
+        \item \textbf{Section 8.7:} Rules for calculations and proofs (``Type D: Skew-Symmetry and Factorizations'').
+    \end{itemize}
+\end{itemize}
+
+\subsection*{7. Linear Parameterization and Regressor Matrix}
+\begin{itemize}
+    \item \textbf{Objective:} Extract the base dynamic parameter vector to obtain the form $Y(q, \dot{q}, \ddot{q}) a = u$.
+    \item \textbf{Where to look in the PDF:}
+    \begin{itemize}
+        \item \textbf{Section 8.8:} Step-by-step guide to identifying the regressor (``Type E: Linear Parameterization and Identification'').
+    \end{itemize}
+\end{itemize}
+
+\subsection*{8. Motion Planning and Time Optimization (Time Scaling)}
+\begin{itemize}
+    \item \textbf{Objective:} Recalculate or minimize the execution time of a trajectory while respecting torque/effort limits (Torque bounds).
+    \item \textbf{Where to look in the PDF:}
+    \begin{itemize}
+        \item \textbf{Section 8.10:} Procedures for time-scaling (``Type G: Time Scaling under Torque Bounds'').
+    \end{itemize}
+\end{itemize}
 
 \end{document}
