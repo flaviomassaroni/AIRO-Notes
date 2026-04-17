@@ -1,371 +1,342 @@
 \documentclass[11pt,a4paper,twoside]{report}
 
-% ================= PREAMBOLO =================
+% ================= PREAMBLE =================
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[english,italian]{babel}
+\usepackage[english]{babel}
 \usepackage{amsmath, amssymb, amsfonts}
 \usepackage{geometry}
 \geometry{a4paper, top=3cm, bottom=3cm, left=2.5cm, right=2.5cm}
 
-\usepackage{xcolor} % Necessario per i colori dei link
+\usepackage{xcolor} 
 \usepackage{hyperref}
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue!60!black,
+    linkcolor=blue!70!black,
     filecolor=magenta,      
     urlcolor=cyan,
-    pdftitle={Medical Robotics - Appunti Completi},
+    pdftitle={Medical Robotics - Comprehensive Study Guide},
 }
 
 \usepackage{setspace}
 \usepackage{titlesec}
 \usepackage{fancyhdr}
-\usepackage{microtype} % Migliora la giustificazione e riduce gli overfull hbox
+\usepackage{microtype} 
+\usepackage{enumitem}
 
-% Risoluzione del warning sull'altezza dell'intestazione
+% Resolve the headheight warning
 \setlength{\headheight}{14.5pt}
 
-% Formattazione dei titoli dei capitoli per renderli eleganti ma compatti
+% Elegant and compact chapter title formatting
 \titleformat{\chapter}[display]
   {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{15pt}{\Huge}
 \titlespacing*{\chapter}{0pt}{-20pt}{30pt}
 
-% Intestazioni e Piè di pagina
+% Headers and Footers
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[LE,RO]{\thepage}
 \fancyhead[LO,RE]{\leftmark}
 \renewcommand{\headrulewidth}{0.4pt}
 
-% Interlinea ottimizzata per la lettura di lunghi testi
+% Optimized line spacing for comfortable reading
 \setstretch{1.15}
 
 \begin{document}
 
 \begin{titlepage}
     \centering
-    \vspace*{3cm}
-    {\fontsize{40}{48}\selectfont \bfseries Medical Robotics\par}
+    \vspace*{2cm}
+    {\fontsize{38}{45}\selectfont \bfseries Medical Robotics\par}
     \vspace{1.5cm}
-    {\Large \itshape Dispense Discorsive per la Preparazione all'Esame\par}
-    \vspace{2cm}
+    {\Large \itshape Comprehensive Study Notes for Exam Preparation\par}
+    \vspace{1.5cm}
+    {\large \textbf{Based on the course held by Professor Vendittelli}\par}
+    \vspace{0.5cm}
+    {\large Sapienza University of Rome\par}
+    \vspace{3cm}
+    \vfill
 \end{titlepage}
 
 \tableofcontents
 \newpage
 
 % =====================================================================
-% CAPITOLO 1
+% CHAPTER 1: INTRODUCTION AND CLASSIFICATION
 % =====================================================================
-\chapter{Introduzione e Classificazione dei Sistemi Chirurgici}
+\chapter{Introduction and Classification}
 
-\section{Il Contesto della Robotica Medica}
-La robotica medica non consiste semplicemente nell'installare un braccio industriale all'interno di una sala operatoria. A differenza dei robot industriali tradizionali, che operano in ambienti altamente strutturati, isolati da barriere di sicurezza e su oggetti inanimati, i robot medici condividono il loro spazio di lavoro con il personale clinico ed eseguono azioni fisiche direttamente su un paziente umano. Questo cambio di paradigma introduce sfide uniche legate alla sicurezza intrinseca, alla sterilizzazione, alla gestione dell'interazione fisica e all'integrazione fluida nel flusso di lavoro clinico.
+\section{Definition of a Medical Robot}
+The definition of a robot in the medical field is multifaceted. According to Michael Brady (1980), robotics is \textit{"the intelligent connection between perception and action"}. This definition perfectly fits medical robotics, where sensors (perception) read physical interactions and anatomy, and actuators (action) execute commands mediated by the surgeon's intelligence or a control algorithm. From a regulatory standpoint, the IEC TR 60601-4-1 directive defines a medical robot as "medical electrical equipment with a degree of autonomy intended to perform tasks."
+The paradox of the surgical robot is well summarized by J. Moser's quote: \textit{"Just a Million Dollar Needle Holder."} The true engineering challenge is proving that this highly sophisticated tool objectively improves clinical outcomes compared to traditional manual surgery.
 
-L'evoluzione storica della chirurgia è sempre stata guidata da una tensione e un compromesso fondamentale: massimizzare l'effetto terapeutico minimizzando al contempo i danni collaterali. La chirurgia tradizionale a cielo aperto (Open Surgery) garantisce al chirurgo una visibilità eccellente, un accesso diretto agli organi e una destrezza ineguagliabile grazie al feedback tattile diretto. I costi per il paziente, tuttavia, sono elevati: grandi incisioni comportano lunghi tempi di degenza, alto rischio di infezioni e un notevole stress fisiologico. 
-
-L'avvento della chirurgia minimamente invasiva (MIS - Minimally Invasive Surgery), basata sull'inserimento di strumenti lunghi e sottili attraverso piccoli fori chiamati trocar, ha ridotto drasticamente il trauma. Tuttavia, la MIS ha sottratto al chirurgo gran parte dei suoi vantaggi naturali: la visione tridimensionale è andata persa in favore di monitor 2D, i movimenti sono risultati invertiti a causa del cosiddetto "effetto fulcro" sul trocar, e i gradi di libertà (DOF) degli strumenti si sono drasticamente ridotti. La robotica chirurgica nasce esattamente per risolvere questo paradosso: restituire al chirurgo la destrezza, la visione tridimensionale e l'ergonomia tipiche della chirurgia a cielo aperto, pur preservando i benefici di un accesso minimamente invasivo.
-
-\section{Schemi di Classificazione}
-Non esiste un unico schema di classificazione universalmente accettato per i robot medici. Durante lo studio della disciplina, è essenziale padroneggiare diverse prospettive, poiché ciascuna evidenzia aspetti specifici dell'architettura e del controllo.
-
-\subsection{La Classificazione di Troccaz (Modalità di Interazione)}
-Proposta all'inizio degli anni 2000 da Jocelyne Troccaz, questa classificazione è fondamentale per gli ingegneri perché mappa direttamente il comportamento del sistema sull'architettura di controllo e sull'hardware. Si basa sul livello di interazione fisica tra robot e operatore:
+\section{The Evolution of Surgery and its Tasks}
+Surgical evolution is driven by the need to resolve a fundamental trade-off: maximizing the therapeutic effect while minimizing collateral damage (patient trauma).
 \begin{itemize}
-    \item \textbf{Sistemi Passivi:} Il robot non è dotato di attuatori in grado di forzare o generare movimento in modo autonomo; i giunti sono liberi e strumentati solo con sensori (come encoder). Il chirurgo muove fisicamente lo strumento, mentre il sistema fornisce informazioni sulla posizione rispetto all'anatomia del paziente, agendo come un navigatore avanzato. Un esempio classico è il \textit{Viewing Wand}, utilizzato in neurochirurgia per allineare gli strumenti basandosi su scansioni TC pre-operatorie.
-    \item \textbf{Sistemi Attivi:} Questi sistemi eseguono autonomamente un piano chirurgico precedentemente calcolato. Il chirurgo assume un ruolo di pianificatore e supervisore, mantenendo la possibilità di interrompere la procedura istantaneamente in caso di emergenza. Un esempio paradigmatico è il \textit{ROBODOC}, utilizzato in ortopedia per fresare la cavità ossea del femore con estrema precisione prima dell'inserimento di una protesi, o il \textit{CyberKnife} per la radiochirurgia stereotassica.
-    \item \textbf{Sistemi Interattivi (Shared Control):} In questo paradigma, robot e chirurgo condividono il controllo fisico dello strumento. Il chirurgo applica le forze, mentre il robot guida, filtra o vincola il movimento. A loro volta, si dividono in:
+    \item \textbf{Open Surgery:} Guarantees maximum dexterity and 3D vision for the surgeon but causes large incisions, high risk of infections, and prolonged hospital stays.
+    \item \textbf{Minimally Invasive Surgery (MIS - Laparoscopy):} Operations are performed through 5-12 mm incisions using trocars. Trauma drops significantly, but the surgeon faces the \textit{fulcrum effect} (inverted hand-tool motion), loss of depth perception (2D vision), the need for a camera assistant, and poor ergonomics.
+    \item \textbf{Micro/Nano Surgery:} Therapies at the cellular level. The physical obstacle here is that at microscopic scales (e.g., 100 $\mu$m blood vessels), the surgeon's physiological hand tremor (approx. 182 $\mu$m) is larger than the target itself.
+\end{itemize}
+Medical robotics, specifically with the \textit{da Vinci} system (introduced in 1999), emerged to merge the benefits of both paradigms: restoring the dexterity of Open Surgery (via 7-DOF articulated EndoWrist instruments) while preserving the low invasiveness of MIS.
+
+\section{Classification Schemes}
+Surgical robotic systems are complex and multifaceted. Several classification schemes are presented in the literature, as each highlights a different engineering and clinical aspect.
+
+\subsection{Troccaz Classification (Interaction Modality, 2001)}
+Based on the level of physical interaction between the machine and the human:
+\begin{itemize}
+    \item \textbf{Passive Systems:} Unactuated, manually driven by the surgeon. The system acts as a spatial navigator. Example: \textit{Viewing Wand} (an articulated arm with encoders that displays the scalpel tip's position on a pre-operative CT scan).
+    \item \textbf{Active Systems:} Execute a surgical plan autonomously under human supervision. Example: \textit{ROBODOC} for autonomous orthopedic bone milling; \textit{CyberKnife} for frameless stereotactic radiosurgery.
+    \item \textbf{Interactive Systems (Shared Control):} The machine and the human share physical control of the instrument. They are divided into:
     \begin{itemize}
-        \item \textit{Sistemi Semi-attivi:} Il robot posiziona una guida meccanica nella configurazione corretta e poi blocca i propri giunti. Il chirurgo agisce all'interno di questo vincolo fisico invalicabile (es. il sistema NeuroMate per l'inserimento di aghi).
-        \item \textbf{Sistemi Sinergici:} I vincoli non sono imposti meccanicamente ma via software, e sono quindi programmabili dinamicamente. Rientrano in questa categoria sistemi come il \textit{PADyC} (che utilizzava complessi sistemi di ruote libere) o l'\textit{Acrobot / MAKO}, che sfrutta il controllo di impedenza per generare "muri virtuali" attorno a un'area di taglio sicuro.
+        \item \textit{Semi-active:} The robot autonomously positions a mechanical guide and then locks its motors. The surgeon inserts the tool through the guide (e.g., NeuroMate).
+        \item \textit{Synergistic:} The constraint is "virtual" and programmed via software, such as Virtual Fixtures (e.g., PADyC, Acrobot/MAKO).
     \end{itemize}
-    \item \textbf{Sistemi Teleoperati:} Si basano su un'architettura Master-Slave. Il chirurgo siede a una console separata dal paziente e manovra dispositivi di input (master). Un robot al tavolo operatorio (slave) replica fedelmente i movimenti all'interno del corpo del paziente. Il sistema \textit{da Vinci} è l'esempio commerciale per eccellenza. Questa separazione permette di filtrare elettronicamente il tremore fisiologico e di scalare i movimenti (ad esempio, un movimento di 5 cm del chirurgo si traduce in un movimento di 1 cm dello strumento).
+    \item \textbf{Teleoperated Systems:} The surgeon is physically decoupled from the patient and operates a master console. A slave robot replicates the movements, applying tremor filtering and \textit{motion scaling} (e.g., da Vinci).
 \end{itemize}
 
-\subsection{Livelli di Autonomia (LoA)}
-Ispirato alla classificazione SAE per i veicoli a guida autonoma, il framework dei Livelli di Autonomia (LoA) diventa sempre più rilevante con l'integrazione dell'Intelligenza Artificiale. La scala va da LoA 0 a LoA 5:
+\subsection{Other Classifications: Taylor, Joskowicz, Dario}
 \begin{itemize}
-    \item \textbf{LoA 0 (Nessuna Autonomia):} Corrisponde alla chirurgia manuale tradizionale.
-    \item \textbf{LoA 1 (Robot Assistance):} Il chirurgo controlla continuamente ogni movimento, ma il robot fornisce supporto passivo (filtraggio del tremore, scaling). Il da Vinci standard opera a questo livello.
-    \item \textbf{LoA 2 (Task-level Autonomy):} Il chirurgo fornisce i parametri di un compito specifico e il robot lo esegue autonomamente senza rilasciare il controllo fino al termine. Il fresaggio osseo autonomo del ROBODOC appartiene al LoA 2.
-    \item \textbf{LoA 3 (Conditional Autonomy):} Il sistema genera strategie in modo indipendente, richiede l'approvazione del chirurgo e poi esegue porzioni estese della procedura.
-    \item \textbf{LoA 4 (High-level Autonomy) e LoA 5 (Full Autonomy):} Sistemi in grado di adattarsi dinamicamente, prendere decisioni complesse o eseguire un'intera operazione senza alcun intervento umano. Attualmente non esistono sistemi chirurgici operanti stabilmente a questi livelli nella pratica clinica.
+    \item \textbf{Taylor (2003):} Introduces the concept of \textit{Computer Integrated Surgery (CIS)}. Distinguishes between CAD/CAM systems (where image registration plays a vital role, e.g., ROBODOC) and \textit{Surgical Assistants} (e.g., \textit{AESOP}, a voice-controlled arm to hold the endoscope, eliminating human assistant fatigue).
+    \item \textbf{Joskowicz (2005):} Classifies based on the type of support, ranging from patient-specific passive jigs to intraoperative navigation, floor-mounted robots, and finally \textbf{patient-mounted robots} (e.g., \textit{Mazor/Renaissance} for spinal surgery, which are fixed to the patient's bone, making the system immune to respiratory movements and eliminating the need for real-time tracking).
+    \item \textbf{Paolo Dario (2004):} Creates a 2D matrix crossing the \textit{Type of Access} (Traditional, MIS, Endoluminal) with the \textit{Type of Interaction}.
 \end{itemize}
 
+\subsection{Levels of Autonomy (LoA) and Regulations}
+Adapted from the SAE autonomous driving scale, the LoA framework ranges from 0 (no autonomy) to 5 (full autonomy, currently non-existent in clinical practice). The standard \textit{da Vinci} is \textbf{LoA 1} (the surgeon continuously controls everything; the robot only filters tremor). A robot like \textit{ROBODOC} is \textbf{LoA 2} (task-level autonomy: the human initiates the process, and the robot executes the milling).
+From a regulatory perspective, the \textbf{IEC 80601-2-77} standard mandates the definition and demonstration of "essential performance" based on the device's level of invasiveness.
+
 % =====================================================================
-% CAPITOLO 2
+% CHAPTER 2: KINEMATIC DESIGN AND RCM
 % =====================================================================
-\chapter{Progettazione Cinematica e il Vincolo RCM}
+\chapter{Kinematic Design and the RCM Constraint}
 
-La progettazione cinematica di un robot medico parte sempre dall'analisi del task clinico. Non si progetta mai un robot "universale", ma si ottimizza lo spazio di lavoro, la destrezza e la sicurezza attorno all'operazione da eseguire.
+Kinematic design is strictly driven by the surgical task. Engineers do not design "universal" robots, but rather optimize workspace, dexterity, and safety around the specific operation to be performed.
 
-\section{Architetture Seriali: SCARA vs. Antropomorfo}
-Le architetture seriali convenzionali costituiscono la maggioranza dei robot medici attualmente sul mercato (circa il 60\%). Tra queste, due tipologie principali dominano le scelte di design: il manipolatore SCARA e quello antropomorfo (a gomito). 
+\section{Serial Architectures: SCARA vs. Anthropomorphic}
+\begin{itemize}
+    \item \textbf{SCARA (e.g., ROBODOC):} The architecture of choice for milling rigid surfaces. Its workspace is an annular cylinder that perfectly "wraps" around a patient lying on the operating table without wasting volume. The primary axis is prismatic and vertical: this provides \textbf{intrinsic gravitational safety} (if power fails, the arm cannot fall sideways onto the patient). Arm singularities are known and confined to the outer boundaries of the workspace.
+    \item \textbf{Anthropomorphic (e.g., CyberKnife):} Features a spherical workspace. It allows approaches from multiple angles, which is fundamental for non-isocentric radiosurgery. However, in the event of power loss, the cantilevered links would collapse onto the patient due to gravity, necessitating heavy counterweights or highly reliable redundant braking systems.
+\end{itemize}
 
-La scelta tra i due è dettata da profondi requisiti clinici. Prendiamo in esame la lavorazione di superfici ossee rigide, tipica dell'ortopedia (ad esempio la preparazione di anca o ginocchio). In questo scenario, l'architettura \textbf{SCARA} è storicamente preferita. Il motivo principale risiede nello spazio di lavoro: lo SCARA possiede un workspace a forma di cilindro anulare. Quando un paziente giace supino sul lettino operatorio, questo spazio di lavoro "avvolge" perfettamente il corpo, garantendo un volume di intervento ampio ma limitato in altezza. In secondo luogo, poiché il primo asse dello SCARA è tipicamente prismatico e verticale, il braccio non può fisicamente collassare sul paziente in caso di interruzione dell'alimentazione elettrica o rottura dei freni, fornendo una \textbf{sicurezza gravitazionale intrinseca}. Infine, le singolarità del braccio SCARA si trovano ai confini dello spazio di lavoro (a massima estensione o ripiegamento), rendendo facile posizionare il paziente ben lontano da queste zone critiche.
+\section{The Remote Center of Motion (RCM) Constraint}
+In MIS, the instrument shaft passes through the abdominal wall at a fixed point (the trocar). No transverse forces can be generated at this point, otherwise the tissue would tear. Kinematically, this constraint forces the robot to move such that a stationary point (the RCM) exists along the instrument shaft, around which it can only rotate and translate axially (providing 4 DOFs inside the abdomen).
 
-L'architettura \textbf{Antropomorfa}, invece, offre uno spazio di lavoro sferico e una maggiore destrezza nell'orientare gli strumenti da innumerevoli direzioni. Questo è ideale per applicazioni come la radiochirurgia (es. CyberKnife), dove l'acceleratore lineare deve colpire il tumore da più angolazioni possibili per risparmiare i tessuti sani. Tuttavia, i suoi link montati a sbalzo comportano un rischio di collasso gravitazionale, richiedendo una complessa sensoristica ridondante, freni ad alta affidabilità o l'uso di pesanti contrappesi.
-
-\section{Il Vincolo del Centro Remoto di Moto (RCM)}
-La chirurgia minimamente invasiva (MIS) introduce uno dei vincoli cinematici più importanti dell'intera disciplina: il \textbf{Remote Center of Motion (RCM)}.
-Quando lo strumento robotico penetra la parete addominale attraverso il trocar, esso è costretto a ruotare e scorrere attorno a quel preciso punto nello spazio. Il robot non deve esercitare forze trasversali sul punto di ingresso, altrimenti lacererebbe gravemente i tessuti del paziente. Matematicamente, lo strumento all'interno dell'addome possiede solo 4 gradi di libertà (DOF) utili: 3 rotazioni (che permettono alla punta di muoversi su una calotta sferica) e 1 traslazione telescopica (l'inserimento). 
-
-Esistono quattro approcci ingegneristici per risolvere il problema dell'RCM:
+There are four engineering methods to satisfy the RCM constraint:
 \begin{enumerate}
-    \item \textbf{Giunti Passivi:} Il braccio del robot è dotato, in prossimità dello strumento, di giunti non motorizzati (liberi). Quando lo strumento entra nel trocar, le forze di contatto spingono i giunti passivi ad allinearsi perfettamente al fulcro. Questo approccio è economicamente vantaggioso e intrinsecamente sicuro, in quanto l'adattamento meccanico impedisce lacerazioni, ma sacrifica la precisione e la rigidità del posizionamento.
-    \item \textbf{RCM Meccanico:} La struttura del robot è disegnata in modo che, indipendentemente dalla configurazione dei motori, l'asse dello strumento passi sempre per un punto fisso invariante nello spazio. L'implementazione più celebre è il \textbf{parallelogramma articolato} utilizzato nei bracci del da Vinci. Il vantaggio è assoluto in termini di sicurezza software (non serve alcun algoritmo per mantenere il fulcro), ma impone ingombri meccanici enormi sopra il paziente.
-    \item \textbf{Controllo Cinematico (Software RCM):} Il robot è un classico braccio seriale sovra-attuato (con 6 o 7 DOF). Il vincolo RCM non esiste nell'hardware, ma è garantito in tempo reale dal controllore. Si definisce il punto sull'asta dello strumento che attraversa il trocar e si impone matematicamente che la sua velocità cartesiana sia rigorosamente nulla ($\dot{p}_{RCM} = 0$). Sfruttando il formalismo del Null Space, i motori eseguono moti interni per muovere la punta mantenendo fermo il punto di ingresso. Questo permette robot molto compatti e multi-funzione, ma scarica tutta la responsabilità sulla sicurezza del software e sulla frequenza di aggiornamento del controllore.
-    \item \textbf{Controllo di Forza:} Meno diffuso per questo scopo specifico, prevede l'uso di un sensore di forza/coppia che misura le tensioni esercitate dall'asta sul trocar. Il robot è programmato in closed-loop per muovere i giunti in modo da minimizzare costantemente queste forze trasversali, inseguendo dolcemente il punto di ingresso.
+    \item \textbf{Passive Joints (e.g., Zeus system):} The robot's distal joints, near the trocar, are free (unactuated). When the surgeon moves the system, the resistance of the abdominal wall forces the mechanics to align naturally. It is intrinsically safe but lacks precision due to mechanical friction.
+    \item \textbf{Mechanical RCM (e.g., da Vinci Patient Cart):} The structure is geometrically designed (e.g., using an articulated parallelogram) so that, regardless of motor angles, the instrument axis always passes through a fixed focal point in space. The advantage is that the RCM is hardware-guaranteed; the disadvantage is the massive mechanical footprint above the patient and the need to physically align this fixed point exactly with the incision.
+    \item \textbf{Kinematic Control (Software RCM):} The robot is a standard, redundant serial arm (e.g., 6 or 7 DOFs). The RCM is mathematically enforced via software as a zero-velocity constraint in Cartesian space: $\dot{p}_{RCM} = J_{RCM}(q) \dot{q} = 0$. The motors perform \textit{null-space} motions to move the tip while keeping the trocar point stationary. This allows for compact, multi-purpose robots, but patient safety relies entirely on software reliability.
+    \item \textbf{Force Control:} A force/torque sensor is installed on the wrist. If the shaft presses against the trocar, the sensor detects it and commands the motors to yield to the push, minimizing the transverse force. Very flexible, but sensors introduce complexity, cost, and sterilization issues.
 \end{enumerate}
 
-\section{Analisi dei Gradi di Libertà e Formula di Grübler}
-Un problema classico per i progettisti è determinare quanti giunti debba avere il braccio esterno per garantire la voluta destrezza all'interno dell'addome. Si utilizza la formula di Grübler per i sistemi a loop chiuso:
+\section{Degrees of Freedom Analysis (Grübler's Formula)}
+To determine how many joints the external robotic arm needs, Grübler's formula is used. An arm inserted into an abdomen closes a kinematic chain with the operating table, where the trocar acts as a 4-DOF virtual joint.
+The formula for a closed loop (where the number of joints $n$ equals the number of links $l$) simplifies to:
 \begin{equation}
-    m = \sum_{i=1}^{n} d_i - 6(n + 1 - l)
+    m = \sum d_i - 6(n + 1 - l) \implies m = \text{Total DOFs} - 6
 \end{equation}
-dove $m$ è la mobilità totale (i DOF utili), $d_i$ sono i gradi di libertà di ciascun giunto, $n$ è il numero totale di giunti e $l$ il numero di corpi rigidi. 
-Nella MIS, il trocar agisce a tutti gli effetti come un "giunto virtuale" a 4 DOF che chiude il loop cinematico tra il robot e il tavolo operatorio (paziente). Poiché per un loop chiuso il numero di giunti $n$ eguaglia il numero di link $l$, l'equazione si semplifica notevolmente in:
-\begin{equation}
-    m = \text{DOF}_{totali} - 6
-\end{equation}
-Sapendo che i DOF totali sono la somma dei DOF del braccio esterno incognito ($x$) e dei 4 DOF del trocar, si ha $m = x + 4 - 6$, ovvero $x = m + 2$.
-Pertanto, se il chirurgo desidera 4 gradi di libertà all'interno dell'addome (es. per posizionare l'apice di un ago), il braccio esterno dovrà essere progettato con esattamente 6 giunti attuati.
+Let $x$ be the number of actuated DOFs of the external arm. The total DOFs are $x + 4$ (the 4 DOFs of the trocar). If the surgeon requires an internal mobility $m=4$ (e.g., targeting a needle tip), we have:
+$4 = x + 4 - 6 \implies x = 6$. Therefore, 6 external DOFs are required to position the tool tip internally while respecting the trocar constraint.
 
 % =====================================================================
-% CAPITOLO 3
+% CHAPTER 3: PARALLEL ROBOTS AND CARDIOLOCK
 % =====================================================================
-\chapter{Architetture Cinematiche Parallele}
+\chapter{Parallel Architectures and Special Applications}
 
-Benché la stragrande maggioranza dei robot medici e industriali adotti architetture seriali (una singola catena aperta dalla base all'end-effector), per determinati e complessi compiti clinici le architetture \textbf{parallele} risultano essenziali.
+Although serial manipulators are the majority, \textbf{parallel} architectures (where multiple independent chains connect the base to the end-effector) are indispensable for tasks requiring lightning-fast dynamics, high stiffness, and a high payload-to-weight ratio.
 
-\section{Confronto tra Architetture}
-Un manipolatore seriale accumula flessibilità ed errori geometrici lungo l'intera catena. Inoltre, ogni motore prossimale (vicino alla base) deve sopportare il peso di tutti i link e dei motori distali. Questo genera macchine con un rapporto payload-to-weight molto basso e inerzie elevate. I seriali, tuttavia, offrono spazi di lavoro immensi e risoluzioni della cinematica inversa spesso disponibili in forma analitica chiusa, ideali per garantire un controllo real-time senza latenze di calcolo.
+\section{Serial vs. Parallel Manipulators}
+In \textbf{parallel manipulators}, joint errors average out rather than accumulating. Since heavy motors are often fixed to the base, the inertia of the moving parts is extremely low, allowing for very high operating frequencies.
+Mathematically, the \textbf{Inverse Kinematics} of parallel robots is generally decoupled and solvable in closed analytical form: given the platform's pose, each leg becomes a simple, independent serial problem.
+Conversely, \textbf{Direct (Forward) Kinematics} is extremely complex. Even for a simple planar 3-RPR mechanism, the solution leads to a 6th-degree polynomial, often requiring numerical iterative methods.
+The workspace of a parallel robot is very restricted (the intersection of the individual legs' workspaces). While a flaw in industry, this becomes a \textbf{feature of intrinsic safety} in surgery: in the event of a controller runaway, the hardware physically cannot exceed a confined volume.
 
-Al contrario, un \textbf{manipolatore parallelo} è un meccanismo a catena cinematica chiusa, in cui la piattaforma mobile (end-effector) è connessa alla base fissa tramite \textbf{più catene indipendenti} che lavorano in parallelo. 
-Questo design inverte quasi tutte le proprietà dei robot seriali:
-\begin{itemize}
-    \item \textbf{Alta rigidezza e precisione estrema:} I carichi esterni sono condivisi tra tutte le gambe della struttura, minimizzando le deflessioni e impedendo che gli errori dei singoli giunti si sommino direttamente.
-    \item \textbf{Bassa inerzia e altissima agilità:} Spesso, nei robot paralleli, i motori pesanti sono tutti montati sulla base fissa. Le catene in movimento sono costituite solo da bielle leggere. Questo garantisce accelerazioni fulminee e bande passanti elevatissime, proprietà critiche quando si deve compensare il rapido battito cardiaco o il tremore fisiologico.
-    \item \textbf{Cinematica Inversa disaccoppiata:} Nei paralleli, la cinematica inversa (trovare l'angolo dei motori nota la posa dell'end-effector) è generalmente banale. Conoscendo la posizione della piattaforma, il problema si scompone in tanti piccoli problemi separati per ciascuna gamba.
-    \item \textbf{Cinematica Diretta complessa:} Al contrario, calcolare la posa dell'end-effector noti gli angoli dei motori porta a sistemi di equazioni non lineari fortemente accoppiati, la cui risoluzione analitica è rara. Spesso conduce a polinomi di alto grado (es. grado 6 per un semplice 3-RPR planare), con radici multiple che rendono difficile determinare in quale "assemblaggio" si trovi fisicamente il robot.
-    \item \textbf{Spazio di lavoro ridotto:} Il workspace è confinato dall'intersezione dell'area di lavoro delle singole gambe, risultando spesso in volumi molto ridotti. Questo aspetto, che è un grave difetto in ambito industriale, diventa un prezioso asset di \textbf{sicurezza intrinseca} in sala operatoria: in caso di runaway del controller, l'hardware del robot non può fisicamente oltrepassare un volume circoscritto, proteggendo il paziente.
-\end{itemize}
-
-\section{Le Singolarità nei Manipolatori Paralleli}
-L'analisi delle singolarità rivela una differenza critica rispetto ai robot seriali. Differenziando rispetto al tempo il vincolo di chiusura $\mathbf{H}(\mathbf{X}, \boldsymbol{\theta}) = 0$, otteniamo l'equazione differenziale che domina i sistemi paralleli:
+\section{Singularity Analysis}
+The differential kinematics of a parallel manipulator is governed by two Jacobian matrices, derived by differentiating the closure constraint $\mathbf{H}(\mathbf{X}, \boldsymbol{\theta}) = 0$:
 \begin{equation}
     \mathbf{U}\dot{\mathbf{X}} + \mathbf{V}\dot{\boldsymbol{\theta}} = \mathbf{0}
 \end{equation}
-dove $\mathbf{U} = \partial \mathbf{H} / \partial \mathbf{X}$ e $\mathbf{V} = \partial \mathbf{H} / \partial \boldsymbol{\theta}$.
-Essendoci due matrici giacobiane, emergono tre tipi distinti di singolarità:
+Because there are two Jacobians, three distinct types of singularities emerge:
 \begin{enumerate}
-    \item \textbf{Singolarità di Primo Tipo (Seriali):} Si verificano quando $\mathbf{V}$ perde rango (mentre $\mathbf{U}$ è invertibile). Fisicamente, una o più gambe sono alla massima estensione o completamente ripiegate. Esistono velocità non nulle dei giunti attivi ($\dot{\boldsymbol{\theta}} \neq 0$) che non generano alcuna velocità sull'end-effector ($\dot{\mathbf{X}} = 0$). Queste singolarità risiedono sui \textit{bordi} dello spazio di lavoro.
-    \item \textbf{Singolarità di Secondo Tipo (Parallele):} Questa è la classe più problematica. Si verificano quando $\mathbf{U}$ perde rango. Esiste una velocità dell'end-effector $\dot{\mathbf{X}} \neq 0$ \textbf{anche se tutti i motori attivi sono fermi e bloccati} ($\dot{\boldsymbol{\theta}} = 0$). La struttura acquisisce un grado di libertà infinitesimo e incontrollabile, non essendo più in grado di resistere a sforzi in una certa direzione. Essendo singolarità che possono manifestarsi \textit{all'interno} del workspace, in ambito chirurgico rappresentano un pericolo inaccettabile e devono essere evitate mediante un'attenta progettazione geometrica.
-    \item \textbf{Singolarità di Terzo Tipo:} Si verificano quando entrambe le matrici perdono rango simultaneamente, generando architetture labili dipendenti fortemente dalla geometria costruttiva (es. dimensioni identiche tra base e piattaforma mobile in specifiche configurazioni simmetriche).
+    \item \textbf{Type 1 (Serial Singularities):} $\mathbf{V}$ loses rank ($\det(V)=0$). These occur at the boundary of the workspace when legs are fully extended or folded. Non-zero joint velocities ($\dot{\boldsymbol{\theta}} \neq 0$) exist that produce no end-effector velocity ($\dot{\mathbf{X}} = 0$).
+    \item \textbf{Type 2 (Parallel/Local Singularities):} $\mathbf{U}$ loses rank ($\det(U)=0$). This is the most critical case. A non-zero end-effector velocity $\dot{\mathbf{X}} \neq 0$ exists \textbf{even when all active motors are physically locked} ($\dot{\boldsymbol{\theta}} = 0$). The mechanism gains an uncontrollable infinitesimal degree of freedom and cannot resist external forces. These occur \textit{inside} the workspace and \textbf{must be strictly avoided in surgery}, as they lead to loss of tool control.
+    \item \textbf{Type 3 Singularities:} Both matrices lose rank simultaneously, due to degenerate architectural choices (e.g., exact symmetric proportions between base and moving platform).
 \end{enumerate}
 
-\section{Sfruttare le Singolarità: L'Esempio Cardiolock}
-In rari casi, la vicinanza a una singolarità parallela non viene fuggita ma \textbf{intenzionalmente sfruttata}. È il caso del progetto di ricerca \textbf{Cardiolock}, uno stabilizzatore attivo progettato per la chirurgia coronarica a cuore battente.
-Il compito del robot è controbilanciare il rapido movimento del cuore. Data l'alta frequenza (con armoniche fino a decine di Hertz) e la necessità di annullare i ritardi di gioco meccanico (backlash), si è reso necessario l'uso di \textbf{attuatori piezoelettrici}. I piezo garantiscono bande passanti enormi, ma soffrono di un difetto intrinseco: la loro corsa lineare è infinitesima (100-200 $\mu$m), del tutto insufficiente a compensare escursioni cardiache di alcuni millimetri.
-La soluzione ingegneristica è stata quella di inserire l'attuatore piezoelettrico alla base di un meccanismo parallelo (un 3-PRR modificato) che lavora costantemente in prossimità di una singolarità di Tipo 2. La matematica ci dice che vicino a queste configurazioni, il rapporto tra la velocità dell'end-effector e quella dell'attuatore diverge. Sfruttando l'architettura come amplificatore meccanico, la microscopica deformazione del piezoelettrico viene moltiplicata in un'ampia e rapida rotazione del polso del robot, risolvendo il problema della corsa senza compromettere la banda passante. 
+\section{Case Study 1: The Cardiolock (Exploiting Singularities)}
+The \textbf{Cardiolock} is an active stabilizer designed for beating-heart coronary surgery. Unlike passive stabilizers that leave millimeter-scale residual motions, the Cardiolock actively moves to cancel myocardial motion, keeping the surgical area virtually motionless.
+
+Compensation requires a very high bandwidth (heart frequencies $\sim$10Hz), forcing designers to use \textbf{piezoelectric actuators} (zero friction, zero backlash). The flaw of piezo actuators is their \textbf{extremely limited stroke}, on the order of 100-200 $\mu$m. How can one compensate for millimeters of heartbeat with micrometers of stroke?
+The brilliant engineering intuition behind Cardiolock was to employ a planar 3-PRR mechanism and deliberately operate it **in close proximity to a Type 2 parallel singularity**. Kinematics dictates that near a Type 2 singularity, the ratio of end-effector velocity to actuator velocity approaches infinity. By exploiting this phenomenon, a microscopic translation of the piezo actuator is kinematically "amplified" into a vast rotation of the robot's wrist, solving the stroke problem without compromising bandwidth.
+
+\section{Case Study 2: Pentagon Mechanism (In-Vivo Microscopy)}
+Similarly to Cardiolock, stabilizing a microscope image on living animals requires compensating for large displacements at high frequencies. A 5-bar closed-loop parallel mechanism ("Pentagon") is used, pushed at the base by two piezoelectric actuators. Again, the goal is to optimize the link geometry (by analyzing the Jacobian and its eigenvalues) to maximize the motion amplification factor isotropically, allowing the microscope to track the target cell without losing focus.
 
 % =====================================================================
-% CAPITOLO 4
+% CHAPTER 4: INTERACTION CONTROL
 % =====================================================================
-\chapter{Controllo dell'Interazione Fisica: Impedenza e Ammittenza}
+\chapter{Interaction Control: Impedance and Admittance}
 
-Sia nei sistemi ad autonomia condivisa, sia in quelli teleoperati, o in quelli autonomi che entrano in contatto con tessuti cedevoli, sorge un problema irrisolvibile con i classici algoritmi della robotica industriale: il controllo di posizione puro è inadeguato. Se un robot guidato in pura posizione incontra una resistenza imprevista (es. un osso), cercherà di azzerare l'errore aumentando la corrente nei motori fino al proprio limite, causando distruzioni tissutali gravissime. È quindi obbligatorio controllare l'interazione dinamica tra il movimento e la forza scambiata. Questo si ottiene tramite i controlli di \textbf{Impedenza} e di \textbf{Ammittenza}.
+When a medical robot comes into contact with the patient or the surgeon, pure position control (which forces the robot to reach fixed coordinates regardless of the environment) is dangerous. If a position-controlled robot hits an unexpected bone, it will increase motor current to its limit to reduce the position error, destroying tissues. It is mandatory to control the dynamic relationship between motion and exchanged force. This is achieved via \textbf{Impedance} and \textbf{Admittance} control.
 
-\section{Il Modello in Spazio Cartesiano e la Dinamica Desiderata}
-Per semplificare la sintesi del controllo, si suppone solitamente che un controllore a basso livello di \textit{feedback linearization} (linearizzazione esatta in retroazione) abbia già annullato le complesse dinamiche non lineari di Coriolis, la gravità e le inerzie accoppiate dei giunti. Nello spazio Cartesiano, il robot manipolatore si comporta quindi come una semplice massa controllabile $m$:
+Assuming a low-level controller is already compensating for gravity and Coriolis forces (feedback linearization in Cartesian space), the machine's dynamics can be reduced to a controllable mass $m$:
 \begin{equation}
     m\ddot{p} = u + F_{ext}
 \end{equation}
-dove $p$ è la posizione cartesiana, $u$ è la forza di controllo comandata ai motori e $F_{ext}$ è la forza esterna applicata al robot (dal chirurgo o dal tessuto).
-L'obiettivo dei controllori di interazione è fare in modo che il robot, in risposta a una forza, si comporti come un sistema massa-molla-smorzatore virtuale, imponendo una precisa equazione dinamica di errore:
-\begin{equation} \label{eq:desired_dynamics}
+where $u$ is the control command and $F_{ext}$ is the external force.
+
+\section{Impedance Control}
+In impedance control, **the input to the model is a kinematic perturbation (position/velocity) and the output is a commanded force**.
+The goal is to force the robot to follow this desired target equation:
+\begin{equation}
     m_d(\ddot{p} - \ddot{p}_d) + b(\dot{p} - \dot{p}_d) + k(p - p_d) = F_{ext}
 \end{equation}
-dove $p_d$ è la traiettoria desiderata, $m_d$ l'inerzia apparente, $b$ lo smorzamento e $k$ la rigidezza del comportamento.
-
-\section{Il Paradigma del Controllo di Impedenza}
-Nel controllo di impedenza, la causalità del sistema è strutturata così: \textbf{il robot accetta in ingresso una deviazione di movimento (posizione e velocità) e reagisce generando una forza in output}. 
-
-Sostituendo la (\ref{eq:desired_dynamics}) nel modello della massa, calcoliamo la legge di controllo $u$:
+where $m_d, b, k$ are the desired apparent mass, damping, and stiffness, respectively, and $p_d$ is the nominal trajectory.
+Solving for the desired acceleration $\ddot{p}$ and substituting it into the robot's dynamics yields the control law:
 \begin{equation}
-    u = m\ddot{p}_d + \frac{m}{m_d} \Big( b(\dot{p}_d - \dot{p}) + k(p_d - p) \Big) + \left( \frac{m}{m_d} - 1 \right) F_{ext}
+    u = m\ddot{p}_d + \frac{m}{m_d}\Big( b(\dot{p}_d - \dot{p}) + k(p_d - p) \Big) + \left( \frac{m}{m_d} - 1 \right)F_{ext}
 \end{equation}
-Questa formulazione cela un aspetto fondamentale per l'hardware del robot medico. Se il progettista sceglie di non alterare l'inerzia apparente del robot, ponendo $m_d = m$ (cioè il robot deve "pesare" quanto pesa realmente), il termine che moltiplica $F_{ext}$ si annulla. 
-L'equazione si riduce a:
-\begin{equation}
-    u = m\ddot{p}_d + b(\dot{p}_d - \dot{p}) + k(p_d - p)
-\end{equation}
-Questo è nient'altro che un controllore Proporzionale-Derivativo (PD) con azione di feedforward in accelerazione. \textbf{Il controllo di impedenza, se non si modifica la massa, non richiede l'utilizzo di un costoso e complesso sensore di forza/coppia al polso del robot}. È sufficiente disporre di encoder sui giunti per calcolare le posizioni. 
-L'unica limitazione architettonica è che il robot deve permettere il \textbf{controllo diretto di coppia (torque control)} ai motori per poter erogare la forza $u$ calcolata, ed è desiderabile che l'architettura meccanica sia intrinsecamente \textit{backdrivable} (a bassi attriti), tipicamente usando trasmissioni a cavo.
 
-\section{Il Paradigma del Controllo di Ammittenza}
-Il controllo di ammittenza ribalta la causalità: \textbf{il sistema accetta in ingresso una forza e genera come output un movimento di riferimento}.
+\textbf{Crucial Detail:} If the designer chooses \textbf{not} to alter the robot's perceived inertia, setting $m_d = m$ (apparent mass equals real mass), the final term containing $F_{ext}$ cancels out completely. This means that \textbf{impedance control (without inertial reshaping) requires no force/torque sensor at the end-effector}. It simply becomes a Proportional-Derivative (PD) controller with acceleration feedforward.
+This scheme perfectly suits robots with low-inertia direct-drive actuators and high-efficiency transmissions (e.g., cable-driven), where \textit{torque control} can be commanded directly to the motors in a \textit{backdrivable} manner.
 
-A differenza dell'impedenza, nel controllo di ammittenza \textbf{il sensore di forza è un requisito obbligatorio}. Il chirurgo applica una forza sul polso, il sensore la legge e la invia al calcolatore. Risolvendo nel dominio di Laplace l'equazione del comportamento desiderato, il sistema calcola uno spostamento virtuale $\Delta p_r$:
+\section{Admittance Control}
+Admittance control reverses the causality: **the input is force, and the output is a motion correction**.
+Here, \textbf{a force sensor is mandatory}. The surgeon or environment applies a force $F_{ext}$, which is read by the sensor and passed to a virtual dynamic model to calculate a target position modification $\Delta p_r$:
 \begin{equation}
     \Delta p_r = \frac{F_{ext}}{m_d s^2 + b s + k}
 \end{equation}
-Questo offset viene sommato alla posizione nominale $p_d$, generando un nuovo riferimento $p_r = p_d + \Delta p_r$. Questo riferimento viene poi passato a un rigidissimo e veloce controllore di posizione PID interno, che impone ai motori di inseguire ciecamente $p_r$. 
+The new reference $p_r = p_d + \Delta p_r$ is then fed into a highly stiff, high-gain inner PID position controller, which forces the motors to track $p_r$.
 
-Questo paradigma è ideale per riadattare all'uso medico robot industriali convenzionali. I robot industriali utilizzano spesso riduttori armonici (Harmonic Drives) che generano enormi attriti e rendono il braccio \textbf{non backdrivable} (non si muove spingendolo). Con l'ammittenza, il sensore di forza rileva la spinta e il software "finge" la compliance aggiornando i target di posizione, mascherando l'intrinseca rigidità meccanica del braccio.
+This approach is fundamental for retrofitting conventional, heavy industrial robots. Industrial robots often use Harmonic Drives, which generate massive friction and make the arm \textbf{non-backdrivable} (it cannot be pushed physically). With admittance control, the force sensor detects the push and the software "fakes" compliance by continuously updating position targets, masking the arm's intrinsic mechanical rigidity.
 
 % =====================================================================
-% CAPITOLO 5
+% CHAPTER 5: VIRTUAL FIXTURES AND SYNERGISTIC SYSTEMS
 % =====================================================================
-\chapter{Virtual Fixtures (Active Constraints)}
+\chapter{Virtual Fixtures and Synergistic Systems}
 
-I concetti di interazione fisica trovano la loro massima e più elegante espressione chirurgica nelle \textbf{Virtual Fixtures (VF)}, o vincoli attivi. Introdotte negli anni '90 da L.B. Rosenberg per il controllo teleoperato in ambito aerospaziale, una VF è un vincolo definito via software che guida, argina o inibisce il movimento di un manipolatore, in analogia a come un righello fisico impone a una penna di tracciare una linea retta o a come una dima guida la punta di un trapano. 
-Le VF migliorano drasticamente l'ergonomia, sopprimono le deviazioni e riducono il carico cognitivo del chirurgo.
-
-\section{Classificazione: Guidance vs. Forbidden-Region}
-Esistono due macro-famiglie di Virtual Fixtures:
+\section{What are Virtual Fixtures?}
+Introduced in the 1990s by L.B. Rosenberg (US Air Force), \textbf{Virtual Fixtures (VF)} are \textit{"abstract perceptual overlays"} introduced into the control interface. They are not hardware obstacles, but computational limits that simulate the effect of mechanical guides (like a ruler), vastly increasing the safety and precision of shared-control and teleoperated tasks.
 \begin{itemize}
-    \item \textbf{Guidance Virtual Fixtures (GVF):} Hanno un ruolo proattivo. Attraggono o incanalano il movimento del robot lungo un tracciato preferenziale 1D o su una superficie 2D (es. l'inserimento rettilineo di un ago per biopsia).
-    \item \textbf{Forbidden-Region Virtual Fixtures (FRVF):} Hanno un ruolo restrittivo. Definiscono dei volumi di esclusione nello spazio, funzionando come veri e propri "muri virtuali" che prevengono il danneggiamento di anatomie delicate (es. nervi o grossi vasi sanguigni adiacenti all'area di taglio).
+    \item \textbf{Guidance VFs (GVF):} Actively attract or channel the robot's motion along a preferred 1D path or 2D surface (e.g., a straight needle insertion).
+    \item \textbf{Forbidden-Region VFs (FRVF):} Prevent access to delicate anatomical zones, acting as virtual walls.
 \end{itemize}
+These fixtures can be modeled as \textbf{Hard} (absolute prohibition to deviate, the robot fully absorbs non-compliant forces) or \textbf{Soft} (provides clear elastic tactile resistance, but a sufficient force from the surgeon can override the constraint, providing an exit strategy if pre-operative planning was flawed).
 
-L'intensità del vincolo è un fattore di progettazione fondamentale. Un \textbf{Hard VF} annulla completamente qualsiasi comando che devii dalla traiettoria pre-programmata o che tenti di violare la zona proibita. È di vitale importanza in neurochirurgia. Tuttavia, la totale inflessibilità può essere pericolosa se la registrazione pre-operatoria contiene errori, intrappolando il chirurgo in un percorso errato.
-Un \textbf{Soft VF}, invece, impiega una rigidità elastica finita. Offre un chiaro avvertimento tattile (una crescente resistenza come se si stesse tirando un elastico o affondando in un fluido denso), ma consente al chirurgo di vincere il vincolo qualora applichi volontariamente una forza sufficiente a superarlo. Questo garantisce sicurezza preservando al chirurgo l'autorità decisionale finale.
-
-\section{Formulazione Matematica in Ammittenza}
-Per costruire matematicamente un GVF basato sull'ammittenza, si sfrutta la geometria dello spazio di lavoro. Data la direzione preferenziale in cui si vuole permettere il moto (ad esempio il vettore tangente alla traiettoria pianificata), si definisce una matrice $\mathbf{P}(t)$ che descrive questa direzione (o piano) punto per punto. 
-Si calcola l'operatore di proiezione ortogonale su questo spazio:
+\section{Mathematical Modeling of GVFs}
+To mathematically construct an admittance-based GVF, one defines a matrix $\mathbf{P}(t)$ representing the space of desired motion directions point by point.
+The orthogonal projection operator onto this subspace is:
 \begin{equation}
     \Pi_P = \mathbf{P}(\mathbf{P}^T \mathbf{P})^{-1}\mathbf{P}^T
 \end{equation}
-Quando l'operatore applica una forza $f$ sulla maniglia del robot, questa forza non viene tradotta direttamente in velocità in modo isotropo. Invece, la legge di controllo filtra le direzioni:
+When the operator applies a force $f$, the control law filters the directions:
 \begin{equation}
-    v = c \Big( \underbrace{\Pi_P f}_{\text{forza utile}} + \lambda_\perp \underbrace{(\mathbf{I} - \Pi_P) f}_{\text{forza trasversale}} \Big)
+    v = c \Big( \underbrace{\Pi_P f}_{\text{useful force}} + \lambda_\perp \underbrace{(\mathbf{I} - \Pi_P) f}_{\text{transverse force}} \Big)
 \end{equation}
-dove $c$ è l'ammittenza nominale (quanto il robot è sensibile) e $\lambda_\perp$ è il fattore di attenuazione per i movimenti indesiderati.
-Se impostiamo $\lambda_\perp = 0$, la forza trasversale applicata dal chirurgo per uscire dal percorso viene matematicamente moltiplicata per zero: il robot semplicemente non si sposterà di un millimetro lateralmente. Si ottiene così un comportamento \textbf{Hard GVF}. Impostando $\lambda_\perp$ tra 0 e 1 si ottiene un \textbf{Soft GVF}.
+where $c$ is the nominal admittance and $\lambda_\perp \in [0, 1]$ is the attenuation factor.
+If $\lambda_\perp = 0$, we have a Hard GVF (transverse forces are multiplied by zero). If $\lambda_\perp > 0$, we obtain a Soft GVF.
 
-\section{Formulazione in Impedenza e Vincoli di Passività}
-In sistemi teleoperati come il \textit{da Vinci Research Kit (dVRK)}, i VF vengono tipicamente applicati alla console del Master sotto forma di impedenza. Man mano che lo slave si avvicina a un limite proibito o devia dalla linea guida, il software calcola la distanza dal target, e genera una forza di richiamo:
-\begin{equation}
-    f_{VF} = -K_{VF}(x_d - x) - D_{VF}(\dot{x}_d - \dot{x})
-\end{equation}
-Questa forza $f_{VF}$ viene sommate alle equazioni del Master e applicata fisicamente sui motori della console. Il chirurgo "sente" il vincolo sotto forma di resistenza tattile.
+\section{Historical Synergistic Systems: PADyC and Acrobot}
+Synergistic systems represent the physical implementation of VFs in shared-control tasks.
 
-C'è un dettaglio tecnico vitale nell'implementazione di questi muri. Se l'anatomia si muove (il paziente respira), la parete virtuale si sposta online per inseguirla. Variare istantaneamente e in tempo reale i parametri della molla virtuale $K_{VF}$ significa immettere o prelevare bruscamente energia potenziale dal sistema in modo non fisico. Questo fenomeno genera oscillazioni parassite, che minano la stabilità del loop chiuso Master-Slave. Per garantire che il sistema non diventi instabile ferendo il paziente o l'operatore, è categorico utilizzare strategie di controllo basate sulla \textbf{Passività}, come l'utilizzo di "serbatoi di energia" (Energy Tanks) che monitorano e limitano rigorosamente il budget energetico erogato dai motori virtuali.
+\subsection{PADyC (Passive Arm with Dynamic Constraints)}
+Developed by TIMC Grenoble, PADyC is a triumph of passive mechatronics. It uses no motors to push the tool. Instead, each joint features two opposed \textit{freewheels} connected to motors. A freewheel blocks motion in one direction but allows it in the other. By regulating the speed of the internal motors, PADyC defines a "window of admissible velocities" $[\omega_{min}, \omega_{max}]$ for each joint.
+The system is \textbf{intrinsically safe}, but the underlying mathematical problem is daunting: translating Cartesian safety constraints into a Window of Admissible Configurations (WAC) for each joint in configuration space is computationally extremely expensive, limiting its clinical success.
+
+\subsection{Acrobot / MAKO (Active Constraints Robot)}
+Developed at Imperial College (now MAKO by Stryker) for knee arthroplasty. Unlike PADyC, it uses an active arm and \textbf{impedance control} to generate a FRVF.
+The intervention area is divided into three regions based on the distance $d$ from the safe bone boundary:
+\begin{enumerate}
+    \item \textbf{Region I (Safe Zone, d > D1):} The robot has very low impedance (\textit{free motion}). The surgeon moves transparently.
+    \item \textbf{Region II (Transition Zone, 0 < d < D1):} As the tool approaches the boundary, the robot's impedance increases progressively in the normal direction, becoming stiffer, while remaining compliant tangentially.
+    \item \textbf{Region III (Forbidden Zone, d < 0):} Beyond the boundary, PD gains max out; the robot brakes sharply, preventing further penetration.
+\end{enumerate}
+The gradual stiffness increase in RII is crucial: a sudden step-function increase in stiffness would trigger unstable vibrations due to the violent force transient on the motors.
 
 % =====================================================================
-% CAPITOLO 6
+% CHAPTER 6: REGISTRATION
 % =====================================================================
-\chapter{Registrazione in Robotica Chirurgica}
+\chapter{Robotic Registration}
 
-Affinché un robot possa navigare autonomamente, oppure possa imporre un Virtual Fixture per evitare i nervi del paziente, deve conoscere le coordinate del paziente rispetto alla propria base. 
-Le procedure cliniche iniziano giorni prima, con l'acquisizione di scansioni TC o RM (modello digitale pre-operatorio, \textbf{Image Space}). Al momento dell'operazione, il robot si trova nel \textbf{Robot Space} e vede la stanza e i sensori.
-La \textbf{Registrazione} è esattamente il calcolo dell'operazione matematica (Rototraslazione rigida, matrice in $SE(3)$) che sovrappone perfettamente lo spazio digitale pre-operatorio con la fisica realtà del paziente sul lettino.
-
-È essenziale non confondere la Registrazione con due operazioni affini:
+Registration is the mathematical heart of Computer Integrated Surgery. It corresponds to finding the spatial transformation (Rotation $\mathbf{R}$ and Translation $\mathbf{t}$) that maps the pre-operative digital coordinates (CT scans, surgical plans) to the physical space in the OR where the robot moves.
+It must be distinguished from:
 \begin{itemize}
-    \item \textbf{Calibrazione:} Determina trasformazioni spaziali fisse e note a priori tra sensori e base del robot (es. calibrare la telecamera a infrarossi con la flangia del robot).
-    \item \textbf{Tracking:} Avviene a valle della registrazione. È la lettura continua a decine di Hertz della posa dinamica di strumenti e tessuti (tramite marker ottici).
+    \item \textbf{Calibration:} Determines the fixed transformation between sensors (e.g., from camera to robot base).
+    \item \textbf{Tracking:} Dynamically computes the pose of moving objects in real-time.
 \end{itemize}
 
-\section{Registrazione Point-to-Point (Metodo di Procruste)}
-Questo algoritmo si usa quando si ha a disposizione un set di punti la cui corrispondenza è conosciuta 1 a 1 a priori. Si utilizzano \textit{fiducials} artificiali (es. viti in titanio impiantate nell'osso, chiaramente visibili nella CT e facilmente toccabili con il puntatore del robot). Avendo identificato $N \ge 3$ punti $A_i$ (coordinate CT) e i corrispondenti $B_i$ (coordinate Robot), il problema matematico si scrive come la minimizzazione delle distanze quadratiche:
+\section{Point-to-Point Registration (Procrustes Problem)}
+Used when a set of points with known 1-to-1 correspondences is available (e.g., titanium \textit{fiducial screws} implanted in the bone before the CT scan).
+Given two matched point sets, $A_i$ (CT) and $B_i$ (Robot), the goal is to minimize the error:
 \begin{equation}
-    \min_{R,t} \sum_{i=1}^{N} || A_i - (R B_i + t) ||^2
+    \min_{R \in SO(3), t} \sum_{i=1}^{N} \| A_i - (R B_i + t) \|^2
 \end{equation}
-Sotto il vincolo che $R \in SO(3)$ (deve essere una rotazione valida e non una deformazione).
-La soluzione si calcola in \textbf{forma chiusa e globale} attraverso la Singular Value Decomposition (SVD):
+\textbf{SVD Solution (Closed Form):} 
+1. Calculate the centroids of both point clouds.
+2. Center the points by subtracting their respective centroids ($\tilde{A}_i, \tilde{B}_i$).
+3. Build the cross-covariance matrix: $H = \sum_{i} \tilde{B}_i (\tilde{A}_i)^T$.
+4. Decompose using SVD: $H = U \Sigma V^T$.
+5. The optimal rotation is $\mathbf{R} = V U^T$.
+6. If $\det(\mathbf{R}) = -1$ (the algorithm found a reflection instead of a valid rigid rotation), flip the sign of the last column of $V$ and recalculate.
+7. The translation is derived from the rotated centroids: $t = \bar{A} - R\bar{B}$.
+
+\textbf{Iterative Solution (Gauss-Newton):} If data is noisy, non-linear least squares optimization is used. The SVD estimate is often used as a highly accurate initial guess (seed) for the Gauss-Newton solver.
+
+\section{Point-to-Surface Registration (ICP Algorithm)}
+In less invasive surgeries, screws are not implanted. The surgeon sweeps an optoelectronic probe over the exposed bone surface, acquiring thousands of unknown points. Because it is unknown which specific CT vertex corresponds to each acquired point, the \textbf{Iterative Closest Point (ICP)} algorithm is used:
 \begin{enumerate}
-    \item Si calcolano i baricentri (centroidi) delle due nuvole di punti e si esprime la posizione dei punti in un sistema di riferimento baricentrico ($\tilde{A}_i$ e $\tilde{B}_i$). Questo disaccoppia il problema di rotazione da quello di traslazione.
-    \item Si calcola la matrice di dispersione incrociata (cross-covariance matrix): $H = \sum_{i=1}^{N} \tilde{B}_i (\tilde{A}_i)^T$.
-    \item Si scompone $H$ usando la SVD: $H = U \Sigma V^T$.
-    \item La rotazione ottimale è semplicemente $R = V U^T$.
-    \item Nel caso il determinante di tale rotazione sia $-1$ (l'algoritmo matematico ha trovato una riflessione anziché una rotazione solida), si capovolge il segno dell'ultima colonna di $V$ e si ricalcola $R$.
-    \item Trovata la rotazione, la traslazione è data dalla distanza tra i baricentri ruotati: $t = \bar{A} - R\bar{B}$.
+    \item Provide an "initial guess" alignment $T^{(0)}$.
+    \item \textbf{Data Association:} For each physically acquired point, geometrically find the closest point on the CT mesh. This creates fictitious pairs.
+    \item \textbf{Resolution:} Apply the SVD Point-to-Point algorithm on these pairs to calculate a new roto-translation $T^{(1)}$.
+    \item Apply the transformation and loop back to step 2 until the RMS error converges.
 \end{enumerate}
 
-\section{Registrazione Point-to-Surface (Algoritmo ICP)}
-Nella maggior parte degli interventi, non si possono costringere i pazienti a operazioni invasive per inserire viti nell'osso giorni prima della chirurgia. In sala, il chirurgo "struscia" un puntatore optoelettronico in maniera pseudocasuale sulla superficie esposta dell'osso, acquisendo una nuvola di migliaia di punti intra-operatori.
-Ora sorge un problema grave: per un generico punto catturato nello spazio reale, non sappiamo a priori a quale specifico vertice del modello 3D CT esso corrisponda. Questo è il problema della \textit{Data Association}.
-L'algoritmo standard per risolvere questo problema è l'\textbf{Iterative Closest Point (ICP)}:
-\begin{enumerate}
-    \item Si applica una trasformazione iniziale "indovinata" $T^{(0)}$ per allineare approssimativamente i dati alla CT.
-    \item \textbf{Fase di Corrispondenza:} Per ogni punto acquisito dal robot, si cerca geometricamente il punto più vicino (\textit{closest point}) sulla superficie poligonale del modello TC. Abbiamo appena creato delle "coppie" di punti fittizie.
-    \item \textbf{Fase di Trasformazione:} Avendo delle coppie, si applica l'algoritmo di Procruste (SVD) del paragrafo precedente, calcolando una nuova trasformazione $T^{(1)}$ che minimizza l'errore tra i punti accoppiati.
-    \item Si aggiorna la posizione e si torna al punto 2, iterando fino a quando l'errore RMS (Root Mean Square) scende sotto una soglia clinica di accettabilità (es. $0.5$ mm).
-\end{enumerate}
-L'ICP gode di una garanzia matematica di convergenza monotona: l'errore cala a ogni iterazione. Tuttavia, la convergenza è garantita \textbf{soltanto verso un minimo locale}. Se la stima iniziale $T^{(0)}$ è molto distante dalla realtà (il modello è ruotato di 180 gradi, ad esempio), l'ICP fallirà clamorosamente allineando la parte frontale della nuvola con il retro dell'osso. Questo rende indispensabile, in procedure come quella dell'Acrobot, una fase preliminare in cui il chirurgo tocca 3-4 punti anatomici macroscopici noti per fornire all'ICP un'ottima condizione di partenza.
+ICP guarantees monotonic convergence, but \textbf{only to a local minimum}. If the initial guess is poor, ICP might align the front of the real bone with the back of the 3D model. The standard clinical solution is to begin registration by manually touching 3-4 macroscopic anatomical landmarks to provide ICP with an excellent starting condition.
 
 % =====================================================================
-% CAPITOLO 7
+% CHAPTER 7: TELEOPERATION AND STABILITY
 % =====================================================================
-\chapter{Teleoperazione: Trasparenza, Stabilità e Ritardi}
+\chapter{Bilateral Teleoperation: The Transparency-Stability Dilemma}
 
-Nell'architettura chirurgica a più alto impatto mondiale, la \textbf{teleoperazione bilaterale} (usata nel sistema da Vinci), il chirurgo manovra la console master mentre il robot manipolatore slave esegue l'operazione nel sito remoto. In un sistema bilaterale, il flusso informativo è bidirezionale: posizioni e velocità del Master viaggiano verso lo Slave per comandarlo, e le forze di reazione tissutale lette dallo Slave tornano indietro e vengono iniettate nei motori del Master, fornendo al chirurgo il cruciale \textbf{feedback tattile} (Haptic Feedback).
+In \textbf{bilateral teleoperation} (e.g., da Vinci 5), the surgeon manipulates a Master console while a Slave robot executes the action on the tissue. The Master sends motion commands to the Slave, and the Slave sends back measured tissue reaction forces to the Master's motors, providing vital \textbf{Haptic Feedback}.
 
-\section{Telepresenza e Trasparenza Perfetta}
-Il "Sacro Graal" della teleoperazione è raggiungere la \textbf{Telepresenza}: il sistema robotico scompare percettivamente e il chirurgo ha l'illusione fisica di toccare e tagliare i tessuti del paziente con le proprie mani (o con le mani "ridimensionate" dai fattori di motion scaling $\lambda_v$ e $\lambda_f$).
-Per formalizzare questo concetto, si utilizza l'analogia elettro-meccanica: il teleoperatore (composto da master, linea di comunicazione e slave) viene modellato come una \textbf{Rete a 2 Porte (Two-Port Network)} analoga ai doppi bipoli studiati in elettrotecnica, dove la forza è l'analogo della tensione e la velocità è l'analogo della corrente.
-
-Se indichiamo con $Z_e = f_s/\dot{x}_s$ l'impedenza fisica dell'ambiente remoto (la consistenza del tessuto del paziente), e con $Z_t = f_m/\dot{x}_m$ l'impedenza percepita alle mani del chirurgo afferrando la cloche del master, l'obiettivo per avere una trasparenza perfetta (fattori di scaling esclusi) è ottenere $Z_t \equiv Z_e$.
-
-La dinamica lineare del teleoperatore può essere espressa mediante la \textbf{Matrice Ibrida $H(s)$} di Lawrence:
+This system can be modeled as an electrical circuit using \textbf{Two-Port Network theory}, where Effort variables (Voltage $\rightarrow$ Force) and Flow variables (Current $\rightarrow$ Velocity) interact.
+Using Lawrence's \textbf{Hybrid Matrix $H(s)$}, the system is described by connecting inputs to outputs:
 \begin{equation}
     \begin{bmatrix} f_m \\ -\dot{x}_s \end{bmatrix}
     = 
     \begin{bmatrix} H_{11} & H_{12} \\ H_{21} & H_{22} \end{bmatrix}
     \begin{bmatrix} \dot{x}_m \\ f_s \end{bmatrix}
 \end{equation}
-Risolvendo il sistema ponendo $f_s = Z_e \dot{x}_s$, si ottiene l'impedenza trasmessa al chirurgo in funzione dei parametri della rete:
-\begin{equation}
-    Z_t = \frac{H_{11} + (H_{11}H_{22} - H_{12}H_{21})Z_e}{1 + H_{22}Z_e}
-\end{equation}
-Affinché $Z_t = Z_e$ sia un'identità verificata \textbf{per qualunque tipo di tessuto} $Z_e$ (che sia molle o duro come l'osso), i coefficienti della matrice devono necessariamente assumere i seguenti valori della Trasparenza Perfetta:
+
+\section{Transparency (Telepresence)}
+The clinical goal is to provide the surgeon with the exact physical sensation of touching tissues bare-handed. Let the environment's impedance be $Z_e = f_s/\dot{x}_s$ and the impedance felt at the master be $Z_t = f_m/\dot{x}_m$.
+\textbf{Perfect Transparency} requires $Z_t = Z_e$ regardless of the tissue type. Solving the hybrid matrix equations shows that this identity holds if and only if:
 \begin{equation}
     H_{11} = 0, \quad H_{22} = 0, \quad H_{12} = 1, \quad H_{21} = -1
 \end{equation}
-Questi quattro parametri hanno un significato fisico chiarissimo:
-\begin{itemize}
-    \item $H_{11} = 0$: In spazio libero (slave che non tocca nulla), il chirurgo non deve sentire alcuna forza. Per ottenere zero netto, il controllo deve \textbf{compensare e nascondere completamente la massa fisica dei motori del Master}. Questo richiede di iniettare forze in feedforward proporzionali alle \textit{accelerazioni}, derivate estremamente suscettibili al rumore di misura.
-    \item $H_{12} = 1$: La forza impattata dallo slave deve riflettersi in scala 1:1 verso il Master.
-    \item $H_{21} = -1$: Lo slave deve tracciare perfettamente in velocità i movimenti impartiti dal Master.
-    \item $H_{22} = 0$: Se il master è saldamente bloccato dalle mani del chirurgo, e qualcuno preme fisicamente sullo slave, lo slave non deve cedere o spostarsi (Ammittenza nulla dello slave).
-\end{itemize}
-Per ottenere la trasparenza perfetta è necessaria una complessa "Architettura a 4 canali", che invii continuamente in rete sia le misure di forza che di posizione da entrambi i lati.
+Physical meaning: In free-space ($f_s=0$), the console must perfectly cancel its own inertia ($H_{11}=0$); tissue forces must transfer 1:1 ($H_{12}=1$); the slave must track master movements infinitely well ($H_{21}=-1$); and if the master is locked, pushing the slave must yield no movement ($H_{22}=0$). 
 
-\section{Stabilità Assoluta e il Criterio di Llewellyn}
-Tuttavia, i sistemi teleoperati con ritorno di forza chiudono un anello cibernetico e meccanico incredibilmente esteso, spesso attraversato da \textbf{ritardi di trasmissione (Time Delays)}. Sebbene in sala operatoria (sullo stesso bus) i ritardi siano minimi (1-2 ms), nella telechirurgia a distanza (come nella memorabile operazione Lindbergh da New York a Strasburgo) i round-trip time superano agevolmente i 150 ms. In un sistema retroazionato in forza, il ritardo di comunicazione trasforma le leggi di controllo in generatori di energia spuria, spingendo le braccia robotiche a oscillare violentemente.
+\section{Absolute Stability and Llewellyn's Criterion}
+Teleoperated systems with force feedback close an enormous cyber-physical loop, often plagued by \textbf{Time Delays}. In force-feedback systems, communication delays turn control laws into spurious energy generators, causing violent robotic oscillations. This breaks the principle of \textbf{Passivity}.
 
-Per garantire la sicurezza clinica, non è sufficiente che il sistema sia stabile in certe condizioni; deve godere di \textbf{Stabilità Assoluta}. Un sistema è assolutamente stabile se, qualunque impedenza passiva l'operatore umano esibisca (se stringe forte la cloche o la lascia lenta) e qualunque tessuto passivo lo slave stia manipolando, il sistema complessivo rimane Stabile, senza oscillazioni non smorzate.
-
-Per una rete a due porte lineare e tempo-invariante (LTI), questa garanzia è verificata dal rigoroso \textbf{Criterio di Llewellyn}. Le condizioni di stabilità in frequenza impongono che:
-\begin{enumerate}
-    \item Non ci siano poli a parte reale positiva in $H_{11}$ e $H_{22}$ (il master da solo e lo slave da solo devono essere singolarmente stabili in loop aperto).
-    \item La parte reale deve essere non negativa: $\text{Re}[H_{11}(j\omega)] \ge 0$ e $\text{Re}[H_{22}(j\omega)] \ge 0$. Significa che entrambe le porte devono essere dissipative (l'attrito proprio dei motori o lo smorzamento iniettato dal software deve estrarre energia).
-    \item L'\textbf{Indice di Stabilità di Llewellyn} $\eta(\omega)$ deve essere superiore o uguale a $1$ per qualsiasi frequenza di eccitazione:
-    \begin{equation}
-        \eta(\omega) = \frac{2 \text{Re}[H_{11}] \text{Re}[H_{22}] - \text{Re}[H_{12}H_{21}]}{|H_{12}H_{21}|} \ge 1
-    \end{equation}
-\end{enumerate}
-
-\section{L'Inevitabile Baratro: Trasparenza vs. Stabilità}
-Eccoci al teorema cruciale e all'amara lezione della teleoperazione, che condiziona l'intera progettazione dei sistemi chirurgici bilaterali. 
-
-Se proviamo a inserire i valori ottimali che ci darebbero la favolosa \textbf{Trasparenza Perfetta} ($H_{11}=0, H_{22}=0, H_{12}=1, H_{21}=-1$) nel numeratore e denominatore dell'equazione dell'Indice di Llewellyn, scopriamo un risultato lapidario:
+To guarantee clinical safety, the system must possess \textbf{Absolute Stability}: it must remain stable regardless of how tightly the surgeon grips the master or what passive tissue the slave hits. For Linear Time-Invariant (LTI) two-port networks, this is verified by \textbf{Llewellyn's Absolute Stability Criterion}.
+Alongside stable poles and individual port dissipativity ($\text{Re}[H_{11}]\ge 0, \text{Re}[H_{22}]\ge 0$), Llewellyn's primary constraint requires the Stability Index $\eta(\omega)$ to be $\ge 1$:
 \begin{equation}
-    \eta(\omega) = \frac{2 (0)(0) - \text{Re}[(1)(-1)]}{|(1)(-1)|} = \frac{0 - (-1)}{1} = 1
+    \eta(\omega) = \frac{2 \text{Re}[H_{11}] \text{Re}[H_{22}] - \text{Re}[H_{12}H_{21}]}{|H_{12}H_{21}|} \ge 1
 \end{equation}
-L'indice vale \textbf{esattamente 1}. Questo significa che \textbf{un teleoperatore matematicamente e perfettamente trasparente risiede esattamente sul sottile confine della stabilità marginale}.
-Essere a $\eta=1$ significa non avere alcun margine di sicurezza strutturale. Non appena si introduce la più trascurabile imperfezione, un filtraggio dei segnali analogici, il rumore dei sensori, o (soprattutto) un \textbf{ritardo di comunicazione}, l'indice sprofonda istantaneamente a $\eta < 1$, e il braccio robotico esplode in instabilità violente non appena sfiora un osso o il tavolo operatorio.
 
-Esiste un \textbf{Trade-off Teorico Invalicabile tra Trasparenza e Stabilità}. Non è una limitazione dei processori moderni, ma una ineluttabile legge della fisica delle reti cibernetiche. Per allontanarsi dall'orlo del baratro e portare il sistema in sicurezza ($\eta \gg 1$), l'ingegnere robotico è costretto a degradare intenzionalmente il sistema, perseguendo due vie parallele:
-\begin{itemize}
-    \item Aumentare fortemente i termini dissipativi $\text{Re}[H_{11}]$ e $\text{Re}[H_{22}]$. Questo significa iniettare smorzamento artificiale nel controllo del Master. La console diventerà vischiosa, più faticosa da muovere in free-space; il chirurgo perderà la magica sensazione di assenza di peso.
-    \item Ridurre drasticamente il prodotto di accoppiamento incrociato (il termine $|H_{12}H_{21}|$ al denominatore). Non potendo ridurre il tracciamento della posizione ($H_{21}$), gli ingegneri sono forzati a far calare $H_{12} < 1$, scalando, filtrando fortemente o annullando del tutto la forza restituita alle mani del chirurgo, annebbiando l'informazione tattile in virtù della sicurezza del paziente. 
-\end{itemize}
+\section{The Inevitable Abyss: Transparency vs. Stability}
+By plugging the parameters of \textbf{Perfect Transparency} ($0, 0, 1, -1$) into Llewellyn's index, we obtain the most tragic and crucial result of the discipline:
+\begin{equation}
+    \eta(\omega) = \frac{0 - (-1)}{1} = 1
+\end{equation}
+A mathematically perfectly transparent surgical teleoperator **sits exactly on the brink of marginal stability**. 
+In a system where $\eta = 1$, introducing even a single millisecond of network latency or sensor noise causes the index to drop below 1, rendering the machine violently unstable.
 
-Per superare l'instabilità da ritardo senza perdere troppa trasparenza, la ricerca moderna utilizza concetti derivati dalle telecomunicazioni in fibra ottica come le \textbf{Wave Variables} (variabili d'onda). Anziché inviare semplicemente un pacchetto UDP con un valore di "Forza" e uno di "Velocità", il master e lo slave si scambiano trasformazioni algebriche delle due, viaggiando come onde incidenti e riflesse lungo la linea di trasmissione; questo metodo di codifica garantisce passività su canali con tempo di volo ritardato, stabilizzando la teleoperazione a lunghissima distanza.
+This unveils the \textbf{Fundamental Trade-off}: \textit{it is physically impossible to achieve maximum tactile transparency and maximum stability simultaneously}. To secure stability ($\eta \gg 1$), engineers must intentionally degrade telepresence: they must inject heavy virtual damping into the joysticks (increasing $\text{Re}[H_{11}]$ and losing the weightless feel) and heavily scale down or filter the force sent back to the surgeon (reducing $|H_{12}H_{21}|$), blurring tactile information in the name of patient safety.
+
+To overcome extreme delays in long-distance telesurgery, modern research uses \textbf{Wave Variables}. Instead of exchanging forces and velocities, the ports exchange linear combinations of the two that emulate scattering waves. This mathematical encoding \textbf{guarantees network passivity regardless of the time delay}, stabilizing long-distance teleoperation at the cost of slight position tracking degradation.
 
 \end{document}
