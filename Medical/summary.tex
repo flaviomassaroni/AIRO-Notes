@@ -1,0 +1,279 @@
+\documentclass[11pt,a4paper,twoside]{report}
+
+% ================= PREAMBOLO =================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english,italian]{babel}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+
+% Configurazione dei link
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Medical Robotics - Study Guide},
+}
+
+% Stile dei box per definizioni e teoremi
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{conceptbox}[1][]{
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{mathbox}[1][]{
+    colback=red!5!white,
+    colframe=red!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{warningbox}[1][]{
+    colback=orange!5!white,
+    colframe=orange!80!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+% Intestazioni e Piè di pagina
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO,RE]{\leftmark}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ================= INIZIO DOCUMENTO =================
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{4cm}
+    {\Huge \bfseries Medical Robotics\par}
+    \vspace{1cm}
+    {\Large \itshape Schema Riassuntivo per la Preparazione all'Esame\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ================= CAPITOLO 1 =================
+\chapter{Introduzione e Classificazione}
+
+\section{Cos'è un Robot Medico?}
+A differenza della robotica industriale classica, in cui il robot opera in ambienti strutturati, la robotica medica prevede la presenza continua dell'uomo (paziente e chirurgo) nel \textit{loop} di controllo. 
+Il compromesso fondamentale della chirurgia è: \textbf{Massimizzare l'effetto terapeutico minimizzando i danni collaterali} (Open Surgery $\rightarrow$ MIS $\rightarrow$ Endoluminale $\rightarrow$ Micro/Nano robotica).
+
+\section{Schemi di Classificazione}
+Non esiste un unico schema di classificazione. Durante il corso ne vengono esaminati diversi:
+
+\subsection{Classificazione di Troccaz (Modalità di Interazione)}
+\begin{itemize}
+    \item \textbf{Passive Systems:} Il robot non ha attuatori (es. \textit{Viewing Wand}). Funge da navigatore, leggendo la posizione degli strumenti e mostrandola sulle immagini pre-operatorie.
+    \item \textbf{Active Systems:} Eseguono autonomamente un task pre-pianificato (es. \textit{ROBODOC} per il milling osseo, \textit{CyberKnife} per la radioterapia). Il chirurgo supervisiona.
+    \item \textbf{Interactive (Shared Control) Systems:} Robot e chirurgo condividono il controllo fisico dello strumento. Si dividono in:
+    \begin{itemize}
+        \item \textit{Semi-active:} Vincoli meccanici fissi (es. NeuroMate blocca un asse e il chirurgo inserisce l'ago).
+        \item \textit{Synergistic:} Vincoli programmabili via software (es. PADyC con ruote libere, Acrobot/MAKO con controllo d'impedenza).
+    \end{itemize}
+    \item \textbf{Teleoperated Systems:} Architettura Master-Slave. Il chirurgo manovra la console master, il robot esegue sul paziente (es. \textit{Da Vinci}). Offrono \textit{motion scaling} e filtraggio del tremore.
+\end{itemize}
+
+\subsection{Livelli di Autonomia (LoA - Haidegger)}
+Simile a quello delle automobili, va da \textbf{LoA 0} (nessuna autonomia) a \textbf{LoA 5} (autonomia completa, non esistente clinicamente). Il \textit{Da Vinci} standard è \textbf{LoA 1} (assistenza continua), \textit{ROBODOC} è \textbf{LoA 2} (autonomia a livello di task), \textit{CyberKnife} con tracciamento respiratorio si avvicina a \textbf{LoA 4}.
+
+\begin{warningbox}[Attenzione: Simulazione vs. Animazione]
+    Nella robotica medica, l'\textbf{animazione} è pre-calcolata e non interattiva. La \textbf{simulazione} integra le equazioni della fisica (ODE/PDE) in tempo reale rispondendo agli input di controllo e alle collisioni (fondamentale per training e AI).
+\end{warningbox}
+
+
+% ================= CAPITOLO 2 =================
+\chapter{Progettazione Cinematica e Vincolo RCM}
+
+\section{Architetture Seriali: SCARA vs. Antropomorfo}
+Le architetture seriali dominano il mercato (circa 61\%).
+\begin{itemize}
+    \item \textbf{SCARA:} Ideale per compiti come il fresaggio osseo (ROBODOC). Ha un'alta rigidezza nel piano orizzontale, uno spazio di lavoro cilindrico che "avvolge" il paziente e offre \textbf{sicurezza gravitazionale intrinseca} (in caso di blackout non collassa sul paziente).
+    \item \textbf{Antropomorfo:} Spazio di lavoro sferico, maggiore destrezza ma meno rigidezza. Rischio di collasso gravitazionale.
+\end{itemize}
+
+\section{Il Vincolo RCM (Remote Center of Motion)}
+Nella chirurgia minimamente invasiva (MIS), lo strumento entra nel corpo attraverso un \textit{trocar}. Questo punto di ingresso non deve subire forze laterali che strapperebbero i tessuti. Lo strumento deve ruotare e traslare \textbf{attorno a questo punto fisso esterno al robot}.
+Esistono 4 metodi per soddisfare l'RCM:
+\begin{enumerate}
+    \item \textbf{Giunti Passivi:} (Es. \textit{Zeus}). Giunti non attuati si allineano naturalmente al trocar grazie alla conformità meccanica. Sicuro ma impreciso.
+    \item \textbf{RCM Meccanico:} (Es. \textit{Da Vinci}). Si utilizza un meccanismo a parallelogramma. L'RCM è garantito dall'hardware indipendentemente dal controllo.
+    \item \textbf{Controllo Cinematico:} Si vincolano le velocità dei giunti in modo che la velocità del punto del robot coincidente col trocar sia nulla ($\dot{p}_{RCM} = \mathbf{0}$).
+    \item \textbf{Controllo di Forza:} Un sensore di forza al polso misura le forze esercitate dal trocar e il robot si muove per annullarle (minimizzando la pressione sui tessuti).
+\end{enumerate}
+
+\begin{mathbox}[Formula di Grübler per l'Analisi dei DOF]
+Per contare i gradi di libertà (DOF) necessari, consideriamo il trocar come un giunto virtuale con 4 DOF (3 rotazioni + 1 inserzione). La formula è:
+\begin{equation}
+    m = \sum d_i - 6(n + 1 - l)
+\end{equation}
+Dove $m$ è la mobilità (i DOF interni desiderati al tool), $d_i$ i DOF dei giunti, $n$ il numero di giunti e $l$ i corpi rigidi (loop chiuso $\implies n = l$).\\
+Semplificando: $m = (\text{DOF totali}) - 6$.
+Se il trocar fornisce 4 DOF e vogliamo 4 DOF interni (es. 2 tilt, inserzione, rotazione tool), il robot esterno necessita di $x$ DOF: $4 = 4 + x - 6 \implies x = 6$ DOF.
+\end{mathbox}
+
+
+% ================= CAPITOLO 3 =================
+\chapter{Architetture Cinematiche Parallele}
+
+\section{Seriali vs. Paralleli}
+A differenza dei seriali (catena aperta), i manipolatori paralleli connettono la base all'end-effector tramite \textbf{più catene indipendenti} (loop chiusi).
+\begin{itemize}
+    \item \textbf{Vantaggi:} Alta rigidezza, altissimo rapporto payload/peso (i carichi sono distribuiti), inerzia bassissima (i motori sono sulla base $\implies$ alte accelerazioni), \textbf{Cinematica Inversa spesso in forma chiusa e semplice}.
+    \item \textbf{Svantaggi:} Spazio di lavoro molto ridotto (che in medicina è un asset di sicurezza!), \textbf{Cinematica Diretta complessa} (spesso non in forma chiusa, richiede polinomi di alto grado), presenza di singolarità interne allo spazio di lavoro.
+\end{itemize}
+
+\section{Singolarità nei Manipolatori Paralleli}
+L'equazione differenziale fondamentale è $\mathbf{U}\dot{\mathbf{X}} + \mathbf{V}\dot{\boldsymbol{\theta}} = \mathbf{0}$. Questo genera tre tipi di singolarità:
+\begin{enumerate}
+    \item \textbf{Primo Tipo (Seriali):} $\mathbf{V}$ perde rango. Esistono velocità dei giunti che non producono moto dell'end-effector. Avvengono ai bordi del workspace.
+    \item \textbf{Secondo Tipo (Parallele):} $\mathbf{U}$ perde rango. Esiste una velocità dell'end-effector $\dot{\mathbf{X}} \neq \mathbf{0}$ anche se \textbf{tutti gli attuatori sono bloccati} ($\dot{\boldsymbol{\theta}} = \mathbf{0}$). Il meccanismo acquisisce gradi di libertà incontrollabili. \textbf{Pericolosissime in chirurgia} (possono avvenire all'interno del workspace).
+    \item \textbf{Terzo Tipo:} Entrambe le matrici perdono rango contemporaneamente (configurazioni degeneri).
+\end{enumerate}
+
+\begin{conceptbox}[Esempio: Amplificatore a 3-PRR (Cardiolock)]
+    Nella robotica medica, la vicinanza a una singolarità parallela (di Tipo 2) viene a volte \textbf{sfruttata intenzionalmente} per amplificare la corsa infinitesima degli attuatori piezoelettrici, come nel dispositivo Cardiolock per la compensazione del battito cardiaco.
+\end{conceptbox}
+
+
+% ================= CAPITOLO 4 =================
+\chapter{Modalità di Controllo nell'Interazione Fisica}
+
+\section{Controllo di Impedenza vs. Ammittenza}
+Entrambi i controlli mirano a gestire l'interazione modellando il robot come un sistema massa-molla-smorzatore, ma lo fanno in modo strutturalmente opposto.
+
+\begin{mathbox}[Controllo di Impedenza]
+    \textbf{Input:} Movimento (posizione/velocità). \textbf{Output:} Forza.\\
+    La legge di interazione desiderata è:
+    \begin{equation}
+        m_d(\ddot{p} - \ddot{p}_d) + b(\dot{p} - \dot{p}_d) + k(p - p_d) = F_{ext}
+    \end{equation}
+    \begin{itemize}
+        \item Se $m_d = m$ (massa apparente = massa reale), l'equazione del controllo diventa un controllore PD con feedforward in accelerazione. \textbf{Non richiede un sensore di forza}.
+        \item Se $m_d \neq m$ (si vuole alterare l'inerzia), è \textbf{necessario} misurare $F_{ext}$ con un sensore.
+    \end{itemize}
+    \textit{Richiede il controllo di coppia (torque control) ai giunti del robot.}
+\end{mathbox}
+
+\begin{mathbox}[Controllo di Ammittenza]
+    \textbf{Input:} Forza. \textbf{Output:} Movimento.\\
+    Il sensore di forza \textbf{è sempre necessario}. La forza misurata entra nel modello di ammittenza che calcola un offset di posizione $\Delta p_r = \frac{F_{ext}}{ms^2+bs+k}$. Questo $\Delta p_r$ viene sommato alla traiettoria e fornito a un controllore di posizione interno (loop interno rigido).
+    \textit{Ideale per robot industriali re-purposed che non permettono il controllo diretto di coppia.}
+\end{mathbox}
+
+
+% ================= CAPITOLO 5 =================
+\chapter{Virtual Fixtures (Active Constraints)}
+Un Virtual Fixture (VF) non è un oggetto fisico, ma un vincolo generato via software che emula una guida fisica (es. un righello) per migliorare sicurezza, precisione e velocità nei sistemi cooperativi o teleoperati.
+
+\section{Classificazione dei VF}
+\begin{itemize}
+    \item \textbf{Guidance VFs (GVF):} Aiutano a mantenere il tool su un percorso o superficie desiderata.
+    \item \textbf{Forbidden-Region VFs (FRVF):} Impediscono l'ingresso in zone critiche (es. sistema \textit{Acrobot / MAKO}).
+\end{itemize}
+
+I GVF possono essere \textbf{Hard} (l'utente non può uscire dalla guida) o \textbf{Soft} (l'utente può forzare l'uscita).
+
+\section{Formulazione Matematica (GVF Admittance)}
+Dato un target o un percorso, si definisce $\mathbf{P}(t)$ le cui colonne generano la direzione preferenziale. Si definisce l'operatore di proiezione ortogonale:
+\begin{equation}
+    \Pi_P = \mathbf{P}(\mathbf{P}^T \mathbf{P})^{-1}\mathbf{P}^T
+\end{equation}
+La velocità del tool (in ammittenza) in risposta alla forza dell'utente $f$ è:
+\begin{equation}
+    v = c \left( \Pi_P + \lambda_\perp (\mathbf{I} - \Pi_P) \right) f
+\end{equation}
+Se $\lambda_\perp = 0 \implies$ \textbf{Hard GVF} (la forza non allineata viene annullata). \\
+Se $\lambda_\perp \in (0,1) \implies$ \textbf{Soft GVF}.
+
+\begin{conceptbox}[Dynamic VFs in Teleoperazione]
+    Nel robot da Vinci (dVRK), le GVF sono applicate al master tramite \textbf{forze molla-smorzatore} sull'operatore: $f_{VF} = -K_{VF}(x_d - x) - D_{VF}(\dot{x}_d - \dot{x})$. Modificare online i parametri $K$ e $D$ può immettere energia nel sistema; per garantire la \textbf{stabilità} è necessario imporre vincoli di \textbf{Passività} (es. Energy Tanks).
+\end{conceptbox}
+
+
+% ================= CAPITOLO 6 =================
+\chapter{Registrazione del Robot}
+La registrazione è il calcolo della trasformazione geometrica rigida (Rotazione $R$ e Traslazione $t$) che allinea il modello pre-operatorio (es. TC) con il frame intra-operatorio del robot.
+\textit{Attenzione a non confonderla con la Calibrazione (relazione tra device fissi) e il Tracking (in tempo reale).}
+
+\section{Point-to-Point (Procrustes Problem)}
+Si basa sull'identificazione di $N \ge 3$ punti omologhi (\textit{fiducials} artificiali o landmark anatomici). Soluzione in forma chiusa via SVD:
+\begin{enumerate}
+    \item Calcolo dei centroidi $\bar{f}^A$ e $\bar{f}^B$ e centramento dei punti.
+    \item Matrice di cross-covarianza: $H = \sum \tilde{f}^B_i (\tilde{f}^A_i)^T$.
+    \item Decomposizione SVD: $H = U \Sigma V^T$.
+    \item Rotazione ottimale: $R_{ott} = V U^T$. (Se $\det(V U^T) = -1$, invertire l'ultima colonna di $V$ per evitare riflessioni).
+\end{enumerate}
+
+\section{Point-to-Surface (Algoritmo ICP)}
+Quando le corrispondenze non sono note a priori (es. si "struscia" un probe sull'osso), si usa l'\textbf{Iterative Closest Point (ICP)}:
+\begin{enumerate}
+    \item Trasforma i punti intra-operatori con la stima corrente $T^{(k)}$.
+    \item \textbf{Closest point:} Trova il punto più vicino sulla superficie del modello TC.
+    \item Aggiorna la trasformazione risolvendo il problema Point-to-Point con le nuove corrispondenze.
+    \item Ripeti fino a convergenza (L'ICP garantisce convergenza solo a un \textbf{minimo locale}, quindi richiede una buona inizializzazione).
+\end{enumerate}
+
+
+% ================= CAPITOLO 7 =================
+\chapter{Teleoperazione, Trasparenza e Stabilità}
+
+La teleoperazione bilaterale modella il sistema Master-Canale-Slave come un circuito elettrico (forza $\sim$ tensione, velocità $\sim$ corrente) tramite le reti a \textbf{2-Porte (Two-Port Networks)}.
+
+\section{Trasparenza (Telepresence)}
+La \textit{Kinesthetic perception} ideale richiede che l'impedenza percepita dal chirurgo al master ($Z_t$) sia esattamente quella dell'ambiente remoto ($Z_e$). 
+Definiti i fattori di scala di velocità ($\lambda_v$) e forza ($\lambda_f$), la \textbf{Telepresence} si ha per $\lambda_v = \lambda_f = 1$. In forma di Matrice Ibrida (Lawrence), la trasparenza perfetta richiede l'architettura generale a 4-Canali e implica:
+\begin{equation}
+    H_{11} = 0, \quad H_{22} = 0, \quad H_{12} = 1, \quad H_{21} = -1
+\end{equation}
+Tuttavia, ottenere $H_{11}=0$ in free-motion (l'operatore non deve sentire l'inerzia del master) richiede \textbf{misura delle accelerazioni} per compensare le inerzie, cosa complessa e rumorosa.
+
+\section{Stabilità e Criterio di Llewellyn}
+Nei sistemi teleoperati, specie con ritardi di comunicazione, i loop di forza retroazionati possono causare instabilità. L'analisi si basa sulla \textbf{Passività} (il sistema non deve generare energia).
+Per sistemi LTI a due porte, la condizione necessaria e sufficiente per la \textbf{Stabilità Assoluta} è il \textbf{Criterio di Llewellyn}:
+\begin{enumerate}
+    \item Nessun polo nel semipiano destro (Stabilità BIBO).
+    \item $\text{Re}[H_{11}] \ge 0$ e $\text{Re}[H_{22}] \ge 0$ (Passività alle singole porte).
+    \item L'indice di stabilità di Llewellyn deve essere $\ge 1$:
+    \begin{equation}
+        \eta(\omega) = \frac{2 \text{Re}[H_{11}] \text{Re}[H_{22}] - \text{Re}[H_{12}H_{21}]}{|H_{12}H_{21}|} \ge 1
+    \end{equation}
+\end{enumerate}
+
+\begin{warningbox}[Trade-off Fondamentale: Trasparenza vs. Stabilità]
+    Sostituendo i valori di trasparenza perfetta ($H_{11}=0, H_{22}=0, H_{12}=1, H_{21}=-1$) nell'equazione, otteniamo $\eta(\omega) = 1$.
+    \textbf{Un teleoperatore perfettamente trasparente è marginalmente stabile}. Qualsiasi ritardo lo renderà instabile. Per questo motivo si ricorre ad architetture ridotte come la \textbf{Position-Position} (massima stabilità, scarsa trasparenza) e all'uso di \textbf{Wave Variables} (che codificano le variabili di porta per mantenere la passività anche in presenza di ritardi di comunicazione notevoli).
+\end{warningbox}
+
+% ================= CONCLUSIONI =================
+\chapter{Sintesi dei Concetti Chiave}
+Per l'esame assicurati di saper discutere:
+\begin{itemize}
+    \item I \textbf{pro e contro} delle architetture seriali vs parallele e i tipi di singolarità.
+    \item I \textbf{4 metodi per l'RCM}.
+    \item La differenza implementativa tra \textbf{Impedenza} (input posizione, output forza, no sensore se $m=m_d$) e \textbf{Ammittenza} (input forza, output pos/vel, sensore forza obbligatorio, robot non retroazionabile).
+    \item La costruzione logica dei \textbf{Virtual Fixtures} e come l'operatore di proiezione definisce GVF hard o soft.
+    \item La matematica dell'\textbf{ICP} e della \textbf{Registrazione P2P}.
+    \item La tensione intrinseca in \textbf{Teleoperazione} tra Trasparenza ($\eta=1$) e Stabilità, giustificata dal criterio di Llewellyn.
+\end{itemize}
+
+\end{document}
