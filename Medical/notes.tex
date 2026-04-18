@@ -21,7 +21,7 @@
 \usepackage{setspace}
 \usepackage{titlesec}
 \usepackage{fancyhdr}
-\usepackage{microtype} 
+\usepackage[activate=false]{microtype} 
 \usepackage{enumitem}
 
 % Resolve the headheight warning
@@ -67,17 +67,58 @@
 \chapter{Introduction and Classification}
 
 \section{Definition of a Medical Robot}
-The definition of a robot in the medical field is multifaceted. According to Michael Brady (1980), robotics is \textit{"the intelligent connection between perception and action"}. This definition perfectly fits medical robotics, where sensors (perception) read physical interactions and anatomy, and actuators (action) execute commands mediated by the surgeon's intelligence or a control algorithm. From a regulatory standpoint, the IEC TR 60601-4-1 directive defines a medical robot as "medical electrical equipment with a degree of autonomy intended to perform tasks."
-The paradox of the surgical robot is well summarized by J. Moser's quote: \textit{"Just a Million Dollar Needle Holder."} The true engineering challenge is proving that this highly sophisticated tool objectively improves clinical outcomes compared to traditional manual surgery.
+The definition of a robot in the medical field is multifaceted, and the precise wording varies across standards bodies and research traditions.
+
+\begin{itemize}
+    \item \textbf{RIA / ANSI definition:} ``A reprogrammable, multifunctional manipulator designed to move material, parts, tools, or specialised devices through variable programmed motions for the performance of a variety of tasks.''
+    \item \textbf{ISO 8373 definition:} ``An actuated mechanism programmable in two or more axes, with a degree of autonomy, moving within its environment, to perform intended tasks.''
+    \item \textbf{Michael Brady (1980):} Robotics is \textit{``the intelligent connection between perception and action''}. This definition is particularly apt in medicine, where sensors (perception) read physical interactions and anatomy, and actuators (action) execute commands mediated by the surgeon's intelligence or a control algorithm.
+    \item \textbf{IEC TR 60601-4-1 (Medical Robot):} ``A robot intended to be used as medical electrical equipment or a medical electrical system.''
+\end{itemize}
+
+The paradox of the surgical robot is well summarised by J.\ Moser's quote: \textit{``Just a Million Dollar Needle Holder.''} The true engineering challenge is proving that this highly sophisticated tool objectively improves clinical outcomes compared to traditional manual surgery.
+
+\subsection{Animation vs. Simulation}
+A critical conceptual distinction, particularly relevant for AI-based surgical training platforms, is the difference between \textbf{animation} and \textbf{simulation}:
+\begin{itemize}
+    \item \textbf{Animation} is pre-computed: the motion of objects is scripted in advance, and the control input cannot change the outcome.
+    \item \textbf{Simulation} is computed in real time from a dynamic model (it integrates the equations of motion), and the system state evolves in response to actual control inputs.
+\end{itemize}
+For AI training and surgical skill assessment, only simulation is valid: a simulator responds to what you do; an animation does not.
 
 \section{The Evolution of Surgery and its Tasks}
-Surgical evolution is driven by the need to resolve a fundamental trade-off: maximizing the therapeutic effect while minimizing collateral damage (patient trauma).
+Surgical evolution is driven by the need to resolve a fundamental trade-off: maximising the therapeutic effect while minimising collateral damage (patient trauma). A useful classification framework is the \textbf{surgical spectrum}, which ranges from highly invasive to microscopic interventions.
+
 \begin{itemize}
-    \item \textbf{Open Surgery:} Guarantees maximum dexterity and 3D vision for the surgeon but causes large incisions, high risk of infections, and prolonged hospital stays.
-    \item \textbf{Minimally Invasive Surgery (MIS - Laparoscopy):} Operations are performed through 5-12 mm incisions using trocars. Trauma drops significantly, but the surgeon faces the \textit{fulcrum effect} (inverted hand-tool motion), loss of depth perception (2D vision), the need for a camera assistant, and poor ergonomics.
-    \item \textbf{Micro/Nano Surgery:} Therapies at the cellular level. The physical obstacle here is that at microscopic scales (e.g., 100 $\mu$m blood vessels), the surgeon's physiological hand tremor (approx. 182 $\mu$m) is larger than the target itself.
+    \item \textbf{Open Surgery:} Guarantees maximum dexterity and 3D vision for the surgeon but causes large incisions, high risk of infections, and prolonged recovery periods. Forces exchanged with tissue are in the range of Newtons to tens of Newtons.
+    \item \textbf{Minimally Invasive Surgery (MIS — Laparoscopy):} Operations are performed through 5--12\,mm port incisions using trocars. Recovery time drops from 4--6 weeks (open) to 1--2 weeks. However, the surgeon faces the \textit{fulcrum effect} (inverted hand-tool motion), loss of depth perception (2D vision), the need for a camera assistant, and poor ergonomics.
+    \item \textbf{Endoluminal / NOTES} (Natural Orifice Transluminal Endoscopic Surgery): Access via natural body orifices, further reducing external trauma but imposing severe constraints on instrument dexterity.
+    \item \textbf{Microsurgery:} Target vessels are 100--500\,$\mu$m in diameter; operative forces are measured in millinewtons (mN). The surgeon's physiological hand tremor ($\sim$50--200\,$\mu$m amplitude) is commensurate with or larger than the surgical target itself.
+    \item \textbf{Micro/Nano Surgery:} Therapies at the cellular level. Locomotion at these scales operates in a low-Reynolds-number hydrodynamic regime, subject to \textbf{Purcell's Scallop Theorem} (1977): a robot cannot swim through simple reciprocal (back-and-forth) motions because the net displacement in both directions is zero. Novel actuation strategies (e.g., rotating helical flagella) are required.
 \end{itemize}
-Medical robotics, specifically with the \textit{da Vinci} system (introduced in 1999), emerged to merge the benefits of both paradigms: restoring the dexterity of Open Surgery (via 7-DOF articulated EndoWrist instruments) while preserving the low invasiveness of MIS.
+
+Medical robotics, specifically with the \textit{da Vinci} system (introduced in 1999), emerged to merge the benefits of the first two paradigms: restoring the dexterity of Open Surgery (via 7-DOF articulated EndoWrist instruments, 10$\times$ stereoscopic magnification, and motion scaling of 3:1 or 5:1) while preserving the low invasiveness of MIS. It has been described as \textit{``laparoscopy with superpowers''}.
+
+\section{Robots in Healthcare: A Taxonomy}
+Robotic systems in healthcare are grouped into three broad categories based on their \textbf{primary user} and clinical scope:
+
+\begin{itemize}
+    \item \textbf{Medical Robotics:} Used by clinicians and surgeons for interventional and diagnostic procedures (e.g., da Vinci, CyberKnife).
+    \item \textbf{Rehabilitation Robotics:} Used by therapists to support therapeutic training and motor recovery (e.g., exoskeletons, gait-training platforms).
+    \item \textbf{Assistive Technologies:} Used directly by patients to augment personal independence and compensate for physical limitations (e.g., powered wheelchairs, prosthetics).
+\end{itemize}
+
+\subsection{Market Context: the da Vinci System (2024)}
+The da Vinci remains the dominant tele-surgical platform. As of 2024, over \textbf{10,000} units are installed worldwide; a procedure begins every \textbf{11.75 seconds}; and the unit cost ranges between \textbf{\$1.0M and \$2.3M}. Its technical hallmarks are a patient cart with 3--4 robotic arms, EndoWrist instruments providing \textbf{7 DOF} at the tip, 10$\times$ HD 3D stereo vision, and motion scaling of 3:1 or 5:1.
+
+\subsection{Historical Milestones}
+\begin{itemize}
+    \item \textbf{1985:} PUMA 560 — the first robot used in surgery (CT-guided neurosurgical biopsy).
+    \item \textbf{1992:} ROBODOC (ISS/Think Surgical) — first robot designed specifically for autonomous bone milling in total hip replacement.
+    \item \textbf{AESOP} (Computer Motion): voice-controlled, 7-DOF robotic arm for endoscope positioning; eliminated the need for a human camera assistant.
+    \item \textbf{2001 — Operation Lindbergh:} First transatlantic telesurgery. Duration: \textbf{54 minutes}; round-trip ATM fibre-optic latency: $\approx$\textbf{150\,ms}. The system used was \textbf{ZEUS} (Computer Motion). Computer Motion was subsequently acquired by Intuitive Surgical (maker of da Vinci).
+    \item \textbf{Telesurgery latency threshold:} Latencies above \textbf{200--300\,ms} cause measurable degradation in surgeon performance. Current 5G research targets sub-50\,ms round-trip delays.
+\end{itemize}
 
 \section{Classification Schemes}
 Surgical robotic systems are complex and multifaceted. Several classification schemes are presented in the literature, as each highlights a different engineering and clinical aspect.
@@ -86,10 +127,10 @@ Surgical robotic systems are complex and multifaceted. Several classification sc
 Based on the level of physical interaction between the machine and the human:
 \begin{itemize}
     \item \textbf{Passive Systems:} Unactuated, manually driven by the surgeon. The system acts as a spatial navigator. Example: \textit{Viewing Wand} (an articulated arm with encoders that displays the scalpel tip's position on a pre-operative CT scan).
-    \item \textbf{Active Systems:} Execute a surgical plan autonomously under human supervision. Example: \textit{ROBODOC} for autonomous orthopedic bone milling; \textit{CyberKnife} for frameless stereotactic radiosurgery.
+    \item \textbf{Active Systems:} Execute a surgical plan autonomously under human supervision. Example: \textit{ROBODOC} (Think Surgical / ISS, 1992; evolved into \textit{TSolution One}) — a \textbf{SCARA} arm with a 2-DOF wrist and a 6-DOF force/torque sensor at the end-effector; bone-milling accuracy $<$\,1\,mm; pre-operative planning via the \textit{Orthodoc} software. A drawback of the original ROBODOC was the need to implant titanium fiducial pins in the bone during a separate minor surgical procedure prior to the main operation. A similar system, \textbf{CASPAR} (URS Ortho, Germany), used an anthropomorphic rather than SCARA arm. \textit{CyberKnife} (Accuray) uses a KUKA 6-DOF arm carrying a 6\,MeV linear accelerator for frameless, image-guided stereotactic radiosurgery with sub-millimetre targeting accuracy.
     \item \textbf{Interactive Systems (Shared Control):} The machine and the human share physical control of the instrument. They are divided into:
     \begin{itemize}
-        \item \textit{Semi-active:} The robot autonomously positions a mechanical guide and then locks its motors. The surgeon inserts the tool through the guide (e.g., NeuroMate).
+        \item \textit{Semi-active:} The robot autonomously positions a mechanical guide and then locks its motors. The constraint is fixed mechanically once the robot has locked in place. The surgeon inserts the tool through the guide (e.g., \textbf{NeuroMate}, Renishaw Mayfield, UK — a 5-DOF arm used for neurosurgical guidance).
         \item \textit{Synergistic:} The constraint is "virtual" and programmed via software, such as Virtual Fixtures (e.g., PADyC, Acrobot/MAKO).
     \end{itemize}
     \item \textbf{Teleoperated Systems:} The surgeon is physically decoupled from the patient and operates a master console. A slave robot replicates the movements, applying tremor filtering and \textit{motion scaling} (e.g., da Vinci).
@@ -97,10 +138,32 @@ Based on the level of physical interaction between the machine and the human:
 
 \subsection{Other Classifications: Taylor, Joskowicz, Dario}
 \begin{itemize}
-    \item \textbf{Taylor (2003):} Introduces the concept of \textit{Computer Integrated Surgery (CIS)}. Distinguishes between CAD/CAM systems (where image registration plays a vital role, e.g., ROBODOC) and \textit{Surgical Assistants} (e.g., \textit{AESOP}, a voice-controlled arm to hold the endoscope, eliminating human assistant fatigue).
-    \item \textbf{Joskowicz (2005):} Classifies based on the type of support, ranging from patient-specific passive jigs to intraoperative navigation, floor-mounted robots, and finally \textbf{patient-mounted robots} (e.g., \textit{Mazor/Renaissance} for spinal surgery, which are fixed to the patient's bone, making the system immune to respiratory movements and eliminating the need for real-time tracking).
+    \item \textbf{Taylor (2003) — Computer-Integrated Surgery (CIS):} Taylor frames surgical robotics using an engineering analogy: \textit{Surgical CAD/CAM}, where the CAD step defines the target geometry (pre-operative imaging and planning), the CAM step translates it into machine trajectories (registration and intraoperative transfer), and the machine executes them. The CIS framework has three phases:
+    \begin{enumerate}
+        \item \textit{Pre-operative:} computer-assisted planning on CT/MRI data.
+        \item \textit{Intra-operative:} plan transfer to the patient, imaging feedback, and robot execution.
+        \item \textit{Post-operative:} computer-assisted outcome evaluation.
+    \end{enumerate}
+    Taylor further distinguishes two CIS categories:
+    \begin{itemize}
+        \item \textit{Surgical CAD/CAM systems} (e.g., ROBODOC): image registration plays a vital role.
+        \item \textit{Surgical Assistants}, subdivided into:
+        \begin{itemize}
+            \item \textbf{Surgical Extenders} — systems that \textit{enhance or extend} the surgeon's physical abilities without replacing their decision-making (e.g., da Vinci: tremor filtering, 3D magnification, motion scaling).
+            \item \textbf{Auxiliary Surgical Supports} — systems that work alongside the surgeon to hold or position instruments (e.g., AESOP, a ``robotic third hand'' for the endoscope).
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Joskowicz (2005):} Classifies orthopedic robotic support into four levels:
+    \begin{enumerate}
+        \item \textit{Passive mechanisms} (e.g., Viewing Wand — ISG Technologies).
+        \item \textit{Patient-specific templates}: individually printed 3D guides. Advantages: low cost, rigid mechanical support, patient-specific. Disadvantages: production lead time; cannot be modified intra-operatively if anatomy differs from imaging; a separate guide is needed per vertebra.
+        \item \textit{Intraoperative imaging and navigation}: optical tracking requires an unobstructed line of sight; the Viewing Wand passive arm avoids this limitation.
+        \item \textit{Robotics}: floor-/bed-mounted (e.g., ROBODOC, MAKO) or \textbf{patient-mounted} (e.g., Mazor/MARS). Relevant context: pedicle screw insertion targets a vertebral corridor of only \textbf{5--7\,mm} (lumbar; less in the thoracic spine), and historically \textbf{10--40\%} of screws were malpositioned. Patient-mounted robots (bone-anchored) automatically compensate for global patient movements such as breathing, because the robot's reference frame moves rigidly with the bone.
+    \end{enumerate}
     \item \textbf{Paolo Dario (2004):} Creates a 2D matrix crossing the \textit{Type of Access} (Traditional, MIS, Endoluminal) with the \textit{Type of Interaction}.
 \end{itemize}
+
+\textbf{Kinematic note on MARS (Mazor):} the bone-mounted mini-robot is a \textbf{6-DOF parallel mechanism} (a variant of the Stewart platform), which provides the compactness and inherent stiffness required for bone-anchored use. Its minimal footprint and sub-centimetre workspace are features, not limitations: in the event of a controller failure, the physical workspace boundary prevents any large, dangerous motion.
 
 \subsection{Levels of Autonomy (LoA) and Regulations}
 Adapted from the SAE autonomous driving scale, the LoA framework ranges from 0 (no autonomy) to 5 (full autonomy, currently non-existent in clinical practice). The standard \textit{da Vinci} is \textbf{LoA 1} (the surgeon continuously controls everything; the robot only filters tremor). A robot like \textit{ROBODOC} is \textbf{LoA 2} (task-level autonomy: the human initiates the process, and the robot executes the milling).
@@ -113,31 +176,64 @@ From a regulatory perspective, the \textbf{IEC 80601-2-77} standard mandates the
 
 Kinematic design is strictly driven by the surgical task. Engineers do not design "universal" robots, but rather optimize workspace, dexterity, and safety around the specific operation to be performed.
 
+\section{Statistical Overview of Surgical Robot Architectures}
+A survey of commercially deployed medical robots reveals the following kinematic architecture distribution:
+\begin{itemize}
+    \item \textbf{Serial} — \textbf{61\%} of deployed systems.
+    \item \textbf{Hybrid} (parallel base + serial wrist) — \textbf{24\%}.
+    \item \textbf{Parallel} — \textbf{15\%}.
+\end{itemize}
+By clinical domain, MIS accounts for \textbf{46\%} of deployments, followed by neurosurgery (\textbf{21\%}), orthopaedics (\textbf{12\%}), ultrasound guidance (\textbf{10\%}), biopsy/needle insertion (\textbf{8\%}), and radiotherapy (\textbf{3\%}). Typical joint counts are 3 DOF for positioning plus 2 or 3 DOF for the wrist, giving 5 or 6 DOF total.
+
+A further structural constraint in sterile environments is the \textbf{asepsis boundary}: non-medical equipment must remain at least \textbf{400\,mm} from the operating table. This directly influences the mechanical footprint and the placement of motor electronics (robot \textbf{SCALPP} is a notable example of a SCARA system designed to satisfy this constraint for autonomous skin harvesting).
+
 \section{Serial Architectures: SCARA vs. Anthropomorphic}
 \begin{itemize}
-    \item \textbf{SCARA (e.g., ROBODOC):} The architecture of choice for milling rigid surfaces. Its workspace is an annular cylinder that perfectly "wraps" around a patient lying on the operating table without wasting volume. The primary axis is prismatic and vertical: this provides \textbf{intrinsic gravitational safety} (if power fails, the arm cannot fall sideways onto the patient). Arm singularities are known and confined to the outer boundaries of the workspace.
-    \item \textbf{Anthropomorphic (e.g., CyberKnife):} Features a spherical workspace. It allows approaches from multiple angles, which is fundamental for non-isocentric radiosurgery. However, in the event of power loss, the cantilevered links would collapse onto the patient due to gravity, necessitating heavy counterweights or highly reliable redundant braking systems.
+    \item \textbf{SCARA (e.g., ROBODOC):} The architecture of choice for milling rigid surfaces. Its workspace is an annular cylinder that perfectly ``wraps'' around a patient lying on the operating table without wasting volume. The primary axis is prismatic and vertical: this provides \textbf{intrinsic gravitational safety} (if power fails, the arm cannot fall sideways onto the patient). Arm singularities are known and confined to the outer boundaries of the workspace.
+    \item \textbf{Anthropomorphic (e.g., CyberKnife, MAKO):} Features a spherical workspace. It allows approaches from multiple angles, which is fundamental for non-isocentric radiosurgery. However, in the event of power loss, the cantilevered links would collapse onto the patient due to gravity, necessitating heavy counterweights or highly reliable redundant braking systems.
+\end{itemize}
+
+\subsection{Wrist Architectures}
+The wrist (orientation mechanism) is a design challenge independent of the arm. Common families in medical robotics include:
+\begin{itemize}
+    \item \textbf{Spherical serial wrist} — 44\% of robotic ultrasound probes.
+    \item \textbf{Parallelogram linkage} — 31\%.
+    \item \textbf{Circular arc} — 25\%.
+\end{itemize}
+Notably, \textbf{74\% of robotic ultrasound systems} incorporate an RCM mechanism. A critical problem with a standard spherical wrist is that its \textbf{wrist singularities} can occur anywhere inside the reachable workspace, not just at its boundary: repositioning the patient does not eliminate them. This motivated the design of asymmetric wrists in systems such as SCALPP.
+
+\subsection{Singularities: Arm vs. Wrist}
+\begin{itemize}
+    \item \textbf{Arm (structural) singularities:} Occur at the workspace boundary (e.g., fully extended elbow). They can be avoided by pre-operatively placing the volume of interest away from those configurations.
+    \item \textbf{Wrist singularities:} Occur \textit{anywhere} within the reachable workspace and cannot be resolved by repositioning the patient. They require dedicated wrist architectures or singularity-avoidance control strategies.
 \end{itemize}
 
 \section{The Remote Center of Motion (RCM) Constraint}
-In MIS, the instrument shaft passes through the abdominal wall at a fixed point (the trocar). No transverse forces can be generated at this point, otherwise the tissue would tear. Kinematically, this constraint forces the robot to move such that a stationary point (the RCM) exists along the instrument shaft, around which it can only rotate and translate axially (providing 4 DOFs inside the abdomen).
+In MIS, the instrument shaft passes through the abdominal wall at a fixed point (the trocar). No transverse forces can be generated at this point, otherwise the tissue would tear. Kinematically, this constraint forces the robot to move such that a stationary point (the RCM) exists along the instrument shaft, around which it can only rotate and translate axially (providing \textbf{4 DOF} inside the abdomen: 2 rotations, 1 axial translation, 1 axial rotation).
 
 There are four engineering methods to satisfy the RCM constraint:
 \begin{enumerate}
-    \item \textbf{Passive Joints (e.g., Zeus system):} The robot's distal joints, near the trocar, are free (unactuated). When the surgeon moves the system, the resistance of the abdominal wall forces the mechanics to align naturally. It is intrinsically safe but lacks precision due to mechanical friction.
-    \item \textbf{Mechanical RCM (e.g., da Vinci Patient Cart):} The structure is geometrically designed (e.g., using an articulated parallelogram) so that, regardless of motor angles, the instrument axis always passes through a fixed focal point in space. The advantage is that the RCM is hardware-guaranteed; the disadvantage is the massive mechanical footprint above the patient and the need to physically align this fixed point exactly with the incision.
-    \item \textbf{Kinematic Control (Software RCM):} The robot is a standard, redundant serial arm (e.g., 6 or 7 DOFs). The RCM is mathematically enforced via software as a zero-velocity constraint in Cartesian space: $\dot{p}_{RCM} = J_{RCM}(q) \dot{q} = 0$. The motors perform \textit{null-space} motions to move the tip while keeping the trocar point stationary. This allows for compact, multi-purpose robots, but patient safety relies entirely on software reliability.
-    \item \textbf{Force Control:} A force/torque sensor is installed on the wrist. If the shaft presses against the trocar, the sensor detects it and commands the motors to yield to the push, minimizing the transverse force. Very flexible, but sensors introduce complexity, cost, and sterilization issues.
+    \item \textbf{Passive Joints (e.g., Zeus system — PRRRR architecture):} The robot's distal joints, near the trocar, are free (unactuated). The Zeus system uses three actuated joints and a passive universal joint. When the surgeon moves the system, the resistance of the abdominal wall forces the mechanics to align naturally. Intrinsically safe but imprecise due to mechanical friction.
+    \item \textbf{Mechanical RCM (e.g., da Vinci Patient Cart):} The structure is geometrically designed (articulated parallelogram) so that the instrument axis always passes through a fixed focal point regardless of joint angles. RCM is hardware-guaranteed; the drawback is the massive mechanical footprint above the patient and the need to align this fixed point precisely with the incision during setup.
+    \item \textbf{Kinematic Control (Software RCM):} The robot is a standard redundant serial arm. The RCM is enforced mathematically as a zero-velocity Cartesian constraint: $\dot{p}_{RCM} = J_{RCM}(q)\,\dot{q} = 0$. The RCM point is parameterised as a convex combination along the instrument shaft:
+    \[
+        p_{RCM} = p_i + \lambda\,(p_{i+1} - p_i), \quad \lambda \in [0,1]
+    \]
+    When $\lambda = 1$ the end-effector coincides with the entry point; as $\lambda \to 0$ the proximal joint $i$ approaches the RCM, producing a degenerate configuration that must be prevented by a virtual joint limit. This approach enables compact, multi-purpose robots at the cost of total reliance on software reliability.
+    \item \textbf{Force Control:} A force/torque sensor on the wrist detects transverse shaft forces and commands the motors to yield, minimising trocar loads. Flexible but adds complexity, cost, and sterilisation challenges.
 \end{enumerate}
 
 \section{Degrees of Freedom Analysis (Grübler's Formula)}
 To determine how many joints the external robotic arm needs, Grübler's formula is used. An arm inserted into an abdomen closes a kinematic chain with the operating table, where the trocar acts as a 4-DOF virtual joint.
-The formula for a closed loop (where the number of joints $n$ equals the number of links $l$) simplifies to:
+The formula for a closed loop simplifies to:
 \begin{equation}
-    m = \sum d_i - 6(n + 1 - l) \implies m = \text{Total DOFs} - 6
+    m = \text{Total joint DOFs} - 6
 \end{equation}
-Let $x$ be the number of actuated DOFs of the external arm. The total DOFs are $x + 4$ (the 4 DOFs of the trocar). If the surgeon requires an internal mobility $m=4$ (e.g., targeting a needle tip), we have:
-$4 = x + 4 - 6 \implies x = 6$. Therefore, 6 external DOFs are required to position the tool tip internally while respecting the trocar constraint.
+Let $x$ be the number of actuated DOFs of the external arm. The total DOFs are $x + 4$ (the 4 DOFs of the trocar). For an internal mobility $m$ (desired task DOFs inside the patient):
+\[
+    m = (x + 4) - 6 \implies x = m + 2
+\]
+For $m = 4$ (full retinal or laparoscopic tool control), $x = 6$ external DOFs are required. For $m = 2$, only 4 external DOFs suffice (e.g., simple needle positioning with no axial rotation).
 
 % =====================================================================
 % CHAPTER 3: PARALLEL ROBOTS AND CARDIOLOCK
@@ -146,70 +242,174 @@ $4 = x + 4 - 6 \implies x = 6$. Therefore, 6 external DOFs are required to posit
 
 Although serial manipulators are the majority, \textbf{parallel} architectures (where multiple independent chains connect the base to the end-effector) are indispensable for tasks requiring lightning-fast dynamics, high stiffness, and a high payload-to-weight ratio.
 
-\section{Serial vs. Parallel Manipulators}
-In \textbf{parallel manipulators}, joint errors average out rather than accumulating. Since heavy motors are often fixed to the base, the inertia of the moving parts is extremely low, allowing for very high operating frequencies.
-Mathematically, the \textbf{Inverse Kinematics} of parallel robots is generally decoupled and solvable in closed analytical form: given the platform's pose, each leg becomes a simple, independent serial problem.
-Conversely, \textbf{Direct (Forward) Kinematics} is extremely complex. Even for a simple planar 3-RPR mechanism, the solution leads to a 6th-degree polynomial, often requiring numerical iterative methods.
-The workspace of a parallel robot is very restricted (the intersection of the individual legs' workspaces). While a flaw in industry, this becomes a \textbf{feature of intrinsic safety} in surgery: in the event of a controller runaway, the hardware physically cannot exceed a confined volume.
+\section{Definitions}
+\begin{itemize}
+    \item \textbf{Generalised parallel manipulator:} A closed kinematic chain in which the end-effector is connected to the fixed base through several independent kinematic chains.
+    \item \textbf{Parallel robot:} A generalised parallel manipulator whose end-effector has $n$ DOF, formed by connecting the end-effector to the base through at least two independent chains, equipped with exactly $n$ actuators.
+    \item \textbf{Fully parallel manipulator:} A parallel robot in which the number of kinematic chains equals the number of DOF of the end-effector, with each chain containing exactly one actuated joint.
+\end{itemize}
 
-\section{Singularity Analysis}
-The differential kinematics of a parallel manipulator is governed by two Jacobian matrices, derived by differentiating the closure constraint $\mathbf{H}(\mathbf{X}, \boldsymbol{\theta}) = 0$:
+\section{Serial vs. Parallel Manipulators}
+
+\subsection{Kinematic and Dynamic Comparison}
+\begin{itemize}
+    \item \textbf{Accuracy:} In serial robots, mechanical errors accumulate along the chain. In parallel robots, errors are shared across chains and partly cancel at the end-effector.
+    \item \textbf{Inertia and bandwidth:} Serial robots carry all proximal link masses; parallel robots fix motors at the base, yielding very low moving inertia and a payload-to-weight ratio well above the 0.1--0.5 range typical of industrial serial arms.
+    \item \textbf{Workspace:} Serial robots have large, dexterous workspaces. Parallel workspaces are the intersection of individual leg workspaces — small by industrial standards but a \textbf{safety asset in surgery}: a robot that can physically reach only a small volume is intrinsically limited in the harm it can cause.
+    \item \textbf{Kinematics duality:} In serial robots, direct kinematics is trivial and inverse kinematics is complex. For parallel robots the situation is \textit{exactly reversed}: inverse kinematics decouples into independent single-chain subproblems (often closed-form), while direct kinematics is complex — the 3-RPR planar case reduces to a 6th-degree polynomial.
+\end{itemize}
+
+\subsection{Differential Kinematics and the Two-Jacobian Framework}
+Differentiating the closure constraint $\mathbf{H}(\mathbf{X}, \boldsymbol{\theta}) = 0$ yields:
 \begin{equation}
     \mathbf{U}\dot{\mathbf{X}} + \mathbf{V}\dot{\boldsymbol{\theta}} = \mathbf{0}
 \end{equation}
+The inverse kinematics Jacobian is $J_{IK} = -V^{-1}U$ and the direct kinematics Jacobian is $J_{DK} = -U^{-1}V$.
+
+\section{Singularity Analysis}
 Because there are two Jacobians, three distinct types of singularities emerge:
 \begin{enumerate}
-    \item \textbf{Type 1 (Serial Singularities):} $\mathbf{V}$ loses rank ($\det(V)=0$). These occur at the boundary of the workspace when legs are fully extended or folded. Non-zero joint velocities ($\dot{\boldsymbol{\theta}} \neq 0$) exist that produce no end-effector velocity ($\dot{\mathbf{X}} = 0$).
-    \item \textbf{Type 2 (Parallel/Local Singularities):} $\mathbf{U}$ loses rank ($\det(U)=0$). This is the most critical case. A non-zero end-effector velocity $\dot{\mathbf{X}} \neq 0$ exists \textbf{even when all active motors are physically locked} ($\dot{\boldsymbol{\theta}} = 0$). The mechanism gains an uncontrollable infinitesimal degree of freedom and cannot resist external forces. These occur \textit{inside} the workspace and \textbf{must be strictly avoided in surgery}, as they lead to loss of tool control.
-    \item \textbf{Type 3 Singularities:} Both matrices lose rank simultaneously, due to degenerate architectural choices (e.g., exact symmetric proportions between base and moving platform).
+    \item \textbf{Type 1 (Serial):} $\mathbf{V}$ loses rank. Occurs at the workspace boundary (legs fully extended or folded). Non-zero joint velocities exist that produce no end-effector motion.
+    \item \textbf{Type 2 (Parallel/Local):} $\mathbf{U}$ loses rank. \textbf{Most dangerous}: a non-zero end-effector velocity exists even with all actuators locked. The mechanism gains an uncontrollable DOF and cannot resist external forces. Occurs \textit{inside} the workspace and must be strictly avoided in surgery.
+    \item \textbf{Type 3:} Both $\mathbf{U}$ and $\mathbf{V}$ lose rank simultaneously, arising from degenerate architectural choices (e.g., symmetric base and moving platform proportions).
 \end{enumerate}
 
-\section{Case Study 1: The Cardiolock (Exploiting Singularities)}
-The \textbf{Cardiolock} is an active stabilizer designed for beating-heart coronary surgery. Unlike passive stabilizers that leave millimeter-scale residual motions, the Cardiolock actively moves to cancel myocardial motion, keeping the surgical area virtually motionless.
+\subsection{The da Vinci Four-Bar Linkage and its Singularity}
+The RCM mechanism of the da Vinci patient cart is modelled as a planar \textbf{RRRR four-bar linkage}. Its differential kinematics obeys:
+\begin{equation}
+    \dot{\vartheta}_c = \frac{s_2}{s_3}\,\dot{\vartheta}_1
+\end{equation}
+A Type 2 (parallel) singularity occurs when $s_3 = 0$ (i.e., $\vartheta_3 = \pm\pi$), corresponding to the \textbf{collapse of the parallelogram}: the RCM constraint is lost and the tool tip can move uncontrollably. This is a critical forbidden configuration.
 
-Compensation requires a very high bandwidth (heart frequencies $\sim$10Hz), forcing designers to use \textbf{piezoelectric actuators} (zero friction, zero backlash). The flaw of piezo actuators is their \textbf{extremely limited stroke}, on the order of 100-200 $\mu$m. How can one compensate for millimeters of heartbeat with micrometers of stroke?
-The brilliant engineering intuition behind Cardiolock was to employ a planar 3-PRR mechanism and deliberately operate it **in close proximity to a Type 2 parallel singularity**. Kinematics dictates that near a Type 2 singularity, the ratio of end-effector velocity to actuator velocity approaches infinity. By exploiting this phenomenon, a microscopic translation of the piezo actuator is kinematically "amplified" into a vast rotation of the robot's wrist, solving the stroke problem without compromising bandwidth.
+\section{Case Study 1: The Cardiolock (Exploiting Singularities)}
+\subsection{Clinical Context and Architecture}
+Beating-heart coronary surgery requires avoiding cardiopulmonary bypass (extracorporeal circulation, ECC — a pump that oxygenates and circulates blood while the heart is stopped), with its associated neurological risks. Passive stabilisers (e.g., Medtronic Octopus, Esculap FlexHeart) leave residual motion of several mm, insufficient for anastomosis requiring precision on the order of \textbf{0.1\,mm}.
+
+The \textbf{Cardiolock} is an active stabiliser that cancels myocardial motion in real time. Its architecture comprises:
+\begin{enumerate}
+    \item A positioning arm (coarse placement).
+    \item A rigid shaft ($L = 250$\,mm) inserted through a trocar.
+    \item Stabilising fingers at the distal tip (contact with the heart).
+    \item A high-speed camera with endoscope.
+    \item An active base structure: a serial spherical 2-DOF mechanism, each joint being a planar 3-PRR parallel mechanism.
+\end{enumerate}
+
+\subsection{Actuation and Stroke Amplification}
+Cardiac cycle frequency is $\sim$1\,Hz with harmonics up to 10\,Hz. Classical electric motors with gear trains introduce backlash and insufficient bandwidth. \textbf{Piezoelectric stack actuators} are used instead: bandwidth in the hundreds of Hz to kHz range, sub-millisecond response, zero backlash — but \textbf{stroke limited to 100--200\,$\mu$m}, while tip compensation requires 1--2\,mm.
+
+The key insight is to operate the 3-PRR mechanism \textbf{near a Type 2 singularity}, where the ratio of end-effector velocity to actuator velocity diverges. The closer $\epsilon \to 0$ (angle between a leg and the end-effector link), the larger the amplification:
+\begin{equation}
+    \dot{\theta} = \frac{1}{\|EB_2\|\sin(\varepsilon)}\,\dot{q}_2
+\end{equation}
+A 180\,$\mu$m actuator stroke is amplified to the required mm-scale tip motion without sacrificing bandwidth.
+
+\subsection{Tip Kinematics and Geometric Trade-off}
+The differential kinematics of the 2-DOF spherical joint maps actuator velocities to tip velocities via:
+\begin{equation}
+    \begin{pmatrix} \dot{x} \\ \dot{y} \end{pmatrix}
+    =
+    \begin{pmatrix} L\sin\alpha_1 & 0 \\ 0 & L\sin\alpha_2 \end{pmatrix}
+    \begin{pmatrix} \dot{\theta}_1 \\ \dot{\theta}_2 \end{pmatrix}
+\end{equation}
+Increasing the angles $\alpha_1, \alpha_2$ increases the tip displacement range but also increases the inertia of the moving structure, degrading dynamic performance. This is the fundamental \textbf{range/bandwidth trade-off} of the mechanism.
+
+\subsection{Why Cardiolock Was Not Adopted Clinically}
+Despite sub-millimetre compensation in animal trials, clinical adoption failed for three reasons: (1) \textbf{Safety} — rapid uncontrolled motion near the heart upon controller failure is catastrophic; (2) \textbf{Bulk and complexity} — the parallel mechanism base was too intrusive for an intraoperative device; (3) \textbf{Cost-benefit} — the marginal gain over high-quality passive stabilisers did not justify the clinical and regulatory risk.
+
+Later versions replaced rigid joints with \textbf{compliant mechanisms} (flexible hinges), modelled using the \textbf{Pseudo-Rigid Body Model (PRBM)}, which substitutes each flexibility with an equivalent revolute joint and torsional spring, allowing the standard parallel-robot kinematic framework to be applied directly.
 
 \section{Case Study 2: Pentagon Mechanism (In-Vivo Microscopy)}
-Similarly to Cardiolock, stabilizing a microscope image on living animals requires compensating for large displacements at high frequencies. A 5-bar closed-loop parallel mechanism ("Pentagon") is used, pushed at the base by two piezoelectric actuators. Again, the goal is to optimize the link geometry (by analyzing the Jacobian and its eigenvalues) to maximize the motion amplification factor isotropically, allowing the microscope to track the target cell without losing focus.
+\subsection{Biological Motion Characteristics}
+For live-cell microscopy, two physiological disturbances must be compensated:
+\begin{itemize}
+    \item \textbf{Cardiac motion:} amplitude 20--40\,$\mu$m at $\sim$10\,Hz.
+    \item \textbf{Respiratory motion:} amplitude 1000--1200\,$\mu$m at $\sim$0.2\,Hz.
+\end{itemize}
+
+\subsection{Mechanism and Design Optimisation}
+A 5-bar closed-loop parallel mechanism (``Pentagon'') is driven by two \textbf{Physik Instrumente P239.90} piezoelectric actuators (stroke 180\,$\mu$m). The mechanism has 2 active joints ($\theta_1, \theta_2$) and 3 passive joints. The Jacobian is computed via the \textbf{Virtual Tree Method}: the closed chain is cut at one link, yielding two open branches; the closure constraint sets the velocity of the cut point to zero.
+
+The two design requirements are optimised jointly by analysing the eigenvalues of the Jacobian:
+\begin{enumerate}
+    \item \textbf{Sufficient amplification} — the Jacobian eigenvalues must be large enough to amplify the 180\,$\mu$m stroke to cover the $\sim$500\,$\mu$m respiratory range. The optimised design achieves amplifications of 563\,$\mu$m (actuator 1) and 464\,$\mu$m (actuator 2).
+    \item \textbf{Isotropy} — the condition number of the Jacobian must be minimised so that amplification is uniform in all directions, preventing focus loss.
+\end{enumerate}
 
 % =====================================================================
 % CHAPTER 4: INTERACTION CONTROL
 % =====================================================================
 \chapter{Interaction Control: Impedance and Admittance}
 
-When a medical robot comes into contact with the patient or the surgeon, pure position control (which forces the robot to reach fixed coordinates regardless of the environment) is dangerous. If a position-controlled robot hits an unexpected bone, it will increase motor current to its limit to reduce the position error, destroying tissues. It is mandatory to control the dynamic relationship between motion and exchanged force. This is achieved via \textbf{Impedance} and \textbf{Admittance} control.
+When a medical robot comes into contact with the patient or the surgeon, pure position control is dangerous. If a position-controlled robot hits an unexpected bone, it will increase motor current to its limit to reduce the position error, destroying tissues. It is mandatory to control the dynamic relationship between motion and exchanged force. This is achieved via \textbf{Impedance} and \textbf{Admittance} control.
 
-Assuming a low-level controller is already compensating for gravity and Coriolis forces (feedback linearization in Cartesian space), the machine's dynamics can be reduced to a controllable mass $m$:
+\section{Control Modalities vs. Control Laws}
+An important conceptual distinction: a \textbf{control modality} describes the role of the human in the control loop; it does not prescribe a specific control law. The three modalities are:
+\begin{itemize}
+    \item \textbf{Autonomous (Task-level autonomy):} The robot executes a pre-planned surgical task without any real-time human input beyond monitoring and emergency stop (e.g., ROBODOC milling a femoral canal).
+    \item \textbf{Cooperative / Hands-on / Shared control:} The robot constrains or augments the surgeon's movement in real time. The surgeon physically moves the robot; the robot filters motion, applies virtual fixtures, or prevents entry into forbidden zones (e.g., Acrobot, MAKO).
+    \item \textbf{Teleoperation:} The slave robot in contact with the patient is separate from the master interface guided by the surgeon, with optional force feedback (e.g., da Vinci).
+\end{itemize}
+
+Key distinctions between cooperative and teleoperated systems:
+\begin{itemize}
+    \item \textit{Force scaling} is possible in both modalities.
+    \item \textit{Position scaling} is \textbf{intrinsically impossible} in cooperative systems: the surgeon's hand and the instrument tip are mechanically coupled and move the same physical distance.
+    \item Cooperative systems are less expensive (no second robot/infrastructure) but require physical co-location of surgeon and patient.
+\end{itemize}
+
+\section{Interaction Control Methods}
+Assuming a low-level controller compensates for gravity and Coriolis forces (feedback linearisation), the machine dynamics reduce to:
 \begin{equation}
     m\ddot{p} = u + F_{ext}
 \end{equation}
-where $u$ is the control command and $F_{ext}$ is the external force.
 
-\section{Impedance Control}
-In impedance control, **the input to the model is a kinematic perturbation (position/velocity) and the output is a commanded force**.
-The goal is to force the robot to follow this desired target equation:
+\subsection{Impedance Control}
+The input is a kinematic perturbation (position/velocity); the output is a commanded force. The desired interaction law is:
 \begin{equation}
     m_d(\ddot{p} - \ddot{p}_d) + b(\dot{p} - \dot{p}_d) + k(p - p_d) = F_{ext}
 \end{equation}
-where $m_d, b, k$ are the desired apparent mass, damping, and stiffness, respectively, and $p_d$ is the nominal trajectory.
-Solving for the desired acceleration $\ddot{p}$ and substituting it into the robot's dynamics yields the control law:
+The resulting control law is:
 \begin{equation}
     u = m\ddot{p}_d + \frac{m}{m_d}\Big( b(\dot{p}_d - \dot{p}) + k(p_d - p) \Big) + \left( \frac{m}{m_d} - 1 \right)F_{ext}
 \end{equation}
+\textbf{Key simplification:} Setting $m_d = m$ (no inertial reshaping) cancels the $F_{ext}$ term entirely, \textbf{eliminating the need for a force/torque sensor}. Impedance control then reduces to a PD controller with acceleration feedforward, suitable for backdrivable, low-inertia, cable-driven arms.
 
-\textbf{Crucial Detail:} If the designer chooses \textbf{not} to alter the robot's perceived inertia, setting $m_d = m$ (apparent mass equals real mass), the final term containing $F_{ext}$ cancels out completely. This means that \textbf{impedance control (without inertial reshaping) requires no force/torque sensor at the end-effector}. It simply becomes a Proportional-Derivative (PD) controller with acceleration feedforward.
-This scheme perfectly suits robots with low-inertia direct-drive actuators and high-efficiency transmissions (e.g., cable-driven), where \textit{torque control} can be commanded directly to the motors in a \textit{backdrivable} manner.
-
-\section{Admittance Control}
-Admittance control reverses the causality: **the input is force, and the output is a motion correction**.
-Here, \textbf{a force sensor is mandatory}. The surgeon or environment applies a force $F_{ext}$, which is read by the sensor and passed to a virtual dynamic model to calculate a target position modification $\Delta p_r$:
+\subsection{Admittance Control}
+The input is force; the output is a motion correction. A \textbf{force sensor is mandatory}:
 \begin{equation}
     \Delta p_r = \frac{F_{ext}}{m_d s^2 + b s + k}
 \end{equation}
-The new reference $p_r = p_d + \Delta p_r$ is then fed into a highly stiff, high-gain inner PID position controller, which forces the motors to track $p_r$.
+The new reference $p_r = p_d + \Delta p_r$ is fed to a high-gain inner PID position controller. This is the natural choice for \textbf{non-backdrivable} robots with harmonic drives, as the software ``fakes'' compliance by continuously updating position targets.
 
-This approach is fundamental for retrofitting conventional, heavy industrial robots. Industrial robots often use Harmonic Drives, which generate massive friction and make the arm \textbf{non-backdrivable} (it cannot be pushed physically). With admittance control, the force sensor detects the push and the software "fakes" compliance by continuously updating position targets, masking the arm's intrinsic mechanical rigidity.
+\subsection{Impedance vs. Admittance: Hardware Suitability}
+\begin{itemize}
+    \item \textbf{Admittance:} Well-suited to non-backdrivable robots with position control. A force sensor is always required.
+    \item \textbf{Impedance:} Requires torque control capability at the joints. If $m_d = m$, no force sensor needed. Many industrial robots expose only position interfaces, making impedance control infeasible — admittance is the only option.
+\end{itemize}
+
+\section{The Acrobot Clinical Architecture}
+The Acrobot system (developed at Imperial College London, commercialised as MAKO by Stryker) implements a \textbf{dual-loop admittance architecture}:
+\begin{itemize}
+    \item \textbf{Inner loop} (joint position/velocity control): runs at \textbf{550\,Hz / 2\,ms} for stability.
+    \item \textbf{Outer loop} (Cartesian admittance and constraint evaluation): runs at \textbf{100\,Hz / 10--15\,ms}; computationally heavier but lower bandwidth is sufficient.
+\end{itemize}
+The three spatial zones use the following thresholds:
+\begin{itemize}
+    \item \textbf{Region I} (safe zone): $d > 2$\,mm — free motion, only damping and friction compensation.
+    \item \textbf{Region II} (boundary zone): $0 < d \leq 2$\,mm — stiffness increases progressively, preventing overshoot instability.
+    \item \textbf{Region III} (forbidden zone): $d \leq 0$ — maximum PD gains; the robot actively pushes back.
+\end{itemize}
+End-effector range: yaw and pitch in $[-30°, 30°]$, extension 30--50\,cm.
+
+\textbf{Clinical outcomes (2003):} accuracy 2--3$\times$ better, reproducibility 3$\times$ better than manual surgery; patient satisfaction 92\% at two years.
+
+\section{Application: ROBHOT (Superficial Hyperthermia)}
+\textbf{ROBHOT} (Sapienza University / Medlogix / Alba ON4000 platform) is a cooperative robot for superficial \textbf{oncological hyperthermia}: raising tumour tissue temperature to \textbf{4--8°C} above physiological baseline (target: 40--45°C) to inhibit DNA repair mechanisms and enhance radio/chemotherapy. The robot uses:
+\begin{itemize}
+    \item \textbf{Impedance control} for autonomous antenna tracking along a planned path.
+    \item \textbf{Admittance control} for manual guidance by the operator (freehand repositioning).
+\end{itemize}
+This hybrid modality makes it an instructive example of both control laws deployed in the same clinical system.
 
 % =====================================================================
 % CHAPTER 5: VIRTUAL FIXTURES AND SYNERGISTIC SYSTEMS
@@ -217,126 +417,663 @@ This approach is fundamental for retrofitting conventional, heavy industrial rob
 \chapter{Virtual Fixtures and Synergistic Systems}
 
 \section{What are Virtual Fixtures?}
-Introduced in the 1990s by L.B. Rosenberg (US Air Force), \textbf{Virtual Fixtures (VF)} are \textit{"abstract perceptual overlays"} introduced into the control interface. They are not hardware obstacles, but computational limits that simulate the effect of mechanical guides (like a ruler), vastly increasing the safety and precision of shared-control and teleoperated tasks.
+Introduced in \textbf{1992} by L.B.\ Rosenberg at the US Air Force Armstrong Laboratory, \textbf{Virtual Fixtures (VF)} are software-generated constraints on the motion of a robotic manipulator (or on the haptic feedback presented to a teleoperator) that mimic the effect of a physical constraint or guide. They are not hardware obstacles; they are computational limits.
 \begin{itemize}
-    \item \textbf{Guidance VFs (GVF):} Actively attract or channel the robot's motion along a preferred 1D path or 2D surface (e.g., a straight needle insertion).
-    \item \textbf{Forbidden-Region VFs (FRVF):} Prevent access to delicate anatomical zones, acting as virtual walls.
+    \item \textbf{Guidance VFs (GVF):} Assist the user in moving the manipulator along desired paths or surfaces; define a \textit{preferred direction of motion}. Forces in the preferred direction are transmitted with little or no attenuation; forces in non-preferred directions are filtered.
+    \item \textbf{Forbidden-Region VFs (FRVF):} Prevent the manipulator from entering a defined forbidden region; act as a virtual wall. Motion away from or along the boundary is permitted; motion toward the forbidden region is blocked or heavily resisted.
 \end{itemize}
-These fixtures can be modeled as \textbf{Hard} (absolute prohibition to deviate, the robot fully absorbs non-compliant forces) or \textbf{Soft} (provides clear elastic tactile resistance, but a sufficient force from the surgeon can override the constraint, providing an exit strategy if pre-operative planning was flawed).
+
+\subsection{Hard, Soft, and Medium Guidance}
+\begin{itemize}
+    \item \textbf{Hard:} No (or negligible) non-preferred force component is transmitted; the operator cannot deviate from the planned path.
+    \item \textbf{Soft:} The non-preferred component is attenuated but not eliminated; the operator retains freedom to deviate.
+    \item \textbf{Medium:} Empirically the best compromise in uncertain microsurgical environments: the VF planner is never perfect, and medium guidance provides the flexibility to correct small planning errors without fully abandoning guidance.
+\end{itemize}
+
+\subsection{Admittance-type vs. Impedance-type Implementation}
+The interaction is modelled as either $V(s) = Y(s)\,F(s)$ (admittance: force in, velocity out) or $F(s) = Z(s)\,V(s)$ (impedance: velocity in, force out).
+
+\textbf{The guidance mechanism is anisotropy:} by setting different gains in different Cartesian directions within $Y(s)$ or $Z(s)$, the VF channels motion without any additional hardware.
+
+The target interaction law (planar mass model) is:
+\begin{equation}
+    m(\dot{v} - \dot{v}_d) + K_D(v - v_d) + K_P(x - x_d) = F_G
+\end{equation}
+\begin{itemize}
+    \item \textbf{Admittance-based law:} $U = m\dot{v}_d + K_D(v_d - v) + K_P(x_d - x)$. \textit{Requires force measurement always; implementable on position-controlled robots.}
+    \item \textbf{Impedance-based law:} $U = \frac{m}{m_d}(m_d\dot{v}_d + K_D(v_d - v) + K_P(x_d - x)) + \left(\frac{m}{m_d} - 1\right)F_G$. Setting $m_d = m$ cancels the $F_G$ term — \textit{no force sensor needed}. Requires torque-control capable joints.
+\end{itemize}
+
+\subsection{FRVF Placement in Teleoperation}
+\begin{itemize}
+    \item \textbf{Master side only:} The operator feels repulsive haptic feedback near the boundary, but there is no physical guarantee that the slave will not cross it if the operator continues to push.
+    \item \textbf{Slave side only:} Physical safety is guaranteed; however, the operator may not perceive the constraint and may exert large forces inadvertently.
+    \item \textbf{Both sides:} Combines physical safety (slave) with informative haptic feedback (master) — the preferred architecture for safety-critical teleoperation.
+\end{itemize}
 
 \section{Mathematical Modeling of GVFs}
-To mathematically construct an admittance-based GVF, one defines a matrix $\mathbf{P}(t)$ representing the space of desired motion directions point by point.
+To mathematically construct an admittance-based GVF, one defines a matrix $\mathbf{P}(t)$ representing the space of desired motion directions.
 The orthogonal projection operator onto this subspace is:
 \begin{equation}
     \Pi_P = \mathbf{P}(\mathbf{P}^T \mathbf{P})^{-1}\mathbf{P}^T
 \end{equation}
 When the operator applies a force $f$, the control law filters the directions:
 \begin{equation}
-    v = c \Big( \underbrace{\Pi_P f}_{\text{useful force}} + \lambda_\perp \underbrace{(\mathbf{I} - \Pi_P) f}_{\text{transverse force}} \Big)
+    v = c \Big( \underbrace{\Pi_P f}_{\text{preferred force}} + \lambda_\perp \underbrace{(\mathbf{I} - \Pi_P) f}_{\text{transverse force}} \Big)
 \end{equation}
-where $c$ is the nominal admittance and $\lambda_\perp \in [0, 1]$ is the attenuation factor.
-If $\lambda_\perp = 0$, we have a Hard GVF (transverse forces are multiplied by zero). If $\lambda_\perp > 0$, we obtain a Soft GVF.
+where $c$ is the nominal admittance and $\lambda_\perp \in [0, 1]$:
+\begin{itemize}
+    \item $\lambda_\perp = 0$: \textbf{Hard GVF} — transverse forces suppressed.
+    \item $\lambda_\perp \in (0,1)$: \textbf{Soft GVF} — transverse forces attenuated.
+    \item $\lambda_\perp = 1$: \textbf{Isotropic admittance} — VF has no effect.
+\end{itemize}
 
 \section{Historical Synergistic Systems: PADyC and Acrobot}
 Synergistic systems represent the physical implementation of VFs in shared-control tasks.
 
 \subsection{PADyC (Passive Arm with Dynamic Constraints)}
-Developed by TIMC Grenoble, PADyC is a triumph of passive mechatronics. It uses no motors to push the tool. Instead, each joint features two opposed \textit{freewheels} connected to motors. A freewheel blocks motion in one direction but allows it in the other. By regulating the speed of the internal motors, PADyC defines a "window of admissible velocities" $[\omega_{min}, \omega_{max}]$ for each joint.
-The system is \textbf{intrinsically safe}, but the underlying mathematical problem is daunting: translating Cartesian safety constraints into a Window of Admissible Configurations (WAC) for each joint in configuration space is computationally extremely expensive, limiting its clinical success.
+Developed by TIMC Grenoble, PADyC is a triumph of passive mechatronics. It uses no motors to push the tool. Instead, each joint features two opposed \textit{freewheels} connected to motors. A freewheel blocks motion in one direction but allows it in the other. By regulating the speed of the internal motors, PADyC defines a ``window of admissible velocities'' $[\omega_{i}^{-}, \omega_{i}^{+}]$ for each joint $i$.
+
+The Cartesian safety constraints are translated into a \textbf{Window of Admissible Configurations (WAC)} for the full joint space via the intersection over all $k$ control points:
+\begin{equation}
+    WAC(t) = \bigcap_{j=1}^{k} WAC_j(t)
+\end{equation}
+
+PADyC implements five operative modes:
+\begin{enumerate}
+    \item \textit{Free mode} — no constraints active.
+    \item \textit{Position mode} — locks the end-effector at a target pose.
+    \item \textit{Region mode} — with two variants: \textit{keep inside} (confines the tool within a safe volume) and \textit{keep outside} (defines a forbidden zone).
+    \item \textit{Trajectory mode} — channels the tool along a pre-planned path.
+    \item \textit{Specialised modes} — linear, planar, or conical constraints.
+\end{enumerate}
+
+The system is \textbf{intrinsically safe} (it cannot generate active motion), but the underlying mathematical problem is daunting: translating Cartesian safety constraints into the WAC for each joint in configuration space is computationally extremely expensive and is numerically ill-conditioned near kinematic singularities, limiting its clinical uptake.
 
 \subsection{Acrobot / MAKO (Active Constraints Robot)}
-Developed at Imperial College (now MAKO by Stryker) for knee arthroplasty. Unlike PADyC, it uses an active arm and \textbf{impedance control} to generate a FRVF.
+Developed at Imperial College London (now commercialised as \textbf{MAKO} by Stryker) for knee arthroplasty. Unlike PADyC, it uses an active arm and \textbf{impedance control} to generate a FRVF.
 The intervention area is divided into three regions based on the distance $d$ from the safe bone boundary:
 \begin{enumerate}
-    \item \textbf{Region I (Safe Zone, d > D1):} The robot has very low impedance (\textit{free motion}). The surgeon moves transparently.
-    \item \textbf{Region II (Transition Zone, 0 < d < D1):} As the tool approaches the boundary, the robot's impedance increases progressively in the normal direction, becoming stiffer, while remaining compliant tangentially.
-    \item \textbf{Region III (Forbidden Zone, d < 0):} Beyond the boundary, PD gains max out; the robot brakes sharply, preventing further penetration.
+    \item \textbf{Region I (Safe Zone, $d > D_1$):} The robot has very low impedance (\textit{free motion}). The surgeon moves transparently.
+    \item \textbf{Region II (Transition Zone, $0 < d < D_1$):} As the tool approaches the boundary, the robot's impedance increases progressively in the normal direction, becoming stiffer, while remaining compliant tangentially.
+    \item \textbf{Region III (Forbidden Zone, $d < 0$):} Beyond the boundary, PD gains max out; the robot brakes sharply, preventing further penetration.
 \end{enumerate}
-The gradual stiffness increase in RII is crucial: a sudden step-function increase in stiffness would trigger unstable vibrations due to the violent force transient on the motors.
+The gradual stiffness increase in Region II is crucial: a sudden step-function increase in stiffness would trigger unstable vibrations due to the violent force transient on the motors.
+
+\subsection{Comparative Analysis: PADyC vs. Acrobot}
+\begin{itemize}
+    \item \textbf{PADyC} (passive freewheel hardware):
+    \begin{itemize}
+        \item \textit{Advantage} — intrinsically safe; cannot generate active force on the patient.
+        \item \textit{Disadvantage} — high computational load to map Cartesian task constraints into joint-space WAC; ill-conditioned near singularities.
+    \end{itemize}
+    \item \textbf{Acrobot / MAKO} (software impedance control):
+    \begin{itemize}
+        \item \textit{Advantage} — greater flexibility for complex 3D geometries; transparent in free space (Region I).
+        \item \textit{Disadvantage} — requires extremely reliable real-time computing; patient safety depends entirely on software correctness.
+    \end{itemize}
+\end{itemize}
+
+\section{Application: GVF-Based Control for Retinal Surgery}
+\subsection{Clinical Motivation}
+Retinal vein cannulation requires inserting a needle into a vessel of diameter $\sim$\textbf{100\,$\mu$m}, while the RMS physiological hand tremor is $\sim$\textbf{182\,$\mu$m}. Manual freehand execution is therefore physically infeasible: the tremor amplitude exceeds the vessel diameter.
+
+Required DOF for ocular surgery: 3 DOF for approach; for retinal surgery, 4 DOF at the entry port (3 orientation rotations + 1 axial translation for insertion/retraction).
+
+\subsection{The Steady-Hand Robot (SHR)}
+Developed at Johns Hopkins University (JHU), the SHR operates in cooperative mode. Its admittance law is:
+\begin{equation}
+    v = G\,f, \quad G \in \mathbb{R}^{6\times 6}
+\end{equation}
+The RCM is enforced \textbf{virtually, via a software optimisation constraint} — not through a mechanical linkage. This contrasts with the Leuven robot (mechanical RCM via parallel linkage) and the TU Munich robot (hybrid parallel-serial architecture for combined rigidity and workspace). The \textbf{Micron} (Carnegie Mellon) is a fundamentally different approach: a fully \textbf{handheld active micromanipulator} with piezoelectric actuators that cancels tremor locally, without sharing the mechanical support with any robotic arm.
+
+\subsection{Passivity and Energy Tanks}
+When VF parameters ($K_{VF}$, $D_{VF}$) change online during teleoperation, energy can be injected into the system, causing unbounded oscillations. The solution is to enforce \textbf{passivity}: a passive system cannot generate energy internally, guaranteeing bounded behaviour regardless of the operator's actions. \textbf{Energy tanks} monitor the energy budget and prevent parameter changes from injecting net energy, enabling safe adaptive VF without restricting performance.
 
 % =====================================================================
 % CHAPTER 6: REGISTRATION
 % =====================================================================
 \chapter{Robotic Registration}
 
-Registration is the mathematical heart of Computer Integrated Surgery. It corresponds to finding the spatial transformation (Rotation $\mathbf{R}$ and Translation $\mathbf{t}$) that maps the pre-operative digital coordinates (CT scans, surgical plans) to the physical space in the OR where the robot moves.
+Registration is the mathematical heart of Computer Integrated Surgery. It corresponds to finding the rigid spatial transformation (Rotation $\mathbf{R} \in SO(3)$ and Translation $\mathbf{t}$) that maps pre-operative digital coordinates (CT/MRI) to the physical OR space where the robot operates.
+
+\[
+{}^{A}f = R_B\,{}^{B}f + {}^{A}t_B
+\]
+
 It must be distinguished from:
 \begin{itemize}
-    \item \textbf{Calibration:} Determines the fixed transformation between sensors (e.g., from camera to robot base).
-    \item \textbf{Tracking:} Dynamically computes the pose of moving objects in real-time.
+    \item \textbf{Calibration:} Determines the fixed transformation between devices physically co-located in a stable, long-term configuration (e.g., robot base $\to$ optical localiser). Performed once or when the room setup changes.
+    \item \textbf{Tracking:} Continuously updates the transformation between a moving instrument and the localiser in real time.
+    \item \textbf{Multi-modal image registration:} Fuses images from different modalities (CT for bone, MRI for soft tissue) or from different times; often requires non-rigid (deformable) methods for soft tissue.
 \end{itemize}
 
+\section{Localisation Technologies}
+\begin{itemize}
+    \item \textbf{Optical (current gold standard):} Infrared cameras track active or passive reflective markers. Advantage: high accuracy. Disadvantage: requires unobstructed \textbf{line of sight} — occlusion by the surgical team causes tracking loss. The \textbf{NDI Polaris Vega} is the most widely deployed clinical optical localiser.
+    \item \textbf{Magnetic:} Spatial field generators and miniature embedded sensors. Advantage: no line-of-sight requirement, tiny sensors. Disadvantage: extreme sensitivity to \textbf{electromagnetic interference} from OR equipment (motors, electrosurgical units), severely limiting clinical adoption.
+    \item \textbf{Mechanical (passive articulated arms):} Encode pose via joint encoders. The \textbf{ISG Viewing Wand} was an early neurological example. Disadvantages: bulky, restricts movement. Largely abandoned today.
+\end{itemize}
+
+Intraoperative imaging modalities include \textbf{fluoroscopy} (C-arm X-ray, real-time bone) and \textbf{ultrasound} (radiation-free, soft tissue).
+
 \section{Point-to-Point Registration (Procrustes Problem)}
-Used when a set of points with known 1-to-1 correspondences is available (e.g., titanium \textit{fiducial screws} implanted in the bone before the CT scan).
-Given two matched point sets, $A_i$ (CT) and $B_i$ (Robot), the goal is to minimize the error:
+Used when $n \geq 3$ \textbf{non-collinear} corresponding point pairs are known. Three non-collinear pairs are the minimum to uniquely determine the 6-DOF rigid transformation.
+
+The objective function is:
 \begin{equation}
-    \min_{R \in SO(3), t} \sum_{i=1}^{N} \| A_i - (R B_i + t) \|^2
+    (R^*, t^*) = \arg\min_{R \in SO(3),\,t}\sum_{i=1}^{n}\|{}^{A}f_i - R\,{}^{B}f_i - t\|^2
 \end{equation}
-\textbf{SVD Solution (Closed Form):} 
-1. Calculate the centroids of both point clouds.
-2. Center the points by subtracting their respective centroids ($\tilde{A}_i, \tilde{B}_i$).
-3. Build the cross-covariance matrix: $H = \sum_{i} \tilde{B}_i (\tilde{A}_i)^T$.
-4. Decompose using SVD: $H = U \Sigma V^T$.
-5. The optimal rotation is $\mathbf{R} = V U^T$.
-6. If $\det(\mathbf{R}) = -1$ (the algorithm found a reflection instead of a valid rigid rotation), flip the sign of the last column of $V$ and recalculate.
-7. The translation is derived from the rotated centroids: $t = \bar{A} - R\bar{B}$.
 
-\textbf{Iterative Solution (Gauss-Newton):} If data is noisy, non-linear least squares optimization is used. The SVD estimate is often used as a highly accurate initial guess (seed) for the Gauss-Newton solver.
-
-\section{Point-to-Surface Registration (ICP Algorithm)}
-In less invasive surgeries, screws are not implanted. The surgeon sweeps an optoelectronic probe over the exposed bone surface, acquiring thousands of unknown points. Because it is unknown which specific CT vertex corresponds to each acquired point, the \textbf{Iterative Closest Point (ICP)} algorithm is used:
+\textbf{SVD closed-form solution:}
 \begin{enumerate}
-    \item Provide an "initial guess" alignment $T^{(0)}$.
-    \item \textbf{Data Association:} For each physically acquired point, geometrically find the closest point on the CT mesh. This creates fictitious pairs.
-    \item \textbf{Resolution:} Apply the SVD Point-to-Point algorithm on these pairs to calculate a new roto-translation $T^{(1)}$.
-    \item Apply the transformation and loop back to step 2 until the RMS error converges.
+    \item Compute centroids $\bar{A}$, $\bar{B}$ and centre both clouds: $\tilde{A}_i = A_i - \bar{A}$, $\tilde{B}_i = B_i - \bar{B}$.
+    \item Build cross-covariance: $H = \sum_i \tilde{B}_i \tilde{A}_i^T$.
+    \item Decompose: $H = U\Sigma V^T$.
+    \item Optimal rotation: $R = VU^T$. If $\det(R) = -1$, negate the last column of $V$ (avoid reflections).
+    \item Optimal translation: $t = \bar{A} - R\bar{B}$.
 \end{enumerate}
 
-ICP guarantees monotonic convergence, but \textbf{only to a local minimum}. If the initial guess is poor, ICP might align the front of the real bone with the back of the 3D model. The standard clinical solution is to begin registration by manually touching 3-4 macroscopic anatomical landmarks to provide ICP with an excellent starting condition.
+\textbf{Pseudo-inverse caution:} Due to sensor noise, the pseudo-inverse approach does not guarantee $R \in SO(3)$ — it may produce matrices that shear or scale space. Therefore, the pseudo-inverse is used \textit{only as an initial guess} for the iterative Gauss-Newton solver.
+
+\textbf{Gauss-Newton refinement:} The state vector is $x = (t_x, t_y, t_z, \alpha, \beta, \gamma) \in SE(3)$. The cost is:
+\begin{equation}
+    F(x) = \sum_{i=1}^{N} e_i^T(x)\,\Omega_i\,e_i(x)
+\end{equation}
+where $\Omega_i = \Sigma_i^{-1}$ is the inverse covariance matrix (measurement weighting). The optimal update step solves the normal equations $H\Delta x^* = -b$, i.e., $\Delta x^* = -H^{-1}b$.
+
+\subsection{Feature Types}
+\begin{itemize}
+    \item \textbf{Artificial fiducials:} Titanium screws implanted pre-operatively (invasive, highly reliable). Used by ROBODOC; main drawback: requires a separate surgical procedure under anaesthesia.
+    \item \textbf{Anatomical landmarks:} Natural bony prominences or vascular bifurcations (non-invasive, less precise).
+\end{itemize}
+
+\section{Point-to-Surface Registration (ICP Algorithm)}
+In minimally invasive procedures, no screws are implanted. The surgeon sweeps an optoelectronic probe over the exposed bone surface, collecting point clouds with \textbf{unknown correspondences}. The \textbf{Iterative Closest Point (ICP)} algorithm (Besl-McKay, 1992) is used:
+
+\begin{enumerate}
+    \item \textbf{Transform:} Apply current estimate $T^{(k)}$ to acquired points.
+    \item \textbf{Find closest:} For each transformed point, find the geometrically nearest point on the CT surface mesh ($A m_i^{(k)}$).
+    \item \textbf{Update:} Solve the point-to-point SVD problem on the temporary pairs to compute $T^{(k+1)}$.
+    \item \textbf{Error check:} $\mathcal{E}^{(k)} = \frac{1}{N_p}\sum_i \|Am_i^{(k)} - T^{(k+1)}\,{}^Bp_i\|^2$. Iterate until convergence.
+\end{enumerate}
+
+\textbf{Properties:} ICP guarantees monotonic convergence but \textbf{only to a local minimum}. A poor initialisation may align the front of the bone with the back of the CT model. The standard clinical solution (as in the Acrobot) is to first palpate \textbf{4 anatomical landmarks} to generate an accurate initial guess, then collect \textbf{20--30 random surface points} for ICP refinement.
+
+CASPAR improves on ROBODOC by adding a second fiducial set $S'$ tracked in real time to compensate for intraoperative patient movement.
+
+\subsection{The Distance Matrix Method (Unknown Correspondences)}
+Exploits the \textbf{isometry property}: a rigid-body transformation preserves Euclidean distances. The relative inter-point distances within each frame constitute a unique topological signature for each point, enabling correspondence matching between CT and tracker frames without prior labelling.
+
+\section{Case Study: ROBHOT Registration (Oncological Hyperthermia)}
+The ROBHOT system localises an electromagnetic antenna applicator relative to a CT-reconstructed tumour model. The transformation chain from CT target to applicator frame is:
+\begin{equation}
+    {}^{A}p_T = {}^{A}T_{A_m}\,{}^{A_m}T_V\,{}^{V}T_{CT}\,{}^{CT}p_T
+\end{equation}
+where ${}^{V}T_{CT}$ is the \textbf{output of the registration algorithm} (constant once registered), ${}^{A_m}T_V$ is measured dynamically by the optical camera (NDI Polaris Vega), and ${}^{A}T_{A_m}$ is a fixed calibration. Registration uses $N \geq 4$ artificial markers and applies the pseudo-inverse / Gauss-Newton pipeline. Validation yielded an RMS error below \textbf{1\,cm}, sufficient for clinical hyperthermia delivery. The software architecture comprises three classes: \textit{PolarisProxy} (camera API), \textit{RegistrationTask} (distance matrix + ICP solver), and \textit{VREPProxy} (CoppeliaSim digital-twin visualisation).
 
 % =====================================================================
 % CHAPTER 7: TELEOPERATION AND STABILITY
 % =====================================================================
-\chapter{Bilateral Teleoperation: The Transparency-Stability Dilemma}
+\chapter{Bilateral Teleoperation: Principles, Transparency and Stability}
 
-In \textbf{bilateral teleoperation} (e.g., da Vinci 5), the surgeon manipulates a Master console while a Slave robot executes the action on the tissue. The Master sends motion commands to the Slave, and the Slave sends back measured tissue reaction forces to the Master's motors, providing vital \textbf{Haptic Feedback}.
+\section{Definitions and Historical Context}
+\begin{itemize}
+    \item \textbf{Teleoperation:} Extension of a person's perception and manipulation capabilities to a remote location, encompassing the manipulator, sensors, actuators, and the communication channel.
+    \item \textbf{Telepresence:} The condition in which the operator feels physically present at the remote site; dexterity of the remote device matches that of the unaided human hand. Mathematically: $\lambda_v = \lambda_f = 1$ (complete transparency).
+    \item \textbf{Telerobotics:} Remote control of robots; implies robotic (not merely passive pantograph) devices on both local and remote sides.
+    \item \textbf{Kinesthetic perception:} The perception of force relative to motion — i.e., the impedance of the remote environment.
+\end{itemize}
 
-This system can be modeled as an electrical circuit using \textbf{Two-Port Network theory}, where Effort variables (Voltage $\rightarrow$ Force) and Flow variables (Current $\rightarrow$ Velocity) interact.
-Using Lawrence's \textbf{Hybrid Matrix $H(s)$}, the system is described by connecting inputs to outputs:
+Historical milestones: early 1800s — Thomas Jefferson's polygraph (mechanical pantograph); 1940s — Raymond Goertz's mechanical pantographs for radioactive materials (Argonne National Laboratory); 1954 — electromechanical manipulators with servo feedback; 1960s — CCTV and head-mounted displays. Contemporary examples: Luca Parmitano teleoperating a rover (ESA Analog-1 campaign); Ocean One (Stanford) for subsea robotics.
+
+\section{Kinematic Coupling}
+\textbf{Joint-level coupling} is possible only when master and slave are kinematically equivalent (e.g., historical pantographs):
+\[
+    q_{offset} = q_m^{(0)} - q_s^{(0)}, \qquad q_s^r = q_m + q_{offset}
+\]
+
+\textbf{Task-level (Cartesian) coupling} is standard in surgery, where master and slave are kinematically dissimilar. Position offset is additive; orientation offset is \textit{multiplicative} using rotation matrices:
+\[
+    R_s^r = R_m\,R_{offset}, \quad R_m^r = R_s\,R_{offset}^{-1}, \quad R_{offset} = R_m^{-1}|_0 \cdot R_s|_0
+\]
+The multiplicative formulation avoids the singularities and ambiguities that arise with Euler-angle differences. \textbf{Clutching} is required when the master workspace is smaller than the slave's: the operator disconnects, repositions the master, reconnects, and continues — analogous to lifting a computer mouse.
+
+\section{Kinesthetic Scaling}
+Let $\lambda_v = \dot{x}_s / \dot{x}_m$ (velocity scaling) and $\lambda_f = f_m / f_s$ (force scaling). The power relationship is:
+\[
+    P_m = \frac{\lambda_f}{\lambda_v}\,P_s
+\]
+The \textbf{transmitted impedance} is $Z_m = \lambda_v\,\lambda_f\,Z_s$. Scaling factors in surgery ($\lambda_v = \lambda_f = K$, applied magnification):
+\begin{itemize}
+    \item Spatial dimension: factor $K$. Area: $K^2$. Volume/mass: $K^3$.
+\end{itemize}
+\textbf{Clinical example} ($\lambda_v = \lambda_f = 0.2$): the slave moves 5$\times$ less than the master (high precision); the tissue feels 25 times softer ($Z_m = 0.04\,Z_s$); palpation is unreliable. Power is conserved ($P_m = P_s$). Conversely, $\lambda_v = \lambda_f = 1$ yields perfect transparency.
+
+\section{Two-Port Network Model}
+\subsection{Mechanical–Electrical Analogy}
+\begin{center}
+\begin{tabular}{ll}
+\hline
+\textbf{Electrical} & \textbf{Mechanical} \\
+\hline
+Voltage $V(t)$ & Force/Torque $F(t)$ \\
+Current $I(t)$ & Velocity $\dot{x}(t)$ \\
+Resistance $R$ & Viscous damping $B$ \\
+Inductance $L$ & Inertia $M$ ($Z_M = Ms$) \\
+Capacitance $C$ & Spring compliance $1/K$ ($Z_K = K/s$) \\
+\hline
+\end{tabular}
+\end{center}
+Instantaneous power at a port: $P = \mathcal{E} \cdot \mathcal{F}$.
+
+\subsection{System Structure}
+The full teleoperation system is modelled as: one-port network $Z_h$ (human operator) $\|$ two-port network (master + channel + slave) $\|$ one-port network $Z_e$ (remote environment).
+
+\subsection{Hybrid Matrix Representations}
+Two conventions are in use:
+
+\textbf{Convention L (Lawrence):}
 \begin{equation}
-    \begin{bmatrix} f_m \\ -\dot{x}_s \end{bmatrix}
-    = 
-    \begin{bmatrix} H_{11} & H_{12} \\ H_{21} & H_{22} \end{bmatrix}
-    \begin{bmatrix} \dot{x}_m \\ f_s \end{bmatrix}
+    \begin{bmatrix} F_m \\ V_m \end{bmatrix} = H_L \begin{bmatrix} V_s \\ -F_s \end{bmatrix}
+\end{equation}
+
+\textbf{Convention C (Circuit / Llewellyn):}
+\begin{equation}
+    \begin{bmatrix} F_m \\ -\dot{x}_s \end{bmatrix} = H_C \begin{bmatrix} \dot{x}_m \\ F_s \end{bmatrix}
+\end{equation}
+
+The transmitted impedance in Convention L is:
+\begin{equation}
+    Z_t = \frac{F_m}{V_m} = (H_{L,11} - H_{L,12}\,Z_e)(H_{L,21} - H_{L,22}\,Z_e)^{-1}
 \end{equation}
 
 \section{Transparency (Telepresence)}
-The clinical goal is to provide the surgeon with the exact physical sensation of touching tissues bare-handed. Let the environment's impedance be $Z_e = f_s/\dot{x}_s$ and the impedance felt at the master be $Z_t = f_m/\dot{x}_m$.
-\textbf{Perfect Transparency} requires $Z_t = Z_e$ regardless of the tissue type. Solving the hybrid matrix equations shows that this identity holds if and only if:
+\textbf{Perfect transparency} requires $Z_t = Z_e$ for all environment types. Solving the hybrid matrix yields the necessary and sufficient conditions:
 \begin{equation}
     H_{11} = 0, \quad H_{22} = 0, \quad H_{12} = 1, \quad H_{21} = -1
 \end{equation}
-Physical meaning: In free-space ($f_s=0$), the console must perfectly cancel its own inertia ($H_{11}=0$); tissue forces must transfer 1:1 ($H_{12}=1$); the slave must track master movements infinitely well ($H_{21}=-1$); and if the master is locked, pushing the slave must yield no movement ($H_{22}=0$). 
+Physical interpretation: $H_{11} = 0$ means the master cancels its own inertia in free space; $H_{12} = 1$ means tissue forces transfer 1:1; $H_{21} = -1$ means the slave tracks master velocity perfectly; $H_{22} = 0$ means locking the master yields no slave motion.
+
+If $H_{C,11} \neq 0$, the operator feels master-side dynamics even with no slave contact (``distorted free-motion perception'').
 
 \section{Absolute Stability and Llewellyn's Criterion}
-Teleoperated systems with force feedback close an enormous cyber-physical loop, often plagued by \textbf{Time Delays}. In force-feedback systems, communication delays turn control laws into spurious energy generators, causing violent robotic oscillations. This breaks the principle of \textbf{Passivity}.
+Teleoperated systems with force feedback close a large cyber-physical loop plagued by \textbf{time delays}. Communication delays turn control laws into spurious energy generators, breaking \textbf{passivity} and causing violent oscillations.
 
-To guarantee clinical safety, the system must possess \textbf{Absolute Stability}: it must remain stable regardless of how tightly the surgeon grips the master or what passive tissue the slave hits. For Linear Time-Invariant (LTI) two-port networks, this is verified by \textbf{Llewellyn's Absolute Stability Criterion}.
-Alongside stable poles and individual port dissipativity ($\text{Re}[H_{11}]\ge 0, \text{Re}[H_{22}]\ge 0$), Llewellyn's primary constraint requires the Stability Index $\eta(\omega)$ to be $\ge 1$:
+\textbf{Absolute stability} requires stability regardless of the (passive) terminating impedances — i.e., no matter how the surgeon grips the master or what tissue the slave contacts. For LTI two-port networks, this is verified by \textbf{Llewellyn's criterion}:
+\begin{enumerate}
+    \item All poles of $H(s)$ in the open left half-plane.
+    \item $\text{Re}[H_{11}(j\omega)] \geq 0$ and $\text{Re}[H_{22}(j\omega)] \geq 0$ for all $\omega$.
+    \item The stability index:
+    \begin{equation}
+        \eta(\omega) = \frac{2\,\text{Re}[H_{11}]\,\text{Re}[H_{22}] - \text{Re}[H_{12}H_{21}]}{|H_{12}H_{21}|} \geq 1
+    \end{equation}
+\end{enumerate}
+
+\section{The Fundamental Trade-off: Transparency vs.\ Stability}
+Substituting the perfect transparency conditions ($H_{11}=0$, $H_{22}=0$, $H_{12}=1$, $H_{21}=-1$) into Llewellyn's index:
 \begin{equation}
-    \eta(\omega) = \frac{2 \text{Re}[H_{11}] \text{Re}[H_{22}] - \text{Re}[H_{12}H_{21}]}{|H_{12}H_{21}|} \ge 1
+    \eta(\omega) = \frac{2 \cdot 0 \cdot 0 - (-1)}{|1 \cdot (-1)|} = \frac{1}{1} = 1
 \end{equation}
+A perfectly transparent teleoperator sits at \textbf{marginal stability}. Any network latency or sensor noise causes $\eta < 1$ — violent instability. To achieve $\eta \gg 1$, engineers must:
+\begin{itemize}
+    \item Inject virtual damping into the master (increases $\text{Re}[H_{11}]$, destroys weightless feel).
+    \item Scale down or filter the force reflected to the surgeon (reduces $|H_{12}H_{21}|$, blurs tactile information).
+\end{itemize}
+\textbf{It is physically impossible to achieve maximum transparency and maximum stability simultaneously.}
 
-\section{The Inevitable Abyss: Transparency vs. Stability}
-By plugging the parameters of \textbf{Perfect Transparency} ($0, 0, 1, -1$) into Llewellyn's index, we obtain the most tragic and crucial result of the discipline:
-\begin{equation}
-    \eta(\omega) = \frac{0 - (-1)}{1} = 1
-\end{equation}
-A mathematically perfectly transparent surgical teleoperator **sits exactly on the brink of marginal stability**. 
-In a system where $\eta = 1$, introducing even a single millisecond of network latency or sensor noise causes the index to drop below 1, rendering the machine violently unstable.
+\section{Wave Variables for Delay-Robust Stability}
+To handle the extreme latencies of long-distance telesurgery, modern research uses \textbf{Wave Variables} (Scattering representation $S$). Instead of exchanging raw forces and velocities, the ports exchange linear combinations of effort and flow that emulate scattering waves. This representation is \textbf{essential for delay-robust stability}: it guarantees network passivity regardless of the communication delay, at the cost of slight position tracking degradation.
 
-This unveils the \textbf{Fundamental Trade-off}: \textit{it is physically impossible to achieve maximum tactile transparency and maximum stability simultaneously}. To secure stability ($\eta \gg 1$), engineers must intentionally degrade telepresence: they must inject heavy virtual damping into the joysticks (increasing $\text{Re}[H_{11}]$ and losing the weightless feel) and heavily scale down or filter the force sent back to the surgeon (reducing $|H_{12}H_{21}|$), blurring tactile information in the name of patient safety.
+\textbf{Shared control with physiological motion compensation:} Motion compensation for the beating heart via visual servoing was investigated but not clinically adopted due to the limited mechanical bandwidth of available robots (insufficient to track cardiac frequencies faithfully). Respiratory compensation is more tractable due to the slower frequency ($\sim$0.2\,Hz).
 
-To overcome extreme delays in long-distance telesurgery, modern research uses \textbf{Wave Variables}. Instead of exchanging forces and velocities, the ports exchange linear combinations of the two that emulate scattering waves. This mathematical encoding \textbf{guarantees network passivity regardless of the time delay}, stabilizing long-distance teleoperation at the cost of slight position tracking degradation.
+
+% =====================================================================
+% CHAPTER 8: EXAM PRACTICE — MULTIPLE-CHOICE QUESTIONS
+% =====================================================================
+\chapter{Exam Practice: Multiple-Choice Questions with Explanations}
+
+This chapter collects representative multiple-choice questions drawn from all lecture topics, ordered by chapter. For each question the correct answer and a concise justification are provided.
+
+% --------- Ch1 ---------
+\section{Chapter 1 — Introduction and Classification}
+
+\textbf{Q1.} Which of the following most accurately describes the kinematic effect of the RCM constraint in conventional laparoscopy?
+\begin{enumerate}[label=\Alph*.]
+    \item Removes 3 DOF and induces physiological tremor in the system.
+    \item \textbf{Reduces DOF from 6 to 4 at the tool tip and induces the fulcrum effect (kinematic inversion).}
+    \item Increases DOF to 7 via articulated EndoWrist-type instruments.
+    \item Blocks all translational motion, allowing only rotations about the trocar.
+\end{enumerate}
+\textit{Answer: B.} The trocar constrains the instrument to 4 DOF (2 rotations, 1 axial translation, 1 axial rotation) and mechanically inverts hand-tool motion (fulcrum effect). Option C describes the da Vinci's engineering solution to overcome this limitation.
+
+\bigskip
+\textbf{Q2.} Above what round-trip latency threshold is measurable degradation of surgeon performance documented in telesurgery?
+\begin{enumerate}[label=\Alph*.]
+    \item 50 ms \quad B. 100 ms \quad C. 150 ms \quad \textbf{D. 200--300 ms}
+\end{enumerate}
+\textit{Answer: D.} Operation Lindbergh was performed at $\approx$150 ms (option C) with success, but the documented performance degradation threshold is 200--300 ms. Sub-50 ms is the 5G research goal.
+
+\bigskip
+\textbf{Q3.} In the Troccaz classification, what distinguishes \textit{Synergistic} systems from \textit{Semi-active} ones?
+\begin{enumerate}[label=\Alph*.]
+    \item Synergistic systems use motors to replace all human motion.
+    \item Semi-active systems leave all constraints programmable and dynamic.
+    \item \textbf{In synergistic systems the constraints are programmable (e.g., via software virtual fixtures); in semi-active systems the constraint is mechanically fixed once the robot locks.}
+    \item Synergistic systems eliminate all haptic feedback to the surgeon.
+\end{enumerate}
+\textit{Answer: C.} PADyC and Acrobot/MAKO are synergistic; NeuroMate is semi-active (mechanical guide, motors lock).
+
+\bigskip
+\textbf{Q4.} In the Taylor (2003) CIS framework, which term best describes the da Vinci surgical system?
+\begin{enumerate}[label=\Alph*.]
+    \item Surgical CAD/CAM system. \quad B. Auxiliary Surgical Support.
+    \item \textbf{Surgical Extender.} \quad D. Autonomous task-level robot.
+\end{enumerate}
+\textit{Answer: C.} Surgical Extenders enhance the surgeon's physical abilities (tremor filtering, 3D magnification, motion scaling) without replacing decision-making. Auxiliary supports (e.g., AESOP) merely hold instruments.
+
+\bigskip
+\textbf{Q5.} Which principle makes locomotion via simple reciprocal motions impossible at micro/nanoscale?
+\begin{enumerate}[label=\Alph*.]
+    \item The rigidity-safety trade-off.
+    \item High inertia at low Reynolds numbers.
+    \item \textbf{Purcell's Scallop Theorem (1977): at low Reynolds numbers net displacement from a symmetric back-and-forth motion is zero.}
+    \item The fulcrum effect applied to microfluidic channels.
+\end{enumerate}
+\textit{Answer: C.}
+
+% --------- Ch2 ---------
+\section{Chapter 2 — Kinematic Design and the RCM Constraint}
+
+\textbf{Q6.} A laparoscopic robot must deliver 4 DOF at the tool tip inside the abdomen. Applying Grübler's formula, how many external arm DOF are required?
+\begin{enumerate}[label=\Alph*.]
+    \item 4 \quad B. 5 \quad \textbf{C. 6} \quad D. 7
+\end{enumerate}
+\textit{Answer: C.} Using $x = m + 2$: $x = 4 + 2 = 6$.
+
+\bigskip
+\textbf{Q7.} What is the geometric meaning of $\lambda = 0$ in the software RCM constraint $p_{RCM} = p_i + \lambda(p_{i+1} - p_i)$?
+\begin{enumerate}[label=\Alph*.]
+    \item The end-effector coincides with the trocar entry point.
+    \item \textbf{Joint $i$ coincides with the RCM — a degenerate configuration prevented by a virtual joint limit.}
+    \item The instrument has been fully withdrawn from the patient.
+    \item The robot is in its parking configuration.
+\end{enumerate}
+\textit{Answer: B.}
+
+\bigskip
+\textbf{Q8.} What is the primary \textit{safety} advantage of the SCARA architecture over anthropomorphic arms in surgery?
+\begin{enumerate}[label=\Alph*.]
+    \item SCARA arms have no wrist singularities.
+    \item \textbf{Intrinsic gravitational safety: if power fails the arm cannot fall onto the patient, as gravity acts along the prismatic vertical axis.}
+    \item SCARA arms have smaller workspace, limiting potential harm.
+    \item SCARA arms are always MRI-compatible.
+\end{enumerate}
+\textit{Answer: B.}
+
+\bigskip
+\textbf{Q9.} What approach does the Zeus system use to satisfy the RCM constraint?
+\begin{enumerate}[label=\Alph*.]
+    \item Mechanical parallelogram linkage.
+    \item \textbf{Passive joints: PRRRR architecture with an unactuated universal joint at the trocar.}
+    \item Software null-space control.
+    \item 6-DOF wrist force/torque sensor.
+\end{enumerate}
+\textit{Answer: B.}
+
+\bigskip
+\textbf{Q10.} Wrist singularities in a standard spherical wrist differ from arm singularities in that:
+\begin{enumerate}[label=\Alph*.]
+    \item They only occur in SCARA architectures.
+    \item They occur at the workspace boundary and can be avoided by patient positioning.
+    \item \textbf{They can occur anywhere within the reachable workspace and cannot be resolved by repositioning the patient.}
+    \item They have no clinical consequence as long as the arm DOF exceeds 5.
+\end{enumerate}
+\textit{Answer: C.}
+
+% --------- Ch3 ---------
+\section{Chapter 3 — Parallel Architectures and Special Applications}
+
+\textbf{Q11.} In a parallel manipulator, what characterises a Type 2 (parallel) singularity?
+\begin{enumerate}[label=\Alph*.]
+    \item $\mathbf{V}$ loses rank; no end-effector motion is possible.
+    \item \textbf{$\mathbf{U}$ loses rank; the end-effector can move even with all actuators physically locked.}
+    \item Both $\mathbf{U}$ and $\mathbf{V}$ lose rank simultaneously.
+    \item The workspace boundary is reached.
+\end{enumerate}
+\textit{Answer: B.} Type 2 singularities are the most dangerous precisely because they occur inside the workspace and cannot be avoided by workspace limitation.
+
+\bigskip
+\textbf{Q12.} Why does the Cardiolock exploit proximity to a Type 2 singularity?
+\begin{enumerate}[label=\Alph*.]
+    \item To increase structural stiffness near the heart.
+    \item To avoid the need for a trocar in cardiac surgery.
+    \item \textbf{Near a Type 2 singularity the end-effector-to-actuator velocity ratio diverges, amplifying a 100--200\,$\mu$m piezo stroke into the mm-scale displacements needed to cancel cardiac motion.}
+    \item To reduce the number of actuators required.
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q13.} The da Vinci RCM mechanism collapses (loses its RCM constraint) when which condition is met in the four-bar linkage model?
+\begin{enumerate}[label=\Alph*.]
+    \item $s_2 = 0$ \quad B. $s_1 = s_3$ \quad \textbf{C. $s_3 = 0$ (i.e., $\vartheta_3 = \pm\pi$)} \quad D. $s_2/s_3 \to \infty$
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q14.} Why was the Cardiolock not adopted clinically despite successful animal trials?
+\begin{enumerate}[label=\Alph*.]
+    \item Its PRBM joints released titanium particles into the bloodstream.
+    \item \textbf{Safety concerns (rapid uncontrolled motion near the heart), mechanical bulk/complexity, and an unfavourable cost-benefit ratio relative to high-quality passive stabilisers.}
+    \item It could not compensate respiratory motion.
+    \item Regulatory bodies banned active cardiac stabilisers in 2003.
+\end{enumerate}
+\textit{Answer: B.} Option A is a fabricated distractor not present in the course material.
+
+\bigskip
+\textbf{Q15.} The two design requirements optimised in the Pentagon mechanism via Jacobian eigenvalue analysis are:
+\begin{enumerate}[label=\Alph*.]
+    \item Stiffness maximisation and backlash elimination.
+    \item \textbf{Sufficient amplification (eigenvalue magnitude) and isotropy (minimised condition number).}
+    \item Minimal footprint and maximum workspace volume.
+    \item Respiratory frequency rejection and cardiac frequency tracking.
+\end{enumerate}
+\textit{Answer: B.}
+
+% --------- Ch4 ---------
+\section{Chapter 4 — Interaction Control}
+
+\textbf{Q16.} What practical advantage does choosing $m_d = m$ in impedance control provide?
+\begin{enumerate}[label=\Alph*.]
+    \item The robot becomes non-backdrivable, increasing stability.
+    \item The controller simplifies to a pure PID.
+    \item \textbf{The $F_{ext}$ term in the control law vanishes, eliminating the need for a force/torque sensor.}
+    \item The apparent inertia is reduced to zero.
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q17.} Why do cooperative (hands-on) systems use non-backdrivable actuators?
+\begin{enumerate}[label=\Alph*.]
+    \item To allow position scaling between surgeon and tool.
+    \item \textbf{Being non-backdrivable, the robot resists all external forces unless explicitly commanded via the admittance law, preventing unintended environment-driven motion.}
+    \item To eliminate the inner position control loop.
+    \item To ensure compatibility with MRI-guided procedures.
+\end{enumerate}
+\textit{Answer: B.}
+
+\bigskip
+\textbf{Q18.} What fundamental limitation applies to cooperative (hands-on) systems but not to teleoperated systems?
+\begin{enumerate}[label=\Alph*.]
+    \item Force scaling is impossible.
+    \item Tremor filtering cannot be implemented.
+    \item \textbf{Position (motion) scaling is intrinsically impossible: the surgeon's hand and the instrument tip are mechanically coupled and move the same physical distance.}
+    \item Virtual fixtures cannot be enforced.
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q19.} The Acrobot dual-loop architecture distributes tasks as follows:
+\begin{enumerate}[label=\Alph*.]
+    \item Outer loop at 550 Hz for joint control; inner loop at 100 Hz for Cartesian admittance.
+    \item \textbf{Inner loop at 550 Hz / 2 ms for joint position/velocity stability; outer loop at 100 Hz / 10--15 ms for Cartesian admittance evaluation and constraint checking.}
+    \item Both loops run at 550 Hz for isochronous computation.
+    \item The inner loop reads the force sensor; the outer loop controls joint velocity.
+\end{enumerate}
+\textit{Answer: B.}
+
+\bigskip
+\textbf{Q20.} Admittance control is preferred over impedance control for retrofitted industrial robots because:
+\begin{enumerate}[label=\Alph*.]
+    \item Industrial robots have very low inertia and are naturally backdrivable.
+    \item \textbf{Industrial robots are non-backdrivable (harmonic drives) and expose only position interfaces; admittance control simulates compliance by continuously updating position targets via an external force sensor.}
+    \item Impedance control requires a wireless network.
+    \item Industrial robots cannot measure velocity.
+\end{enumerate}
+\textit{Answer: B.}
+
+% --------- Ch5 ---------
+\section{Chapter 5 — Virtual Fixtures}
+
+\textbf{Q21.} In an admittance-based GVF, what is the mathematical mechanism that generates directional guidance?
+\begin{enumerate}[label=\Alph*.]
+    \item Setting all off-diagonal gains of $Y(s)$ to zero.
+    \item Placing the forbidden region on the master side only.
+    \item \textbf{Anisotropy of $Y(s)$ or $Z(s)$: different gains in different Cartesian directions channel motion along the preferred subspace.}
+    \item Inverting the damping matrix $K_D$.
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q22.} Impedance-type VF implementation is infeasible on many industrial robots because:
+\begin{enumerate}[label=\Alph*.]
+    \item It always requires a force sensor, which industrial robots lack.
+    \item \textbf{It requires torque-control interfaces at the joints; many industrial robots expose only position-control interfaces.}
+    \item It cannot be used with the Acrobot three-region spatial logic.
+    \item It requires DOF $> 6$.
+\end{enumerate}
+\textit{Answer: B.} Note: when $m_d = m$, no force sensor is needed — distractor A is incorrect.
+
+\bigskip
+\textbf{Q23.} Why is the freehand approach unsafe for retinal vein cannulation?
+\begin{enumerate}[label=\Alph*.]
+    \item The RCM constraint prevents axial insertion of the needle.
+    \item Intraocular pressure exceeds needle penetration force.
+    \item \textbf{The target vessel diameter ($\sim$100\,$\mu$m) is smaller than the RMS physiological hand tremor ($\sim$182\,$\mu$m), making accurate positioning physically impossible.}
+    \item ECC obscures haptic feedback.
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q24.} Which guidance level has empirically proven optimal in uncertain microsurgical environments?
+\begin{enumerate}[label=\Alph*.]
+    \item Hard guidance — minimises tremor effects.
+    \item \textbf{Medium (soft) guidance — balances precision with the flexibility to correct imperfect pre-operative plans.}
+    \item Zero guidance (free motion).
+    \item Master-side FRVF only.
+\end{enumerate}
+\textit{Answer: B.}
+
+\bigskip
+\textbf{Q25.} Placing an FRVF exclusively on the master side in teleoperation:
+\begin{enumerate}[label=\Alph*.]
+    \item Physically prevents the slave from crossing the boundary.
+    \item Provides no feedback to the operator.
+    \item \textbf{Provides haptic feedback to the operator but does not physically prevent the slave from crossing the boundary if the operator continues to push.}
+    \item Guarantees absolute safety without any slave-side logic.
+\end{enumerate}
+\textit{Answer: C.}
+
+% --------- Ch6 ---------
+\section{Chapter 6 — Robotic Registration}
+
+\textbf{Q26.} What distinguishes \textit{Registration} from \textit{Calibration} in a surgical robotic system?
+\begin{enumerate}[label=\Alph*.]
+    \item Calibration is performed in real time; registration is done pre-operatively in the factory.
+    \item Registration fuses CT and MRI modalities; calibration inserts fiducial markers.
+    \item \textbf{Calibration determines the fixed, long-term transformation between co-located OR devices (e.g., robot base to optical localiser); registration aligns the pre-operative digital plan to the intraoperative physical space.}
+    \item Registration applies only to magnetic tracking systems.
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q27.} The minimum geometric requirement for a unique 6-DOF rigid transformation via point-to-point registration is:
+\begin{enumerate}[label=\Alph*.]
+    \item 2 coplanar pairs. \quad B. 3 collinear pairs. \quad \textbf{C. 3 non-collinear pairs.} \quad D. 4 arbitrary pairs.
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q28.} Why is the pseudo-inverse solution used only as an initial guess and not as the final registration output?
+\begin{enumerate}[label=\Alph*.]
+    \item It cannot handle more than 4 correspondences.
+    \item \textbf{Due to measurement noise, the pseudo-inverse does not guarantee $R \in SO(3)$ — it may produce matrices that shear or scale space, violating rigid-body constraints.}
+    \item It requires the inverse of a 6th-degree polynomial.
+    \item It is only valid for surface-based registration.
+\end{enumerate}
+\textit{Answer: B.}
+
+\bigskip
+\textbf{Q29.} Why is the ICP initialisation step (palpating anatomical landmarks) clinically essential?
+\begin{enumerate}[label=\Alph*.]
+    \item ICP cannot process more than 4 surface points without landmarks.
+    \item \textbf{ICP converges only to a local minimum; poor initialisation causes it to converge to an incorrect alignment (e.g., front of bone matched to back of CT model). The 4 landmarks bring the algorithm close to the correct global minimum.}
+    \item Without landmarks the SVD decomposition becomes singular.
+    \item Landmarks compensate for respiratory motion during the sweep.
+\end{enumerate}
+\textit{Answer: B.}
+
+\bigskip
+\textbf{Q30.} The main clinical drawback of ROBODOC's original registration approach was:
+\begin{enumerate}[label=\Alph*.]
+    \item Its accuracy exceeded 1 mm.
+    \item It required intraoperative ultrasound guidance.
+    \item \textbf{It required implanting titanium fiducial pins via a separate surgical procedure under anaesthesia days before the main operation — an unacceptable workflow burden.}
+    \item It could only register the femur, not the acetabulum.
+\end{enumerate}
+\textit{Answer: C.}
+
+% --------- Ch7 ---------
+\section{Chapter 7 — Bilateral Teleoperation}
+
+\textbf{Q31.} With $\lambda_v = \lambda_f = 0.2$, what is the transmitted impedance $Z_m$ perceived at the master?
+\begin{enumerate}[label=\Alph*.]
+    \item $Z_m = Z_s$ \quad B. $Z_m = 0.2\,Z_s$ \quad \textbf{C. $Z_m = 0.04\,Z_s$} \quad D. $Z_m = 5\,Z_s$
+\end{enumerate}
+\textit{Answer: C.} $Z_m = \lambda_v \cdot \lambda_f \cdot Z_s = 0.2 \times 0.2 \times Z_s = 0.04\,Z_s$.
+
+\bigskip
+\textbf{Q32.} Why is the multiplicative rotation offset $R_{offset} = R_m^{-1}|_0 \cdot R_s|_0$ preferred over an additive Euler-angle difference for orientation coupling?
+\begin{enumerate}[label=\Alph*.]
+    \item It reduces communication bandwidth.
+    \item It automatically filters physiological tremor.
+    \item \textbf{It avoids the singularities and mathematical ambiguities inherent in Euler-angle or quaternion differences.}
+    \item It forces the slave into supervisory control mode.
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q33.} The necessary and sufficient conditions for perfect transparency ($Z_t = Z_e$) in the hybrid matrix are:
+\begin{enumerate}[label=\Alph*.]
+    \item $H_{11}=1$, $H_{22}=1$, $H_{12}=0$, $H_{21}=0$.
+    \item $H_{11}=0$, $H_{22}=0$, $H_{12}=-1$, $H_{21}=1$.
+    \item \textbf{$H_{11}=0$, $H_{22}=0$, $H_{12}=1$, $H_{21}=-1$.}
+    \item All diagonal entries maximised, off-diagonal entries minimised.
+\end{enumerate}
+\textit{Answer: C.}
+
+\bigskip
+\textbf{Q34.} Substituting perfect transparency conditions into Llewellyn's stability index $\eta(\omega)$ yields:
+\begin{enumerate}[label=\Alph*.]
+    \item $\eta = 0$ (always unstable). \quad B. $\eta = \infty$ (always stable). \quad \textbf{C. $\eta = 1$ (marginal stability).} \quad D. $\eta$ is undefined.
+\end{enumerate}
+\textit{Answer: C.} $\eta = \frac{2 \cdot 0 \cdot 0 - \text{Re}[1\cdot(-1)]}{|1\cdot(-1)|} = \frac{1}{1} = 1$.
+
+\bigskip
+\textbf{Q35.} Which representation of the two-port immittance matrix is essential for delay-robust stability in long-distance telesurgery?
+\begin{enumerate}[label=\Alph*.]
+    \item Impedance ($Z$). \quad B. Admittance ($Y$). \quad \textbf{C. Scattering ($S$).} \quad D. Hybrid ($H_C$).
+\end{enumerate}
+\textit{Answer: C.} The scattering representation encodes wave variables and guarantees network passivity regardless of communication delay.
 
 \end{document}
