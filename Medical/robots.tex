@@ -1,0 +1,268 @@
+\documentclass[11pt,a4paper,twoside]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+\geometry{a4paper, top=2.8cm, bottom=2.8cm, left=2.5cm, right=2.5cm}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!70!black,urlcolor=cyan,
+    pdftitle={Medical Robotics - Robot Reference Guide}}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[activate=false]{microtype}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\setlength{\headheight}{14.5pt}
+\titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{15pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+\titleformat{\section}{\normalfont\Large\bfseries}{}{0em}{}[\titlerule]
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[LE,RO]{\thepage}\fancyhead[LO,RE]{\leftmark}
+\renewcommand{\headrulewidth}{0.4pt}
+\setstretch{1.15}
+\setlist[itemize]{noitemsep,topsep=3pt}
+
+\newcommand{\robotmeta}[4]{%
+  \noindent\begin{tabular}{@{}ll@{}}
+    \textbf{Origin / Manufacturer:} & #1 \\
+    \textbf{Year:}                  & #2 \\
+    \textbf{Domain:}                & #3 \\
+    \textbf{Troccaz / LoA:}         & #4 \\
+  \end{tabular}\par\smallskip\noindent}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering\vspace*{2cm}
+  {\fontsize{34}{40}\selectfont\bfseries Surgical Robots\par}\vspace{1cm}
+  {\Large\itshape A Concise Reference for Exam Preparation\par}\vspace{1cm}
+  {\large Based on the course held by Professor Vendittelli\par}
+  {\large Sapienza University of Rome\par}\vfill
+\end{titlepage}
+
+\tableofcontents\newpage
+
+% =====================================================================
+\chapter{Historical and Pioneering Systems}
+% =====================================================================
+
+\section{PUMA 560}
+\robotmeta{Unimation / Stäubli}{1985}{Neurosurgery}{Active — LoA 2}
+The PUMA 560 is a standard 6-DOF anthropomorphic industrial arm notable for being the \textbf{first robot used in a surgical procedure}: a CT-guided stereotactic brain biopsy in 1985. It was an experimental repurposing of an industrial platform; no dedicated surgical safety features were present. Its significance is entirely historical: it proved the feasibility of robot-assisted intervention.
+
+\section{ROBODOC / TSolution One}
+\robotmeta{ISS / Think Surgical (now Curexo)}{1992 (first clinical)}{Orthopaedics — Total Hip/Knee Replacement}{Active — LoA 2 (Task-level autonomy)}
+ROBODOC was the \textbf{first robot designed specifically for autonomous surgical bone milling}. Kinematic architecture: \textbf{SCARA} arm with 2-DOF wrist and \textbf{6-DOF force/torque sensor} at the end-effector. Bone-milling accuracy: $<$\,1\,mm. Pre-operative planning via the companion \textbf{Orthodoc} software on CT data.
+
+Registration used \textbf{point-to-point (Procrustes)} on titanium fiducial pins implanted in the femur via a \textbf{separate minor surgical procedure under anaesthesia}, days before the main operation. This invasiveness was the primary \textbf{workflow burden} limiting clinical adoption. The system evolved into the \textbf{TSolution One}.
+
+\section{CASPAR}
+\robotmeta{URS Ortho, Germany}{Late 1990s}{Orthopaedics}{Active — LoA 2}
+Functionally analogous to ROBODOC but using an \textbf{anthropomorphic} rather than SCARA arm. Its engineering contribution over ROBODOC is a \textbf{second fiducial set $S'$} tracked continuously intraoperatively, compensating for patient movement during milling — a problem ROBODOC could not handle without full patient immobilisation.
+
+% =====================================================================
+\chapter{MIS and Teleoperated Systems}
+% =====================================================================
+
+\section{ZEUS}
+\robotmeta{Computer Motion (acquired by Intuitive Surgical, 2003)}{Late 1990s}{MIS / Telesurgery}{Teleoperated — LoA 1}
+ZEUS was the direct competitor of the da Vinci and the system used in \textbf{Operation Lindbergh} (2001): the first transatlantic telesurgery, a laparoscopic cholecystectomy performed from New York on a patient in Strasbourg. Duration: \textbf{54 minutes}; round-trip ATM fibre-optic latency: $\approx$\,\textbf{150\,ms}. Note: the documented surgeon performance degradation threshold is \textbf{200--300\,ms}; Lindbergh succeeded because latency was below this threshold.
+
+Kinematic architecture: \textbf{PRRRR} — three actuated joints plus a \textbf{passive universal joint} at the trocar, satisfying the RCM via \textbf{passive joints}. Intrinsically safe but imprecise. Discontinued after Computer Motion's acquisition by Intuitive Surgical in 2003.
+
+\section{da Vinci (Intuitive Surgical)}
+\robotmeta{Intuitive Surgical}{1999 (FDA clearance)}{MIS — General, Urological, Gynaecological Surgery}{Teleoperated — LoA 1}
+The da Vinci is the dominant teleoperated surgical platform. It addresses every kinematic and ergonomic limitation of manual laparoscopy:
+\begin{itemize}
+  \item \textbf{7 DOF at the tool tip} via articulated \textbf{EndoWrist} instruments (trocar provides 4 DOF; the articulated wrist adds 3).
+  \item \textbf{10$\times$ HD 3D stereoscopic vision}: restores depth perception lost in laparoscopy.
+  \item \textbf{Motion scaling 3:1 or 5:1}: the slave moves 3--5$\times$ less than the master, filtering physiological tremor ($\sim$50--200\,$\mu$m) and amplifying fine motor precision.
+  \item \textbf{Mechanical RCM} via an articulated parallelogram linkage, modelled as a planar \textbf{RRRR four-bar}:
+  \[ \dot{\vartheta}_c = \frac{s_2}{s_3}\,\dot{\vartheta}_1 \]
+  Collapse (Type 2 singularity, loss of RCM) occurs at $s_3 = 0$ ($\vartheta_3 = \pm\pi$) — strictly forbidden.
+  \item Patient cart: 3--4 robotic arms; surgeon operates from an ergonomic seated console.
+\end{itemize}
+\textbf{Market data (2024):} $>$10,000 units worldwide; one procedure every 11.75\,s; unit cost \$1.0M--\$2.3M. The da Vinci is described as \textit{"laparoscopy with superpowers"}: it retains the 5--12\,mm port access of laparoscopy while restoring the dexterity and vision of open surgery.
+
+\section{AESOP}
+\robotmeta{Computer Motion}{Early 1990s}{MIS — Endoscope Holder}{Active / Auxiliary Surgical Support — LoA 2}
+AESOP (Automated Endoscopic System for Optimal Positioning) is a \textbf{7-DOF, voice-controlled} robotic arm that holds and positions the laparoscopic camera, eliminating the need for a human camera assistant and the associated fatigue-induced instability. In Taylor's CIS framework it is an \textbf{Auxiliary Surgical Support}: it works alongside the surgeon to hold an instrument rather than extending dexterity. Discontinued after acquisition by Intuitive Surgical.
+
+% =====================================================================
+\chapter{Orthopaedic Systems}
+% =====================================================================
+
+\section{MAKO (Stryker)}
+\robotmeta{Stryker — evolved from Acrobot, Imperial College London}{2006/2008}{Orthopaedics — Knee and Hip Arthroplasty}{Synergistic — LoA 1}
+MAKO is the commercial evolution of the \textbf{Acrobot} (Active Constraint Robot). It enforces \textbf{Forbidden-Region Virtual Fixtures} via \textbf{impedance control} in a three-region spatial logic:
+\begin{itemize}
+  \item \textbf{Region I} ($d > 2$\,mm): free motion; low impedance.
+  \item \textbf{Region II} ($0 < d \leq 2$\,mm): stiffness increases progressively. A step function would cause overshoot instability.
+  \item \textbf{Region III} ($d \leq 0$): maximum PD gains; robot actively pushes back.
+\end{itemize}
+\textbf{Dual-loop control:} inner joint loop at \textbf{550\,Hz / 2\,ms}; outer Cartesian admittance loop at \textbf{100\,Hz / 10--15\,ms}. End-effector range: $\pm 30°$ yaw/pitch, 30--50\,cm extension. \textbf{Clinical outcomes (2003 Acrobot trial):} accuracy 2--3$\times$ better, reproducibility 3$\times$ better than manual surgery; patient satisfaction 92\% at two years.
+
+\section{Mazor Renaissance / MARS}
+\robotmeta{Mazor Surgical Technologies (now Medtronic)}{2004}{Orthopaedics — Spinal Surgery}{Synergistic / Bone-mounted — LoA 1--2}
+Mazor/MARS is a \textbf{bone-mounted (patient-mounted)} mini-robot anchored rigidly to the vertebra. Kinematic structure: \textbf{6-DOF parallel mechanism} (Stewart--Gough platform variant). Specifications: $50\times50\times80$\,mm$^3$; 250\,g; workspace $20\times20\times20$\,mm$^3$; drill guide accuracy $<$\,0.1\,mm.
+
+Since the robot's reference frame is fixed to the bone, \textbf{all global patient movements (breathing, table repositioning) are automatically compensated} — the primary advantage over floor-mounted systems, which require continuous real-time tracking. Clinical context: pedicle screw corridors are \textbf{5--7\,mm} (lumbar; less thoracic); historical malpositioning rate \textbf{10--40\%}.
+
+% =====================================================================
+\chapter{Neurosurgical Systems}
+% =====================================================================
+
+\section{NeuroMate}
+\robotmeta{Renishaw Mayfield, UK}{1990s}{Neurosurgery — Stereotactic Guidance}{Semi-active — LoA 1--2}
+NeuroMate is a \textbf{5-DOF} arm for stereotactic neurosurgical procedures (DBS electrode implantation, biopsy). It is the canonical \textbf{semi-active} example in Troccaz: the robot positions a mechanical guide tube based on pre-operative imaging, then \textbf{locks its motors}. The constraint is \textbf{mechanically fixed} once locked; the surgeon manually inserts the tool through the stationary guide.
+
+\section{CyberKnife}
+\robotmeta{Accuray}{1999}{Radiosurgery}{Active — LoA 2--3}
+CyberKnife combines a \textbf{KUKA 6-DOF anthropomorphic arm} with a \textbf{6\,MeV linear accelerator (LINAC)} for \textbf{frameless, image-guided stereotactic radiosurgery}. Targeting accuracy: \textbf{sub-millimetre}. An anthropomorphic arm is required (not SCARA) because non-isocentric delivery demands radiation beam approaches from arbitrary 3D angles.
+
+With the \textbf{Synchrony} respiratory motion tracking system, the arm continuously follows internal tumour position correlated with external breathing markers in real time — elevating effective autonomy to \textbf{LoA 2--3}. This is one of the highest-autonomy systems in clinical use.
+
+% =====================================================================
+\chapter{Synergistic and Passive Navigation Systems}
+% =====================================================================
+
+\section{PADyC}
+\robotmeta{TIMC Laboratory, Grenoble}{1990s}{Orthopaedics / MIS}{Synergistic (passive hardware) — LoA 1}
+PADyC (Passive Arm with Dynamic Constraints) implements virtual fixtures entirely in hardware via opposing \textbf{freewheels} on each joint. By controlling freewheel motor speeds, the system defines a window of admissible joint velocities $[\omega_i^-, \omega_i^+]$. The system is \textbf{intrinsically safe}: it cannot generate active forces on the patient. Safety constraints are expressed as:
+\[ WAC(t) = \bigcap_{j=1}^{k} WAC_j(t) \]
+Five operative modes: free, position, region (keep-inside/keep-outside), trajectory, specialised (linear/planar/conical). Main limitation: high computational cost of mapping Cartesian constraints into joint-space WAC; ill-conditioned near singularities.
+
+\section{Viewing Wand (ISG Technologies)}
+\robotmeta{ISG Technologies}{Early 1990s}{Neurosurgery / Orthopaedics}{Passive — LoA 0}
+An \textbf{articulated passive arm} with joint encoders. The surgeon moves it manually; the system reads joint angles and displays the tip position overlaid on pre-operative CT/MRI. Canonical \textbf{passive system} (Troccaz) and \textbf{mechanical localiser} (Joskowicz). Advantage over optical trackers: no line-of-sight requirement. Largely superseded by optical tracking today.
+
+% =====================================================================
+\chapter{Surface Tracking, Radiology and Ultrasound}
+% =====================================================================
+
+\section{SCALPP}
+\robotmeta{European research project}{2000s}{Dermatology — Autonomous Skin Harvesting}{Active — LoA 2}
+A \textbf{6-DOF SCARA} robot for autonomous skin graft harvesting. Notable for illustrating two design constraints: (1) the \textbf{asepsis rule} — non-medical electronics must remain $\geq$\,\textbf{400\,mm} from the operating table; (2) an \textbf{asymmetric wrist} design, motivated by the fact that standard spherical wrist singularities can appear anywhere within the reachable workspace.
+
+\section{OTELO / MELODY}
+\robotmeta{French research consortium}{2000s}{Tele-echography}{Teleoperated — LoA 1}
+An ultra-lightweight robot (\textbf{PPRRRP}, 6 DOF) for \textbf{remote ultrasound examination}. Its probe-handling end-effector implements an \textbf{RCM constraint} to safely maintain skin contact, demonstrating that RCM appears in any task requiring pivoting about a fixed body contact point — not only in laparoscopic MIS.
+
+\section{INNOMOTION}
+\robotmeta{Innomedic, Germany}{2000s}{Interventional Radiology — Needle Positioning}{Active / Semi-active — LoA 2}
+A \textbf{5-DOF} \textbf{MR-compatible} system for CT/MRI-guided needle positioning inside the scanner bore (gantry diameter 60--70\,cm). MR compatibility mandates non-ferromagnetic materials and pneumatic or piezoelectric actuation, severely constraining design choices.
+
+\section{XACT Robotics}
+\robotmeta{XACT Robotics, Israel}{2010s}{Interventional Radiology — CT-guided Procedures}{Active — LoA 2}
+A \textbf{parallel robot} for CT-guided needle-based procedures (biopsy, ablation, drainage). The robot autonomously positions the needle guide to the pre-planned trajectory from the CT scan, operating fully inside the gantry without intraoperative surgeon guidance of insertion angle.
+
+% =====================================================================
+\chapter{Cardiac and Microscopy Systems}
+% =====================================================================
+
+\section{Cardiolock}
+\robotmeta{TIMC Laboratory, Grenoble — research prototype}{2000s}{Cardiac Surgery — Active Motion Compensation}{Cooperative — LoA 1}
+Cardiolock is an \textbf{active cardiac stabiliser} for beating-heart coronary surgery — avoiding extracorporeal circulation (ECC: a pump oxygenating blood while the heart is stopped). Passive stabilisers (Medtronic Octopus, Esculap FlexHeart) leave residual motion of several mm; anastomosis requires $\sim$\textbf{0.1\,mm} precision.
+
+\textbf{Architecture:} positioning arm + rigid shaft ($L = 250$\,mm, trocar-inserted) + stabilising fingers + high-speed camera + \textbf{active 2-DOF spherical base} (each DOF is a planar \textbf{3-PRR} parallel mechanism).
+
+\textbf{Actuation:} piezoelectric stack actuators; bandwidth hundreds\,Hz to kHz; stroke \textbf{100--200\,$\mu$m}; zero backlash; sub-ms response. Classical motors excluded due to gear backlash and insufficient bandwidth for cardiac frequencies ($\sim$1\,Hz with harmonics to 10\,Hz).
+
+\textbf{Stroke amplification via Type 2 singularity:} the 3-PRR operates near a parallel singularity where end-effector/actuator velocity ratio diverges:
+\[ \dot{\theta} = \frac{1}{\|EB_2\|\sin\varepsilon}\,\dot{q}_2 \quad (\varepsilon \to 0 \Rightarrow \text{amplification} \to \infty) \]
+Tip kinematics:
+\[ \begin{pmatrix}\dot{x}\\\dot{y}\end{pmatrix} = \begin{pmatrix}L\sin\alpha_1 & 0\\ 0 & L\sin\alpha_2\end{pmatrix}\begin{pmatrix}\dot{\theta}_1\\\dot{\theta}_2\end{pmatrix} \]
+Increasing angles $\alpha$ raises range but increases inertia, degrading dynamic performance (\textbf{range/bandwidth trade-off}).
+
+\textbf{Why not adopted:} (1) Safety — uncontrolled motion near the heart upon controller failure; (2) Mechanical bulk; (3) Marginal clinical gain over high-quality passive stabilisers. Later versions replaced rigid joints with compliant mechanisms, analysed via the \textbf{Pseudo-Rigid Body Model (PRBM)}.
+
+\section{Pentagon Mechanism}
+\robotmeta{TIMC Laboratory, Grenoble — research prototype}{2000s}{In-vivo Microscopy — Physiological Motion Compensation}{Cooperative — LoA 1}
+A \textbf{5-bar closed-loop planar parallel mechanism} driven by two \textbf{Physik Instrumente P239.90} piezoelectric actuators (stroke 180\,$\mu$m). Compensates two physiological components:
+\begin{itemize}
+  \item \textbf{Cardiac:} 20--40\,$\mu$m at $\sim$10\,Hz.
+  \item \textbf{Respiratory:} 1000--1200\,$\mu$m at $\sim$0.2\,Hz.
+\end{itemize}
+Jacobian computed via the \textbf{Virtual Tree Method} (cut one link; impose zero velocity at cut point). Two co-optimised design objectives via Jacobian eigenvalue analysis: (1) \textbf{Sufficient amplification} — achieved 563\,$\mu$m (actuator 1) and 464\,$\mu$m (actuator 2) from 180\,$\mu$m stroke; (2) \textbf{Isotropy} — condition number minimised for uniform amplification in all directions.
+
+% =====================================================================
+\chapter{Ophthalmic Robotic Systems}
+% =====================================================================
+
+\section{Steady-Hand Robot (SHR)}
+\robotmeta{Johns Hopkins University (JHU)}{2000s}{Ophthalmic Surgery — Retinal Microsurgery}{Cooperative — LoA 1}
+Clinical motivation: retinal vein diameter $\sim$\textbf{100\,$\mu$m}; surgeon RMS tremor \textbf{182\,$\mu$m} — freehand cannulation is physically infeasible. SHR operates in \textbf{cooperative admittance} mode: $v = G\,f$, $G \in \mathbb{R}^{6\times6}$. The RCM is enforced \textbf{entirely in software} as an optimisation constraint at each control step — not via a mechanical linkage, making the system compact but software-dependent. Required DOF for retinal surgery: 4 (3 orientation rotations + 1 axial translation).
+
+\section{Micron (Carnegie Mellon University)}
+\robotmeta{Carnegie Mellon University (CMU)}{2000s}{Ophthalmic Surgery — Tremor Cancellation}{Cooperative / Handheld — LoA 1}
+Micron is a \textbf{fully handheld active micromanipulator}: unlike every other system in this guide, it shares \textbf{no mechanical support with a robotic arm}. The surgeon holds it directly. Embedded \textbf{piezoelectric actuators} sense and cancel tremor locally in real time, exploiting their kHz bandwidth to track physiological tremor frequencies.
+
+\section{Leuven Robot}
+\robotmeta{University Hospitals Leuven, Belgium}{2000s}{Ophthalmic Surgery — Retinal Microsurgery}{Cooperative — LoA 1}
+Enforces RCM via a \textbf{mechanical parallel linkage} — hardware-guaranteed safety, in contrast to SHR's software approach. Operates in cooperative mode for retinal procedures.
+
+\section{TU Munich Ophthalmic Robot}
+\robotmeta{Technical University of Munich}{2000s}{Ophthalmic Surgery}{Cooperative — LoA 1}
+\textbf{Hybrid parallel-serial architecture}: the parallel sub-structure provides high stiffness and spatial positioning accuracy; the serial wrist provides the orientation dexterity required for intraocular manipulation. Illustrates why hybrid architectures exist: no single topology satisfies all requirements simultaneously.
+
+% =====================================================================
+\chapter{Radiotherapy and Application-Specific Systems}
+% =====================================================================
+
+\section{ROBHOT / Alba ON4000}
+\robotmeta{Sapienza University of Rome / Medlogix s.r.l.}{2010s}{Oncological Hyperthermia}{Cooperative — LoA 1}
+ROBHOT positions an electromagnetic antenna on the body surface to deliver \textbf{oncological hyperthermia}: raising tumour temperature to \textbf{40--45°C} ($+$4--8°C above baseline). Biological premise: tumour cells are more thermosensitive than healthy tissue; heat inhibits DNA repair mechanisms, enhancing radio/chemotherapy. Uses two control laws simultaneously: \textbf{impedance control} for autonomous antenna path tracking; \textbf{admittance control} for manual operator repositioning.
+
+Registration chain:
+\[ {}^Ap_T = {}^AT_{A_m}\;{}^{A_m}T_V\;{}^VT_{CT}\;{}^{CT}p_T \]
+where ${}^VT_{CT}$ is the ICP Gauss-Newton registration output (constant); ${}^{A_m}T_V$ is measured live by the \textbf{NDI Polaris Vega} optical camera; ${}^AT_{A_m}$ is fixed calibration. Validation RMS error: $<$1\,cm.
+
+\section{Surgiscope}
+\robotmeta{ISIS / Elekta}{1990s--2000s}{Ophthalmic and Neurosurgery}{Hybrid — LoA 1}
+A \textbf{hybrid} robotic microscope support combining a parallel positioning sub-structure with a serial wrist. Cited in the Dario (2004) classification as an example of hybrid architecture — parallel for stiffness, serial for orientation dexterity.
+
+% =====================================================================
+\chapter{Quick Reference Table}
+% =====================================================================
+
+\begin{table}[ht]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}lXllX@{}}
+\toprule
+\textbf{System} & \textbf{Domain} & \textbf{Troccaz} & \textbf{LoA} & \textbf{Key distinguishing feature} \\
+\midrule
+PUMA 560        & Neurosurgery       & Active        & 2     & First surgical robot (1985) \\
+ROBODOC         & Orthopaedics       & Active        & 2     & SCARA; Orthodoc; $<$1\,mm milling \\
+CASPAR          & Orthopaedics       & Active        & 2     & Anthropomorphic; real-time fiducial set $S'$ \\
+ZEUS            & MIS / Telesurgery  & Teleoperated  & 1     & Operation Lindbergh; PRRRR passive RCM \\
+da Vinci        & MIS                & Teleoperated  & 1     & 7 DOF EndoWrist; 10$\times$ 3D; 3:1/5:1 scaling \\
+AESOP           & MIS                & Active (Aux.) & 2     & Voice-controlled 7-DOF camera arm \\
+MAKO            & Orthopaedics       & Synergistic   & 1     & 3-region impedance; 550/100\,Hz dual loop \\
+Mazor/MARS      & Spinal surgery     & Synergistic   & 1--2  & Bone-mounted Stewart; $<$0.1\,mm; auto patient-motion comp. \\
+NeuroMate       & Neurosurgery       & Semi-active   & 1--2  & 5-DOF; locked mechanical guide \\
+CyberKnife      & Radiosurgery       & Active        & 2--3  & KUKA 6-DOF + LINAC 6\,MeV; sub-mm \\
+PADyC           & Orthopaedics       & Synergistic   & 1     & Freewheel passive VF; intrinsically safe \\
+Viewing Wand    & Neuro/Orthopaedics & Passive       & 0     & Passive arm navigator; no line-of-sight issue \\
+SCALPP          & Dermatology        & Active        & 2     & SCARA; 400\,mm asepsis rule \\
+OTELO/MELODY    & Tele-echography    & Teleoperated  & 1     & PPRRRP; remote probe; RCM on skin \\
+INNOMOTION      & Interv. radiology  & Active        & 2     & 5-DOF; MR-compatible \\
+Cardiolock      & Cardiac surgery    & Cooperative   & 1     & 3-PRR singularity amplification; piezo \\
+Pentagon        & In-vivo microscopy & Cooperative   & 1     & 5-bar; 563\,$\mu$m amplification; isotropy \\
+SHR             & Ophthalmology      & Cooperative   & 1     & Software RCM; admittance $v=Gf$ \\
+Micron          & Ophthalmology      & Cooperative   & 1     & Handheld; embedded piezo tremor cancellation \\
+Leuven Robot    & Ophthalmology      & Cooperative   & 1     & Mechanical RCM via parallel linkage \\
+TU Munich       & Ophthalmology      & Cooperative   & 1     & Hybrid parallel-serial \\
+ROBHOT          & Hyperthermia       & Cooperative   & 1     & Impedance+admittance; NDI Polaris Vega \\
+Surgiscope      & Ophthalmic/Neuro   & Hybrid        & 1     & Hybrid; microscope stabilisation \\
+XACT Robotics   & Interv. radiology  & Active        & 2     & Parallel; CT-guided needle placement \\
+\bottomrule
+\end{tabularx}
+\caption{All surgical robots covered in the course.}
+\end{table}
+
+\end{document}
