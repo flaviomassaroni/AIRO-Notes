@@ -25,7 +25,7 @@
 \usepackage[colorlinks=true, linkcolor=RoyalBlue, urlcolor=ForestGreen, citecolor=RedOrange]{hyperref}
 
 % --- Tabelle ---
-\usepackage{array, booktabs, tabularx}
+\usepackage{array, booktabs, tabularx, longtable}
 
 % --- Header/footer ---
 \usepackage{fancyhdr, emptypage}
@@ -38,9 +38,32 @@
 
 % --- Altri pacchetti utili ---
 \usepackage{parskip}        % spazio tra paragrafi
-\usepackage{booktabs}
 \usepackage{tocloft}
 \usepackage{etoolbox}
+\usepackage{setspace}
+\onehalfspacing
+
+% --- Boxes for definitions and notes ---
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{definizione}[1][]{
+    colback=blue!5!white, colframe=blue!50!black,
+    fonttitle=\bfseries, title=Definizione #1,
+    breakable
+}
+
+\newtcolorbox{attenzione}[1][]{
+    colback=orange!10!white, colframe=orange!70!black,
+    fonttitle=\bfseries, title=Attenzione #1,
+    breakable
+}
+
+\newtcolorbox{approfondimento}[1][]{
+    colback=green!5!white, colframe=green!50!black,
+    fonttitle=\bfseries, title=Approfondimento: #1,
+    breakable
+}
 
 % --- Comandi matematici personali (dal tuo template) ---
 \DeclareMathOperator*{\argmax}{argmax}
@@ -75,19 +98,16 @@
 \begin{document}
 
 \title{\textbf{Neuroengineering}}
+\author{}
 \maketitle
 \tableofcontents
 
-% --- Parte I: Corso di Neuroengineering (Astolfi) ---
-\part{Neuroengineering}
+\part{NeuroFisiologia}
 
-% Qui includi i capitoli del tuo Astolfi.tex (dopo aver rimosso il preambolo)
-% Esempio: \include{Astolfi_chapters/01_introduction}
-% Oppure se hai un unico file pulito: \include{Astolfi_content}\
 \include{Astolfi_content}
 
-% --- Parte II: Altro corso (es. Elettrofisiologia Cellulare) ---
-\part{Altro Corso}
-% \include{...
+\part{Elettrofisiologia}
+
+\include{Cincotti.tex}
 
 \end{document}

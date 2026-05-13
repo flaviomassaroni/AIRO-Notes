@@ -1,0 +1,1077 @@
+% ============================================================
+\chapter{Elettromiografia (EMG)}
+% ============================================================
+
+\section{Fisiologia di base della contrazione muscolare e controllo motorio}
+
+\subsection{Fibra muscolare e sue proprietà}
+
+La \textbf{fibra muscolare} è l'unità strutturale di base del muscolo scheletrico. Si tratta di una cellula allungata (lunghezza variabile da pochi mm a oltre 30 cm) specializzata nella produzione di forza meccanica.
+
+\begin{definizione}[-- Fibra Muscolare]
+Le fibre muscolari sono tessuti \textbf{eccitabili}. A riposo, la cellula muscolare mantiene un \textbf{potenziale di membrana a riposo} di circa \(\mathbf{-90}\) \textbf{mV}, più negativo di quello del neurone (ca.\ $-70$ mV). Questo gradiente è mantenuto principalmente dalla pompa sodio-potassio (Na\(^+\)/K\(^+\)-ATPasi).
+\end{definizione}
+
+Quando la membrana viene depolarizzata oltre la soglia (tipicamente $\sim -60$ mV), si genera un \textbf{Potenziale d'Azione della Fibra Muscolare} (MFAP, \textit{Muscle Fiber Action Potential}). Il MFAP ha una forma bifasica (o trifasica se registrato con elettrodi di superficie) e una durata di circa 1--5 ms.
+
+\begin{approfondimento}{Eccitazione--Contrazione}
+Il segnale elettrico del MFAP innesca il \textbf{meccanismo di accoppiamento eccitazione-contrazione} attraverso la liberazione di Ca\(^{2+}\) dal reticolo sarcoplasmatico, che permette l'interazione actina-miosina e quindi la contrazione meccanica.
+\end{approfondimento}
+
+\subsection{Velocità di conduzione della fibra muscolare (MFCV)}
+
+\begin{definizione}[-- MFCV]
+Il MFAP si propaga lungo la fibra muscolare in entrambe le direzioni a partire dalla \textbf{giunzione neuromuscolare} (zona di innervazione), con una velocità chiamata \textbf{Muscle Fiber Conduction Velocity} (MFCV), tipicamente nell'intervallo \(\mathbf{2\text{--}6}\) \textbf{m/s}.
+\end{definizione}
+
+La MFCV dipende da numerosi fattori:
+\begin{itemize}
+    \item \textbf{Concentrazioni ioniche}: elevata concentrazione extracellulare di K\(^+\) (come avviene durante la fatica) riduce il gradiente di membrana e rallenta la conduzione; il pH intracellulare influisce sull'attività dei canali ionici.
+    \item \textbf{Temperatura}: una diminuzione di temperatura riduce la MFCV (effetto diretto sulla permeabilità di membrana e sulla velocità delle reazioni enzimatiche).
+    \item \textbf{Diametro e morfologia della fibra}: fibre più grosse hanno MFCV maggiore (analogia con i cavi elettrici).
+    \item \textbf{Lunghezza della fibra}: fibre molto corte hanno velocità apparente inferiore per effetti di fine-fibra.
+    \item \textbf{Tipo di fibra}: le fibre \textit{fast-twitch} (tipo II) conducono più velocemente delle fibre \textit{slow-twitch} (tipo I).
+    \item \textbf{Fatica muscolare}: durante la fatica, l'accumulo di K\(^+\) extracellulare e la riduzione di pH abbassano la MFCV di 10--20\%.
+    \item \textbf{Patologie neuromuscolari}: alcune neuropatie o miopatie alterano la MFCV.
+\end{itemize}
+
+\begin{approfondimento}{MFCV come indice di fatica}
+Nella ricerca applicata, la MFCV è un indice sensibile della fatica muscolare. Il suo valore si stima dall'EMG di superficie tramite analisi di correlazione o metodi in frequenza (spostamento verso il basso del centroide spettrale). Questo ha applicazioni in ergonomia e in sport science.
+\end{approfondimento}
+
+\subsection{Unità Motoria (MU)}
+
+\begin{definizione}[-- Unità Motoria]
+L'\textbf{Unità Motoria} (MU) è l'unità funzionale di base del sistema neuromuscolare. È composta da:
+\begin{enumerate}
+    \item Un singolo \textbf{motoneurone alfa} (nel midollo spinale o nel tronco encefalico)
+    \item \textbf{Tutte le fibre muscolari} da esso innervate (attraverso la giunzione neuromuscolare)
+\end{enumerate}
+\end{definizione}
+
+Il numero di fibre per unità motoria varia notevolmente:
+\begin{itemize}
+    \item Muscoli di precisione (es.\ muscoli oculari): 3--10 fibre per MU → controllo fine.
+    \item Muscoli posturali o di forza (es.\ gastrocnemio): 1000--2000 fibre per MU.
+\end{itemize}
+
+Il \textbf{Potenziale d'Azione dell'Unità Motoria} (MUAP, \textit{Motor Unit Action Potential}) è il segnale elettrico generato dall'attivazione di una singola unità motoria, risultante dalla \textbf{somma spaziale e temporale} di tutti gli MFAP delle fibre che la compongono:
+\[
+\text{MUAP}(t) = \sum_{k=1}^{N_{fibre}} \text{MFAP}_k(t - \tau_k)
+\]
+dove $\tau_k$ è il ritardo di arrivo del potenziale alla $k$-esima fibra.
+
+\subsection{Modulazione della forza muscolare}
+
+La forza esercitata da un muscolo è modulata dal SNC attraverso due meccanismi principali che agiscono \textbf{in modo concorrente}:
+
+\begin{enumerate}
+    \item \textbf{Reclutamento} (\textit{Recruitment}): incremento del numero di unità motorie attivate. Segue il \textit{principio delle dimensioni di Henneman}: le MU di piccole dimensioni (slow-twitch, più resistenti alla fatica) vengono reclutate per prime, poi a forze crescenti entrano in gioco le MU più grandi (fast-twitch). Questo meccanismo \textbf{domina a basse forze} (\(<30\text{--}50\%\) della forza massima).
+
+    \item \textbf{Rate Coding} (codifica di frequenza / \textit{firing rate}): aumento della frequenza di scarica dei potenziali d'azione delle MU già attive. La frequenza minima di scarica è di circa 5--10 impulsi al secondo (ips); quella massima può superare 60 ips in alcuni muscoli. Il rate coding è \textbf{più significativo ad alte forze e durante contrazioni rapide}.
+\end{enumerate}
+
+\begin{attenzione}[]
+Il reclutamento e il rate coding non sono processi sequenziali: avvengono contemporaneamente. Anche durante la riduzione della forza la loro combinazione è diversa rispetto all'incremento.
+\end{attenzione}
+
+\subsection{Biofisica della generazione del segnale EMG}
+
+\subsubsection{Modello tripolare dell'MFAP}
+
+L'MFAP propagante può essere modellato come un \textbf{tripolo}:
+\begin{itemize}
+    \item Una \textbf{fase negativa centrale} (zona di depolarizzazione attiva)
+    \item Due \textbf{fasi positive} (anteriore = zona di depolarizzazione imminente; posteriore = zona di ripolarizzazione)
+\end{itemize}
+La forma osservata dipende dalla distanza e dall'orientamento dell'elettrodo rispetto al tripolo in moto.
+
+\begin{approfondimento}{Effetti di fine-fibra}
+Quando il potenziale raggiunge i tendini (fine-fibra), si generano ulteriori componenti che decadono con la distanza \textbf{più lentamente} rispetto alle componenti principali del tripolo. Questo influisce sulla forma del MUAP registrato con elettrodi di superficie.
+\end{approfondimento}
+
+\subsubsection{Conduzione di volume (\textit{Volume Conductor})}
+
+I tessuti biologici interposti tra le fibre muscolari e gli elettrodi (grasso, fascia, pelle) agiscono come \textbf{filtri passa-basso spaziali e temporali} sulla distribuzione del potenziale. Questo spiega perché:
+\begin{itemize}
+    \item La forma e l'ampiezza del potenziale registrato dipendono dalla posizione dell'elettrodo.
+    \item Il segnale EMG di superficie è la sovrapposizione di numerosi MUAP (interferogram).
+    \item Gli elettrodi di superficie rilevano contributi da più MU e da fibre distanti (cross-talk).
+\end{itemize}
+
+\section{Strumentazione EMG}
+
+\subsection{Tipi di elettrodi}
+
+\begin{tabularx}{\linewidth}{lXX}
+\toprule
+\textbf{Tipo} & \textbf{Caratteristiche} & \textbf{Applicazioni} \\
+\midrule
+Elettrodo ad ago (intramuscolare) & Alta selettività, registra 1--2 MU, invasivo & Clinica, diagnosi NMD \\
+Elettrodo di superficie & Non invasivo, bassa selettività, rileva EMG globale & Ricerca, biofeedback, gait analysis \\
+Elettrodo a griglia (HD-EMG) & Array di elettrodi di superficie, informazione spaziale & Ricerca, decomposizione \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Posizionamento e parametri che influenzano l'EMG}
+
+La posizione dell'elettrodo rispetto alla zona di innervazione (midpoint della fibra) e ai tendini influenza fortemente la morfologia del segnale. Il \textbf{posizionamento ottimale} è tipicamente al centro del ventre muscolare, lontano dai confini.
+
+\textbf{Selettività} e \textbf{cross-talk}: gli elettrodi bipolari con inter-elettrodo distance ridotta aumentano la selettività ma riducono la sensibilità a MU profonde. Il cross-talk da muscoli adiacenti può contaminare il segnale.
+
+\section{Elaborazione del segnale EMG}
+
+\subsection{Pipeline tipica di elaborazione}
+
+\begin{enumerate}
+    \item \textbf{Pre-amplificazione differenziale} (direttamente sull'elettrodo, per ridurre il rumore)
+    \item \textbf{Filtraggio passa-banda} (tipicamente 20--500 Hz per EMG di superficie)
+    \item \textbf{Rimozione artefatti} (powerline, ECG se necessario)
+    \item \textbf{Estrazione di feature}
+    \item \textbf{Analisi / classificazione}
+\end{enumerate}
+
+\subsection{Feature di base del segnale EMG}
+
+\subsubsection{Dominio dell'ampiezza}
+
+Dato il segnale EMG campionato $x_i$, $i = 0, \ldots, N-1$:
+
+\begin{align}
+\text{ARV} &= \frac{1}{N}\sum_{i=0}^{N-1} |x_i| \quad \text{(Average Rectified Value)} \\[4pt]
+\text{RMS} &= \sqrt{\frac{1}{N}\sum_{i=0}^{N-1} x_i^2} \quad \text{(Root Mean Square)}
+\end{align}
+
+\begin{attenzione}[]
+\textbf{ARV $\neq$ RMS}: l'ARV è la media dei valori assoluti; l'RMS è la radice della media dei quadrati. Per un segnale sinusoidale di ampiezza $A$: RMS $= A/\sqrt{2}$, mentre ARV $= 2A/\pi$.
+\end{attenzione}
+
+\subsubsection{Dominio della frequenza}
+
+Lo spettro di potenza dell'EMG di superficie è concentrato tra 20 e 500 Hz, con picco attorno a 100--150 Hz. I principali parametri spettrali sono:
+\begin{itemize}
+    \item \textbf{Mean Frequency} (MNF): baricentro spettrale $\bar{f} = \frac{\sum_f f \cdot P(f)}{\sum_f P(f)}$
+    \item \textbf{Median Frequency} (MDF): frequenza che divide la PSD in due aree uguali
+\end{itemize}
+Durante la fatica muscolare, entrambe diminuiscono (spostamento verso basse frequenze), principalmente per riduzione della MFCV.
+
+% ============================================================
+\chapter{Elettroencefalogramma (EEG)}
+% ============================================================
+
+\section{Introduzione storica}
+
+\begin{itemize}
+    \item \textbf{Hans Berger (anni '20--'30)}: primo a registrare l'EEG umano non invasivo; scopre un'oscillazione persistente a $\sim 10$ Hz che chiama \textbf{ritmo alfa}.
+    \item \textbf{Adrian e Matthews}: confermano i risultati di Berger e propongono per la prima volta l'\textbf{ipotesi di idling} (\textit{idling hypothesis}): i ritmi cerebrali compaiono quando la corteccia è a riposo e non impegnata in alcun compito.
+    \item \textbf{Anni 1960--70}: l'avvento dei computer permette il calcolo di \textbf{medie time-locked} agli stimoli (averaging), aumentando drasticamente il rapporto segnale-rumore e rivelando i \textbf{Potenziali Evocati} (ERP).
+\end{itemize}
+
+\section{Generazione del segnale EEG}
+
+Il segnale EEG ha origine principale dai \textbf{potenziali post-sinaptici} (PSP) dei neuroni piramidali dello strato IV della corteccia. I PSP, a differenza dei potenziali d'azione neuronali (molto brevi), hanno una durata di decine di millisecondi e possono quindi sommarsi temporalmente per produrre un segnale registrabile a distanza.
+
+I fattori che determinano se un insieme di neuroni contribuisce apprezzabilmente all'EEG sono:
+\begin{enumerate}
+    \item \textbf{Orientamento dei neuroni}: i neuroni piramidali devono essere \textbf{allineati} (sorgenti di tipo \textit{open field}) per sommare costruttivamente. Sorgenti in geometria \textit{closed field} (es.\ insula) si annullano e non contribuiscono all'EEG.
+    \item \textbf{Sincronicità dell'attività neurale}: l'EEG misura l'attività di interi \textit{patch} corticali. Solo se migliaia di neuroni si attivano in modo sincrono il segnale risultante è abbastanza grande da essere misurato.
+    \item \textbf{Distanza tra neuroni ed elettrodi}: l'ampiezza decresce con la distanza (conduzione di volume).
+    \item \textbf{Configurazione campo aperto/chiuso}.
+\end{enumerate}
+
+\begin{approfondimento}{Ampiezza dell'EEG}
+I segnali EEG hanno ampiezza tipica di \textbf{10--100 $\mu$V} per l'attività spontanea. I potenziali evocati (ERP) hanno ampiezza molto minore, tipicamente \textbf{1--10 $\mu$V}. Per confronto, l'EMG dei muscoli del cuoio capelluto può raggiungere 1 mV = \textbf{10 volte} il segnale EEG.
+\end{approfondimento}
+
+\section{Ritmi cerebrali}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{llp{8cm}}
+\toprule
+\textbf{Ritmo} & \textbf{Banda (Hz)} & \textbf{Caratteristiche e Significato Funzionale} \\
+\midrule
+Delta & $< 3.5$ & Sonno profondo (stadi 3--4 NREM); patologie se presente nello stato di veglia \\
+Theta & 4--7.5 & Sonnolenza, meditazione, processi mnemonici (ippocampo) \\
+Alpha & 8--13 & Occhi chiusi, stato rilassato, lobo occipitale; soppresso dall'apertura degli occhi o da compiti visivi \\
+Mu & 8--13 & Ritmo alfa \textbf{centrale} (corteccia sensomotoria); soppresso da movimento reale o immaginato \\
+Beta & 14--30 & Stato attivo, pianificazione motoria, cognizione; \textit{event-related synchronization} al termine del movimento \\
+Gamma & $> 30$ & Binding percettivo, processi cognitivi superiori; difficile da misurare (sovrapposizione EMG) \\
+\bottomrule
+\end{tabular}
+\caption{Principali bande di frequenza dell'EEG e significato funzionale.}
+\end{table}
+
+\subsection{Proprietà del ritmo mu}
+
+Il ritmo mu è per molti versi analogo al ritmo alfa (stessa banda di frequenza, $\sim 10$ Hz), ma se ne distingue per:
+\begin{itemize}
+    \item \textbf{Localizzazione}: generato nella \textbf{corteccia sensomotoria} (regioni centrali: C3, Cz, C4) invece che nelle regioni occipitali.
+    \item \textbf{Forma d'onda}: oscillazioni \textbf{``ad arco''} (forma asimmetrica, non sinusoidale pura).
+    \item \textbf{Waxing and waning}: l'ampiezza varia irregolarmente nel tempo, con periodi di crescita e decrescita.
+    \item \textbf{Modulazione funzionale}: l'ampiezza del mu \textbf{diminuisce} (ERD) durante il movimento reale, l'immaginazione di movimento (motor imagery) e anche solo durante l'osservazione del movimento altrui (neuroni specchio).
+\end{itemize}
+
+\section{Strumentazione EEG}
+
+\subsection{Elettrodi}
+
+Gli elettrodi più usati in EEG sono realizzati in \textbf{argento con strato di cloruro d'argento} (Ag/AgCl):
+\begin{itemize}
+    \item Sono \textbf{non polarizzabili}: non formano un doppio strato di carica significativo, quindi non introducono una tensione di polarizzazione variabile nel tempo.
+    \item Consentono la registrazione di \textbf{potenziali lentamente variabili} (componenti EEG a bassa frequenza, < 0.1 Hz).
+    \item Hanno basso rumore e bassa deriva (\textit{drift}).
+\end{itemize}
+
+Gli elettrodi in \textbf{oro} sono \textbf{polarizzabili}: introducono una tensione di polarizzazione che deriva nel tempo, rendendoli \textbf{inadatti alla registrazione di potenziali lenti}.
+
+\subsubsection{Impedenza di contatto}
+
+L'\textbf{impedenza} (misurata in $k\Omega$ con corrente alternata) quantifica la qualità del contatto elettrodo-cute attraverso il gel conduttivo. Le linee guida EEG tradizionali richiedono impedenza $< 5\, k\Omega$. Gli amplificatori moderni ad alta impedenza di ingresso ($\sim 10^8 \,\Omega$) permettono di registrare anche con impedenze più elevate.
+
+\begin{attenzione}[]
+L'impedenza di contatto \textbf{deve essere misurata con corrente alternata}, non con corrente continua. Usare corrente continua causerebbe la polarizzazione dell'elettrodo.
+\end{attenzione}
+
+\begin{approfondimento}{Effetto partitore di tensione}
+L'impedenza di contatto $Z_{el}$ e l'impedenza di ingresso dell'amplificatore $Z_{in}$ formano un partitore di tensione. Il potenziale effettivamente amplificato vale:
+\[
+V_{eff} = V_{scalp} \cdot \frac{Z_{in}}{Z_{in} + Z_{el}}
+\]
+Per avere $V_{eff} \approx V_{scalp}$ occorre $Z_{in} \gg Z_{el}$. Con $Z_{in} = 10^8\,\Omega$ e $Z_{el} = 5\,k\Omega = 5 \times 10^3\,\Omega$, si ottiene un errore < 0.005\%.
+\end{approfondimento}
+
+\subsection{Il sistema 10-20 (Internazionale)}
+
+Il sistema 10-20 è lo standard internazionale per il posizionamento degli elettrodi EEG:
+\begin{itemize}
+    \item Le distanze tra elettrodi adiacenti sono il \textbf{10\% o il 20\%} della distanza tra punti anatomici di riferimento (nasion--inion in senso antero-posteriore; punti preauricolari in senso laterale).
+    \item \textbf{Etichette}: F = Frontale, C = Centrale, P = Parietale, O = Occipitale, T = Temporale.
+    \item Numeri \textbf{dispari} = emisfero \textbf{sinistro}; numeri \textbf{pari} = emisfero \textbf{destro}; \textbf{z} = linea mediana.
+    \item Il sistema 10-10 (o 10\%) estende il 10-20 con posizioni intermedie per cap ad alta densità.
+\end{itemize}
+
+\subsection{Amplificatore differenziale}
+
+L'amplificatore differenziale amplifica la \textbf{differenza} tra due ingressi mentre rigetta i segnali comuni (rumore di rete, artefatti capacitivi):
+\[
+V_{out} = G_d\,(V_+ - V_-) + G_c\left(\frac{V_+ + V_-}{2}\right)
+\]
+dove $G_d$ è il guadagno differenziale e $G_c$ è il guadagno di modo comune.
+
+\subsubsection{CMRR (Common-Mode Rejection Ratio)}
+
+\begin{definizione}[-- CMRR]
+\[
+\text{CMRR} = \frac{G_d}{G_c} \quad \Rightarrow \quad \text{CMRR}_{dB} = 20\log_{10}\!\left(\frac{G_d}{G_c}\right)
+\]
+Un buon amplificatore EEG ha CMRR $\sim 100\, dB$, cioè il segnale differenziale viene amplificato $10^5$ volte di più del modo comune.
+\end{definizione}
+
+\begin{attenzione}[]
+Il CMRR è $G_d / G_c$ (guadagno \textit{differenziale} su guadagno \textit{comune}), \textbf{non} il rapporto inverso.
+\end{attenzione}
+
+\textbf{Perché il CMRR degrada in pratica}: se le impedenze dei due elettrodi sono diverse, il segnale di modo comune viene convertito in segnale differenziale (CMRR ridotto). Per questo le impedenze degli elettrodi devono essere \textbf{bilanciate} tra loro.
+
+Un singolo canale EEG richiede \textbf{tre elettrodi}: due ingressi all'amplificatore differenziale + uno per il ground (potenziale di riferimento).
+
+\subsection{Montaggi}
+
+\begin{itemize}
+    \item \textbf{Monopolare (referenziale)}: ogni canale è la differenza tra un elettrodo attivo e un \textbf{unico} riferimento (es.\ orecchio, mastoide, naso). Semplice ma dipendente dalla posizione del riferimento.
+    \item \textbf{Bipolare}: differenza tra elettrodi \textbf{adiacenti}. Utile per evidenziare le inversioni di fase (localizzazione della sorgente), usato soprattutto in clinica.
+    \item \textbf{CAR (Common Average Reference)}: si sottrae da ogni canale la media istantanea di tutti i canali. In condizioni ideali (elettrodi distribuiti uniformemente sull'intera sfera, sorgenti profonde) approssima il riferimento all'infinito.
+\end{itemize}
+
+\begin{approfondimento}{Effetto della posizione del riferimento}
+La posizione del riferimento influenza forma e ampiezza delle tracce EEG, ma \textbf{non influenza il profilo relativo} della topografia scalare (le differenze di potenziale tra canali restano le stesse). Un riferimento posto vicino a una sorgente attiva ``contamina'' tutti i canali con l'attività di quella sorgente.
+\end{approfondimento}
+
+\section{Artefatti EEG}
+
+\begin{definizione}[-- Artefatto EEG]
+Un artefatto EEG è qualsiasi differenza di potenziale dovuta a sorgenti \textbf{extracerebrali}. \textbf{Prevenire è sempre preferibile all'eliminazione post-hoc} tramite elaborazione del segnale.
+\end{definizione}
+
+\begin{longtable}{p{2.8cm}p{4.5cm}p{6cm}}
+\toprule
+\textbf{Artefatto} & \textbf{Origine} & \textbf{Caratteristiche chiave} \\
+\midrule
+\endhead
+EOG (oculare) & Dipolo corneoretinico: cornea (+), retina (-) & $\sim 500\,\mu$V, prevalente in frontale; il lampeggio genera deflazione positiva; movimenti verticali/orizzontali generano deflazioni positive/negative in F \\[4pt]
+EMG (muscolare) & Muscoli di testa e collo & Frequenze $> 20$ Hz fino a 1 mV (10$\times$ EEG); aumenta con tensione muscolare \\[4pt]
+ECG (cardiaco) & Attività elettrica del cuore & Più evidente se il riferimento è off-head (orecchio, mastoide) \\[4pt]
+Ballistocardiografico & Impulso arterioso vicino all'elettrodo & Movimento meccanico dell'elettrodo causato dalla pulsazione; forma lenta \\[4pt]
+Sudorazione & Risposta galvanica cutanea & Lenta ($< 0.5$ Hz), alta ampiezza (mV), legata a stress/termoregolazione \\[4pt]
+Powerline & Accoppiamento capacitivo con la rete elettrica & Banda stretta a 50 Hz (60 Hz in USA/Giappone) + armoniche (dispari); esaltato da asimmetria di impedenza \\[4pt]
+Movimento elettrodo & Spostamento del doppio strato elettrochimico & Artefatto lento; ridotto con elettrodi Ag/AgCl (non polarizzabili) \\
+\bottomrule
+\caption{Principali artefatti EEG, loro origine e caratteristiche.}
+\end{longtable}
+
+\section{Analisi EEG}
+
+\subsection{Attività evocata vs indotta}
+
+\begin{itemize}
+    \item \textbf{Evocata (\textit{evoked})}: l'attività cerebrale è \textbf{phase-locked} allo stimolo. Ha la stessa latenza ad ogni ripetizione. Si recupera con \textbf{averaging semplice} sui trial.
+    \item \textbf{Indotta (\textit{induced})}: l'attività cerebrale è \textbf{non phase-locked} (jitter di latenza). L'averaging semplice la cancella. Si analizza calcolando l'\textbf{inviluppo del segnale filtrato} (rettifica o quadratura) e poi mediando.
+\end{itemize}
+
+\subsection{Potenziali Evento-Correlati (ERP)}
+
+\subsubsection{Averaging}
+
+Il principio dell'averaging sfrutta il Teorema del Limite Centrale: se l'EEG spontaneo è un rumore i.i.d. a media zero, la media di $N$ trial riduce il rumore di un fattore $\sqrt{N}$, preservando l'ERP (che è coerente tra trial):
+\[
+\text{RMS}_{rumore,\, avg} = \frac{\sigma_{EEG}}{\sqrt{N}}
+\]
+Per raddoppiare il SNR occorre \textbf{quadruplicare} il numero di trial.
+
+\subsubsection{Nomenclatura ERP}
+
+I picchi vengono denominati con:
+\begin{itemize}
+    \item \textbf{P} (positivo) o \textbf{N} (negativo) + numero che indica la latenza nominale in ms (es.\ N100, P300).
+    \item In convenzioni più antiche, il numero indica l'ordine del picco (N1, P2, \ldots).
+    \item La \textbf{latenza} è misurata rispetto all'evento/stimolo (non all'inizio della registrazione).
+    \item L'\textbf{ampiezza} è misurata rispetto a una \textbf{baseline} pre-stimolo (tipicamente 100--200 ms prima dello stimolo), in cui l'ampiezza media è assunta zero.
+    \item Un picco registrato a 108 ms con polarità negativa può essere denominato \textbf{N100} se corrisponde fisiologicamente al componente N100 (la denominazione è funzionale, non geometrica).
+\end{itemize}
+
+\subsubsection{P300 e paradigma Oddball}
+
+\begin{definizione}[-- P300]
+Il \textbf{P300} è un'onda positiva che compare $\sim 300$ ms dopo la presentazione di uno stimolo \textbf{raro e significativo} (bersaglio) all'interno di una sequenza di stimoli frequenti (non bersaglio): il \textbf{paradigma oddball}. È massimo nelle regioni centro-parietali.
+\end{definizione}
+
+Il P300 è associato a processi cognitivi di attenzione, memoria di lavoro e aggiornamento del contesto. La sua ampiezza aumenta all'aumentare della rarità dello stimolo bersaglio e alla sua significatività per il soggetto.
+
+\subsubsection{Terminologia temporale degli stimoli}
+
+\begin{itemize}
+    \item \textbf{SOA (Stimulus Onset Asynchrony)}: tempo tra l'\textit{inizio} di uno stimolo e l'\textit{inizio} del successivo.
+    \item \textbf{ISI (Inter-Stimulus Interval)}: tempo tra la \textit{fine} di uno stimolo e l'\textit{inizio} del successivo. Relazione: $\text{ISI} = \text{SOA} - \text{durata stimolo}$.
+    \item \textbf{ITI (Inter-Trial Interval)}: tempo tra la fine di un trial e l'inizio del successivo.
+\end{itemize}
+
+\begin{attenzione}[]
+ISI \textbf{non} è il tempo tra due stimoli successivi (quello è il SOA). ISI = SOA $-$ durata stimolo.
+\end{attenzione}
+
+Quando il SOA è troppo corto, i componenti a lunga latenza dell'ERP (come il P300) hanno ampiezza ridotta, perché la corteccia non ha ancora completato l'elaborazione del trial precedente.
+
+\subsection{ERD/ERS (Event-Related Desynchronization/Synchronization)}
+
+\begin{definizione}[-- ERD/ERS]
+Quantifica le variazioni di \textbf{potenza} in una banda di frequenza rispetto a un periodo di baseline:
+\[
+\text{ERD/ERS}(\%) = \frac{P(t) - P_{baseline}}{P_{baseline}} \times 100
+\]
+Valori negativi indicano \textbf{desincronizzazione} (ERD, calo di potenza); valori positivi indicano \textbf{sincronizzazione} (ERS, aumento di potenza).
+\end{definizione}
+
+\textbf{Procedura di calcolo}:
+\begin{enumerate}
+    \item \textbf{Filtraggio passa-banda} nella banda di interesse (es.\ 8--13 Hz per il mu)
+    \item \textbf{Quadratura} (o rettifica) dei campioni per ottenere la potenza istantanea
+    \item \textbf{Averaging sincronizzato} tra trial
+    \item \textbf{Smoothing} con finestra mobile (media mobile su finestre brevi adiacenti)
+    \item \textbf{Calcolo percentuale} rispetto alla media nel periodo di baseline
+\end{enumerate}
+
+\begin{approfondimento}{Analisi Tempo-Frequenza}
+Un'alternativa alla procedura ERD/ERS è la Short-Time Fourier Transform (STFT) o la trasformata Wavelet, che permette di visualizzare l'evoluzione dello spettro nel tempo (spettrogramma). Il trade-off fondamentale è: \textbf{maggiore risoluzione temporale implica minore risoluzione frequenziale} e viceversa (principio di incertezza di Heisenberg).
+\end{approfondimento}
+
+% ============================================================
+\chapter{Elaborazione dei Segnali Biomedici}
+% ============================================================
+
+\section{Caratterizzazione statistica dei segnali}
+
+Dato un segnale digitale $x_i$ con $N$ campioni ($i = 0, 1, \ldots, N-1$):
+
+\begin{align}
+\text{Media:} \quad & \bar{X} = \frac{1}{N}\sum_{i=0}^{N-1} x_i \\[6pt]
+\text{ARV:} \quad & ARV_X = \frac{1}{N}\sum_{i=0}^{N-1} |x_i| \\[6pt]
+\text{RMS:} \quad & RMS_X = \sqrt{\frac{1}{N}\sum_{i=0}^{N-1} x_i^2} \\[6pt]
+\text{Varianza:} \quad & s_X^2 = \frac{1}{N-1}\sum_{i=0}^{N-1} (x_i - \bar{X})^2 \\[6pt]
+\text{Dev.\ Std.:} \quad & s_X = \sqrt{s_X^2}
+\end{align}
+
+\textbf{Nota importante}: quando il segnale ha media zero ($\bar{X} = 0$), vale $RMS \approx s_X$ (l'approssimazione è esatta al limite $N \to \infty$). Questo permette di identificare l'RMS con la deviazione standard per segnali a media nulla.
+
+\textbf{Distribuzioni di ampiezza di segnali tipici}:
+\begin{itemize}
+    \item \textbf{Sinusoide}: la distribuzione di ampiezza è a forma di U (i campioni si accumulano vicino ai valori di picco). Dev.\ std.\ teorica: $\sigma = A/\sqrt{2}$.
+    \item \textbf{Onda triangolare} da $-A$ a $+A$: distribuzione uniforme. Dev.\ std.\ teorica: $\sigma = 2A/\sqrt{12}$.
+    \item \textbf{Rumore gaussiano bianco}: distribuzione normale, spettro piatto (tutti i campioni scorrelati).
+\end{itemize}
+
+\section{Conversione Analogico-Digitale (ADC)}
+
+\subsection{Campionamento e Teorema di Nyquist-Shannon}
+
+\begin{definizione}[-- Teorema di Shannon]
+Un segnale continuo può essere \textbf{correttamente campionato e ricostruito} se e solo se \textbf{non contiene componenti frequenziali superiori a metà della frequenza di campionamento}:
+\[
+f_{max} < \frac{f_s}{2} = f_{Nyquist}
+\]
+La ricostruzione del segnale analogico dalla versione campionata è equivalente alla somma di funzioni $\text{sinc}(\cdot)$, una per ogni campione, centrata nel rispettivo istante di campionamento e con ampiezza uguale al valore del campione.
+\end{definizione}
+
+\subsubsection{Aliasing}
+
+Quando la condizione di Shannon è violata ($f > f_{Nyquist}$), la componente spettrale si \textbf{rispecchia} (aliasing) producendo una frequenza fantasma:
+\[
+f_{alias} = f_s - f_{originale} \in [0, f_{Nyquist})
+\]
+
+\begin{attenzione}[\ -- Filtro anti-aliasing]
+Per prevenire l'aliasing si usa un \textbf{filtro analogico passa-basso} (filtro anti-aliasing) \textbf{prima} del convertitore ADC, in modo da eliminare tutte le componenti con $f > f_{Nyquist}$. Questo filtro deve essere \textbf{analogico} (non digitale) poiché il campionamento avviene dopo.
+\end{attenzione}
+
+\subsection{Quantizzazione}
+
+La quantizzazione approssima il valore continuo del campione al più vicino dei $2^{N_{bit}}$ livelli di quantizzazione disponibili.
+
+\begin{align}
+V_{LSB} &= \frac{\text{Range}_{ADC}}{2^{N_{bit}}} \quad \text{(Least Significant Bit)} \\[4pt]
+\sigma_{quant} &= \frac{1}{\sqrt{12}} V_{LSB} \quad \text{(std.\ dev.\ del rumore di quantizzazione)}
+\end{align}
+
+Il rumore di quantizzazione ha distribuzione uniforme in $[-V_{LSB}/2, +V_{LSB}/2]$, media zero, e varianza $V_{LSB}^2/12$.
+
+\textbf{Trade-off Range/Risoluzione}:
+\begin{itemize}
+    \item \textbf{Range ADC grande} $\Rightarrow$ $V_{LSB}$ grande $\Rightarrow$ rumore di quantizzazione maggiore
+    \item \textbf{Range ADC piccolo} $\Rightarrow$ possibile \textbf{saturazione} (clipping) del segnale se supera il range
+\end{itemize}
+
+\begin{attenzione}[]
+L'aliasing è dovuto a frequenza di campionamento \textbf{insufficiente}; il clipping (saturazione) è dovuto al \textbf{range di ingresso} troppo piccolo. Sono cause distinte.
+\end{attenzione}
+
+\section{Teorema del Limite Centrale (CLT) e rumore}
+
+\begin{definizione}[-- CLT]
+La media di $N$ variabili casuali \textbf{i.i.d.} (indipendenti e identicamente distribuite) tende a una distribuzione \textbf{normale (gaussiana)} per $N \to \infty$, indipendentemente dalla distribuzione originale. Per $N$ qualsiasi, se le variabili sono già gaussiane, la media è gaussiana esattamente.
+\end{definizione}
+
+Per $N$ variabili con deviazione standard $\sigma$:
+\[
+\sigma_{\bar{X}} = \frac{\sigma}{\sqrt{N}}
+\]
+
+\textbf{Conseguenza per l'EEG}: l'averaging di $N$ trial riduce il rumore EEG spontaneo (assunto i.i.d.\ a media zero) di un fattore $\sqrt{N}$, preservando il segnale ERP (coerente tra trial). Per questo si afferma che:
+\[
+\text{RMS}_{avg, N \text{ trial}} = \frac{\sigma_{EEG}}{\sqrt{N}}
+\]
+
+\begin{approfondimento}{Rumore bianco gaussiano}
+In un \textbf{rumore bianco gaussiano}: (1) tutti i campioni sono statisticamente \textbf{incorrelati} (conoscere un campione non dà informazione sul successivo); (2) la distribuzione di ampiezza è \textbf{normale}; (3) lo spettro di potenza è \textbf{piatto} (uguale potenza a ogni frequenza). Questi tre aspetti sono indipendenti: un segnale può essere bianco ma non gaussiano, o gaussiano ma non bianco.
+\end{approfondimento}
+
+\section{Filtri digitali}
+
+\subsection{Caratteristiche generali di un filtro}
+
+Un filtro lascia passare alcune componenti spettrali e blocca (o attenua) le altre:
+
+\begin{itemize}
+    \item \textbf{Passband}: intervallo di frequenze in cui il guadagno $\approx 1$ (segnale passato quasi inalterato).
+    \item \textbf{Stopband}: intervallo in cui il guadagno $\approx 0$ (segnale bloccato).
+    \item \textbf{Banda di transizione}: zona di passaggio tra passband e stopband.
+    \item \textbf{Frequenza di taglio} (\textit{cutoff}): convenzionalmente dove il guadagno $= 1/\sqrt{2} \approx 0.707$ ($-3$ dB). Per un filtro passa-alto è detta \textit{low cutoff frequency}; per un passa-basso è detta \textit{high cutoff frequency}.
+    \item \textbf{Roll-off}: pendenza della risposta in frequenza nella banda di transizione (più è ripida, migliore la selettività).
+\end{itemize}
+
+\begin{attenzione}[]
+Il guadagno nella stopband deve essere valutato in \textbf{scala logaritmica (dB)}, non lineare. In scala lineare, la differenza tra $0.001$ e $0.0001$ è invisibile, ma in dB è la differenza tra $-60$ e $-80$ dB (una differenza significativa).
+\end{attenzione}
+
+\textbf{Buone caratteristiche di un filtro}: (1) roll-off rapido, (2) passband piatto (no ripple), (3) forte attenuazione in stopband ($< -40$ dB tipicamente).
+
+\subsection{FIR vs IIR}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{p{3.5cm}p{5.5cm}p{5cm}}
+\toprule
+\textbf{Caratteristica} & \textbf{FIR (Finite Impulse Response)} & \textbf{IIR (Infinite Impulse Response)} \\
+\midrule
+Equazione & $y[i] = \sum_{k=0}^{M} b_k\, x[i-k]$ & $y[i] = \sum_{k} b_k\, x[i-k] - \sum_{k} a_k\, y[i-k]$ \\[4pt]
+Risposta all'impulso & Finita (si esaurisce) & Infinita (retroazione) \\[4pt]
+Fase lineare & \textbf{Sì} (possibile per design) & \textbf{No} (mai con retroazione) \\[4pt]
+Efficienza & Meno efficiente (ordine più alto a parità di specifiche) & Più efficiente \\[4pt]
+Metodi di design & Windowed sinc, Parks-McClellan (equiripple) & Butterworth, Chebyshev I/II, Elliptic \\[4pt]
+Stabilità & Sempre stabile & Può essere instabile \\
+\bottomrule
+\end{tabular}
+\caption{Confronto FIR vs IIR.}
+\end{table}
+
+\begin{attenzione}[]
+Un filtro IIR \textbf{non può} avere fase lineare. Solo i filtri FIR possono essere progettati con fase lineare (distorsione di fase nulla). Questo è importante per applicazioni dove la forma d'onda è rilevante (es.\ ERP).
+\end{attenzione}
+
+\subsection{Filtro di Butterworth}
+
+Il filtro di Butterworth è un \textbf{filtro IIR} con risposta in frequenza \textbf{massimamente piatta} nella passband (no ripple). La risposta in ampiezza è:
+\[
+|H(j\omega)|^2 = \frac{1}{1 + (\omega/\omega_c)^{2n}}
+\]
+dove $n$ è l'ordine del filtro e $\omega_c$ la frequenza di taglio. L'ordine $n$ determina la pendenza del roll-off ($-20n$ dB/decade).
+
+\subsection{Filtro Notch}
+
+Il filtro \textbf{notch} è un filtro band-reject con banda di rigetto molto stretta. È usato per rimuovere il rumore di rete elettrica (50 Hz in Europa, 60 Hz in USA). Rimuove efficacemente l'artefatto preservando quasi integralmente le bande utili del segnale.
+
+\section{Analisi Spettrale (DFT e PSD)}
+
+\subsection{Discrete Fourier Transform (DFT)}
+
+\begin{definizione}[-- DFT]
+La DFT trasforma $N$ campioni temporali in $N$ valori complessi nel dominio della frequenza, rappresentanti ampiezza e fase delle componenti sinusoidali a frequenze $f_k = k \cdot \Delta f = k/T_{tot}$.
+\end{definizione}
+
+\textbf{Parametri chiave}:
+\begin{align}
+\Delta f &= \frac{1}{T_{tot}} = \frac{f_s}{N} \quad \text{(risoluzione frequenziale, cioè distanza tra bin adiacenti)} \\
+f_{Nyquist} &= \frac{f_s}{2} \quad \text{(frequenza massima rappresentata)}
+\end{align}
+
+Per un segnale reale lo spettro è \textbf{hermitiano} ($X(-f) = X^*(f)$), quindi la metà positiva è sufficiente a caratterizzare completamente il segnale.
+
+La FFT (\textit{Fast Fourier Transform}) è un'implementazione efficiente della DFT quando $N$ è una \textbf{potenza di 2}, con complessità $O(N \log N)$ invece di $O(N^2)$.
+
+\subsection{Zero-padding}
+
+Aggiungere zeri alla fine del segnale \textbf{non migliora la risoluzione frequenziale reale} (determinata dalla lunghezza del segnale originale), ma \textbf{interpola} lo spettro rendendolo visivamente più liscio (riduce la distanza $\Delta f$ tra campioni del DFT senza aggiungere informazione).
+
+\subsection{Spectral leakage e windowing}
+
+\textbf{Causa del leakage}: estrarre una sezione finita di durata $\Delta T$ da un segnale più lungo equivale a moltiplicarlo per una finestra rettangolare, che nel dominio frequenziale produce una \textbf{convoluzione con una funzione sinc} (DFT della finestra rettangolare). Il sinc ha lobi laterali che ``inquinano'' le frequenze vicine (leakage).
+
+\textbf{Finestre tapered} (Hann, Hamming, Blackman-Harris): riducono i lobi laterali a scapito di un allargamento del lobo principale.
+
+\textbf{Scelta della finestra}:
+\begin{itemize}
+    \item \textbf{Rettangolare}: preferita quando si vogliono risolvere due componenti con frequenza simile e potenza analoga (lobo principale più stretto).
+    \item \textbf{Tapered}: preferita quando una componente forte potrebbe mascherare una componente debole a frequenza diversa (lobi laterali più bassi).
+\end{itemize}
+
+\subsection{Densità Spettrale di Potenza (PSD)}
+
+\begin{definizione}[-- Periodogramma]
+$PS(f) = \frac{1}{N} |DFT(x)|^2$. È uno stimatore \textbf{non consistente}: la varianza della stima non diminuisce all'aumentare della durata del segnale.
+\end{definizione}
+
+\subsubsection{Metodo di Welch (averaged windowed periodogram)}
+
+\begin{enumerate}
+    \item Dividere il segnale in $M$ segmenti \textbf{sovrapposti} (overlap tipicamente 50\%)
+    \item Applicare una finestra (es.\ Hann) a ciascun segmento
+    \item Calcolare il periodogramma di ogni segmento
+    \item \textbf{Mediare} i $M$ periodogrammi
+\end{enumerate}
+
+\textbf{Trade-off}: riduce la varianza della stima di un fattore $\approx \sqrt{M}$ (o $\sim M$ in varianza) a scapito della \textbf{risoluzione in frequenza} (inversamente proporzionale alla lunghezza del segmento, non alla lunghezza totale del segnale).
+
+\begin{approfondimento}{Sovrapposizione di epoche nei BCI}
+Nel contesto BCI SMR, le epoche di analisi possono essere sovrapposte a livello di sistema (per ottenere aggiornamenti frequenti del classificatore, ogni $\sim 100$ ms) \textbf{indipendentemente} dalla sovrapposizione interna al metodo di Welch. Questi due livelli di overlap sono concettualmente distinti: il primo è una scelta di sistema, il secondo è un'opzione algoritmica interna alla stima della PSD.
+\end{approfondimento}
+
+% ============================================================
+\chapter{Brain-Computer Interfaces (BCI)}
+% ============================================================
+
+\section{Definizione formale e obiettivi}
+
+\begin{definizione}
+    \textbf{Nota:} BCI secondo Wolpaw \& Wolpaw (2012)
+    Un \textbf{Brain-Computer Interface} (BCI) è un sistema che misura l'attività del Sistema Nervoso Centrale (SNC) e la converte in un \textbf{output artificiale}, bypassando completamente le normali vie neuromuscolari (nervi e muscoli), modificando così le interazioni correnti tra cervello e ambiente.
+\end{definizione}
+
+I cinque obiettivi di un BCI (secondo Wolpaw):
+\begin{enumerate}
+    \item \textbf{Replace}: sostituire una funzione completamente persa (es.\ controllo di una carrozzina per un paziente tetraplegico).
+    \item \textbf{Restore}: restituire una funzione specifica (es.\ capacità di afferrare oggetti).
+    \item \textbf{Enhance}: potenziare una funzione cognitiva o fisiologica (es.\ rilevamento della sonnolenza in un guidatore).
+    \item \textbf{Supplement}: affiancare un output naturale del SNC.
+    \item \textbf{Improve}: recuperare o allenare una funzione danneggiata (base delle applicazioni riabilitative).
+\end{enumerate}
+
+\section{Pipeline closed-loop del BCI}
+
+Il BCI opera come una pipeline sequenziale chiusa (\textit{closed-loop}):
+\begin{enumerate}
+    \item \textbf{Intenzione}: l'utente genera un processo cognitivo (es.\ motor imagery) che modifica il segnale cerebrale.
+    \item \textbf{Estrazione di feature}: algoritmi estraggono feature rilevanti dal segnale grezzo (es.\ PSD in banda mu).
+    \item \textbf{Traduzione / Classificazione}: le feature vengono classificate e convertite in un comando digitale.
+    \item \textbf{Comando e Feedback}: il comando è eseguito nell'ambiente (es.\ movimento del cursore) e il risultato viene restituito all'utente come \textbf{feedback in tempo reale}.
+\end{enumerate}
+
+\begin{attenzione}[]
+Il \textbf{feedback in tempo reale è obbligatorio} per l'apprendimento del BCI. Bypassare le vie neuromuscolari è un'abilità innaturale: il cervello richiede feedback istantaneo per adattare i propri segnali, esattamente come nell'apprendimento di qualsiasi abilità motoria.
+\end{attenzione}
+
+\section{BCI Assistivi — P300 Speller}
+
+\subsection{Contesto clinico: il gap AT}
+
+Nella tecnologia assistiva (AT), la disabilità è definita come il \textbf{mismatch tra la condizione della persona e il suo ambiente}. I dispositivi AT tradizionali (joystick, touchscreen, eye-tracker) richiedono sempre un movimento fisico o muscolare affidabile. Quando patologie come ALS, Locked-In Syndrome o ictus grave compromettono tutti i movimenti, il BCI diventa l'\textbf{unico canale di input possibile}.
+
+\subsection{Paradigma P300 Speller (Farwell \& Donchin)}
+
+\begin{enumerate}
+    \item L'utente fissa un carattere bersaglio in una matrice (es.\ 6$\times$6 = 36 caratteri).
+    \item Righe e colonne lampeggiano casualmente in sequenza (\textit{row-column paradigm}).
+    \item Il lampeggio della riga/colonna contenente il carattere bersaglio è uno stimolo \textbf{raro e significativo} per l'utente $\Rightarrow$ elicita un \textbf{P300}.
+    \item Il sistema identifica il carattere bersaglio come l'\textbf{intersezione} della riga e della colonna che hanno prodotto il P300 massimo.
+\end{enumerate}
+
+\subsection{Pipeline di decodifica}
+
+\begin{enumerate}
+    \item \textbf{Feature extraction}: per ogni flash, il segnale EEG viene segmentato attorno allo stimolo. La tensione viene mediata su finestre temporali brevi ($\sim 50$ ms) a latenze specifiche su canali specifici. Questo produce un vettore di feature spazio-temporale robusto al rumore ad alta frequenza.
+    \item \textbf{Classificazione -- SWLDA}: l'\textit{Stepwise Linear Discriminant Analysis} è il classificatore classico per il P300 BCI. Vantaggi: (a) generalizza bene anche con piccoli training set; (b) i pesi del modello sono interpretabili e verificabili come pattern fisiologici P300 (canali centro-parietali, latenza $\sim 300$ ms).
+    \item \textbf{Traduzione}: il classificatore determina la riga e la colonna vincenti, calcola la loro intersezione e invia un comando discreto all'ambiente AT (es.\ GRID3, Communicator). Il BCI moderno agisce come un \textbf{trigger discreto}, delegando l'intera logica applicativa al software AT commerciale.
+\end{enumerate}
+
+\section{BCI Riabilitativi — Sensorimotor Rhythms (SMR)}
+
+\subsection{Motor Imagery (MI)}
+
+\begin{definizione}[-- Motor Imagery]
+La \textbf{motor imagery} (immaginazione motoria) è la simulazione mentale di un movimento \textbf{senza} esecuzione effettiva. La variante \textbf{cinestesica (prima persona)}, che consiste nel rivivere la sensazione fisica del movimento, attiva le stesse reti corticali del movimento reale (M1, SMA, corteccia premotoria) ed è quella efficace per i BCI. La variante \textbf{visuale (terza persona)} — immaginarsi dall'esterno — è \textbf{inefficace} per i BCI.
+\end{definizione}
+
+\subsection{Sensorimotor Rhythms (SMR) e ERD}
+
+I \textbf{ritmi sensomotori} (SMR) includono il ritmo mu (8--12 Hz) e il ritmo beta (14--30 Hz) sulla corteccia sensomotoria. Durante la motor imagery si osserva un \textbf{ERD} (desincronizzazione, calo di potenza) contralesionale (nell'emisfero opposto all'arto immaginato). Il ritmo beta mostra un'ulteriore dinamica: una \textbf{ERS} (sincronizzazione, aumento di potenza) al termine del movimento (\textit{post-movement beta rebound}).
+
+\begin{approfondimento}{Uso del termine ERD nel contesto BCI}
+Nel contesto dei BCI riabilitativi, il termine ERD viene spesso usato per descrivere anche le variazioni \textbf{continue e state-dependent} della potenza SMR (non legate a singoli eventi discreti). Questo uso è tecnicamente impreciso (ERD è formalmente definito rispetto a un evento) ma è convenzionalmente accettato in letteratura BCI.
+\end{approfondimento}
+
+\subsection{Classificazione asincrona per BCI SMR}
+
+La classificazione SMR opera in modo \textbf{asincrono} (continuo, senza attendere eventi discreti):
+\begin{enumerate}
+    \item \textbf{Stima spettrale (Welch)}: ogni $\sim 100$ ms si calcola la PSD su un'epoca breve ($\sim 1$ s) con overlap successivo.
+    \item \textbf{Selezione feature (calibrazione)}: SWLDA seleziona i bin frequenziali e i canali più predittivi durante una sessione di calibrazione.
+    \item \textbf{Traduzione online}: regressione lineare calcola un punteggio continuo ogni $\sim 100$ ms (frequenza di aggiornamento del BCI).
+    \item \textbf{Feedback}: il punteggio controlla, ad es., la velocità verticale di un cursore (su = riposo, giù = motor imagery).
+\end{enumerate}
+
+\subsection{Chiusura del loop sensomotorio per la neuroplasticità}
+
+Il problema riabilitativo post-ictus è il seguente:
+\begin{itemize}
+    \item L'ictus danneggia la via corticospinale $\Rightarrow$ il paziente non può muovere l'arto $\Rightarrow$ nessun feedback sensoriale dal movimento $\Rightarrow$ il loop sensomotorio è \textbf{rotto}.
+\end{itemize}
+
+La soluzione BCI:
+\begin{itemize}
+    \item Quando il classificatore rileva \textbf{motor imagery dell'arto plegico}, attiva un \textbf{driver esogeno} (FES = Functional Electrical Stimulation, o esoscheletro) che \textbf{muove fisicamente} l'arto.
+    \item Ciò genera un feedback sensoriale afferente \textbf{contingente all'intenzione motoria corteccia}.
+    \item Secondo il principio hebbiano (\textit{``neurons that fire together, wire together''}), questo accoppiamento tempestivo di intenzione motoria e feedback sensoriale favorisce la \textbf{neuroplasticità} e il ripristino delle connessioni corticospinali.
+\end{itemize}
+
+\subsection{Hybrid BCI — Corticomuscular Coherence (CMC)}
+
+\begin{definizione}[-- Hybrid BCI con CMC]
+Un sistema BCI ibrido monitora sia \textbf{EEG} che \textbf{EMG}. Il dispositivo si attiva solo quando rileva \textbf{coerenza} tra l'attività della corteccia motoria (EEG) e il muscolo bersaglio corretto (EMG). Questo previene strategie maladattative, come compensazione con la spalla o movimenti specchio dell'arto sano.
+\end{definizione}
+
+\section{Evidenza clinica: studio Pichiorri et al. (2015)}
+
+Lo studio ha confrontato la riabilitazione BCI-assistita vs.\ fisioterapia standard in pazienti con ictus subacuto:
+\begin{itemize}
+    \item \textbf{Outcome primario}: il gruppo BCI ha mostrato miglioramento significativamente maggiore alla scala \textbf{Fugl-Meyer} per il recupero motorio dell'arto superiore.
+    \item La probabilità di raggiungere la MCID (\textit{Minimal Clinically Important Difference}) era \textbf{2.5 volte maggiore} nel gruppo BCI.
+    \item \textbf{Meccanismo neuroplastico}: aumento della potenza spettrale motoria sull'emisfero \textbf{ipsilesionale} (quello colpito) + aumento del \textbf{coupling interemisferico} specificamente nelle bande \textbf{beta1/beta2} (bande motorie).
+\end{itemize}
+
+% ============================================================
+\chapter{Domande Vero/Falso dalle Slide}
+% ============================================================
+
+\begin{center}
+\textit{Tutte le affermazioni seguenti provengono direttamente dalle slide del corso (sezioni ``True statements'' e testi di riepilogo). \\[4pt]
+Ogni affermazione è \textbf{VERA} (le slide presentano solo affermazioni vere come lista di studio). \\[4pt]
+Le note esplicative in corsivo aiutano a capire il concetto e a trasformarle in domande V/F d'esame.}
+\end{center}
+
+\section{Blocco 1 — Ritmi EEG e potenziali evocati (slide 13)}
+
+\begin{itemize}
+    \item \textbf{Vero:} Il ritmo alfa è una componente oscillatoria dell'EEG spontaneo.
+    \textit{Il ritmo alfa si osserva sull'EEG spontaneo (non evocato) con frequenza $\sim 10$ Hz nelle regioni occipitali durante lo stato di riposo a occhi chiusi.}
+    
+    \item \textbf{Vero:} La frequenza del ritmo alfa è intorno a 10 Hz.
+    \textit{Convenzionalmente la banda alfa è 8--13 Hz, con il picco tipico del ritmo alfa intorno a 10 Hz.}
+    
+    \item \textbf{Vero:} L'ampiezza dell'EEG in banda alfa diminuisce quando la regione corticale generatrice è impegnata in un compito funzionale.
+    \textit{Questo è il fenomeno ERD (Event-Related Desynchronization). Aprire gli occhi o eseguire un compito visivo provoca la soppressione del ritmo alfa occipitale.}
+    
+    \item \textbf{Vero:} Il ritmo alfa visivo è generato nel lobo occipitale della corteccia cerebrale.
+    \textit{Il ritmo alfa ``vero'' o visivo ha massimo sugli elettrodi O1, O2, Oz. Il ritmo mu ha invece massimo su C3, Cz, C4.}
+    
+    \item \textbf{Vero:} Il ritmo mu è una componente oscillatoria dell'EEG spontaneo nella banda alfa, ma generato nelle regioni centrali.
+    \textit{Stessa frequenza del ritmo alfa ($\sim 8$--$13$ Hz) ma origine nella corteccia sensomotoria (non occipitale).}
+    
+    \item \textbf{Vero:} Le oscillazioni del ritmo mu hanno forma ``ad arco'' piuttosto che sinusoidale.
+    \textit{La forma ``ad arco'' (arched) è asimmetrica, con le fasi positive arrotondate a cupola; è una caratteristica distintiva del mu rispetto all'alfa occipitale.}
+    
+    \item \textbf{Vero:} L'ampiezza del ritmo alfa non è costante ma ``sale e scende'' (\textit{waxes and wanes}) con periodi irregolari.
+    \textit{I periodi di waxing/waning sono tipicamente dell'ordine di circa 1 secondo. Questo andamento variabile è una proprietà intriseca dei ritmi cerebrali spontanei.}
+    
+    \item \textbf{Vero:} La banda alfa è convenzionalmente limitata tra 8 e 13 Hz.
+    
+    \item \textbf{Vero:} Le bande delta e theta identificano frequenze inferiori a quelle della banda alfa; le bande beta e gamma identificano frequenze superiori.
+    \textit{Ordine crescente: $\delta < \theta < \alpha/\mu < \beta < \gamma$.}
+    
+    \item \textbf{Vero:} Il ritmo alfa può essere osservato filtrando il segnale EEG spontaneo con un filtro passa-banda con frequenze di taglio a 8 e 13 Hz.
+    
+    \item \textbf{Vero:} I Potenziali Evocati sono deflessioni del segnale EEG successive alla presentazione di uno stimolo sensoriale.
+    
+    \item \textbf{Vero:} I potenziali evento-correlati (ERP) includono i Potenziali Evocati ma anche risposte EEG a eventi motori o cognitivi.
+    \textit{Gli ERP sono la categoria più ampia; i Potenziali Evocati sensoriali (VEP, AEP, SEP) sono un sottogruppo.}
+\end{itemize}
+
+\section{Blocco 2 — Strumentazione EEG e sistema 10-20 (slide 37/45)}
+
+\begin{itemize}
+    \item \textbf{Vero:} Gli elettrodi Ag/AgCl sono non-polarizzabili, permettendo la registrazione di potenziali molto lentamente variabili.
+    \textit{Essere non-polarizzabili significa che non formano una tensione di polarizzazione variabile nel tempo all'interfaccia metallo-elettrolita.}
+    
+    \item \textbf{Vero:} In EEG, l'impedenza è la misura della qualità del contatto tra elettrodo e cuoio capelluto attraverso il gel conduttivo.
+    
+    \item \textbf{Vero:} L'impedenza di contatto degli elettrodi si misura in k$\Omega$ usando corrente alternata.
+    \textit{La misura con corrente continua causerebbe polarizzazione dell'elettrodo, alterando il valore misurato.}
+    
+    \item \textbf{Vero:} Gli elettrodi in oro sono polarizzabili e non dovrebbero essere usati per misurare potenziali lentamente variabili.
+    \textit{Esatto opposto degli Ag/AgCl. L'oro è ottimo per l'ampiezza del segnale ma la polarizzazione introduce deriva lenta.}
+    
+    \item \textbf{Vero:} Il CMRR di un amplificatore differenziale è il rapporto tra il guadagno differenziale e il guadagno di modo comune.
+    \textit{$CMRR = G_d / G_c$. Valori alti (es.\ 100 dB) indicano un amplificatore migliore.}
+    
+    \item \textbf{Vero:} Il CMRR è espresso in dB; valori più alti indicano amplificatori migliori.
+    
+    \item \textbf{Vero:} Un alto CMRR sopprime i disturbi di modo comune come il rumore di rete (50 Hz).
+    \textit{Il rumore di rete è accoppiato in modo comune su entrambi gli ingressi; un alto CMRR lo rigetta efficacemente.}
+    
+    \item \textbf{Vero:} La misura di un singolo canale EEG richiede tre elettrodi: due ingressi all'amplificatore differenziale e uno per il ground.
+    
+    \item \textbf{Vero:} L'impedenza di ingresso di un amplificatore biomedico deve essere molti ordini di grandezza superiore all'impedenza di contatto degli elettrodi; tipicamente è dell'ordine di $10^8\,\Omega$.
+    \textit{Questo garantisce che quasi tutta la tensione generata dal segnale biologico cada sull'amplificatore e non sull'impedenza di contatto.}
+    
+    \item \textbf{Vero:} Le linee guida EEG suggeriscono di mantenere l'impedenza di contatto sotto 5 k$\Omega$.
+    \textit{Gli amplificatori moderni ad alta impedenza di ingresso permettono di rilassare questo requisito.}
+    
+    \item \textbf{Vero:} Se l'impedenza di contatto dell'elettrodo è paragonabile all'impedenza di ingresso dell'amplificatore, si forma un partitore di tensione che riduce il potenziale misurato.
+    
+    \item \textbf{Vero:} Le differenze di impedenza di contatto tra gli elettrodi dovrebbero essere piccole, altrimenti il CMRR dell'amplificatore è compromesso.
+    \textit{L'asimmetria di impedenza converte il rumore di modo comune in segnale differenziale, degradando di fatto il CMRR pratico.}
+    
+    \item \textbf{Vero:} Il sistema 10-20 usa la prima lettera dei quattro lobi della corteccia (F, P, O, T) più ``C'' per le regioni centrali.
+    
+    \item \textbf{Vero:} Nel sistema 10-20, i numeri dispari designano elettrodi nell'emisfero sinistro, i pari nell'emisfero destro.
+    
+    \item \textbf{Vero:} Il sistema 10-20 prende il nome dal fatto che la distanza tra elettrodi adiacenti è il 10\% o il 20\% della distanza tra coppie di punti di riferimento sul cranio.
+    
+    \item \textbf{Vero:} Nella registrazione monopolare, tutti i canali condividono un unico elettrodo di riferimento posto in una posizione assunta lontana dalle sorgenti di interesse (es.\ lobi delle orecchie).
+    
+    \item \textbf{Vero:} La posizione dell'elettrodo di riferimento può influenzare fortemente la forma e l'ampiezza dei potenziali EEG.
+    \textit{Un riferimento attivo ``contamina'' tutti i canali. Il profilo delle topografie scalari (differenze relative) tuttavia non è influenzato dal riferimento.}
+    
+    \item \textbf{Vero:} Nella registrazione bipolare, ogni canale è la differenza di potenziale tra due elettrodi adiacenti; è usata principalmente in ambito clinico per evidenziare inversioni di fase.
+    
+    \item \textbf{Vero:} I segnali EEG registrati in configurazione monopolare possono essere ri-referenziati al CAR (Common Average Reference) sottraendo da ogni canale la media istantanea di tutti i canali.
+    \textit{In condizioni ideali (elettrodi uniformemente distribuiti sull'intera superficie, sorgenti interne) il CAR approssima il riferimento all'infinito.}
+\end{itemize}
+
+\section{Blocco 3 — Artefatti EEG, ERP ed ERD/ERS (slide 120--121)}
+
+\begin{itemize}
+    \item \textbf{Vero:} Un artefatto EEG è una differenza di potenziale dovuta a sorgenti extracerebrali.
+    
+    \item \textbf{Vero:} Gli artefatti possono avere origine biologica (occhi, muscoli, cuore) o essere causati da generatori elettromagnetici esterni o da eventi che influenzano il setup di registrazione.
+    
+    \item \textbf{Vero:} Gli artefatti possono essere parzialmente attenuati o rimossi, ma è sempre preferibile prevenirli durante l'acquisizione.
+    
+    \item \textbf{Vero:} L'occhio ha la parte frontale (cornea) positiva e quella posteriore (retina) negativa, e i suoi movimenti generano artefatti EOG sull'EEG dell'ordine di 500 $\mu$V.
+    \textit{Questo dipolo corneo-retinico è la sorgente dell'artefatto EOG, dominante sulle derivazioni frontali.}
+    
+    \item \textbf{Vero:} Durante un battito di ciglia (\textit{eyeblink}), la palpebra cortocircuita il potenziale positivo della superficie esterna dell'occhio, causando deflazioni positive sull'EEG di diversi centinaia di $\mu$V.
+    
+    \item \textbf{Vero:} Un movimento improvviso degli occhi verso l'alto/basso genera una deflazione positiva/negativa dell'EEG (EOG) sui canali frontali.
+    
+    \item \textbf{Vero:} Un movimento degli occhi verso destra/sinistra genera una deflazione positiva/negativa sul canale F8.
+    \textit{F8 è l'elettrodo frontale destro; un movimento degli occhi verso destra avvicina la cornea (+) a F8 $\Rightarrow$ deflessione positiva su F8, negativa su F7.}
+    
+    \item \textbf{Vero:} L'attività elettrica dei muscoli (EMG) ha contenuto spettrale a partire da 20 Hz e superiori, influenzando le bande beta e gamma dell'EEG.
+    
+    \item \textbf{Vero:} L'ampiezza dell'EMG originata dai muscoli della testa può avere ampiezza 10 volte superiore all'EEG spontaneo (dell'ordine di 1 mV).
+    
+    \item \textbf{Vero:} L'artefatto cardiaco (ECG) è più evidente se l'elettrodo di riferimento non è posizionato sulla testa.
+    \textit{Un riferimento ai lobi delle orecchie o alle mastoidi è più vicino al cuore, aumentando l'ampiezza dell'artefatto ECG.}
+    
+    \item \textbf{Vero:} L'artefatto ballistocardiografico è causato indirettamente dal polso di un vaso sanguigno che provoca il movimento di un elettrodo vicino.
+    
+    \item \textbf{Vero:} La sudorazione influenza l'EEG causando un artefatto lentamente variabile e di alta ampiezza (sotto 0.5 Hz, fino a diversi mV).
+    
+    \item \textbf{Vero:} Il rumore di rete è causato dall'accoppiamento capacitivo tra i conduttori di alimentazione e il setup di registrazione.
+    
+    \item \textbf{Vero:} Il rumore di rete interessa una banda molto stretta intorno ai 50 Hz (o 60 Hz); bande di frequenza multiple (tipicamente dispari) possono essere interessate.
+    
+    \item \textbf{Vero:} Il rumore di rete è accentuato dalle asimmetrie negli elettrodi (differenze di impedenza e percorso dei cavi), che impediscono il rigetto del rumore di modo comune.
+    
+    \item \textbf{Vero:} I filtri notch rimuovono efficacemente il rumore di rete rigettando selettivamente la banda stretta interessata dall'artefatto.
+    
+    \item \textbf{Vero:} Come passo preliminare all'analisi EEG, è possibile scartare canali estensivamente contaminati da artefatti e/o epoche temporali contenenti artefatti.
+    
+    \item \textbf{Vero:} La stima di ERP/EP richiede l'acquisizione di numerose ripetizioni (tipicamente decine o centinaia) dello stimolo.
+    
+    \item \textbf{Vero:} L'EEG spontaneo (ampiezza decine di $\mu$V) è un rumore che maschera completamente gli ERP (ampiezza $\mu$V o sub-$\mu$V) sul segnale registrato non mediato.
+    
+    \item \textbf{Vero:} La procedura di averaging per ERP consiste nel segmentare epoche a durata fissa dalla registrazione grezza, allineate alla ripetizione dell'evento, e nel calcolare la media sincronizzata.
+    
+    \item \textbf{Vero:} La media sincronizzata di $N$ trial preserva l'ampiezza dell'ERP e riduce l'EEG spontaneo di un fattore $\sqrt{N}$.
+    
+    \item \textbf{Vero:} L'ampiezza di un ERP è misurata rispetto a un'epoca di baseline (tipicamente precedente allo stimolo), in cui l'ampiezza media è assunta zero.
+    
+    \item \textbf{Vero:} La latenza di un picco ERP è misurata rispetto all'evento rilevante (presentazione dello stimolo).
+    
+    \item \textbf{Vero:} I picchi ERP sono denominati con P (positivo) o N (negativo) seguito dalla latenza nominale in ms (es.\ N100, P300).
+    
+    \item \textbf{Vero:} Un picco negativo a 108 ms su un soggetto specifico può ancora essere denominato N100 se corrisponde al fenomeno fisiologico dell'N100 nominale.
+    \textit{La nomenclatura è funzionale, non geometrica: N100 identifica una classe di risposta neurofisiologica, la cui latenza può variare tra soggetti.}
+    
+    \item \textbf{Vero:} L'SOA (\textit{Stimulus Onset Asynchrony}) misura l'intervallo di tempo tra l'inizio di due stimoli successivi. Se ogni trial contiene un solo stimolo, è equivalente all'ITI (\textit{Inter-Trial Interval}).
+    
+    \item \textbf{Vero:} L'ISI (\textit{Inter-Stimulus Interval}) misura l'intervallo tra la fine di uno stimolo e l'inizio del successivo. Vale: ISI = SOA $-$ durata stimolo.
+    \textit{Importante non confondere ISI con SOA: l'ISI è il \textbf{silenzio} tra stimoli, il SOA è l'intervallo tra gli \textbf{inizi}.}
+    
+    \item \textbf{Vero:} Con SOA troppo corto, la risposta a uno stimolo ha ampiezza ridotta; i componenti ERP a lunga latenza sono particolarmente sensibili.
+    
+    \item \textbf{Vero:} L'attività cerebrale phase-locked allo stimolo è chiamata evocata (\textit{evoked}); quella non phase-locked (jitter di latenza) è chiamata indotta (\textit{induced}).
+    
+    \item \textbf{Vero:} L'averaging può rivelare in modo affidabile i componenti dell'ERP corrispondenti ad attività evocata. L'attività indotta è invece esaminata sull'inviluppo (rettifica o quadratura + averaging).
+    
+    \item \textbf{Vero:} In EEG, sincronizzazione (desincronizzazione) è sinonimo di aumento (diminuzione) dell'ampiezza e quindi della potenza del segnale.
+    
+    \item \textbf{Vero:} L'ERD/ERS quantifica le variazioni di potenza dell'EEG rispetto a un periodo di baseline, espresse come variazione percentuale.
+    \[
+    ERD/ERS(\%) = \frac{P(t) - P_{baseline}}{P_{baseline}} \times 100
+    \]
+    
+    \item \textbf{Vero:} Il calcolo dell'ERD/ERS richiede: (i) filtraggio passa-banda; (ii) quadratura dei campioni (o rettifica); (iii) media sincronizzata tra trial; (iv) smoothing; (v) normalizzazione alla baseline.
+    \textit{Un'alternativa usa la rettifica invece della quadratura al passo (ii), stimando l'ampiezza invece della potenza.}
+    
+    \item \textbf{Vero:} L'analisi tempo-frequenza permette di analizzare e visualizzare le variazioni delle componenti spettrali nel tempo. Risoluzione temporale e frequenziale non sono liberamente scelti: maggiore l'una, minore l'altra.
+\end{itemize}
+
+\section{Blocco 4 — ADC: campionamento e quantizzazione (slide 48)}
+
+\begin{itemize}
+    \item \textbf{Vero:} Il teorema di Shannon afferma che un segnale continuo può essere correttamente campionato solo se non contiene componenti frequenziali superiori a metà della frequenza di campionamento.
+    
+    \item \textbf{Vero:} La frequenza di Nyquist è uguale a metà della frequenza di campionamento: $f_{Nyquist} = f_s / 2$.
+    
+    \item \textbf{Vero:} La ricostruzione di un segnale analogico dalla versione campionata equivale alla somma di funzioni sinc(), una per campione, centrata nel rispettivo istante di campionamento.
+    
+    \item \textbf{Vero:} L'aliasing si verifica quando un segnale analogico è campionato al di fuori delle condizioni del teorema di Shannon.
+    
+    \item \textbf{Vero:} Quando una componente sinusoidale con frequenza $f_0 \in (f_{Nyquist}, f_s)$ è campionata a frequenza $f_s$, la frequenza aliasata risultante è $f_{alias} = f_s - f_0 \in (0, f_{Nyquist})$.
+    
+    \item \textbf{Vero:} L'aliasing si previene applicando un filtro analogico passa-basso (filtro anti-aliasing) con frequenza di taglio inferiore a $f_{Nyquist}$ \textbf{prima} della conversione ADC.
+    \textit{Il filtro deve essere analogico perché il campionamento avviene dopo; un filtro digitale interverrebbe solo dopo che l'aliasing si è già verificato.}
+    
+    \item \textbf{Vero:} La quantizzazione introduce un rumore con deviazione standard $\sigma_{quant} = \frac{1}{\sqrt{12}}\,LSB$, dove LSB è il valore del bit meno significativo.
+    
+    \item \textbf{Vero:} La quantizzazione divide il range di ingresso dell'ADC in circa $2^{N_{bit}}$ intervalli, dove $N_{bit}$ è il numero di bit dell'ADC.
+    
+    \item \textbf{Vero:} Con un numero fisso di bit, scegliere un range di ingresso grande aumenta l'errore di quantizzazione; sceglierlo troppo piccolo aumenta il rischio di saturazione (clipping).
+    
+    \item \textbf{Vero:} Un'appropriata applicazione di un filtro analogico (prima della conversione) può prevenire la saturazione rimuovendo artefatti ad alta ampiezza in specifiche bande di frequenza.
+\end{itemize}
+
+\section{Blocco 5 — Statistiche, probabilità e rumore (slide 61)}
+
+\begin{itemize}
+    \item \textbf{Vero:} L'ARV (\textit{Average Rectified Value}) è la media dei valori assoluti di tutti i campioni del segnale.
+    \[
+    ARV = \frac{1}{N}\sum_{i=0}^{N-1}|x_i|
+    \]
+    \textit{Non confondere con l'RMS: $ARV \neq RMS$. Per un segnale sinusoidale: $ARV = \frac{2A}{\pi}$, $RMS = \frac{A}{\sqrt{2}}$.}
+    
+    \item \textbf{Vero:} L'RMS (\textit{Root Mean Square}) è la radice quadrata della media dei valori al quadrato dei campioni.
+    \[
+    RMS = \sqrt{\frac{1}{N}\sum_{i=0}^{N-1}x_i^2}
+    \]
+    
+    \item \textbf{Vero:} La varianza di un segnale si stima sommando i quadrati delle deviazioni di tutti i campioni dalla media campionaria, dividendo per $N-1$.
+    \[
+    s^2 = \frac{1}{N-1}\sum_{i=0}^{N-1}(x_i - \bar{X})^2
+    \]
+    
+    \item \textbf{Vero:} Quando il numero di campioni $N \to \infty$, l'RMS di un segnale a media zero si avvicina alla deviazione standard $\sigma$.
+    \textit{Formalmente: $RMS^2 = \bar{X}^2 + \sigma^2$. Con $\bar{X}=0$: $RMS = \sigma$.}
+    
+    \item \textbf{Vero:} Nel rumore bianco, tutti i campioni sono incorrelati: conoscere il valore di un campione non dà nessuna informazione sul valore di un altro.
+    
+    \item \textbf{Vero:} Lo spettro in frequenza del rumore bianco è piatto: ha la stessa potenza a qualsiasi frequenza.
+    
+    \item \textbf{Vero:} In un rumore gaussiano, la probabilità (densità) che un campione abbia un determinato valore di ampiezza segue la distribuzione normale a media zero.
+    
+    \item \textbf{Vero:} Dati due intervalli di uguale ampiezza $A=[-0.5,+0.5]$ e $B=[0.5,1.5]$, è più probabile che i campioni di un rumore gaussiano abbiano ampiezza in $A$ rispetto a $B$.
+    \textit{Perché la gaussiana ha il massimo di probabilità intorno a 0, e i due intervalli sono alla stessa distanza l'uno (verso 0) e l'altro (verso 1). $A$ è centrato su 0, $B$ è lontano.}
+    
+    \item \textbf{Vero:} I campioni di un'onda triangolare hanno distribuzione uniforme di ampiezza tra $-A$ e $+A$.
+    \textit{L'onda triangolare percorre linearmente tutto il range $[-A,+A]$, quindi ogni valore di ampiezza è equamente campionato.}
+    
+    \item \textbf{Vero:} Il CLT afferma che la distribuzione della media di $N$ variabili i.i.d. tende a una distribuzione normale al tendere di $N$ a infinito, indipendentemente dalla distribuzione originale.
+    
+    \item \textbf{Vero:} La distribuzione della media di $N$ variabili gaussiane i.i.d. è una distribuzione normale \textbf{per qualsiasi valore di $N$}.
+    \textit{Caso speciale del CLT: se le variabili originali sono già gaussiane, la media è gaussiana anche per $N=1$.}
+    
+    \item \textbf{Vero:} La varianza della media di $N$ variabili i.i.d. con varianza $\sigma^2$ è $\sigma^2/N$; la deviazione standard è $\sigma/\sqrt{N}$.
+    
+    \item \textbf{Vero:} La media sincronizzata di $N$ trial contenenti solo EEG spontaneo con $RMS_{single} = \sigma$ produce un segnale con $RMS_{avg} = \sigma/\sqrt{N}$.
+\end{itemize}
+
+\section{Blocco 6 — Filtri digitali (slide 99)}
+
+\begin{itemize}
+    \item \textbf{Vero:} Lo scopo di un filtro è permettere ad alcune componenti spettrali di passare quasi inalterate, bloccando o attenuando le altre.
+    
+    \item \textbf{Vero:} I filtri si classificano in quattro tipi in base alla risposta in frequenza: (i) passa-basso; (ii) passa-alto; (iii) passa-banda; (iv) band-reject (o band-stop).
+    
+    \item \textbf{Vero:} La frequenza di taglio designa il limite della passband. Il guadagno del filtro alla frequenza di taglio è approssimativamente $1/\sqrt{2} \approx 0.71$ ($-3$ dB).
+    
+    \item \textbf{Vero:} La risposta in frequenza di un filtro nella stopband non dovrebbe essere valutata su un grafico con asse del guadagno in scala lineare; dovrebbe essere usata una scala logaritmica (dB).
+    
+    \item \textbf{Vero:} I filtri digitali si classificano in FIR (Finite Impulse Response) e IIR (Infinite Impulse Response).
+    
+    \item \textbf{Vero:} L'output di un filtro FIR è la combinazione lineare di campioni dell'ingresso; l'output di un filtro IIR combina sia campioni dell'ingresso sia campioni passati dell'output.
+    
+    \item \textbf{Vero:} Il filtro di Butterworth è un metodo di design nella famiglia IIR.
+    
+    \item \textbf{Vero:} Un filtro notch è un tipo di filtro band-reject che attenua l'ingresso in una banda stretta intorno alla frequenza notch; il suo uso più comune è rimuovere l'artefatto di rete a 50 Hz.
+    
+    \item \textbf{Vero:} Un filtro IIR è più efficiente di uno FIR: a parità di specifiche, il filtro FIR deve avere ordine più alto.
+    
+    \item \textbf{Vero:} Un filtro FIR può essere progettato per avere fase lineare (nessuna distorsione di fase). I filtri IIR non possono avere fase lineare.
+    \textit{Cruciale per le applicazioni ERP, dove la forma d'onda è importante. Con un filtro IIR a fase non lineare, i picchi ERP sarebbero deformati.}
+\end{itemize}
+
+\section{Blocco 7 — Analisi spettrale DFT e Welch (slide 90--91)}
+
+\begin{itemize}
+    \item \textbf{Vero:} La DFT associa la rappresentazione temporale (campionata, a durata finita) di un segnale alla sua rappresentazione nel dominio della frequenza (a banda limitata, campionata).
+    
+    \item \textbf{Vero:} Data una DFT di $N$ campioni, la prima metà è sufficiente a caratterizzare completamente il segnale (per segnali reali).
+    
+    \item \textbf{Vero:} La FFT è un'implementazione efficiente della DFT per segnali il cui numero di campioni è una potenza di 2.
+    
+    \item \textbf{Vero:} Per un segnale campionato con intervallo $\Delta t_s = 1/f_s$, la distanza tra bin frequenziali adiacenti della DFT è $\Delta f = 1/T_{tot}$, dove $T_{tot}$ è la durata totale del segnale.
+    
+    \item \textbf{Vero:} Lo zero-padding (aggiunta di campioni a zero) riduce la distanza tra campioni adiacenti dello spettro, migliorando visivamente la risoluzione frequenziale, ma non aggiunge informazione reale.
+    
+    \item \textbf{Vero:} Il fenomeno di spectral leakage si osserva quando si estrae una sezione di un segnale più lungo: è matematicamente equivalente a moltiplicare il segnale per una finestra rettangolare.
+    
+    \item \textbf{Vero:} Il leakage spettrale allarga ciascun campione di frequenza dello spettro originale secondo la DFT della funzione di windowing, producendo un lobo principale e lobi laterali.
+    
+    \item \textbf{Vero:} L'uso di una finestra tapered (es.\ Hamming, Blackman-Harris) riduce i lobi laterali ma allarga il lobo principale.
+    
+    \item \textbf{Vero:} Una finestra rettangolare è preferibile per distinguere due componenti con frequenza simile e potenza analoga; una finestra tapered è preferibile quando una componente forte potrebbe mascherarne una debole a frequenza diversa.
+    
+    \item \textbf{Vero:} Il periodogramma è la stima base dello spettro di potenza: $PS(f) = |DFT(x)|^2$. È uno stimatore non consistente (la varianza non diminuisce all'aumentare della durata del segnale).
+    
+    \item \textbf{Vero:} Nel metodo di Welch (averaged windowed periodogram), il segnale è diviso in $N$ segmenti sovrapposti, ciascuno moltiplicato per una finestra, il periodogramma di ciascun segmento è calcolato e mediato con gli altri.
+    
+    \item \textbf{Vero:} La STFT (\textit{Short-Time Fourier Transform}) è un metodo per stimare uno spettrogramma, ovvero la rappresentazione dell'evoluzione temporale dello spettro di un segnale non stazionario.
+    
+    \item \textbf{Vero:} In uno spettrogramma, il tempo è solitamente sull'asse orizzontale, la frequenza sull'asse verticale, e la potenza è codificata con il colore.
+\end{itemize}
+
+\section{Blocco 8 — Brain-Computer Interfaces (slide 4)}
+
+\begin{itemize}
+    \item \textbf{Vero:} Un BCI è un sistema che misura l'attività cerebrale e la converte in un output artificiale che rimpiazza, migliora o estende l'output naturale del cervello, bypassando le vie neuromuscolari normali.
+    
+    \item \textbf{Vero:} L'ERP P300 generato dall'attenzione a uno stimolo bersaglio è sfruttato per costruire tastiere virtuali basate su BCI.
+    
+    \item \textbf{Vero:} L'ampiezza dei ritmi sensomotori può essere volontariamente modulata attraverso l'esercizio di motor imagery, per costruire un BCI di controllo del cursore.
+    
+    \item \textbf{Vero:} Un BCI bypassa completamente le normali vie neuromuscolari per misurare l'attività del SNC e convertirla in un output artificiale.
+    
+    \item \textbf{Vero:} Il funzionamento di un BCI è una pipeline closed-loop che si basa sul feedback ambientale per permettere al cervello dell'utente di apprendere e modificare consapevolmente i propri segnali.
+    
+    \item \textbf{Vero:} Nelle applicazioni assistive, i BCI non mirano a guarire il danno biologico, ma forniscono un canale di accesso alternativo permanente per utenti con gravi deficit motori.
+    
+    \item \textbf{Vero:} Il P300 è un ERP che si manifesta come una deflessione positiva di tensione circa 300 ms dopo la presentazione di uno stimolo bersaglio raro e significativo.
+    
+    \item \textbf{Vero:} In un BCI P300, le feature sono tipicamente costruite mediando la tensione EEG su brevi finestre temporali ($\sim 50$ ms) a specifiche latenze post-stimolo e canali spaziali.
+    
+    \item \textbf{Vero:} Classificatori lineari come SWLDA sono preferiti nei BCI P300 perché generalizzano bene anche con piccoli training set, e i pesi interpretabili permettono di verificare che il modello stia apprendendo una risposta fisiologica genuina.
+    
+    \item \textbf{Vero:} In una moderna architettura AT modulare, un BCI P300 produce solo un trigger discreto di selezione, delegando la logica applicativa complessa al software AT commerciale.
+    
+    \item \textbf{Vero:} I ritmi sensomotori (SMR), che includono il ritmo mu e hanno componenti spettrali nelle bande alfa e beta, si desincronizzano (calano di potenza) durante sia l'esecuzione fisica che l'immaginazione cinestesica di un movimento.
+    
+    \item \textbf{Vero:} I BCI riabilitativi asincroni traducono la modulazione continua e state-dependent della potenza SMR in un comando di intento motorio attivo, senza attendere eventi discreti.
+    
+    \item \textbf{Vero:} L'intervallo di aggiornamento del sistema BCI è inferiore alla durata minima dell'epoca necessaria per una stima spettrale accettabile, per garantire una risposta fluida. Il conseguente overlap di epoche consecutive a livello di sistema è concettualmente distinto dall'overlap algoritmico interno al metodo di Welch.
+    
+    \item \textbf{Vero:} Sebbene formalmente definito rispetto a un evento discreto, il termine ERD è frequentemente usato nei contesti BCI per descrivere cali continui e state-dependent della potenza SMR.
+    
+    \item \textbf{Vero:} L'obiettivo primario di un BCI riabilitativo è guidare la plasticità del SNC attivando le reti motorie danneggiate per ripristinare le funzioni biologiche compromesse.
+    
+    \item \textbf{Vero:} La motor imagery cinestesica, che consiste nel rivivere la sensazione fisiologica del movimento di un arto, attiva efficacemente la corteccia motoria primaria (M1) e l'area motoria supplementare (SMA).
+    
+    \item \textbf{Vero:} Un BCI riabilitativo agisce come un ponte sintetico che chiude il loop sensomotorio interrotto, fornendo feedback sensoriale esogeno esattamente quando la corteccia motoria del paziente genera intento motorio endogeno.
+    
+    \item \textbf{Vero:} Il training BCI-assistito con motor imagery induce una riconfigurazione specifica della rete cerebrale, aumentando significativamente la connettività interemisferica nelle bande beta.
+    \textit{Evidenza dallo studio Pichiorri et al.\ (2015): l'emisfero ipsilesionale aumenta la propria potenza beta, e la coerenza interemisferica nelle bande beta1/beta2 aumenta specificamente nel gruppo BCI.}
+\end{itemize}
+
+\section{Blocco 9 — Elettromiografia (slide finali EMG)}
+
+\begin{itemize}
+    \item \textbf{Vero:} La fibra muscolare è una singola cellula del tessuto muscolare.
+    
+    \item \textbf{Vero:} La membrana della fibra muscolare è un tessuto eccitabile che produce un MFAP alla depolarizzazione.
+    
+    \item \textbf{Vero:} La MFCV (\textit{Muscle Fiber Conduction Velocity}) è tipicamente nell'intervallo 2--6 m/s.
+    
+    \item \textbf{Vero:} La MFCV è influenzata da temperatura, diametro della fibra e fatica muscolare.
+    
+    \item \textbf{Vero:} Un'Unità Motoria è l'unità funzionale fondamentale del sistema neuromuscolare, costituita da un singolo motoneurone alfa e da tutte le fibre muscolari che innerva.
+    
+    \item \textbf{Vero:} Il MUAP è il segnale elettrico generato da una singola unità motoria, che rappresenta la somma spaziale e temporale di tutti gli MFAP costituenti.
+    
+    \item \textbf{Vero:} Il SNC modula la forza muscolare attraverso due meccanismi primari: reclutamento e rate coding.
+    
+    \item \textbf{Vero:} Il reclutamento è il processo di attivazione di unità motorie aggiuntive per aumentare la forza di contrazione.
+    
+    \item \textbf{Vero:} Il rate coding si riferisce all'aumento della frequenza di scarica (impulsi al secondo) delle unità motorie già attive.
+    
+    \item \textbf{Vero:} A bassi livelli di forza, il reclutamento è il meccanismo dominante per la modulazione della forza. Ad alti livelli e durante contrazioni rapide, il rate coding diventa un contributo più significativo.
+    
+    \item \textbf{Vero:} I tessuti tra le fibre muscolari e gli elettrodi di registrazione (grasso, pelle) agiscono come conduttori di volume che filtrano l'EMG spazialmente e temporalmente in modo passa-basso.
+    
+    \item \textbf{Vero:} L'MFAP propagante può essere modellato come un tripolo, con una fase negativa centrale e due fasi positive (anteriore e posteriore).
+    
+    \item \textbf{Vero:} Gli effetti di fine-fibra decadono con la distanza più lentamente rispetto alle altre componenti del MUAP.
+    
+    \item \textbf{Vero:} Le componenti passa-alto e passa-basso del MUAP nel dominio temporale sono legate alle componenti spaziali perché la sorgente si propaga con una specifica velocità di conduzione (CV).
+    \textit{Questo crea un legame intrinseco tra l'analisi temporale e quella spaziale del segnale EMG.}
+\end{itemize}
+
+% ============================================================
