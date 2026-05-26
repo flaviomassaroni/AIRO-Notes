@@ -1,0 +1,99 @@
+<svg width="680" height="232" viewBox="0 0 680 232" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Closed-loop BCI-SRG system architecture</title>
+<desc>Four-stage closed-loop pipeline for post-stroke motor rehabilitation: EEG acquisition with respiratory synchronisation, FBCSP adaptive LDA decoder, safety controller with virtual fixtures and admittance control, soft pneumatic glove. Dashed visuo-proprioceptive feedback closes the loop. Remote clinical supervision connects asynchronously to the system.</desc>
+
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#555552" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="arr-dash" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#888884" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- White background for PDF -->
+<rect width="680" height="232" fill="white"/>
+
+<!-- ── Patient label ── -->
+<text x="76" y="13" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#555552">Patient</text>
+<line x1="76" y1="20" x2="76" y2="42" stroke="#CCCCCA" stroke-width="0.6" stroke-dasharray="3 2"/>
+
+<!-- ── Remote monitoring badge ── -->
+<rect x="498" y="2" width="142" height="24" rx="5" fill="#E8F0FB" stroke="#4A7CC7" stroke-width="0.8"/>
+<text x="569" y="14" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="500" fill="#2C5282">Remote monitoring</text>
+<line x1="569" y1="26" x2="569" y2="42" stroke="#AABFDF" stroke-width="0.6" stroke-dasharray="3 2"/>
+
+<!-- ── Block 1: EEG Acquisition ── -->
+<rect x="10" y="42" width="132" height="86" rx="8" fill="#E6F7F2" stroke="#1A8A6A" stroke-width="1"/>
+<text x="76" y="68" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="600" fill="#0D5C46">EEG Acquisition</text>
+<text x="76" y="86" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1A8A6A">8-ch dry · C3/C4</text>
+<text x="76" y="102" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#1A8A6A">μ/β bands</text>
+<text x="76" y="118" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#2EA882">resp. sync (inhale trigger)</text>
+
+<!-- ── Block 2: BCI Decoder ── -->
+<rect x="162" y="42" width="148" height="86" rx="8" fill="#EEEDFB" stroke="#5046B0" stroke-width="1"/>
+<text x="236" y="68" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="600" fill="#2D2475">BCI Decoder</text>
+<text x="236" y="86" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#5046B0">FBCSP + Adaptive LDA</text>
+<text x="236" y="102" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#5046B0">ERD detection</text>
+<text x="236" y="118" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#7068CC">Woodbury update</text>
+
+<!-- ── Block 3: Safety Controller ── -->
+<rect x="330" y="42" width="148" height="86" rx="8" fill="#FBE9E3" stroke="#C04020" stroke-width="1"/>
+<text x="404" y="68" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="600" fill="#7A2510">Safety Controller</text>
+<text x="404" y="86" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#C04020">Virtual fixtures</text>
+<text x="404" y="102" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#C04020">Admittance (F→v)</text>
+<text x="404" y="118" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#D96040">Fail-safe · E-stop</text>
+
+<!-- ── Block 4: Soft Glove ── -->
+<rect x="498" y="42" width="142" height="86" rx="8" fill="#FEF3E0" stroke="#C07010" stroke-width="1"/>
+<text x="569" y="68" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="600" fill="#7A4506">Soft-Robotic Glove</text>
+<text x="569" y="86" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#C07010">PneuNet · 5 DoF</text>
+<text x="569" y="102" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#C07010">Pneumatic actuation</text>
+<text x="569" y="118" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#D49030">Self-donning · &lt;350 g</text>
+
+<!-- ── Arrows between blocks ── -->
+<line x1="142" y1="85" x2="160" y2="85" stroke="#555552" stroke-width="1.2" marker-end="url(#arr)"/>
+<line x1="310" y1="85" x2="328" y2="85" stroke="#555552" stroke-width="1.2" marker-end="url(#arr)"/>
+<line x1="478" y1="85" x2="496" y2="85" stroke="#555552" stroke-width="1.2" marker-end="url(#arr)"/>
+
+<!-- Arrow labels -->
+<text x="151" y="76" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#777774">EEG</text>
+<text x="319" y="76" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#777774">trigger</text>
+<text x="487" y="76" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#777774">cmd</text>
+
+<!-- ── 300 ms Hebbian window bracket ── -->
+<rect x="148" y="36" width="336" height="98" rx="9" fill="none" stroke="#AAAAAA" stroke-width="0.6" stroke-dasharray="4 3"/>
+<text x="316" y="28" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#888884">≤ 300 ms  —  Hebbian contingency window</text>
+
+<!-- ── Feedback loop ── -->
+<path d="M 569 128 L 569 190 L 76 190 L 76 128"
+  fill="none" stroke="#888884" stroke-width="1" stroke-dasharray="6 3"
+  marker-end="url(#arr-dash)"/>
+<text x="322" y="210" text-anchor="middle" dominant-baseline="central"
+  font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#666663">
+  Visuo-proprioceptive feedback  ·  closed-loop  ·  LoA 2
+</text>
+
+</svg>

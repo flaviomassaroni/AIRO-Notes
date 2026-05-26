@@ -5,34 +5,29 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 %\usepackage{gentium}
-\usepackage{mathptmx} % Use Times Font
-
-
-\usepackage[pdftex]{graphicx} % Required for including pictures
-\usepackage[swedish]{babel} % Swedish translations
-\usepackage[pdftex,linkcolor=black,pdfborder={0 0 0}]{hyperref} % Format links for pdf
-\usepackage{calc} % To reset the counter in the document after title page
-\usepackage{enumitem} % Includes lists
+\usepackage{mathptmx} 
+\usepackage[pdftex]{graphicx} 
+\usepackage[english]{babel}
+\usepackage[pdftex,linkcolor=black,pdfborder={0 0 0}]{hyperref} 
+\usepackage{calc} 
+\usepackage{enumitem}
 \usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{subcaption} 
 \usepackage{float}  
-
-
-\frenchspacing % No double spacing between sentences
-\linespread{1} % Set linespace
-\usepackage[a4paper, lmargin=0.1666\paperwidth, rmargin=0.1666\paperwidth, tmargin=0.1111\paperheight, bmargin=0.1111\paperheight]{geometry} %margins
+\frenchspacing 
+\linespread{1} 
+\usepackage[a4paper, lmargin=0.1666\paperwidth, rmargin=0.1666\paperwidth, tmargin=0.1111\paperheight, bmargin=0.1111\paperheight]{geometry}
 %\usepackage{parskip}
+\usepackage[all]{nowidow}
+\usepackage[protrusion=true,expansion=true]{microtype} 
+\usepackage{titlesec}
+\titleformat{\section}{\normalsize\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\small\bfseries}{\thesubsection}{1em}{}
+\titleformat{\paragraph}{\small\bfseries\itshape}{}{0em}{}
+\titlespacing{\section}{0pt}{6pt}{3pt}
+\titlespacing{\subsection}{0pt}{4pt}{2pt}
 
-\usepackage[all]{nowidow} % Tries to remove widows
-\usepackage[protrusion=true,expansion=true]{microtype} % Improves typography, load after fontpackage is selected
-
-\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
-
-
-%-----------------------
-% Set pdf information and add title, fill in the fields
-%-----------------------
 \hypersetup{ 	
 pdfsubject = {Medical Robotics},
 pdftitle = {Closed-Loop BCI-Triggered System with Soft-Robotic Glove for after-stroke rehabilitation},
@@ -52,71 +47,60 @@ pdfauthor = {Flavio Massaroni}
 
 \section{Clinical Need}
 Stroke represents a major cause of long-term neurological disability globally. 
-As evidenced by epidemiological data from the World Stroke Organization [1], the socio-health impact of
+As evidenced by epidemiological data from the World Stroke Organization \cite{feigin2025world}, the socio-health impact of
 this pathology is constantly growing: over 93 million cases prevalent, some 160 million years of life lost to disability
-(DALYs) and a cost estimated global economic of more than US\$ 890 billion. 
+(DALYs) and a estimated global economic cost of more than US\$ 890 billion. 
 
-Between 55\% and 75\% ofsurvivors have chronic upper limb motor deficit which compromises autonomy 
-in daily activities (ADL) [12]. Donkor [2] contextualize this figure in the perspective of quality of life:
+Between 55\% and 75\% of survivors have chronic upper limb motor deficit which compromises autonomy 
+in daily activities \cite{proietti2024combining}. Donkor \cite{donkor2018stroke} contextualize this figure in the perspective of quality of life:
 stroke is the second cause of death at the world and causes severe permanent disability in about half 
 of the survivors, with high impact on autonomy, working life and the care burden on family members.
 
-This combination of high prevalence and high residual disability justifies 
-the search for advanced technological solutions that can deliver portable therapy with 
-an intensity comparable to that of departments of specialized rehabilitation.
-Recent clinical research indicates that the effectiveness of traditional rehabilitation treatments is severely 
-limited by a therapeutic dosage deficit. 
-The systematic analysis conducted by Newton et al. [3]
-highlights how the actual time spent on active therapeutic exercise (time on task) within conventional
-sessions varies on average between 8 and 44 minutes per day — significantly lower than recommended doses to 
-induce cortical reorganization stable. A clinical paradox emerges: patients with more severe impairment receive 
-doses of significantly lower active therapy precisely because of the high effort required without tools modular 
-assistance.
+The actual time spent on active therapeutic exercise (time on task) within conventional
+sessions varies on average between 8 and 44 minutes per day \cite{newton2023dose} — significantly lower than recommended doses to 
+induce stable cortical reorganization.
 
+Functionally, this dose deficit translates into outcomes: the Ren 
+et al.\ meta-analysis \cite{ren2024effect} of 10 RCTs (290 patients) 
+confirms that BCI-triggered intervention outperforms conventional 
+therapy (SMD\,=\,0.50), implying that conventional care alone fails 
+to activate the neuroplastic mechanisms required for full motor 
+recovery in the majority of patients with severe deficit.
 
 \section{Current Standard of Care and Its Limitations}
 
 The current standard of post-stroke upper limb rehabilitation combines 
 conventional physiotherapy with commercially available robotic orthoses. 
-Both approaches share a critical failure mode: they address the peripheral 
-component of motor recovery while neglecting its central requirement.
+Among passive systems: Bioservo SEM Glove uses EMG-threshold triggering 
+on a peripheral signal absent in dense hemiparesis; Gloreha applies 
+passive mobilization on a fixed schedule; Hand of Hope employs EMG 
+amplitude as a proportional actuator \cite{fiska2025integration}. All 
+three produce joint mobilization without cortical engagement.
 
-Newton et al.~\cite{newton2023dose} quantify this dose gap: effective 
-active therapy time in conventional care averages 8--44 minutes per day — 
-far below the repetition volume required to induce stable cortical 
-reorganization. After discharge, most patients receive virtually no 
-structured rehabilitation.
+Wang et al.~\cite{wang2023effectiveness} quantify this failure: a passive 
+soft-robotic glove improved FMA-UE scores but produced no significant 
+changes in Resting Motor Threshold or Motor Evoked Potential amplitude --- 
+the markers of cortical synaptic excitability. The glove moves the hand; 
+it does not engage the brain. After discharge, most patients receive 
+virtually no structured rehabilitation \cite{newton2023dose}.
 
-The robotic hardware available today does not close this gap. Wang et 
-al.~\cite{wang2023effectiveness} compared a passive soft-robotic glove 
-against repetitive transcranial magnetic stimulation (rTMS) in patients 
-with severe upper limb dysfunction. The passive glove improved 
-Fugl-Meyer Assessment scores (FMA-UE) by facilitating joint mobilization, 
-but produced no significant changes in Resting Motor Threshold (RMT) or 
-Motor Evoked Potential (MEP) amplitude — the markers of cortical synaptic 
-excitability. The glove moves the hand, it does not engage the brain.
+The mechanism required for genuine recovery is well established: stable 
+synaptic modification (STDP) requires temporal coincidence within 
+$\approx$300\,ms between cortical motor intent and afferent 
+feedback \cite{biasiucci2018brain, krueger2024hebbian}. A random or sham 
+activation produces no $\beta$-band coherence 
+increase \cite{krueger2024hebbian} and no clinical 
+improvement \cite{kim2025efficacy}. Rustamov et al.~\cite{rustamov2025ipsihand} 
+confirm that theta-gamma CFC over C3/C4 increases proportionally to motor 
+recovery across BCI sessions --- the gap is not biological, it is a 
+delivery problem.
 
-The neurobiological explanation is well established. Long-term motor 
-recovery depends on Hebbian plasticity (Spike-Timing-Dependent Plasticity, 
-STDP): stable synaptic modifications require temporal coincidence — within 
-approximately 300\,ms — between the pre-synaptic signal (motor cortex 
-activation associated with movement intention) and the post-synaptic 
-afferent feedback generated by the actual limb movement 
-\cite{biasiucci2018brain, krueger2024hebbian}. In the $\mu$ (8--12\,Hz) 
-and $\beta$ (13--30\,Hz) bands, Motor Imagery manifests as event-related 
-desynchronization (ERD) over contralateral motor areas (C3/C4). When a 
-BCI detects this ERD and uses it as an instantaneous trigger, the Hebbian 
-coincidence window is realized. A random or sham activation produces no 
-significant increase in $\beta$-band corticomuscular coherence 
-\cite{krueger2024hebbian} and no relevant clinical improvement 
-\cite{kim2025efficacy}.
-
-The biomarker of this reorganization is measurable in real time: Rustamov 
-et al.~\cite{rustamov2025ipsihand} demonstrate that theta-gamma 
-cross-frequency coupling (CFC) over C3/C4 increases proportionally to 
-motor recovery across BCI sessions, confirming CFC as a neurobiological 
-proxy for treatment efficacy. The mechanism exists, is validated, and is 
-quantifiable. The gap is not biological — it is a delivery problem.
+The sole BCI-triggered orthosis to reach clinical deployment, IpsiHand 
+(Neurolutions), closes this neural loop \cite{rustamov2025ipsihand}, but 
+was validated exclusively in supervised clinical settings with trained 
+personnel at each session \cite{rustamov2025ipsihand}. No commercial 
+system today implements contingent BCI triggering in an unsupervised, 
+home-deployable form.
 
 % ---------------------------------------------------------------
 \section{The Human Limitation Being Addressed}
@@ -147,22 +131,23 @@ intervention outperforms conventional therapy (SMD\,=\,0.50, 95\,\% CI:
 
 The robot is not a substitute for clinical judgment — the therapist remains 
 in the loop asynchronously via remote dashboard. It is a substitute for 
-physical presence and consistanc and automatic reactivity.
+physical presence, consistency, and automatic reactivity.
 
 
 % ---------------------------------------------------------------
 \section{Proposed Robotic Solution}
 % ---------------------------------------------------------------
 
-To overcome the issue, the proposed solution is a BCI-Triggered system with a Soft Robotic Glove. This is the direct consequence
-of the need to satisfy the time gap consistency and the continuative dose during years.
-The device is classified as a wearable, domiciliary and supervised. It is used in autonomous session of 30-45 minutes per 3-5 times per week, 
-without the clinitian presence. An GUI is used to set up and start up the session, and the clinitian monitors during time with a
-claude communication.
+The proposed solution — a BCI-Triggered Soft Robotic Glove (BCI-SRG) — 
+is the direct engineering consequence of the three limitations identified 
+above. The device is a wearable, unsupervised home system used in 
+autonomous sessions of 30--45 minutes, 3--5 times per week, without 
+on-site clinical presence. A tablet GUI manages session setup; the 
+therapist supervises asynchronously via cloud dashboard.
 
 \subsection{Kinematic Architecture}
 
-The architecture is a soft-robotic pneumatic wearable glove, modelled as a sytem of serial kinematic chain anchored 
+The architecture is a soft-robotic pneumatic wearable glove, modelled as a system of serial kinematic chain anchored 
 to a fixed palm \cite{proietti2024combining, fiska2025integration}.
 The choice of using a pneumatic network (PneuNet) is dictated by the need of intrinsic security and passive adaptability to variable geometries in 
 an unsupervised environment.
@@ -187,21 +172,21 @@ by three primary factors:
 
 \begin{figure}[H]
      \centering
-     \captionsetup{aboveskip=2pt, belowskip=2pt} % Compatta le didascalie
+     \captionsetup{aboveskip=2pt, belowskip=2pt}
      \begin{subfigure}[t]{0.45\textwidth}
          \centering
-         \includegraphics[width=0.9\textwidth, trim=0 30 0 30, clip]{hand_view1.png}
+         \includegraphics[width=0.75\textwidth, trim=0 30 0 30, clip]{urdf_frontal.png}
          \caption{Frontal view}
      \end{subfigure}
      \hfill
      \begin{subfigure}[t]{0.45\textwidth}
          \centering
-         \includegraphics[width=0.9\textwidth, trim=0 30 0 30, clip]{hand_view2.png}
+         \includegraphics[width=0.75\textwidth, trim=0 30 0 30, clip]{urdf_lateral.png}
          \caption{Lateral view, showing joint flexion}
      \end{subfigure}
      \caption{URDF kinematic model of the robotic glove.}
      \label{fig:urdf_model}
-     \vspace{-5pt}
+     \vspace{-10pt}
 \end{figure}
 
 Mathematically, this under-actuation defines a constrained kinematic mapping where the joint space $q \in \mathbb{R}^{14}$ is
@@ -209,7 +194,7 @@ coupled to the actuator pressure space $u \in \mathbb{R}^{5}$ via a non-linear v
 \begin{equation}
 q = g(u)
 \end{equation}
-where the passive elasticity of the silicone elastomer acts as a virtual restoring spring,guaranteeing a unique, statically stable equilibrium
+where the passive elasticity of the silicone elastomer acts as a virtual restoring spring, guaranteeing a unique, statically stable equilibrium
 configuration for each input pressure vector $u$.
 
 \subsection{Sensing and Biomechanical Safety}
@@ -222,13 +207,21 @@ System sensing is categorized into two levels: neurological sensing (EEG) and lo
     \item \textbf{Emergency Stop:} A physical, high-visibility emergency button is located on the device controller. Accessible with the patient's unaffected hand, it immediately cuts power to the valves and exhausts residual pneumatic pressure, independently of the software state.
 \end{itemize}
 
-While EEG-based BCI for post-stroke rehabilitation is a safe and clinically established modality, 
-the primary challenge lies in achieving robust decoding rather than biological feasibility. 
-Cortical lesions often trigger neuroplastic reorganization, which can alter the amplitude and spatial topography of Motor Imagery signals. 
-To address this inter-patient variability, our system employs an adaptive Linear Discriminant Analysis (LDA) classifier. 
-This model dynamically calibrates to the patient’s specific, reorganized neural patterns, effectively compensating for post-lesional 
-cortical shifts and ensuring high decoding accuracy despite the altered brain activity.
-
+The neurological sensing layer processes EEG acquired from the 
+rigid-shell headset across four sub-bands (4--8\,Hz, 8--12\,Hz, 
+13--30\,Hz, 30--45\,Hz) using Filter Bank Common Spatial Pattern 
+(FBCSP), producing a compact spatial-spectral feature vector. 
+Classification uses an Adaptive LDA \cite{wu2024adaptive} that 
+performs recursive parameter updates online, compensating for 
+intra-session signal drift caused by cortical reorganization, 
+cognitive state fluctuation, and electrode impedance drift — 
+the three documented sources of EEG non-stationarity in 
+post-stroke patients \cite{wu2024adaptive}. Total pipeline 
+latency on embedded edge hardware is $<$50\,ms, well within 
+the 300\,ms Hebbian contingency window \cite{krueger2024hebbian}. 
+Actuation is executed via five solenoid valves (one per digit), 
+with pressure modulated by the admittance controller in the 
+safety layer.
 
 \subsection{Level of Autonomy, EEG Interface, and Inclusion Criteria}
 
@@ -245,6 +238,9 @@ To ensure autonomous self-donning, the system utilizes a pre-shaped rigid-shell 
 dry electrodes. The mechanical structure guides the headset into the correct position on the C3/C4 
 sites within 2 minutes, removing the need for conductive gel or high-precision alignment.
 
+Motor imagery cues are triggered synchronously with the patient's inhalation phase via an abdominal strain sensor, 
+stabilizing the EEG baseline and reducing false-positive ERD detections \cite{premchand2025personalized}.
+
 \paragraph{Inclusion Criteria as Design Specification}
 
 Autonomous donning assumes sufficient function in the contralateral hand, 
@@ -254,30 +250,103 @@ excluded by the device's inherent design, not by a technological limitation. Thi
 
 Remote clinical supervision is conducted via an \textbf{asynchronous cloud-based dashboard},
 allowing clinicians to regulate virtual fixtures (angular limits, admittance thresholds), review session logs, 
-and personalize task parameters \cite{proietti2024combining}. Patient progress is visualized through simplified traffic-light 
-feedback cues displayed on a tablet.
+and personalize task parameters \cite{proietti2024combining}.
 
+\subsection{Conceptual Diagram}
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{bci_glove_system_diagram_v2.pdf}
-    \caption{Closed-loop architecture of the BCI-SRG system. Key components: (1) respiratory-synchronized EEG acquisition, (2) FBCSP-based adaptive LDA decoder, (3) safety controller integrating virtual fixtures and admittance control, and (4) the pneumatic soft glove. Dashed lines illustrate the visuo-proprioceptive feedback loop. Target end-to-end latency is $\leq 300$\,ms to satisfy Hebbian contingency requirements \cite{biasiucci2018brain}.}
+    \includegraphics[width=\textwidth]{bci_srg_diagram_print.png}
+    \caption{Closed-loop architecture of the BCI-SRG system. Key components: (1) EEG acquisition with respiratory synchronization; (2) FBCSP adaptive LDA decoder; (3) safety controller with virtual fixtures and admittance control; (4) soft pneumatic glove. The dashed arrow represents the visuo-proprioceptive feedback loop. Target latency $\leq 300$\,ms \cite{biasiucci2018brain, krueger2024hebbian}.}
     \label{fig:architettura}
 \end{figure}
 
+\section{Why Feasible Now}
 
-\newpage
+Three convergences make this solution feasible now:
+\begin{itemize}
+    \item \textbf{Dry-electrode EEG at clinical quality:} until 2020, dry electrodes had SNR too low to reliably detect ERD on C3/C4 in real-time. Current systems (used by Premchand 2025 \cite{premchand2025personalized}) have filled this gap. Without this, self-donning at home was not possible -- a technician was needed for gel.
+    \item \textbf{Real-time FBCSP inference on edge hardware:} the FBCSP+LDA decoder required around 50ms on a Raspberry Pi 4, as documented by Wu et al. \cite{wu2024adaptive}. Five years ago this required a dedicated laptop with cabled connection, which is incompatible with the home setting.
+    \item \textbf{Affordable soft robotics:} PneuNet actuators in cast silicone using 3D-printed molds reduce production cost of the glove. Proietti et al. \cite{proietti2024combining} demonstrated in 2024 the first clinical validation of a fully home-based system on 10 patients. 
+\end{itemize}
+\smallskip
+\noindent What is not yet fully mature: robust ERD decoding in patients with
+extensive cortical lesions where Motor Imagery signals are
+significantly reorganized remains an open engineering problem.
+The regulatory framework for AI-enabled closed-loop medical devices
+is evolving but not yet consolidated for home-use BCI systems.
+
+\section{Regulatory and Adoption Pathway}
+
+The device is classified as \textbf{FDA Class II} via the 510(k) clearance pathway, with the IpsiHand (Neurolutions) 
+serving as the \textit{predicate device} due to its identical BCI-triggered robotic paradigm and risk profile \cite{rustamov2025ipsihand}. 
+In the European Union, the device is classified as \textbf{Class IIb} under the EU MDR 2017/745 (Rule 10), 
+as it is an active therapeutic device that 
+administers energy to the patient. Compliance requires a comprehensive Clinical Evaluation Report (CER) 
+and assessment by a Notified Body, demonstrating substantial equivalence to current BCI-triggered orthoses.
+
+The value proposition targets rehabilitation centers, not payers directly. 
+In the US, outpatient physical therapy is reimbursed under CPT 97110--97530; 
+the BCI-SRG does not require a new billing code, but substitutes in-person 
+sessions with remotely supervised home sessions, allowing one therapist to 
+monitor multiple patients concurrently and reducing per-patient labor cost 
+without reducing reimbursable therapist oversight. 
+
+In Europe, NHS/SSN reimbursement will require inclusion in national device registers 
+(e.g., NICE appraisal, Italian LEA), contingent on RCT 
+evidence --- a 3--5 year timeline post-CE mark. A per-session disposable 
+(electrode pad set) provides recurring revenue independent of the 
+reimbursement timeline.
+
+\section{Risks and Failure Modes}
+
+We identify three substantive risks across clinical, technical, and commercial dimensions, each paired with a specific mitigation strategy:
+
+\begin{enumerate}
+    \item \textbf{Technical/Clinical: Signal Non-Stationarity.} EEG signal drift or patient-induced artifacts may degrade decoding accuracy, leading to trigger latencies exceeding the 300\,ms Hebbian window \cite{biasiucci2018brain}. 
+    \textit{Mitigation:} Deployment of the \textbf{Adaptive LDA classifier} \cite{wu2024adaptive}, which performs recursive parameter updates to track neural signal changes in real-time, effectively compensating for intra-session signal drift.
+    
+    \item \textbf{Clinical/Safety: Spasticity-Induced Injury.} Uncontrolled spasticity during assistive movement could lead to excessive force application, potentially exceeding the 5\,N safety threshold. 
+    \textit{Mitigation:} Implementation of the \textbf{admittance control loop} ($F \to v$) coupled with hardware-level \textbf{Virtual Fixtures}. The system forces the glove to yield to involuntary muscle resistance, while geometric software constraints (defined in the URDF model) prevent the actuators from exceeding the therapeutic Range of Motion (ROM).
+
+    \item \textbf{Commercial: Clinician Rejection.} Therapists may perceive BCI-based systems as an unreliable substitute for traditional manual therapy or fear a loss of professional oversight. 
+    \textit{Mitigation:} Position the device as an \textbf{adjunct tool} for \textit{dose intensification} rather than a replacement. The clinical dashboard provides therapists with granular objective data (ADL success rates, BCI engagement, joint ROM), transforming the BCI-SRG into a digital instrument that empowers, rather than replaces, the physiotherapist’s clinical expertise.
+\end{enumerate}
+
+\section{What This Concept Does Not Solve}
+
+Honest limitations of the current BCI-SRG scope:
+
+\begin{itemize}
+    \item \textbf{Total cortical destruction:} The system relies on the existence of residual corticospinal pathways. In cases of massive, total infarction of the primary motor cortex (M1), the Motor Imagery (MI)-based ERD signal may be too weak or absent to allow reliable BCI decoding. The device is not a substitute for functional neural substrate.
+    \item \textbf{Severe cognitive impairment:} The therapy requires active patient engagement and the ability to perform mental Motor Imagery. Patients with severe post-stroke cognitive decline or dementia are currently excluded, as they lack the cognitive resources required to generate a consistent BCI intent signal.    
+    \item \textbf{Standalone replacement of therapy:} The BCI-SRG is a tool for \textit{dose intensification}, not a standalone cure. It does not replace the complex, multidimensional physical and occupational therapy required for global post-stroke recovery; rather, it operationalizes the high-frequency repetitions that current healthcare systems are unable to provide.
+\end{itemize}
+
+\section{Concluding Statement}
+
+Stroke leaves millions of patients with a motor deficit that 
+rehabilitation science knows how to address — but that healthcare 
+systems cannot deliver at the required dose, frequency, and 
+temporal precision. The BCI-Soft Robotic Glove does not propose a new treatment: 
+it proposes a delivery mechanism for one that already works, 
+constrained to the exact autonomy level that the underlying 
+neuroscience demands. The concept is deliberately narrow — one 
+disorder, one limb, one mechanism. Its value, if validated, lies 
+not in replacing the therapist but in making the Hebbian 
+contingency window accessible every day, at home, without one.
+
 \bibliographystyle{unsrt}
 
 \begin{thebibliography}{1}
-\small
+\scriptsize
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
 \setlength{\leftmargin}{0pt}
 \addtolength{\leftmargin}{\labelwidth}
 \addtolength{\leftmargin}{\labelsep}
-\renewcommand{\refname}{Bibliografia}
+\renewcommand{\refname}{References}
 
 \bibitem{feigin2025world}
 Valery~L. Feigin et al.
