@@ -1,0 +1,285 @@
+%--------------------
+% Packages
+% -------------------
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+%\usepackage{gentium}
+\usepackage{mathptmx} % Use Times Font
+
+
+\usepackage[pdftex]{graphicx} % Required for including pictures
+\usepackage[swedish]{babel} % Swedish translations
+\usepackage[pdftex,linkcolor=black,pdfborder={0 0 0}]{hyperref} % Format links for pdf
+\usepackage{calc} % To reset the counter in the document after title page
+\usepackage{enumitem} % Includes lists
+
+\frenchspacing % No double spacing between sentences
+\linespread{1.2} % Set linespace
+\usepackage[a4paper, lmargin=0.1666\paperwidth, rmargin=0.1666\paperwidth, tmargin=0.1111\paperheight, bmargin=0.1111\paperheight]{geometry} %margins
+%\usepackage{parskip}
+
+\usepackage[all]{nowidow} % Tries to remove widows
+\usepackage[protrusion=true,expansion=true]{microtype} % Improves typography, load after fontpackage is selected
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+
+%-----------------------
+% Set pdf information and add title, fill in the fields
+%-----------------------
+\hypersetup{ 	
+pdfsubject = {Medical Robotics},
+pdftitle = {Closed-Loop BCI-Triggered System with Soft-Robotic Glove for after-stroke rehabilitation},
+pdfauthor = {Flavio Massaroni}
+}
+
+%-----------------------
+% Begin document
+%-----------------------
+\begin{document}
+
+\title{Closed-Loop BCI-Triggered System with Soft-Robotic Glove for after-stroke rehabilitation}
+\author{Flavio Massaroni}
+\date{}
+
+\maketitle
+
+\section{Clinical Need}
+Stroke represents a major cause of long-term neurological disability globally. 
+As evidenced by epidemiological data from the World Stroke Organization [1], the socio-health impact of
+this pathology is constantly growing: over 93 million cases prevalent, some 160 million years of life lost to disability
+(DALYs) and a cost estimated global economic of more than US\$ 890 billion. 
+
+Between 55\% and 75\% ofsurvivors have chronic upper limb motor deficit which compromises autonomy 
+in daily activities (ADL) [12]. Donkor [2] contextualize this figure in the perspective of quality of life:
+stroke is the second cause of death at the world and causes severe permanent disability in about half 
+of the survivors, with high im- pact on autonomy, working life and the care burden on family members.
+
+This combination of high prevalence and high residual disability justifies 
+the search for advanced technological solutions that can deliver portable therapy with 
+an intensity comparable to that of departments of specialized rehabilitation.
+Recent clinical research indicates that the effectiveness of traditional rehabilitation treatments is severely 
+limited by a therapeutic dosage deficit. 
+The systematic analysis conducted by Newton et al. [3]
+highlights how the actual time spent on active therapeutic exercise (time on task) within conventional
+sessions varies on average between 8 and 44 minutes per day — significantly lower than recommended doses to 
+induce cortical reorganization stable. A clinical paradox emerges: patients with more severe impairment receive 
+doses of significantly lower active therapy precisely because of the high effort required without tools modular 
+assistance.
+
+
+\section{Current Standard of Care and Its Limitations}
+
+The current standard of post-stroke upper limb rehabilitation combines 
+conventional physiotherapy with commercially available robotic orthoses. 
+Both approaches share a critical failure mode: they address the peripheral 
+component of motor recovery while neglecting its central requirement.
+
+Newton et al.~\cite{newton2023dose} quantify this dose gap: effective 
+active therapy time in conventional care averages 8--44 minutes per day — 
+far below the repetition volume required to induce stable cortical 
+reorganization. After discharge, most patients receive virtually no 
+structured rehabilitation.
+
+The robotic hardware available today does not close this gap. Wang et 
+al.~\cite{wang2023effectiveness} compared a passive soft-robotic glove 
+against repetitive transcranial magnetic stimulation (rTMS) in patients 
+with severe upper limb dysfunction. The passive glove improved 
+Fugl-Meyer Assessment scores (FMA-UE) by facilitating joint mobilization, 
+but produced no significant changes in Resting Motor Threshold (RMT) or 
+Motor Evoked Potential (MEP) amplitude — the markers of cortical synaptic 
+excitability. The glove moves the hand; it does not engage the brain.
+
+The neurobiological explanation is well established. Long-term motor 
+recovery depends on Hebbian plasticity (Spike-Timing-Dependent Plasticity, 
+STDP): stable synaptic modifications require temporal coincidence — within 
+approximately 300\,ms — between the pre-synaptic signal (motor cortex 
+activation associated with movement intention) and the post-synaptic 
+afferent feedback generated by the actual limb movement 
+\cite{biasiucci2018brain, krueger2024hebbian}. In the $\mu$ (8--12\,Hz) 
+and $\beta$ (13--30\,Hz) bands, Motor Imagery manifests as event-related 
+desynchronization (ERD) over contralateral motor areas (C3/C4). When a 
+BCI detects this ERD and uses it as an instantaneous trigger, the Hebbian 
+coincidence window is realized. A random or sham activation produces no 
+significant increase in $\beta$-band corticomuscular coherence 
+\cite{krueger2024hebbian} and no relevant clinical improvement 
+\cite{kim2025efficacy}.
+
+The biomarker of this reorganization is measurable in real time: Rustamov 
+et al.~\cite{rustamov2025ipsihand} demonstrate that theta-gamma 
+cross-frequency coupling (CFC) over C3/C4 increases proportionally to 
+motor recovery across BCI sessions, confirming CFC as a neurobiological 
+proxy for treatment efficacy. The mechanism exists, is validated, and is 
+quantifiable. The gap is not biological — it is a delivery problem.
+
+% ---------------------------------------------------------------
+\section{The Human Limitation Being Addressed}
+% ---------------------------------------------------------------
+
+The mechanism described above requires three conditions that no human 
+operator can reliably provide in an unsupervised home setting:
+
+\textbf{(1) Continuous presence.} The Hebbian contingency must be enforced 
+at every repetition across sessions of 30--45 minutes, 3--5 times per week, 
+for months. A trained therapist cannot be physically present at the 
+patient's home at this frequency — this is precisely the dose gap 
+documented by Newton et al.~\cite{newton2023dose}: 8--44 minutes of active 
+therapy per day in conventional care, with near-zero structured 
+rehabilitation after discharge.
+
+\textbf{(2) Sub-300\,ms reactive latency.} The BCI trigger must fire 
+within the Hebbian coincidence window \cite{krueger2024hebbian}. No human 
+observer can reliably detect ERD onset in a raw EEG signal and manually 
+trigger a mechanical response within this window, consistently, across 
+hundreds of repetitions per session.
+
+\textbf{(3) Operator-independent consistency.} Outcome variability in 
+conventional rehabilitation is partially attributable to inter-therapist 
+inconsistency in task delivery and feedback timing \cite{newton2023dose}. 
+A closed-loop BCI system applies identical contingency criteria at every 
+trial, eliminating this source of variance. Ren et al.~\cite{ren2024effect} 
+confirm in a meta-analysis of 10 RCTs (290 patients) that BCI-triggered 
+intervention outperforms conventional therapy (SMD\,=\,0.50, 95\,\% CI: 
+0.26--0.73), with effect size directly linked to contingency fidelity.
+
+The robot is not a substitute for clinical judgment — the therapist remains 
+in the loop asynchronously via remote dashboard. It is a substitute for 
+physical presence and millisecond-level reactivity: engineering problems, 
+not clinical ones.
+
+
+
+
+
+\newpage
+\bibliographystyle{unsrt}
+\begin{thebibliography}{5}
+
+\bibitem{feigin2025world}
+Valery~L. Feigin, Michael Brainin, Bo~Norrving, Sheila~O. Martins, Jeyaraj
+  Pandian, Patrice Lindsay, Maria~F. Grupper, and Ilari Rautalin.
+\newblock World stroke organization: Global stroke fact sheet 2025.
+\newblock {\em International Journal of Stroke}, 20(2):132--144, 2025.
+
+\bibitem{donkor2018stroke}
+Emmanuel~S. Donkor.
+\newblock Stroke in the 21st century: A snapshot of the burden, epidemiology,
+  and quality of life.
+\newblock {\em Stroke Research and Treatment}, 2018:3238165, 2018.
+
+\bibitem{newton2023dose}
+Sarah~P. Newton, Emily~J. Dalton, Jia~Y. Ang, Marlena Klaic, Vincent Thijs,
+  and Kathryn~S. Hayward.
+\newblock Dose, content, and context of usual care in stroke upper limb motor
+  interventions: A systematic review.
+\newblock {\em Clinical Rehabilitation}, 37(11):1437--1450, 2023.
+
+\bibitem{biasiucci2018brain}
+A.~Biasiucci, R.~Leeb, I.~Iturrate, S.~Perdikis, A.~Al-Khodairy, T.~Corbet,
+  A.~Schnider, T.~Schmidlin, H.~Zhang, M.~Bassolino, D.~Viceic, P.~Vuadens,
+  A.~G. Guggisberg, and J.~d. R.~Mill{\'a}n.
+\newblock Brain-actuated functional electrical stimulation elicits lasting arm
+  motor recovery after stroke.
+\newblock {\em Nature Communications}, 9:2421, 2018.
+
+\bibitem{krueger2024hebbian}
+Johanna Krueger, Richard Krauth, Christoph Reichert, Serafeim Perdikis, Susanne
+  Vogt, Tessa Huchtemann, Stefan D{\"u}rschmid, Almut Sickert, Juliane
+  Lamprecht, Almir Huremovic, Michael G{\"o}rtler, Slawomir~J. Nasuto,
+  I.-Chin Tsai, Robert~T. Knight, Hermann Hinrichs, Hans-Jochen Heinze, Sabine
+  Lindquist, Michael Sailer, Jose~del R.~Mill{\'a}n, and Catherine~M.
+  Sweeney-Reed.
+\newblock Hebbian plasticity induced by temporally coincident bci enhances
+  post-stroke motor recovery.
+\newblock {\em Scientific Reports}, 14:18700, 2024.
+
+\bibitem{kim2025efficacy}
+Myeong~Sun Kim, Hyunju Park, Ilho Kwon, Kwang-Ok An, Hayeon Kim, Gyulee Park,
+  Wooseok Hyung, Chang-Hwan Im, and Joon-Ho Shin.
+\newblock Efficacy of brain-computer interface training with motor
+  imagery-contingent feedback in improving upper limb function and
+  neuroplasticity among persons with chronic stroke: a double-blinded,
+  parallel-group, randomized controlled trial.
+\newblock {\em Journal of NeuroEngineering and Rehabilitation}, 22:1, 2025.
+
+\bibitem{wang2023effectiveness}
+Taotao Wang, Zhonghua Liu, Jianxiong Gu, Jizhi Tan, and Tian Hu.
+\newblock Effectiveness of soft robotic glove versus repetitive transcranial
+  magnetic stimulation in post-stroke patients with severe upper limb
+  dysfunction: A randomised controlled trial.
+\newblock {\em Frontiers in Neurology}, 13:887205, 2023.
+
+\bibitem{osuagwu2020home}
+Bethel~A.~C. Osuagwu, Sarah Timms, Ruth Peachment, Sarah Dowie, Helen
+  Thrussell, Susan Cross, Rebecca Shirley, Antonio Segura-Fragoso, and Julian
+  Taylor.
+\newblock Home-based rehabilitation using a soft robotic hand glove device
+  leads to improvement in hand function in people with chronic spinal cord
+  injury: a pilot study.
+\newblock {\em Journal of NeuroEngineering and Rehabilitation}, 17:40, 2020.
+
+\bibitem{ren2024effect}
+Chunlin Ren, Xinmin Li, Qian Gao, Mengyang Pan, Jing Wang, Fangjie Yang,
+  Zhenfei Duan, Pengxue Guo, and Yasu Zhang.
+\newblock The effect of brain-computer interface controlled functional
+  electrical stimulation training on rehabilitation of upper limb after stroke:
+  a systematic review and meta-analysis.
+\newblock {\em Frontiers in Human Neuroscience}, 18:1438095, 2024.
+
+\bibitem{ma2024motor}
+Zhen-Zhen Ma, Jia-Jia Wu, Zhi Cao, Xu-Yun Hua, Mou-Xiong Zheng,
+  Xiang-Xin Xing, Jie Ma, and Jian-Guang Xu.
+\newblock Motor imagery-based brain-computer interface rehabilitation programs
+  enhance upper extremity performance and cortical activation in stroke
+  patients.
+\newblock {\em Journal of NeuroEngineering and Rehabilitation}, 21:91, 2024.
+
+\bibitem{rustamov2025ipsihand}
+Nabi Rustamov, Lauren Souders, Lauren Sheehan, Alexandre Carter, and Eric~C.
+  Leuthardt.
+\newblock Ipsihand brain-computer interface therapy induces broad upper
+  extremity motor rehabilitation in chronic stroke.
+\newblock {\em Neurorehabilitation and Neural Repair}, 39(1):74--86, 2025.
+
+\bibitem{proietti2024combining}
+Tommaso Proietti, Kristin Nuckols, Jesse Grupper, Diogo~Schwerz de~Lucena,
+  Bianca Inirio, Kelley Porazinski, Diana Wagner, Tazzy Cole, Christina Glover,
+  Sarah Mendelowitz, Maxwell Herman, Joan Breen, David Lin, and Conor Walsh.
+\newblock Combining soft robotics and telerehabilitation for improving motor
+  function after stroke.
+\newblock {\em Wearable Technologies}, 5:e1, 2024.
+
+\bibitem{wu2024adaptive}
+Shizhe Wu, Kinkini Bhadra, Anne-Lise Giraud, and Silvia Marchesotti.
+\newblock Adaptive lda classifier enhances real-time control of an eeg
+  brain-computer interface for decoding imagined syllables.
+\newblock {\em Brain Sciences}, 14:196, 2024.
+
+\bibitem{premchand2025personalized}
+Brian Premchand, Zhuo Zhang, Kai~Keng Ang, Juanhong Yu, Isaac~Okumura Tan,
+  Josephine~Pei Wen~Lam, Anna~Xin Yi~Choo, Ananda Sidarta,
+  Patrick~Wai Hang~Kwong, and Lau~Ha Chloe~Chung.
+\newblock A personalized multimodal bci-soft robotics system for rehabilitating
+  upper limb function in chronic stroke patients.
+\newblock {\em Biomimetics}, 10:94, 2025.
+
+\bibitem{fiska2025integration}
+Vasiliki Fiska, Konstantinos Mitsopoulos, Vasiliki Mantiou, Vasileia
+  Petronikolou, Panagiotis Antoniou, Konstantinos Tagaras, Konstantinos
+  Kasimis, Konstantinos Nizamis, Markos~G. Tsipouras, Alexander Astaras,
+  Panagiotis~D. Bamidis, and Alkinoos Athanasiou.
+\newblock Integration and validation of soft wearable robotic gloves for
+  sensorimotor rehabilitation of human hand function.
+\newblock {\em Applied Sciences}, 15:5299, 2025.
+
+\bibitem{lu2025exploring}
+Yiqing Lu, Weiwei Yang, Song Wu, Yicheng Li, Jinhu Wei, Ming Li, Yongcheng Li,
+  and Yaping Huai.
+\newblock Exploring neural activity changes during motor imagery-based
+  brain-computer interface training with robotic hand for upper limb
+  rehabilitation in ischemic stroke patients: a pilot study.
+\newblock {\em Frontiers in Human Neuroscience}, 19:1626000, 2025.
+
+\end{thebibliography}
+\end{document}

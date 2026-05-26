@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <robot name="hand_3r_glove">
 
+<link name="world"/>
+<joint name="world_to_palm" type="fixed">
+  <parent link="world"/>
+  <child link="palm_link"/>
+  <origin xyz="0 0 0" rpy="0 0 0"/>
+</joint>
+
   <!-- ==================== DICHIARAZIONE MATERIALI GLOBALI ==================== -->
   <material name="grey">
     <color rgba="0.5 0.5 0.5 1.0"/>
