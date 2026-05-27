@@ -52,7 +52,7 @@ this pathology is constantly growing: over 93 million cases prevalent, some 160 
 (DALYs) and a estimated global economic cost of more than US\$ 890 billion. 
 
 Between 55\% and 75\% of survivors have chronic upper limb motor deficit which compromises autonomy 
-in daily activities \cite{proietti2024combining}. Donkor \cite{donkor2018stroke} contextualize this figure in the perspective of quality of life:
+in daily activities \cite{proietti2024combining}. Donkor \cite{donkor2018stroke} contextualizes this figure in the perspective of quality of life:
 stroke is the second cause of death at the world and causes severe permanent disability in about half 
 of the survivors, with high impact on autonomy, working life and the care burden on family members.
 
@@ -62,10 +62,11 @@ induce stable cortical reorganization.
 
 Functionally, this dose deficit translates into outcomes: the Ren 
 et al.\ meta-analysis \cite{ren2024effect} of 10 RCTs (290 patients) 
-confirms that BCI-triggered intervention outperforms conventional 
-therapy (SMD\,=\,0.50), implying that conventional care alone fails 
-to activate the neuroplastic mechanisms required for full motor 
-recovery in the majority of patients with severe deficit.
+reports a standardized mean difference of SMD\,=\,0.50 (95\,\% CI: 
+0.26--0.73) in favour of BCI-triggered over conventional therapy --- 
+a gap that reflects the systematic inability of standard care to 
+activate neuroplastic mechanisms at the required dose, not a 
+difference in treatment target.
 
 \section{Current Standard of Care and Its Limitations}
 
@@ -96,7 +97,7 @@ recovery across BCI sessions --- the gap is not biological, it is a
 delivery problem.
 
 The sole BCI-triggered orthosis to reach clinical deployment, IpsiHand 
-(Neurolutions), closes this neural loop \cite{rustamov2025ipsihand}, but 
+(Neurolutions), closes this neural loop, but 
 was validated exclusively in supervised clinical settings with trained 
 personnel at each session \cite{rustamov2025ipsihand}. No commercial 
 system today implements contingent BCI triggering in an unsupervised, 
@@ -142,15 +143,17 @@ The proposed solution — a BCI-Triggered Soft Robotic Glove (BCI-SRG) —
 is the direct engineering consequence of the three limitations identified 
 above. The device is a wearable, unsupervised home system used in 
 autonomous sessions of 30--45 minutes, 3--5 times per week, without 
-on-site clinical presence. A tablet GUI manages session setup; the 
+on-site clinical presence. A GUI manages session setup; the 
 therapist supervises asynchronously via cloud dashboard.
 
 \subsection{Kinematic Architecture}
 
 The architecture is a soft-robotic pneumatic wearable glove, modelled as a system of serial kinematic chain anchored 
 to a fixed palm \cite{proietti2024combining, fiska2025integration}.
-The choice of using a pneumatic network (PneuNet) is dictated by the need of intrinsic security and passive adaptability to variable geometries in 
-an unsupervised environment.
+The choice of using a pneumatic network (PneuNet) is dictated by 
+the need of intrinsic security and passive adaptability to variable 
+geometries in an unsupervised environment \cite{proietti2024combining, 
+osuagwu2020home}.
 
 The geometric model replicates human anatomy with 3 Degrees of Freedom (DoFs) for each of the 4 fingers (MCP, PIP, and DIP joints) 
 and 2 DoFs for the thumb (CMC and MCP joints), reaching a total of 14 kinematic DoFs. However, the system is intentionally under-actuated, 
@@ -207,21 +210,25 @@ System sensing is categorized into two levels: neurological sensing (EEG) and lo
     \item \textbf{Emergency Stop:} A physical, high-visibility emergency button is located on the device controller. Accessible with the patient's unaffected hand, it immediately cuts power to the valves and exhausts residual pneumatic pressure, independently of the software state.
 \end{itemize}
 
-The neurological sensing layer processes EEG acquired from the 
-rigid-shell headset across four sub-bands (4--8\,Hz, 8--12\,Hz, 
-13--30\,Hz, 30--45\,Hz) using Filter Bank Common Spatial Pattern 
-(FBCSP), producing a compact spatial-spectral feature vector. 
-Classification uses an Adaptive LDA \cite{wu2024adaptive} that 
-performs recursive parameter updates online, compensating for 
-intra-session signal drift caused by cortical reorganization, 
-cognitive state fluctuation, and electrode impedance drift — 
-the three documented sources of EEG non-stationarity in 
-post-stroke patients \cite{wu2024adaptive}. Total pipeline 
-latency on embedded edge hardware is $<$50\,ms, well within 
-the 300\,ms Hebbian contingency window \cite{krueger2024hebbian}. 
-Actuation is executed via five solenoid valves (one per digit), 
-with pressure modulated by the admittance controller in the 
-safety layer.
+The neurological sensing layer processes EEG acquired from the
+rigid-shell headset across four sub-bands (4--8\,Hz, 8--12\,Hz,
+13--30\,Hz, 30--45\,Hz) using Filter Bank Common Spatial Pattern
+(FBCSP)~\cite{premchand2025personalized, lu2025exploring},
+producing a compact spatial-spectral feature vector.
+Classification uses an Adaptive LDA~\cite{wu2024adaptive} that
+performs recursive parameter updates online, compensating for
+intra-session signal drift caused by cortical reorganization,
+cognitive state fluctuation, and electrode impedance drift,
+documented sources of EEG non-stationarity in BCI systems for
+post-stroke rehabilitation~\cite{wu2024adaptive, lu2025exploring}.
+FBCSP feature extraction and LDA classification are
+computationally tractable for real-time BCI
+operation~\cite{premchand2025personalized, wu2024adaptive},
+and the combined pipeline targets an end-to-end latency
+well below the 300\,ms Hebbian contingency
+window~\cite{krueger2024hebbian}.
+Actuation is executed via five solenoid valves (one per digit),
+with pressure modulated by the admittance controller described above.
 
 \subsection{Level of Autonomy, EEG Interface, and Inclusion Criteria}
 
@@ -236,7 +243,7 @@ passive rehabilitation rather than neuroplastic training \cite{biasiucci2018brai
 
 To ensure autonomous self-donning, the system utilizes a pre-shaped rigid-shell EEG headset with spring-loaded 
 dry electrodes. The mechanical structure guides the headset into the correct position on the C3/C4 
-sites within 2 minutes, removing the need for conductive gel or high-precision alignment.
+sites, removing the need for conductive gel or high-precision alignment.
 
 Motor imagery cues are triggered synchronously with the patient's inhalation phase via an abdominal strain sensor, 
 stabilizing the EEG baseline and reducing false-positive ERD detections \cite{premchand2025personalized}.
@@ -265,21 +272,30 @@ and personalize task parameters \cite{proietti2024combining}.
 
 Three convergences make this solution feasible now:
 \begin{itemize}
-    \item \textbf{Dry-electrode EEG at clinical quality:} until 2020, dry electrodes had SNR too low to reliably detect ERD on C3/C4 in real-time. Current systems (used by Premchand 2025 \cite{premchand2025personalized}) have filled this gap. Without this, self-donning at home was not possible -- a technician was needed for gel.
-    \item \textbf{Real-time FBCSP inference on edge hardware:} the FBCSP+LDA decoder required around 50ms on a Raspberry Pi 4, as documented by Wu et al. \cite{wu2024adaptive}. Five years ago this required a dedicated laptop with cabled connection, which is incompatible with the home setting.
+    \item \textbf{Dry-electrode EEG at clinical quality:} until 2020, dry electrodes had SNR too low to reliably detect ERD on C3/C4 in real-time. Current systems \cite{premchand2025personalized} have filled this gap. Without this, self-donning at home was not possible -- a technician was needed for gel.
+    \item \textbf{Real-time FBCSP inference on edge hardware:}
+        The FBCSP\,+\,LDA pipeline has been demonstrated for real-time
+        BCI control in deployed clinical systems~\cite{wu2024adaptive,
+        premchand2025personalized}. Five years ago, comparable pipelines
+        required a dedicated workstation with a cabled connection,
+        incompatible with unsupervised home use.    
     \item \textbf{Affordable soft robotics:} PneuNet actuators in cast silicone using 3D-printed molds reduce production cost of the glove. Proietti et al. \cite{proietti2024combining} demonstrated in 2024 the first clinical validation of a fully home-based system on 10 patients. 
 \end{itemize}
 \smallskip
-\noindent What is not yet fully mature: robust ERD decoding in patients with
-extensive cortical lesions where Motor Imagery signals are
-significantly reorganized remains an open engineering problem.
-The regulatory framework for AI-enabled closed-loop medical devices
-is evolving but not yet consolidated for home-use BCI systems.
+
+\noindent The three enablers above represent mature components ready for 
+integration. What must instead be developed: robust ERD 
+decoding in patients with extensive cortical lesions where Motor 
+Imagery signals are significantly reorganized, and a validated 
+home-safety protocol for the EU MDR Clinical Evaluation Report, 
+which does not yet exist for unsupervised home-use BCI orthoses.
 
 \section{Regulatory and Adoption Pathway}
 
 The device is classified as \textbf{FDA Class II} via the 510(k) clearance pathway, with the IpsiHand (Neurolutions) 
-serving as the \textit{predicate device} due to its identical BCI-triggered robotic paradigm and risk profile \cite{rustamov2025ipsihand}. 
+serving as the predicate device due to its identical BCI-triggered robotic paradigm, as validated in clinical outcomes 
+studies~\cite{rustamov2025ipsihand}.
+
 In the European Union, the device is classified as \textbf{Class IIb} under the EU MDR 2017/745 (Rule 10), 
 as it is an active therapeutic device that 
 administers energy to the patient. Compliance requires a comprehensive Clinical Evaluation Report (CER) 
@@ -303,12 +319,26 @@ reimbursement timeline.
 We identify three substantive risks across clinical, technical, and commercial dimensions, each paired with a specific mitigation strategy:
 
 \begin{enumerate}
-    \item \textbf{Technical/Clinical: Signal Non-Stationarity.} EEG signal drift or patient-induced artifacts may degrade decoding accuracy, leading to trigger latencies exceeding the 300\,ms Hebbian window \cite{biasiucci2018brain}. 
-    \textit{Mitigation:} Deployment of the \textbf{Adaptive LDA classifier} \cite{wu2024adaptive}, which performs recursive parameter updates to track neural signal changes in real-time, effectively compensating for intra-session signal drift.
-    
-    \item \textbf{Clinical/Safety: Spasticity-Induced Injury.} Uncontrolled spasticity during assistive movement could lead to excessive force application, potentially exceeding the 5\,N safety threshold. 
-    \textit{Mitigation:} Implementation of the \textbf{admittance control loop} ($F \to v$) coupled with hardware-level \textbf{Virtual Fixtures}. The system forces the glove to yield to involuntary muscle resistance, while geometric software constraints (defined in the URDF model) prevent the actuators from exceeding the therapeutic Range of Motion (ROM).
-
+    \item \textbf{Technical: Adaptive LDA failure in severe lesions.} 
+    The Adaptive LDA compensates for intra-session drift, but patients 
+    with extensive M1 infarction may produce ERD signals too weak or 
+    spatially reorganized for reliable decoding even after adaptation. 
+    In this subpopulation, the mitigation itself may be insufficient. 
+    \textit{Mitigation:} Restrict clinical indication to patients with 
+    residual corticospinal pathways (confirmed by TMS screening at 
+    enrollment); flag sessions with classification confidence below 
+    threshold for therapist review via dashboard.
+    \item \textbf{Clinical/Safety: Spasticity severity at enrollment.} 
+    The admittance controller mitigates spasticity-induced force during 
+    sessions, but patients with severe spasticity (Modified Ashworth 
+    Scale, MAS $\geq$3 --- a standardized clinical measure of 
+    post-stroke muscle tone ranging from 0 to 4) represent an edge 
+    case where passive resistance may persistently exceed the 
+    therapeutic working range, preventing effective glove actuation 
+    altogether. \textit{Mitigation:} Mandatory spasticity screening 
+    at enrollment (MAS $\leq$2 as inclusion criterion); automatic 
+    session suspension if interaction force exceeds threshold for 
+    $>$500\,ms.
     \item \textbf{Commercial: Clinician Rejection.} Therapists may perceive BCI-based systems as an unreliable substitute for traditional manual therapy or fear a loss of professional oversight. 
     \textit{Mitigation:} Position the device as an \textbf{adjunct tool} for \textit{dose intensification} rather than a replacement. The clinical dashboard provides therapists with granular objective data (ADL success rates, BCI engagement, joint ROM), transforming the BCI-SRG into a digital instrument that empowers, rather than replaces, the physiotherapist’s clinical expertise.
 \end{enumerate}
@@ -318,8 +348,15 @@ We identify three substantive risks across clinical, technical, and commercial d
 Honest limitations of the current BCI-SRG scope:
 
 \begin{itemize}
-    \item \textbf{Total cortical destruction:} The system relies on the existence of residual corticospinal pathways. In cases of massive, total infarction of the primary motor cortex (M1), the Motor Imagery (MI)-based ERD signal may be too weak or absent to allow reliable BCI decoding. The device is not a substitute for functional neural substrate.
-    \item \textbf{Severe cognitive impairment:} The therapy requires active patient engagement and the ability to perform mental Motor Imagery. Patients with severe post-stroke cognitive decline or dementia are currently excluded, as they lack the cognitive resources required to generate a consistent BCI intent signal.    
+    \item \textbf{Bilateral paralysis:} The system requires 
+    single-handed donning with the contralateral limb; patients 
+    with severe bilateral paresis are excluded by design, not by 
+    a technological gap.
+    \item \textbf{Severe cognitive impairment:} Motor Imagery 
+    requires active engagement and metacognitive awareness. 
+    Patients with severe post-stroke cognitive decline or aphasia 
+    affecting task comprehension are outside the indicated 
+    population.
     \item \textbf{Standalone replacement of therapy:} The BCI-SRG is a tool for \textit{dose intensification}, not a standalone cure. It does not replace the complex, multidimensional physical and occupational therapy required for global post-stroke recovery; rather, it operationalizes the high-frequency repetitions that current healthcare systems are unable to provide.
 \end{itemize}
 
