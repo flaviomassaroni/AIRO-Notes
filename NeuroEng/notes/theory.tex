@@ -1,0 +1,387 @@
+\documentclass[10pt, letterpaper]{report}
+
+%=============================================================================
+% PACCHETTI E CONFIGURAZIONI DI BASE
+%=============================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{nicefrac}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\geometry{margin=2.5cm}
+
+% Stile intestazioni e piè di pagina
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{Sezione \thesection}
+\fancyfoot[C]{\thepage}
+\fancyfoot[L]{Guida di Preparazione Teorica - Neuroengineering}
+\fancyfoot[R]{A.A. 2024/2025}
+
+\title{Guida di Preparazione Teorica per Neuroengineering\\(Sintesi per Domande Vero/Falso - Parte I)}
+\author{Sintesi dei Concetti Chiave, Trabocchetti d'Esame e Cheat Sheet}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+%=============================================================================
+\chapter{Biofisica Cellulare e Potenziali di Membrana}
+%=============================================================================
+
+\section{Le Famiglie Ioniche e il Potenziale di Riposo}
+\begin{itemize}
+    \item \textbf{Le 4 famiglie ioniche principali} coinvolte nel funzionamento neuronale sono: Sodio (\(\text{Na}^+\)), Potassio (\(\text{K}^+\")), Cloro (\(\text{Cl}^-\)) e Calcio (\(\text{Ca}^{2+}\)). Il bromo (\(\text{Br}^-\)) o altri alogeni non svolgono alcun ruolo fisiologico principale nel neurone.
+    \item \textbf{Potenziale di riposo (\(V_m\))}: Nel neurone tipico è di circa \(\mathbf{-70\ \text{mV}}\) (polarizzato). Un potenziale di \(-90\ \text{mV}\) è invece tipico delle cellule muscolari striate.
+    \item \textbf{Genesi del potenziale di riposo}: Non è dovuto \emph{esclusivamente} alle forze passive (diffusionali ed elettriche). Senza l'azione continua e termodinamicamente attiva (con consumo di ATP) delle \textbf{pompe ioniche} (trasporto attivo), i gradienti si annullerebbero nel tempo per diffusione passiva.
+\end{itemize}
+
+\section{L'Equazione di Nernst e i Flussi Ionici}
+\begin{itemize}
+    \item \textbf{Valenza (\(z\))}: Nell'equazione di Nernst, la valenza ionica può essere sia positiva (\(\text{Na}^+\): \(+1\), \(\text{Ca}^{2+}\): \(+2\)) sia negativa (\(\text{Cl}^-\): \(-1\)).
+    \item \textbf{Temperatura (\(T\))}: Deve essere tassativamente espressa in \textbf{Kelvin} (\(\text{K}\)), non in gradi Celsius (\(^\circ\text{C}\)).
+    \item \textbf{Direzione delle correnti nette}: La corrente ionica netta spinge sempre il potenziale di membrana verso il potenziale di equilibrio (\(E_j\)) dello specifico ione:
+    \begin{itemize}
+        \item Se \(E_{\text{Na}^+} = +30\ \text{mV}\) e \(V_m = -70\ \text{mV}\), la corrente netta di \(\text{Na}^+\) muoverà il potenziale verso valori positivi (corrente \textbf{depolarizzante}, non iperpolarizzante).
+        \item Se \(E_{\text{Cl}^-} = -80\ \text{mV}\) (ione negativo) e \(V_m = -70\ \text{mV}\), per spostare il potenziale verso \(-80\ \text{mV}\) (iperpolarizzazione) devono entrare cariche negative nella cellula. Pertanto, la corrente netta di \(\text{Cl}^-\) sarà diretta \textbf{dall'esterno verso l'interno} della cellula.
+    \end{itemize}
+\end{itemize}
+
+\section{Meccanismi di Trasporto e Sommazione Sinaptica}
+\begin{itemize}
+    \item \textbf{Pompe ioniche}: Svolgono trasporto \textbf{attivo} (contro gradiente, consumando energia/ATP). I canali ionici svolgono trasporto \textbf{passivo} (secondo gradiente elettrochimico).
+    \item \textbf{Sinapsi inibitoria (IPSP)}: Provoca sempre un'\textbf{iperpolarizzazione} della membrana post-sinaptica (allontanando il potenziale dalla soglia). Una sinapsi eccitatoria (EPSP) provoca invece una depolarizzazione.
+    \item \textbf{Sommazione spaziale e temporale}: Non si escludono a vicenda; possono avvenire simultaneamente. La sommazione temporale dipende strettamente dalla distanza temporale tra potenziali d'azione consecutivi nel neurone pre-sinaptico.
+\end{itemize}
+
+\section*{Trabocchetti d'Esame - Capitolo 1}
+\addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 1}
+\begin{itemize}
+    \item \textbf{Trappola}: ``Le 4 famiglie ioniche principali sono \(\text{Na}^+\), \(\text{K}^+\), \(\text{Br}^-\) e \(\text{Ca}^{2+}\)'' \(\implies\) \textbf{FALSO} (è \(\text{Cl}^-\), non \(\text{Br}^-\)).
+    \item \textbf{Trappola}: ``Il potenziale di riposo del neurone è \(-90\ \text{mV}\)'' \(\implies\) \textbf{FALSO} (è \(-70\ \text{mV}\); \(-90\ \text{mV}\) è tipico della fibra muscolare).
+    \item \textbf{Trappola}: ``Le pompe ioniche si basano su meccanismi di trasporto passivo'' \(\implies\) \textbf{FALSO} (trasporto attivo con consumo di ATP).
+    \item \textbf{Trappola}: ``La temperatura nell'equazione di Nernst è espressa in gradi Celsius'' \(\implies\) \textbf{FALSO} (va espressa in Kelvin).
+\end{itemize}
+
+%=============================================================================
+\chapter{Il Potenziale d'Azione e la Propagazione}
+%=============================================================================
+
+\section{Fisiologia dello Spike (Tutto o Nulla)}
+\begin{itemize}
+    \item \textbf{Canali voltaggio-dipendenti}:
+    \begin{itemize}
+        \item L'apertura dei canali del \textbf{Sodio (\(\text{Na}^+\))} è responsabile della fase di \textbf{depolarizzazione rapida} (fase ascendente dello spike).
+        \item L'apertura dei canali del \textbf{Potassio (\(\text{K}^+\))} (congiuntamente all'inattivazione di quelli del Sodio) è responsabile della fase di \textbf{ripolarizzazione} (fase discendente).
+    \end{itemize}
+    \item \textbf{Refrattarietà}:
+    \begin{itemize}
+        \item \textbf{Assoluta}: Dovuta allo stato di \textbf{inattivazione} dei canali del Sodio (la porta di inattivazione si chiude al picco del potenziale). In questo periodo è biologicamente impossibile generare un secondo spike, indipendentemente dall'intensità dello stimolo.
+        \item \textbf{Relativa}: Dovuta alla lenta chiusura dei canali del Potassio, che causa un'iperpolarizzazione post-potenziale (\emph{undershoot}). È possibile generare uno spike, ma serve uno stimolo più intenso.
+    \end{itemize}
+    \item \textbf{Codifica dell'informazione}: Lo spike ha sempre la stessa ampiezza e durata (``tutto o nulla''). L'informazione non è codificata nell'ampiezza dello spike, bensì nella \textbf{frequenza di scarica} (\emph{rate coding}) e nella distanza temporale tra gli impulsi.
+\end{itemize}
+
+\section{Propagazione dell'Impulso}
+\begin{itemize}
+    \item \textbf{Unidirezionalità}: Garantita dallo stato di refrattarietà assoluta dei canali del Sodio appena transitati dal potenziale d'azione.
+    \item \textbf{Conduzione continua vs Saltatoria}:
+    \begin{itemize}
+        \item La conduzione continua avviene nelle fibre amieliniche ed è lenta (\(\approx 1\ \text{m/s}\)).
+        \item La conduzione saltatoria avviene nelle fibre mieliniche ed è molto rapida (\(\approx 120\ \text{m/s}\)). Il potenziale ``salta'' da un \textbf{nodo di Ranvier} all'altro.
+    \end{itemize}
+    \item \textbf{Effetto della mielina}: La guaina aumenta la resistenza trasversale di membrana (\(r_m\)) e riduce la capacità (\(c_m\)), espandendo la costante di spazio \(\lambda\).
+\end{itemize}
+
+\section*{Trabocchetti d'Esame - Capitolo 2}
+\addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 2}
+\begin{itemize}
+    \item \textbf{Trappola}: ``Il parametro più informativo dello spike train è l'ampiezza dei singoli impulsi'' \(\implies\) \textbf{FALSO} (l'ampiezza è costante; conta la frequenza o l'intervallo temporale).
+    \item \textbf{Trappola}: ``La conduzione continua è più rapida di quella saltatoria'' \(\implies\) \textbf{FALSO} (la saltatoria è circa 100 volte più veloce).
+    \item \textbf{Trappola}: ``La refrattarietà assoluta dipende dai canali del Potassio'' \(\implies\) \textbf{FALSO} (dipende dallo stato di inattivazione dei canali del Sodio).
+\end{itemize}
+
+%=============================================================================
+\chapter{Neuroanatomia e Plasticità}
+%=============================================================================
+
+\section{Anatomia Funzionale e Strutture}
+\begin{itemize}
+    \item \textbf{Sostanza grigia vs bianca}: La sostanza grigia contiene corpi cellulari e dendriti; la sostanza bianca è composta da assoni mielinizzati (alto contenuto lipidico).
+    \item \textbf{Colonne corticali verticali}: Rappresentano l'unità funzionale della corteccia. I neuroni della stessa colonna rispondono in modo identico allo stesso stimolo.
+    \item \textbf{Lobi e specializzazione}:
+    \begin{itemize}
+        \item \textbf{Frontale}: Corteccia motoria primaria, funzioni esecutive, linguaggio espressivo (Area di Broca).
+        \item \textbf{Parietale}: Corteccia somatosensoriale primaria.
+        \item \textbf{Occipitale}: Corteccia visiva primaria (il lobo frontale \textbf{non} ospita la funzione visiva).
+    \end{itemize}
+    \item \textbf{Aree subcorticali}: Talamo, tronco encefalico, gangli della base, cervelletto. L'Homunculus di Penfield (corteccia motoria/sensoriale) è una struttura \textbf{corticale}, non subcorticale.
+    \item \textbf{Homunculus di Penfield}: L'estensione delle aree nel somatotope è proporzionale alla \textbf{densità dei recettori} e alla complessità del controllo motorio, non al volume fisico della parte del corpo (es. la mano e il volto occupano più spazio del tronco).
+\end{itemize}
+
+\section{Meccanismi di Plasticità Cerebrale}
+\begin{itemize}
+    \item \textbf{Plasticità a breve termine}: Dura da millisecondi a minuti. È dovuta a variazioni funzionali (es. quantità di neurotrasmettitore rilasciato), \textbf{non comporta alcuna modifica strutturale} o anatomica permanente sulla membrana post-sinaptica.
+    \item \textbf{Plasticità a lungo termine}: Coinvolge modifiche strutturali e anatomiche permanenti (es. variazione del numero di recettori stabili, \emph{axonal sprouting} o potatura/\emph{pruning} delle sinapsi eccedenti).
+    \item \textbf{Smascheramento (Unmasking)}: Rapida attivazione di connessioni sinaptiche pre-esistenti ma latenti (silenziate), utilizzata dal cervello come sistema di recupero rapido dopo una lesione.
+\end{itemize}
+
+\section*{Trabocchetti d'Esame - Capitolo 3}
+\addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 3}
+\begin{itemize}
+    \item \textbf{Trappola}: ``La sostanza bianca è costituita principalmente da corpi cellulari'' \(\implies\) \textbf{FALSO} (la bianca contiene assoni mielinizzati, la grigia i corpi cellulari).
+    \item \textbf{Trappola}: ``L'estensione corticale dell'Homunculus è proporzionale al volume della parte del corpo corrispondente'' \(\implies\) \textbf{FALSO} (è proporzionale alla densità dei recettori/precisione del movimento).
+    \item \textbf{Trappola}: ``La plasticità a breve termine comporta cambiamenti strutturali nella membrana post-sinaptica'' \(\implies\) \textbf{FALSO} (comporta solo cambiamenti funzionali e temporanei).
+    \item \textbf{Trappola}: ``Il talamo, il tronco encefalico e l'Homunculus di Penfield sono tutte aree subcorticali'' \(\implies\) \textbf{FALSO} (l'Homunculus è una struttura della corteccia).
+\end{itemize}
+
+%=============================================================================
+\chapter{Generazione e Acquisizione dei Segnali EEG/sEMG}
+%=============================================================================
+
+\section{Origine del Segnale EEG}
+\begin{itemize}
+    \item \textbf{Generatori principali dell'EEG}: Sono i \textbf{potenziali post-sinaptici (PSP)} dei neuroni piramidali corticali, non i potenziali d'azione (APs). Gli APs sono troppo brevi (1-2 ms) e asincroni per sommarsi in modo costruttivo, mentre i PSPs durano decine di ms e sommano agevolmente.
+    \item \textbf{Disposizione a palizzata}: I neuroni piramidali sono orientati parallelamente tra loro e perpendicolarmente alla superficie. Questa simmetria genera un \textbf{campo aperto} (\emph{open field}), permettendo ai dipoli elettrici di sommarsi e propagarsi fino allo scalpo.
+    \item \textbf{Sorgenti a campo chiuso}: Neuroni a simmetria radiale (es. cellule stellate) generano correnti che si annullano localmente e non contribuiscono al tracciato EEG di superficie.
+    \item \textbf{Giri vs Solchi}: L'EEG è molto sensibile all'attività dei giri (orientazione radiale favorevole). Nei solchi, i dipoli sono paralleli allo scalpo e si cancellano sulle pareti opposte della fessura (\emph{mutual cancellation}), oltre a subire una maggiore attenuazione dovuta alla profondità.
+    \item \textbf{Sorgenti profonde (subcorticali)}: Subiscono una fortissima attenuazione e dispersione spaziale (\emph{spatial blur/volume conduction}). Di conseguenza, producono un segnale \textbf{molto più sfocato} e attenuato sullo scalpo rispetto alle sorgenti corticali superficiali.
+\end{itemize}
+
+\section{Strumentazione, Elettrodi e Riferimenti}
+\begin{itemize}
+    \item \textbf{Elettrodi Ag/AgCl vs Oro}: Gli elettrodi in Argento/Cloruro d'Argento sono \textbf{non polarizzabili} e stabili, ideali per registrare potenziali lentamente variabili (bassa frequenza). Gli elettrodi d'oro sono polarizzabili (creano derive lente) e sono sconsigliati per variazioni molto lente.
+    \item \textbf{Impedenza di contatto}: Deve essere misurata in \textbf{corrente alternata (AC)} per evitare la polarizzazione dell'elettrodo.
+    \item \textbf{Rapporto d'impedenza}: L'impedenza d'ingresso dell'amplificatore (\(Z_{\text{in}} \approx 10^8\ \Omega\)) deve essere svariati ordini di grandezza superiore all'impedenza di contatto elettrodo-cute (\(Z_{\text{el}} \approx 5\ \text{k}\Omega\)) per evitare l'attenuazione del segnale (effetto partitore di tensione).
+    \item \textbf{Linked-mastoids}: Richiede fisicamente \textbf{due elettrodi} posizionati sulle mastoidi e cortocircuitati, non uno solo.
+    \item \textbf{Sistema 10-20}: I numeri dispari indicano l'emisfero sinistro, i pari il destro. La lettera ``z'' indica la linea mediana (\emph{midline}). L'elettrodo Fz (frontale mediana) si trova anteriormente a Cz (centrale mediana) lungo la linea mediana; Fz \textbf{non} si trova a sinistra di Cz.
+    \item \textbf{CMRR di un amplificatore bipolare}: È il rapporto tra il guadagno differenziale (\(G_d\), che amplifica la differenza di potenziale tra gli elettrodi d'ingresso) e il guadagno di modo comune (\(G_c\), riferito alla media del potenziale rispetto alla massa).
+\end{itemize}
+
+\section*{Trabocchetti d'Esame - Capitolo 4}
+\addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 4}
+\begin{itemize}
+    \item \textbf{Trappola}: ``Il segnale EEG è principalmente generato da potenziali d'azione'' \(\implies\) \textbf{FALSO} (è generato da potenziali post-sinaptici).
+    \item \textbf{Trappola}: ``Le regioni profonde del cervello producono un EEG di scalpo meno sfocato rispetto alle aree corticali'' \(\implies\) \textbf{FALSO} (è molto più sfocato e attenuato).
+    \item \textbf{Trappola}: ``Gli elettrodi d'oro sono ideali per registrare potenziali lentamente variabili'' \(\implies\) \textbf{FALSO} (essendo polarizzabili, sono sconsigliati; si usano gli Ag/AgCl).
+    \item \textbf{Trappola}: ``L'elettrodo Fz si trova a sinistra di Cz'' \(\implies\) \textbf{FALSO} (sono entrambi sulla linea mediana ``z'', Fz è anteriore a Cz).
+    \item \textbf{Trappola}: ``L'impedenza di contatto degli elettrodi va misurata in corrente continua'' \(\implies\) \textbf{FALSO} (va misurata in corrente alternata).
+\end{itemize}
+
+%=============================================================================
+\chapter{Elaborazione dei Segnali e Conversione A/D}
+%=============================================================================
+
+\section{Teorema del Campionamento e Aliasing}
+\begin{itemize}
+    \item \textbf{Teorema di Shannon}: Un segnale continuo può essere correttamente campionato solo se la frequenza di campionamento \(f_s\) è \textbf{strettamente superiore al doppio} della massima componente frequenziale del segnale (\(f_{\max}\)):
+    \[
+    f_s > 2 f_{\max} \implies f_{\text{Nyq}} = \frac{f_s}{2}
+    \]
+    Sottocampionare provoca \textbf{aliasing} (le frequenze sopra Nyquist si ripiegano in banda utile).
+    \item \textbf{Prevenzione dell'aliasing}: Può essere effettuata \textbf{solo tramite un filtro analogico passa-basso} posizionato prima del campionatore (filtro anti-aliasing). Un filtro digitale applicato dopo il campionamento non può rimediare, poiché l'aliasing è già avvenuto in fase di digitalizzazione.
+    \item \textbf{Aliasing vs. Saturazione (Clipping)}: L'aliasing è un errore del dominio del tempo/frequenza (frequenza di campionamento insufficiente). La saturazione (\emph{clipping}) è un errore del dominio delle ampiezze, dovuto a un range d'ingresso dell'ADC più piccolo rispetto all'ampiezza massima del segnale analogico.
+\end{itemize}
+
+\section{Quantizzazione e Ricostruzione}
+\begin{itemize}
+    \item \textbf{Step di quantizzazione (\(V_{LSB}\))}: Divide il range d'ingresso dell'ADC in \(2^{N_{\text{bit}}}\) intervalli (non in \(N_{\text{bit}}\) intervalli).
+    \item \textbf{Rumore di quantizzazione (\(\sigma_{\text{quant}}\))}: Ha una deviazione standard proporzionale alla larghezza dell'intervallo \(V_{LSB}\):
+    \[
+    \sigma_{\text{quant}} = \frac{V_{LSB}}{\sqrt{12}}
+    \]
+    \item \textbf{Ricostruzione ideale del segnale}: Il metodo teoricamente perfetto per ricostruire il segnale analogico dai suoi campioni discreti è l'\textbf{interpolazione sinc} (somma di funzioni sinc caricate sui campioni), non l'interpolazione lineare (unire i punti con segmenti retti).
+\end{itemize}
+
+\section{Proprietà dei Filtri Digitali}
+\begin{itemize}
+    \item \textbf{Frequenza di taglio (Cutoff)}: Definita come la frequenza a cui il guadagno in ampiezza si riduce a \(1/\sqrt{2} \approx 0.707\) rispetto alla banda passante (pari a \(-3\ \text{dB}\)).
+    \item \textbf{Roll-off}: Indica la pendenza della transizione tra banda passante e banda di attenuazione. È elevato se la banda di transizione è molto stretta.
+    \item \textbf{Filtri FIR vs. IIR}:
+    \begin{itemize}
+        \item I filtri \textbf{FIR} possono essere progettati con \textbf{fase perfettamente lineare} (ritardo di gruppo costante nel tempo).
+        \item I filtri \textbf{IIR} sono più efficienti (richiedono ordini molto più bassi a parità di roll-off), ma \textbf{non possono avere fase lineare}.
+    \end{itemize}
+    \item \textbf{Filtro di Butterworth}: È un filtro di tipo \textbf{IIR} caratterizzato da una risposta in frequenza massimamente piatta nella banda passante (\emph{no ripple}).
+\end{itemize}
+
+\section*{Trabocchetti d'Esame - Capitolo 5}
+\addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 5}
+\begin{itemize}
+    \item \textbf{Trappola}: ``L'aliasing può essere rimosso dopo il campionamento applicando un filtro digitale'' \(\implies\) \textbf{FALSO} (l'aliasing va rimosso prima del campionamento con un filtro analogico).
+    \item \textbf{Trappola}: ``L'aliasing si verifica quando il segnale supera il range d'ingresso dell'ADC'' \(\implies\) \textbf{FALSO} (quello è il clipping; l'aliasing dipende solo dalla frequenza di campionamento).
+    \item \textbf{Trappola}: ``I filtri IIR possono essere progettati per avere fase lineare'' \(\implies\) \textbf{FALSO} (solo i filtri FIR possono possedere fase lineare).
+    \item \textbf{Trappola}: ``Il metodo perfetto per ricostruire un segnale dai suoi campioni è l'interpolazione lineare'' \(\implies\) \textbf{FALSO} (è l'interpolazione sinc).
+    \item \textbf{Trappola}: ``La frequenza di Nyquist è la massima frequenza contenuta in un segnale analogico'' \(\implies\) \textbf{FALSO} (è definita come metà della frequenza di campionamento \(f_s/2\)).
+\end{itemize}
+
+%=============================================================================
+\chapter{Analisi Spettrale (DFT, Windowing, Welch)}
+%=============================================================================
+
+\section{DFT e Risoluzione Spettrale}
+\begin{itemize}
+    \item \textbf{Risoluzione spettrale fisica (\(\Delta f\))}: Dipende esclusivamente dalla durata totale della registrazione utile (\(T\)):
+    \[
+    \Delta f = \frac{1}{T} = \frac{f_s}{N}
+    \]
+    Una frequenza di campionamento più alta espande il range frequenziale analizzabile (\(f_s\)), ma \textbf{non migliora} la risoluzione dei bin frequenziali se la durata \(T\) rimane costante.
+    \item \textbf{Zero-Padding}: Riduce la distanza tra i punti calcolati nello spettro (\(\Delta f_{\text{sampled}}\)), agendo come un'interpolazione spettrale che migliora la fluidità del grafico, ma \textbf{non aggiunge alcuna informazione reale} né migliora la risoluzione fisica del segnale (che resta legata alla durata originaria \(T\)).
+    \item \textbf{Spettro di una DFT reale}: La DFT di un segnale a \(N\) campioni produce \(N\) valori complessi. Tuttavia, poiché il segnale d'origine è reale, lo spettro è simmetrico (hermitiano) e la prima metà (\(\nicefrac{N}{2}\) campioni) è sufficiente a definire interamente lo spettro.
+\end{itemize}
+
+\section{Finestre e Sanguinamento Spettrale (Leakage)}
+\begin{itemize}
+    \item \textbf{Finestra rettangolare}: Ha il lobo principale più stretto (ottima risoluzione per picchi vicini di simile ampiezza), ma presenta i lobi secondari più alti. Questo causa un forte \textbf{sanguinamento spettrale} (\emph{spectral leakage}). Non è ``sempre la scelta migliore''.
+    \item \textbf{Finestre tapered (es. Hamming, Blackman-Harris)}: Riducono drasticamente i lobi secondari (riducendo il leakage) al costo di un allargamento del lobo principale (peggiorando la risoluzione di picchi molto vicini).
+    \item \textbf{Teorema di Wiener-Khinchin}: Se una serie temporale non è direttamente trasformabile secondo Fourier, è comunque possibile calcolarne la PSD calcolando la trasformata di Fourier della sua \textbf{funzione di autocorrelazione} (Vero).
+\end{itemize}
+
+\section*{Trabocchetti d'Esame - Capitolo 6}
+\addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 6}
+\begin{itemize}
+    \item \textbf{Trappola}: ``Lo zero-padding permette di migliorare la risoluzione spettrale fisica di una registrazione corta'' \(\implies\) \textbf{FALSO} (interpola solo graficamente, non aggiunge informazioni reali).
+    \item \textbf{Trappola}: ``Aumentando la frequenza di campionamento di una registrazione di 1 secondo, miglioro la risoluzione spettrale'' \(\implies\) \textbf{FALSO} (la risoluzione resta di \(1\ \text{Hz}\), aumenta solo il range di frequenze visibili).
+    \item \textbf{Trappola}: ``Se una serie temporale non è trasformabile secondo Fourier, è impossibile calcolarne la PSD'' \(\implies\) \textbf{FALSO} (si calcola tramite Wiener-Khinchin sulla sua funzione di autocorrelazione).
+    \item \textbf{Trappola}: ``La coerenza ordinaria è definita nel dominio del tempo'' \(\implies\) \textbf{FALSO} (è una misura spettrale definita nel dominio della frequenza).
+\end{itemize}
+
+%=============================================================================
+\chapter{Connettività Funzionale ed Effettiva}
+%=============================================================================
+
+\section{Confronto tra OC, GC e PDC}
+\begin{itemize}
+    \item \textbf{Coerenza Ordinaria (OC)}: Misura bivariata, definita nel dominio della frequenza, \textbf{non direzionale} (\(C_{xy}(f) = C_{yx}(f)\)). Misura la sincronizzazione, non la causalità.
+    \item \textbf{Causalità di Granger (GC)}: Misura bivariata o multivariata, definita nel dominio del tempo, \textbf{direzionale} (asimmetrica, \(G_{x \to y} \neq G_{y \to x}\)).
+    \begin{itemize}
+        \item Un valore negativo dell'indice di Granger (\(G_{x \to y} < 0\)) indica che la varianza dell'errore del modello bivariato è maggiore di quella del modello semplice (univariato). Questo è indice di un \textbf{modello errato} (o di problemi di fitting), poiché l'inclusione di informazioni non dovrebbe mai peggiorare le prestazioni del modello.
+    \end{itemize}
+    \item \textbf{Partial Directed Coherence (PDC)}: Misura \textbf{multivariata}, definita nel dominio della frequenza, \textbf{direzionale} (asimmetrica), normalizzata nell'intervallo \([0, 1]\).
+\end{itemize}
+
+\section{Il Problema della Sorgente Comune (Common Source)}
+\begin{itemize}
+    \item \textbf{Limiti dei metodi bivariati (OC, GC bivariata)}: Non possono identificare se la sincronizzazione tra due nodi \(x\) e \(y\) è dovuta a una reale connessione o all'influenza di un terzo nodo non registrato \(z\) (sorgente comune).
+    \item \textbf{Metodi multivariati (MVAR, PDC)}: Mitigano notevolmente il problema della sorgente comune modellando simultaneamente tutti i nodi registrati nella rete, ma \textbf{non possono risolverlo completamente} se la vera sorgente comune si trova in un'area profonda o non registrata dagli elettrodi.
+\end{itemize}
+
+\section*{Trabocchetti d'Esame - Capitolo 7}
+\addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 7}
+\begin{itemize}
+    \item \textbf{Trappola}: ``La Partial Directed Coherence è un metodo bivariato'' \(\implies\) \textbf{FALSO} (è un metodo multivariato).
+    \item \textbf{Trappola}: ``La coerenza ordinaria permette di mitigare o risolvere il problema della sorgente comune'' \(\implies\) \textbf{FALSO} (essendo bivariata, ne è fortemente affetta).
+    \item \textbf{Trappola}: ``L'approccio multivariato risolve completamente il problema della sorgente comune in ogni scenario'' \(\implies\) \textbf{FALSO} (se la sorgente comune non è registrata o accessibile, il problema persiste).
+\end{itemize}
+
+%=============================================================================
+\chapter{Teoria dei Grafi e Metriche di Rete}
+%=============================================================================
+
+\section{Caratterizzazione Strutturale dei Grafi}
+\begin{itemize}
+    \item \textbf{Shortest Path (\(d_{ij}\))}: La distanza tra due nodi \(i\) e \(j\) in un grafo è data dalla lunghezza del \textbf{percorso più breve} che li unisce (espressa in numero di archi), non dalla lunghezza media di tutti i percorsi possibili. Se i due nodi non sono connessi da alcun percorso, la distanza è pari a \(\infty\) (infinito).
+    \item \textbf{Densità (\(k\))}: È la frazione di archi presenti rispetto al massimo teorico. Appartiene rigorosamente all'intervallo \([0, 1]\). Un valore di densità superiore a \(1\) (es. \(1.3\)) non è fisiologicamente né matematicamente plausibile.
+    \item \textbf{Matrice di adiacenza}: Per grafi non orientati, la matrice di adiacenza è sempre \textbf{simmetrica} rispetto alla diagonale principale.
+\end{itemize}
+
+\section{Integrazione, Segregazione e Modelli di Rete}
+\begin{itemize}
+    \item \textbf{Efficienza Globale (\(E_g\))}: È una misura di \textbf{integrazione} (efficacia dello scambio di informazioni a lungo raggio). Appartiene all'intervallo \([0, 1]\).
+    \item \textbf{Efficienza Locale (\(E_l\))}: Valuta le proprietà di segregazione (formazione di cluster locali) della rete ed è definita come la media delle efficienze globali calcolate sui sottografi locali composti dai soli vicini di ciascun nodo. È una misura \textbf{globale} (caratterizza l'intero grafo come media), non locale.
+    \item \textbf{Divisibilità (\(D\)) e Modularità (\(Q\))}: Sono misure di \textbf{segregazione} (divisione in comunità/moduli), non di integrazione.
+    \begin{itemize}
+        \item La divisibilità per due classi è limitata nell'intervallo \([0.5, 1]\). Il valore minimo della divisibilità \textbf{non può essere zero}.
+        \item La modularità può assumere valori sia positivi sia negativi (un valore pari a \(-0.3\) è plausibile).
+    \end{itemize}
+    \item \textbf{Modello Small-World}: Caratterizzato da un'alta efficienza locale (simile alle reti regolari/lattice) e un'alta efficienza globale (simile alle reti random). Le sue proprietà \textbf{non sono equidistanti} da quelle delle reti regolari e random (è molto più vicina alle regolari per l'efficienza locale e molto più vicina alle random per l'efficienza globale).
+\end{itemize}
+
+\section*{Trabocchetti d'Esame - Capitolo 8}
+\addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 8}
+\begin{itemize}
+    \item \textbf{Trappola}: ``L'efficienza locale è una misura locale del grafo'' \(\implies\) \textbf{FALSO} (è una metrica globale, in quanto è la media calcolata su tutta la rete).
+    \item \textbf{Trappola}: ``In un grafo, la distanza \(d(i,j)\) è la media delle lunghezze dei percorsi che li uniscono'' \(\implies\) \textbf{FALSO} (è la lunghezza del percorso minimo, lo \emph{shortest path}).
+    \item \textbf{Trappola}: ``La divisibilità e la modularità sono misure di integrazione di una rete'' \(\implies\) \textbf{FALSO} (sono misure di segregazione).
+    \item \textbf{Trappola}: ``Il valore minimo della Divisibilità (D) è zero'' \(\implies\) \textbf{FALSO} (è 0.5 per due classi).
+\end{itemize}
+
+%=============================================================================
+\chapter{BCI ed Elettromiografia (sEMG)}
+%=============================================================================
+
+\section{Brain-Computer Interfaces (BCI)}
+\begin{itemize}
+    \item \textbf{P300 Speller}: Si basa sulla risposta evocata da eventi rari e significativi (paradigma oddball). La P300 viene prodotta perché l'utente assegna soggettivamente salienza (rilevanza) allo stimolo target. Non può essere volontariamente modulata tramite \emph{motor imagery}.
+    \item \textbf{SMR (Sensorimotor Rhythms)}: L'ampiezza dei ritmi Mu e Beta può essere volontariamente modulata tramite l'esercizio di \textbf{motor imagery cinestesica} (sensazione fisica in prima persona) per controllare un cursore continuo. La motor imagery visiva (in terza persona) è inefficiente.
+    \item \textbf{ERD/ERS}: L'Event-Related Desynchronization/Synchronization quantifica le variazioni relative di potenza in una specifica banda rispetto ad una baseline, \textbf{non quantifica l'attività phase-locked} (che viene invece estratta tramite semplice averaging temporale sincrono).
+    \item \textbf{Averaging degli ERP}: Nei trial ERP, l'inizio del trial (epoca) di solito \textbf{precede l'istante dell'evento} di un breve intervallo (es. 100-200 ms), per consentire l'estrazione e l'analisi di una baseline pre-stimolo utile alla normalizzazione.
+\end{itemize}
+
+\section{Fisiologia ed Elaborazione sEMG}
+\begin{itemize}
+    \item \textbf{MFCV (Muscle Fiber Conduction Velocity)}: È la velocità di conduzione del potenziale d'azione lungo la fibra muscolare, compresa nell'intervallo \textbf{\(2\text{--}6\ \text{m/s}\)}.
+    \item \textbf{Fatica muscolare}: Provoca un accumulo di metaboliti e acido lattico che abbassa il pH e riduce la MFCV (la velocità di conduzione \textbf{diminuisce}, non aumenta).
+    \item \textbf{Spostamento spettrale}: Come diretta conseguenza della riduzione della MFCV dovuta alla fatica, lo spettro di potenza del segnale sEMG subisce uno spostamento sistematico verso le basse frequenze, che si traduce in una \textbf{diminuzione della frequenza media (MNF) e mediana (MDF)}.
+    \item \textbf{Ampiezza del segnale sEMG}: L'ampiezza grezza espressa in millivolt non può essere confrontata direttamente tra soggetti diversi senza opportuna normalizzazione (es. rispetto alla massima contrazione volontaria - MVC), a causa di fattori di confondimento come lo spessore del tessuto adiposo sottocutaneo.
+\end{itemize}
+
+\section*{Trabocchetti d'Esame - Capitolo 9}
+\addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 9}
+\begin{itemize}
+    \item \textbf{Trappola}: ``L'ERD/ERS quantifica l'attività cerebrale phase-locked allo stimolo'' \(\implies\) \textbf{FALSO} (l'attività evocata phase-locked è stimata via averaging semplice; l'ERD/ERS misura variazioni spettrali non necessariamente phase-locked).
+    \item \textbf{Trappola}: ``La fatica muscolare provoca un aumento della MFCV'' \(\implies\) \textbf{FALSO} (provoca una diminuzione della MFCV).
+    \item \textbf{Trappola}: ``La motor imagery visuale in terza persona è il metodo più efficiente per controllare un BCI SMR'' \(\implies\) \textbf{FALSO} (è efficiente solo quella cinestesica in prima persona).
+    \item \textbf{Trappola}: ``L'ampiezza grezza della sEMG in millivolt può essere confrontata direttamente tra soggetti diversi'' \(\implies\) \textbf{FALSO} (va sempre normalizzata rispetto alla MVC).
+\end{itemize}
+
+%=============================================================================
+\chapter{L'Anti-Error Cheat Sheet}
+%=============================================================================
+
+Tieni a mente questa lista di affermazioni rapide per smentire i classici trabocchetti dei professori nei quiz V/F:
+
+\begin{enumerate}
+    \item \textbf{Frequenza Mu vs. Alpha}: Hanno la \textbf{stessa frequenza} (\(8\text{--}13\ \text{Hz}\)) ma originano in lobi diversi (Mu: centrale/motorio; Alpha: occipitale/visivo).
+    \item \textbf{Forma d'onda Mu}: È \textbf{ad arco} (\emph{arc-shaped}), non sinusoidale simmetrica.
+    \item \textbf{Filtro anti-aliasing}: Deve essere \textbf{analogico}, non digitale.
+    \item \textbf{Aliasing vs. Clipping}: Aliasing = errore di campionamento (tempo); Clipping = errore di saturazione (ampiezza/range d'ingresso).
+    \item \textbf{Linked mastoids}: Richiede \textbf{due} elettrodi fisici cortocircuitati, non uno.
+    \item \textbf{Elettrodi d'oro}: Sono polarizzabili, quindi \textbf{sconsigliati} per potenziali molto lenti (meglio Ag/AgCl).
+    \item \textbf{Sorgente comune e PDC}: La PDC mitiga il problema, ma \textbf{non lo risolve completamente} se la sorgente comune non viene registrata.
+    \item \textbf{PDC}: È un metodo \textbf{multivariato}, non bivariato.
+    \item \textbf{Coerenza Ordinaria}: È definita nel dominio della \textbf{frequenza}, non del tempo. Ed è \textbf{bivariata e simmetrica} (non direzionale).
+    \item \textbf{Granger Causality}: È definita nel dominio del \textbf{tempo} (nella sua formulazione classica) ed è \textbf{direzionale}.
+    \item \textbf{Granger negativo}: Un valore negativo indica un \textbf{errore di modellizzazione}, non una relazione inversa.
+    \item \textbf{Distanza nei grafi}: È lo \emph{shortest path} (percorso minimo), non la media dei percorsi.
+    \item \textbf{Local Efficiency}: È una metrica \textbf{globale} (media delle efficienze locali dei nodi), non locale.
+    \item \textbf{Divisibilità e Modularità}: Sono misure di \textbf{segregazione}, non di integrazione.
+    \item \textbf{Divisibilità minima}: È \textbf{0.5} per due classi, non può essere zero.
+    \item \textbf{Modularità negativa}: È possibile ed indica una scarsa propensione a formare comunità (es. \(-0.3\) è plausibile).
+    \item \textbf{Densità}: Deve essere compresa tra \(0\) e \(1\). Una densità di \(1.3\) è \textbf{impossibile}.
+    \item \textbf{Unmasking}: È un meccanismo di plasticità \textbf{strutturale rapido} che attiva sinapsi pre-esistenti ma silenti.
+    \item \textbf{Plasticità a breve termine}: Non comporta alcuna modifica strutturale stabile nella membrana post-sinaptica.
+    \item \textbf{Fatica muscolare}: \textbf{Riduce} la MFCV e sposta lo spettro (MNF, MDF) verso le \textbf{basse frequenze}.
+    \item \textbf{ARV vs. RMS}: \textbf{Non sono uguali} (RMS pesa i quadrati dei campioni, ARV il valore assoluto).
+    \item \textbf{Zero-padding}: È solo un'\textbf{interpolazione grafica}, non aumenta la risoluzione spettrale reale del segnale.
+    \item \textbf{Fase lineare}: È una proprietà esclusiva dei filtri \textbf{FIR}, non dei filtri IIR (come il Butterworth).
+    \item \textbf{Inizio dell'epoca negli ERP}: Precede quasi sempre lo stimolo per catturare la \textbf{baseline pre-stimolo}.
+    \item \textbf{Generazione dell'EEG}: È dovuta ai \textbf{potenziali post-sinaptici (PSP)} sommati nei neuroni piramidali (campo aperto), non ai potenziali d'azione (APs).
+\end{enumerate}
+
+\end{document}

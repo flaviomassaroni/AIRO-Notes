@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuroQuiz</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0e0f11;
+    --surface: #161719;
+    --surface2: #1e2023;
+    --border: #2a2d31;
+    --text: #e8e9eb;
+    --muted: #6b7280;
+    --accent: #4f9cf9;
+    --accent-dim: rgba(79,156,249,0.12);
+    --green: #34d399;
+    --green-dim: rgba(52,211,153,0.12);
+    --red: #f87171;
+    --red-dim: rgba(248,113,113,0.12);
+    --yellow: #fbbf24;
+    --sidebar-w: 260px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: width .25s ease, min-width .25s ease;
+  }
+  #sidebar.collapsed { width: 0; min-width: 0; }
+
+  .sidebar-header {
+    padding: 20px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-header h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .file-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+  }
+  .file-list::-webkit-scrollbar { width: 4px; }
+  .file-list::-webkit-scrollbar-track { background: transparent; }
+  .file-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .15s;
+    user-select: none;
+  }
+  .file-item:hover { background: var(--surface2); }
+  .file-item input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 14px; height: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .file-item .fname {
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+  .file-item .fcount {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .add-file-area {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+  }
+  #add-csv-btn {
+    width: 100%;
+    padding: 8px;
+    background: var(--surface2);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  #add-csv-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  #csv-file-input { display: none; }
+
+  /* ── Main ── */
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Topbar ── */
+  #topbar {
+    height: 52px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  #toggle-sidebar {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color .15s;
+  }
+  #toggle-sidebar:hover { color: var(--text); }
+
+  .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: .05em;
+  }
+  .logo span { color: var(--muted); font-weight: 400; }
+
+  #topbar-stats {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .stat-pill b { color: var(--text); font-weight: 500; }
+  .stat-pill.green b { color: var(--green); }
+  .stat-pill.red b { color: var(--red); }
+
+  #new-session-btn {
+    padding: 6px 14px;
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    color: var(--accent);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  #new-session-btn:hover { background: var(--accent); color: #fff; }
+
+  /* ── Content ── */
+  #content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    padding: 40px 24px;
+  }
+  #content::-webkit-scrollbar { width: 4px; }
+  #content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── Quiz view ── */
+  #quiz-view { width: 100%; max-width: 680px; display: flex; flex-direction: column; gap: 24px; }
+
+  .progress-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+  .progress-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 28px;
+    position: relative;
+  }
+  .q-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .q-text {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .answer-buttons {
+    display: flex;
+    gap: 12px;
+  }
+  .ans-btn {
+    flex: 1;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    letter-spacing: .05em;
+  }
+  .ans-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+  .ans-btn:disabled { cursor: default; }
+  .ans-btn.correct { border-color: var(--green) !important; background: var(--green-dim) !important; color: var(--green) !important; }
+  .ans-btn.wrong { border-color: var(--red) !important; background: var(--red-dim) !important; color: var(--red) !important; }
+  .ans-btn.reveal-correct { border-color: var(--green) !important; background: var(--green-dim) !important; color: var(--green) !important; }
+
+  .feedback-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 32px;
+  }
+  #feedback-msg {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  #feedback-msg.correct { color: var(--green); }
+  #feedback-msg.wrong { color: var(--red); }
+
+  #next-btn {
+    padding: 8px 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity .15s;
+    display: none;
+  }
+  #next-btn:hover { opacity: .85; }
+
+  /* ── Stats panel ── */
+  #stats-view { width: 100%; max-width: 760px; display: none; flex-direction: column; gap: 28px; }
+
+  .stats-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .stats-header h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  #back-to-quiz {
+    padding: 6px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  #back-to-quiz:hover { color: var(--text); border-color: var(--text); }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .summary-card .sc-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .summary-card .sc-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .summary-card.green .sc-value { color: var(--green); }
+  .summary-card.red .sc-value { color: var(--red); }
+  .summary-card.accent .sc-value { color: var(--accent); }
+
+  .circle-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .circle-svg { overflow: visible; }
+  .circle-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .mistakes-section h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 12px;
+  }
+  .mistake-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .mistake-table th {
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 0 8px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mistake-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  .mistake-table tr:last-child td { border-bottom: none; }
+  .mistake-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--red);
+    white-space: nowrap;
+  }
+  .bar-cell { width: 80px; vertical-align: middle; }
+  .mini-bar-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; background: var(--red); border-radius: 2px; }
+
+  .perf-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .perf-track {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+  }
+  .perf-correct { height: 100%; background: var(--green); border-radius: 99px; float: left; transition: width .6s ease; }
+  .perf-wrong { height: 100%; background: var(--red); border-radius: 99px; float: left; transition: width .6s ease; }
+  .perf-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* ── No questions notice ── */
+  #no-questions {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    color: var(--muted);
+    text-align: center;
+    padding-top: 80px;
+  }
+  #no-questions svg { opacity: .3; }
+  #no-questions p { font-size: 14px; line-height: 1.7; }
+
+  /* ── Stats tab btn ── */
+  #stats-toggle {
+    padding: 6px 14px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  #stats-toggle:hover { color: var(--text); border-color: var(--text); }
+  #stats-toggle.active { background: var(--surface2); color: var(--text); border-color: var(--muted); }
+
+  /* ── Session end card ── */
+  #session-end {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-top: 40px;
+    text-align: center;
+  }
+  #session-end h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    color: var(--text);
+  }
+  #session-end p { font-size: 14px; color: var(--muted); }
+  #session-end .big-score {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .session-actions { display: flex; gap: 10px; }
+  .session-actions button {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'IBM Plex Sans', sans-serif;
+    transition: all .15s;
+  }
+  #continue-btn {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+  }
+  #continue-btn:hover { opacity: .85; }
+  #view-stats-end-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  #view-stats-end-btn:hover { color: var(--text); border-color: var(--text); }
+
+  /* keyboard hint */
+  .kbd-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    opacity: .5;
+  }
+
+  @media (max-width: 600px) {
+    #sidebar { display: none; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <div class="sidebar-header">
+    <h2>Datasets</h2>
+  </div>
+  <div class="file-list" id="file-list"></div>
+  <div class="add-file-area">
+    <button id="add-csv-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Add CSV
+    </button>
+    <input type="file" id="csv-file-input" accept=".csv" multiple>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="main">
+  <!-- Topbar -->
+  <div id="topbar">
+    <button id="toggle-sidebar" title="Toggle sidebar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/>
+      </svg>
+    </button>
+    <div class="logo">Neuro<span>Quiz</span></div>
+    <div id="topbar-stats">
+      <div class="stat-pill green">✓ <b id="tb-correct">0</b></div>
+      <div class="stat-pill red">✗ <b id="tb-wrong">0</b></div>
+      <div class="stat-pill">tot <b id="tb-total">0</b></div>
+      <button id="stats-toggle">Stats</button>
+      <button id="new-session-btn">New Session</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+
+    <!-- No questions notice -->
+    <div id="no-questions">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+        <rect x="9" y="3" width="6" height="4" rx="1"/>
+        <path d="M9 12h6M9 16h4"/>
+      </svg>
+      <p>No dataset selected.<br>Choose one or more CSVs from the sidebar<br>or add a new one.</p>
+    </div>
+
+    <!-- Quiz view -->
+    <div id="quiz-view">
+      <div class="progress-bar-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+        <div class="progress-label" id="progress-label">0 / 0</div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-tag" id="q-tag">Question 1</div>
+        <div class="q-text" id="q-text">Loading...</div>
+      </div>
+
+      <div class="answer-buttons">
+        <button class="ans-btn" id="btn-true" onclick="answer('T')">TRUE</button>
+        <button class="ans-btn" id="btn-false" onclick="answer('F')">FALSE</button>
+      </div>
+
+      <div class="feedback-row">
+        <div id="feedback-msg"></div>
+        <button id="next-btn" onclick="nextQuestion()">Next →</button>
+      </div>
+
+      <div class="kbd-hint">Keyboard: T / F — answer &nbsp;|&nbsp; Space / → — next</div>
+    </div>
+
+    <!-- Session end -->
+    <div id="session-end">
+      <div class="big-score" id="end-score" style="color: var(--accent)">—%</div>
+      <h2>Session Complete</h2>
+      <p id="end-summary">You answered — questions correctly.</p>
+      <div class="session-actions">
+        <button id="view-stats-end-btn" onclick="showStats()">View Stats</button>
+        <button id="continue-btn" onclick="startSession()">New Session</button>
+      </div>
+    </div>
+
+    <!-- Stats view -->
+    <div id="stats-view">
+      <div class="stats-header">
+        <h2>// statistics</h2>
+        <button id="back-to-quiz" onclick="hideStats()">← Back to Quiz</button>
+      </div>
+
+      <!-- Summary grid -->
+      <div class="summary-grid">
+        <div class="summary-card accent">
+          <div class="sc-label">Total Answered</div>
+          <div class="sc-value" id="st-total">0</div>
+        </div>
+        <div class="summary-card green">
+          <div class="sc-label">Correct</div>
+          <div class="sc-value" id="st-correct">0</div>
+        </div>
+        <div class="summary-card red">
+          <div class="sc-label">Wrong</div>
+          <div class="sc-value" id="st-wrong">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-label">Accuracy</div>
+          <div class="sc-value" id="st-acc">—</div>
+        </div>
+      </div>
+
+      <!-- Per-session accuracy bar -->
+      <div id="session-history-section">
+        <div class="mistakes-section">
+          <h3>Session History</h3>
+          <div id="session-bars"></div>
+        </div>
+      </div>
+
+      <!-- Overall accuracy bar -->
+      <div>
+        <div class="mistakes-section">
+          <h3>Overall Performance</h3>
+          <div class="perf-bar-row">
+            <div class="perf-track" id="overall-track">
+              <div class="perf-correct" id="perf-correct-bar" style="width:0%"></div>
+              <div class="perf-wrong" id="perf-wrong-bar" style="width:0%"></div>
+            </div>
+            <div class="perf-label" id="perf-label">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Most missed -->
+      <div class="mistakes-section">
+        <h3>Most Missed Questions</h3>
+        <table class="mistake-table">
+          <thead>
+            <tr>
+              <th style="width:40px">✗</th>
+              <th>Question</th>
+              <th style="width:90px">Wrong / Asked</th>
+              <th style="width:80px"></th>
+            </tr>
+          </thead>
+          <tbody id="mistakes-body"></tbody>
+        </table>
+      </div>
+
+    </div><!-- /stats-view -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const BUILTIN_DATA = [{"domanda": "The 4 main ion families having a role in the neuron functioning are Na+, K+, Cl- and Ca++", "risposta": "T"}, {"domanda": "The 4 main ion families having a role in the neuron functioning are Na+, K+, Br- and Ca++", "risposta": "F"}, {"domanda": "The resting membrane potential for the neural cell is equal to -90.", "risposta": "F"}, {"domanda": "The resting membrane potential for the neural cell is typically around +70 mV.", "risposta": "F"}, {"domanda": "In an inhibitory synapse, the membrane current is always iperpolarizing.", "risposta": "T"}, {"domanda": "In the Nernst equation, the ion valence can be either positive or negative.", "risposta": "T"}, {"domanda": "In the Nernst equation, the temperature is expressed in Celsius degrees", "risposta": "F"}, {"domanda": "The resting membrane potential is entirely due to the sum of the effects of diffusional forces and electrical forces acting on the ions.", "risposta": "F"}, {"domanda": "The resting membrane potential is entirely due to the sum of the effects of the electrical forces acting on the ions and of the ion pumps.", "risposta": "F"}, {"domanda": "If at a certain temperature T the equilibrium potential for a given ion family is equal to +30 mV, and the membrane potential is equal to -70 mV, the ion net current will be a hyperpolarizing one.", "risposta": "F"}, {"domanda": "The propagation speed for an action potential in an unmyelinated axon is slower than in a myelinated one.", "risposta": "T"}, {"domanda": "The Thalamus, the Brainstem and the Penfield Homunculus are all subcortical areas.", "risposta": "F"}, {"domanda": "In the short-term plasticity, there are no structural changes in the post-synaptic membrane.", "risposta": "T"}, {"domanda": "The following measures of brain electrical correlates are in the correct order, from the less detailed to the more detailed one: Scalp EEG, Local Field Potentials, Electrocorticography, Stereo EEG, Extracellular Recordings, Intracellular Recordings.", "risposta": "F"}, {"domanda": "The main contributors to the amplitude of EEG are the post-synaptic potentials.", "risposta": "T"}, {"domanda": "The following factors all affect the amplitude of EEG signals: the neurons' orientation, the synchronicity of the neural activity, the distance between the neurons and the electrodes, the closed/open field generated by the neurons.", "risposta": "T"}, {"domanda": "If a time series is not Fourier-transformable, it is still possible to compute its power spectral density by means of the Wiener-Khinchin Theorem.", "risposta": "T"}, {"domanda": "Ordinary Coherence is directional.", "risposta": "F"}, {"domanda": "Anatomical connectivity can change over large time scales.", "risposta": "T"}, {"domanda": "Causality in the sense of physical influence can be tested by perturbing the brain activity.", "risposta": "T"}, {"domanda": "Wiener-Granger Causality is based on the autoregressive modeling of time series.", "risposta": "T"}, {"domanda": "The Granger Causality Test is a spectral measure.", "risposta": "F"}, {"domanda": "This is an example of the hidden source effect (cascade diagram 3 -> 1 -> 2).", "risposta": "F"}, {"domanda": "Multivariate approaches are more accurate because they use the information from all the time series involved in a unique model.", "risposta": "T"}, {"domanda": "A Density equal to 1.3 is a physiologically plausible result.", "risposta": "F"}, {"domanda": "Local Efficiency is a local measure.", "risposta": "F"}, {"domanda": "Divisibility and Modularity are measures of segregation.", "risposta": "T"}, {"domanda": "A Small-World Network properties are equidistant from those of Regular and Random Networks.", "risposta": "F"}, {"domanda": "Ion pumps are based on a passive membrane transportation mechanism.", "risposta": "F"}, {"domanda": "Given that at a certain temperature T the Cl- equilibrium potential is equal to -80 mV, and the membrane potential is equal to -70 mV, the Cl- net current will be directed from the inside of the cell toward the outside.", "risposta": "F"}, {"domanda": "In chemical synapses, when a neurotransmitter opens the K+ gated channels, the resulting PSP is an inhibitory one.", "risposta": "T"}, {"domanda": "The continuous conduction is faster than the saltatory (myelinated) one.", "risposta": "F"}, {"domanda": "Two ipsilateral regions belong to the same hemisphere.", "risposta": "T"}, {"domanda": "The unmasking of latent synaptic connections is part of the mechanisms behind brain plasticity.", "risposta": "T"}, {"domanda": "To detect a sequence of action potentials over the axon of a neural cell in vivo, the correct procedure is to record extracellular measures.", "risposta": "T"}, {"domanda": "The cortical pyramidal neurons are oriented tangentially to the cortical surface.", "risposta": "F"}, {"domanda": "Synchronously activated neurons produce a larger EEG signal than the same amount of neurons when they are asynchronous.", "risposta": "T"}, {"domanda": "Deep (subcortical) regions of the brain produce a less blurred scalp EEG than cortical ones.", "risposta": "F"}, {"domanda": "If a time series is not Fourier-transformable, it is impossible to compute its PSD.", "risposta": "F"}, {"domanda": "A necessary condition for a linear autoregressive (AR) model is that the time series to be modeled is wide-sense stationary.", "risposta": "T"}, {"domanda": "PDC is a spectral, bivariate method.", "risposta": "F"}, {"domanda": "The use of Ordinary Coherence can mitigate the problem of the common source.", "risposta": "F"}, {"domanda": "A negative value of the Granger Index Gx->y should never occur if the two AR models that are compared to compute the index are correct.", "risposta": "T"}, {"domanda": "In a graph, the distance d(i,j) between two nodes is given by the average length of the paths that link them.", "risposta": "F"}, {"domanda": "In a graph, the Global Efficiency ∈[0, 1].", "risposta": "T"}, {"domanda": "In an undirected graph, I cannot compute the indegree and the outdegree.", "risposta": "T"}, {"domanda": "In the Nernst equation for the electrochemical equilibrium there is a term referred to diffusional forces and a term referred to electrical forces.", "risposta": "T"}, {"domanda": "The temporal summation of PSPs does not depend on the temporal distance between subsequent action potentials in the presynaptic cell.", "risposta": "F"}, {"domanda": "A hyperpolarization with respect to the resting membrane potential can cause the generation of an action potential.", "risposta": "F"}, {"domanda": "The motor homunculus is located in the frontal lobe.", "risposta": "T"}, {"domanda": "The short-term synaptic plasticity can involve a structural change in the post-synaptic membrane.", "risposta": "F"}, {"domanda": "To measure the membrane potential over the soma of a neural cell in vitro, the correct procedure is to record extracellular measures.", "risposta": "F"}, {"domanda": "In a cortical pyramidal neuron, thalamo-cortical synapses are located in the apical portion of its dendritic tree.", "risposta": "F"}, {"domanda": "Radially symmetric neurons produce a closed field and therefore do not significantly contribute to scalp EEG.", "risposta": "T"}, {"domanda": "Potentials recorded by electrodes which are at a close distance on the scalp are mutually independent.", "risposta": "F"}, {"domanda": "The maximum neural response is obtained for a movement direction with an angle of 350 degrees (based on motor cortex tuning curve).", "risposta": "F"}, {"domanda": "Discriminability d' is higher when the coherence level is equal to 6.4% than when it is equal to 12.8%.", "risposta": "F"}, {"domanda": "In reference to the firing rate distribution under preferred vs opposite motion directions: the histogram obtained for the preferred direction (+) is less affected by the coherence level than the distribution (-).", "risposta": "F"}, {"domanda": "In reference to the firing rate distribution under preferred vs opposite motion directions: there is an optimal value z that can be used as a threshold for classification at all coherence levels.", "risposta": "F"}, {"domanda": "Given two time series x and y, the Granger Causality Index Gx->y ∈[-∞, ∞].", "risposta": "F"}, {"domanda": "The Ordinary Coherence is defined in the time domain.", "risposta": "F"}, {"domanda": "A multivariate approach to the estimation of brain networks can always prevent the occurrence of the common source problem.", "risposta": "F"}, {"domanda": "In a graph, when no path links two nodes, the distance between them is infinite.", "risposta": "T"}, {"domanda": "In a graph, the Density ∈[0, 1].", "risposta": "T"}, {"domanda": "The Global Efficiency is normalized to the number N of nodes in the graph.", "risposta": "F"}, {"domanda": "An IPSP consists of a depolarization of the post-synaptic cell membrane.", "risposta": "F"}, {"domanda": "The voltage-gated Na+ channel is responsible for the absolute refractory period.", "risposta": "T"}, {"domanda": "The most informative parameter of the spike train in output to a neuronal cell is the amplitude of the spikes.", "risposta": "F"}, {"domanda": "The firing rate of the pre-synaptic neuron influences the temporal summation of the PSPs in the post-synaptic cell.", "risposta": "T"}, {"domanda": "The frontal lobe houses the primary visual function.", "risposta": "F"}, {"domanda": "In the brain's primary motor cortex (Penfield homunculus) the extension of the cortical region which controls a specific body region is proportional to that body region's volume.", "risposta": "F"}, {"domanda": "The short-term synaptic plasticity involves an irreversible change in the post-synaptic membrane.", "risposta": "F"}, {"domanda": "To record in vivo measures of the membrane potential over the axon of a single neural cell, you will use extracellular measures.", "risposta": "T"}, {"domanda": "The EEG signal is mainly generated by action potentials.", "risposta": "F"}, {"domanda": "The tuning curve shows the firing rate f of a neuron in the primary visual cortex as a function of the retinal disparity angle s. We can infer that the neuron responds mainly to positive s (far-tuned neuron).", "risposta": "T"}, {"domanda": "To record in vitro measures of the membrane potential over the dendrites of a neural cell, you will use extracellular measures.", "risposta": "F"}, {"domanda": "The part of the pyramidal neuron that acts as a current dipole is the axon.", "risposta": "F"}, {"domanda": "The discriminability d' when the coherence=3.2% is higher than when it's =12.8%.", "risposta": "F"}, {"domanda": "In reference to the firing rate distribution: among the two distributions (r+ or r-), r+ is the one affected by the coherence level.", "risposta": "T"}, {"domanda": "The normalized Partial Directed Coherence ∈[0, 1].", "risposta": "T"}, {"domanda": "The Granger Test is more suitable than the Ordinary Coherence to obtain a spectral measure.", "risposta": "F"}, {"domanda": "If Cxy(f) is the ordinary coherence between x and y, Cxy(f)=Cyx(f).", "risposta": "T"}, {"domanda": "The difference between the Wiener's and Granger's definitions of causality in the statistical sense is that Granger indicated a modeling framework to be used to test causality.", "risposta": "T"}, {"domanda": "Regular networks have a smaller Global Efficiency than random networks.", "risposta": "T"}, {"domanda": "A regular network has fewer nodes than a random network.", "risposta": "F"}, {"domanda": "Random networks have a smaller Local Efficiency than regular (lattice) networks.", "risposta": "T"}, {"domanda": "In a graph, the minimum Divisibility is equal to zero.", "risposta": "F"}, {"domanda": "Divisibility and Modularity are measures of integration of a network.", "risposta": "F"}, {"domanda": "The voltage-gated K+ channel inactivation state is responsible for the absolute refractory period.", "risposta": "F"}, {"domanda": "The voltage-gated Na+ channel is responsible for the repolarization phase of the action potential.", "risposta": "F"}, {"domanda": "The firing rate influences the amplitude of the resulting action potential in the post-synaptic cell.", "risposta": "F"}, {"domanda": "The long-term synaptic plasticity involves a structural change in the post-synaptic membrane.", "risposta": "T"}, {"domanda": "The brain operates at the temporal scale of milliseconds.", "risposta": "T"}, {"domanda": "The neurons' spatial orientation affects the amplitude of EEG signals.", "risposta": "T"}, {"domanda": "The synchronicity of the neural activity affects the amplitude of EEG signals.", "risposta": "T"}, {"domanda": "The electrical variation of the membrane potential that mainly contributes to EEG is the action potential.", "risposta": "F"}, {"domanda": "When the firing rate is 55 Hz, I can infer which movement direction produced that response (based on the motor cortex tuning curve peaking at 55Hz).", "risposta": "T"}, {"domanda": "In reference to the motor cortex tuning curve: from the curve I can conclude that this neuron is tuned to be more active in correspondence to a specific movement direction.", "risposta": "T"}, {"domanda": "In reference to the motor cortex tuning curve: the firing rate f was computed as the average of the neural response function across trials.", "risposta": "T"}, {"domanda": "Given the Granger Index Gxy between two time series x and y, a negative value of Gxy means an inverse precedence between the two time series.", "risposta": "F"}, {"domanda": "In the event of data paucity, the Partial Directed Coherence (PDC) is the most accurate estimator of causality in the statistical sense.", "risposta": "F"}, {"domanda": "Undirected graphs are associated with symmetrical adjacency matrices.", "risposta": "T"}, {"domanda": "When temporal summation occurs, spatial summation cannot.", "risposta": "F"}, {"domanda": "In the brain primary somatosensory cortex (Penfield homunculus) the extension of the cortical region which maps a specific body region is proportional to that body region's volume.", "risposta": "F"}, {"domanda": "In a directed graph, all indices are doubled with respect to a corresponding undirected one (i.e., the graph where all the directions have been removed).", "risposta": "F"}, {"domanda": "Modularity values belong to the interval [0,1]", "risposta": "F"}, {"domanda": "The sodium-potassium pump is a passive transportation mechanism.", "risposta": "F"}, {"domanda": "The resting membrane potential for the neural cell is typically around +70 mV.", "risposta": "F"}, {"domanda": "In an excitatory synapse, the post-synaptic membrane current is always hyperpolarizing.", "risposta": "F"}, {"domanda": "The resting membrane potential is entirely due to the sum of the effects of the electrical forces acting on the ions and of the ion pumps.", "risposta": "F"}, {"domanda": "Given an ion family with negative valence, if at a given temperature T its equilibrium potential is equal to -90 mV and the membrane potential is equal to -70 mV, the ions net current will be directed from the outside of the cell toward the inside.", "risposta": "T"}, {"domanda": "The spatial and temporal summations of post-synaptic potentials are mutually exclusive.", "risposta": "F"}, {"domanda": "The primary visual region, the primary auditory region and both Penfield Homunculi are all cortical areas.", "risposta": "T"}, {"domanda": "Long-term synaptic plasticity involves structural changes in the post-synaptic membrane.", "risposta": "T"}, {"domanda": "Local Field Potentials are noninvasive correlates of brain activity.", "risposta": "F"}, {"domanda": "The only way to estimate Causality in the sense of temporal precedence is to perturb the brain activity.", "risposta": "F"}, {"domanda": "The hidden source problem can be completely solved by using multivariate approaches.", "risposta": "F"}, {"domanda": "A Modularity equal to -0.3 is a plausible result.", "risposta": "T"}, {"domanda": "A Divisibility equal to 0 is a plausible result.", "risposta": "F"}, {"domanda": "The inactivation of the voltage-gated Na+ channel is responsible for the absolute refractory period.", "risposta": "T"}, {"domanda": "In reference to the visual cortex disparity tuning curve: from the curve, if the retinal disparity is equal to -0.5, I can infer which firing rate will be produced by the neuron.", "risposta": "T"}, {"domanda": "Undirected graphs produce symmetrical adjacency matrices.", "risposta": "T"}, {"domanda": "Using Partial Directed Coherence completely solves the problem of the hidden (common) source.", "risposta": "F"}, {"domanda": "La velocità di conduzione della fibra muscolare (MFCV) è tipicamente compresa nell'intervallo 2-6 m/s.", "risposta": "T"}, {"domanda": "La fatica muscolare provoca un aumento della MFCV.", "risposta": "F"}, {"domanda": "La motor imagery visuale (in terza persona) è più efficace di quella cinestesica per controllare un BCI basato su ritmi sensomotori.", "risposta": "F"}, {"domanda": "Nello studio di Pichiorri et al. (2015), il gruppo BCI ha mostrato un incremento significativo dell'accoppiamento interemisferico specificamente nelle bande beta1 e beta2.", "risposta": "T"}, {"domanda": "La sostanza bianca è costituita principalmente dai corpi cellulari e dai dendriti dei neuroni.", "risposta": "F"}, {"domanda": "I neuroni appartenenti alla stessa colonna verticale corticale tendono ad avere lo stesso comportamento in risposta al medesimo stimolo.", "risposta": "T"}, {"domanda": "Il cervello umano adulto perde completamente la plasticità sinaptica al di fuori del periodo critico dell'infanzia.", "risposta": "F"}, {"domanda": "Lo smascheramento (unmasking) di connessioni sinaptiche latenti è uno dei meccanismi biologici alla base della plasticità cerebrale.", "risposta": "T"}, {"domanda": "Nel termine elettrico dell'equazione elettrochimica, la valenza z dello ione del calcio (Ca++) è pari a +1.", "risposta": "F"}, {"domanda": "Il modello di Izhikevich combina un buon realismo biologico con un basso costo computazionale, rendendolo adatto alla simulazione di grandi reti neuronali.", "risposta": "T"}, {"domanda": "La tecnica del voltage clamp blocca la conduttanza di membrana per studiare come cambia il potenziale in funzione del tempo.", "risposta": "F"}, {"domanda": "Nel modello di Hodgkin-Huxley, la variabile m rappresenta la probabilità di inattivazione dei canali del sodio.", "risposta": "F"}, {"domanda": "La variabilità temporale del canale del potassio nel modello di Hodgkin-Huxley richiede tre stadi (aperto, chiuso, inattivo).", "risposta": "F"}, {"domanda": "La connettività efficace descrive la dipendenza statistica tra i segnali senza basarsi su un modello generativo causale.", "risposta": "F"}, {"domanda": "In un grafo non orientato, il grado (degree) di un nodo corrisponde alla somma degli elementi sulla riga corrispondente della matrice di adiacenza.", "risposta": "T"}, {"domanda": "Il valore minimo della Divisibilità (D) per una partizione di una rete è pari a zero.", "risposta": "F"}, {"domanda": "The mu rhythm and the alpha rhythm have approximately the same frequency of oscillation and originate in different lobes of the cerebral cortex.", "risposta": "T"}, {"domanda": "The heart activity is likely to contaminate an EEG recording if the reference electrode is not placed on the head.", "risposta": "T"}, {"domanda": "Event-Related Desynchronization/ Synchronization (ERD/S) quantify the amount of coupling between signals on two EEG channels.", "risposta": "F"}, {"domanda": "Induced activity is often examined by analyzing the envelope of the EEG in a relevant frequency band, i.e. by rectifying or squaring the pass-band filtered trials before averaging them.", "risposta": "T"}, {"domanda": "In an ADC, quantization introduces a noise whose amplitude is proportional to the width of the quantization interval (VLSB): σ_quant = 1/sqrt(12) * VLSB.", "risposta": "T"}, {"domanda": "The artifact generated by eye movements can reach amplitudes up to 5 μV in the EEG recordings.", "risposta": "F"}, {"domanda": "The Central Limit Theorem (CLT) states that the average of N zero-mean independent identically distributed signals approaches zero for N -> ∞.", "risposta": "T"}, {"domanda": "An IIR filter can be designed to have 'linear phase', so that they do not introduce time-domain distortions in the waveform of the output signal.", "risposta": "F"}, {"domanda": "The CMRR of a bipolar amplifier measures the ratio between the gain of their average with respect to the electrical ground and the gain of the potential difference between the input electrodes.", "risposta": "F"}, {"domanda": "Aliasing occurs when an analog signal is sampled using a limited input range of the ADC.", "risposta": "F"}, {"domanda": "Despite being more expensive, gold electrodes should be preferred to Ag/AgCl electrodes since they allow recording of extremely slow-changing EEG potentials.", "risposta": "F"}, {"domanda": "In an EEG recording, a session contains one or more trials, each of which contains one or more runs.", "risposta": "F"}, {"domanda": "The input impedance of a biosignal amplifier must be many orders of magnitude higher than the contact impedance of the electrodes. It is usual to have input impedances in the order of 10^8 Ω.", "risposta": "T"}, {"domanda": "The reconstruction of an analog signal from its sampled version is equivalent to the sum a set of sinc(·) functions, one for each sample.", "risposta": "T"}, {"domanda": "The Inter-Stimulus Interval (ISI) measures the time interval between two successive stimuli in a train.", "risposta": "F"}, {"domanda": "It is more likely that samples of zero mean a gaussian noise will have amplitude in the range [-0.5,0] rather than in [0,0.5].", "risposta": "F"}, {"domanda": "In ERP analysis, the EEG continuous recording must be segmented into epochs (trials) of fixed duration, each aligned to a repetition of the event.", "risposta": "T"}, {"domanda": "The η (eta) rhythm is an oscillatory component of the spontaneous EEG.", "risposta": "F"}, {"domanda": "ARVx = sqrt(1/N * sum(x[i]^2)), where the sum extends on the N samples of the signal x[i].", "risposta": "F"}, {"domanda": "The amplitude of a P300 event related potential be voluntarily modulated through the exercise of motor imagery, to build a cursor control based on a BCI.", "risposta": "F"}, {"domanda": "The measurement of two monopolar EEG channels requires four electrodes – two collecting the potentials fed to the non-inverting input of the differential amplifier, one providing the reference potential and one providing the ground potential.", "risposta": "T"}, {"domanda": "The frequency response of a filter in the stopband should never be plotted in logarithmic units (i.e. with the gain is expressed in dB).", "risposta": "F"}, {"domanda": "The DFT of a signal represents the amplitude Ai and initial phases Φi of sinewave components of the signal at frequencies fi ranging from 0Hz (included) to the sampling frequency (excluded).", "risposta": "T"}, {"domanda": "A negative peak in a ERP recorded on a specific subject with a latency of 108ms may still be named N100, if it matches the physiological phenomenon of the nominal N100 component.", "risposta": "T"}, {"domanda": "The oscillations of mu rhythm are more 'arc-shaped' than the alpha rhythm's, which is comparatively a more symmetrical sinewave.", "risposta": "T"}, {"domanda": "The potential at the peak of the EP component P20 is higher than the potential at the peak of the N100 component.", "risposta": "T"}, {"domanda": "The CMRR of an EEG amplifier should be higher than 90 dB.", "risposta": "T"}, {"domanda": "When sampling at 100 Hz, a 75 Hz analog signal component will alias and appear at 25 Hz.", "risposta": "T"}, {"domanda": "The RMS and the standard deviation of a zero-mean signal have the same value (assume that the number of samples N -> ∞).", "risposta": "T"}, {"domanda": "Synchronized averaging of N EEG trials produces N values each corresponding to the average value of the potential in each trial.", "risposta": "F"}, {"domanda": "A rectangular window is always the best choice for spectral analysis because it has the narrowest main lobe and no sidelobes.", "risposta": "F"}, {"domanda": "The P300 ERP generated by attending a target stimulus is exploited to build virtual keyboards based on a BCI.", "risposta": "T"}, {"domanda": "In a 3-channel EEG recording, if the potentials at a given instant are +10μV, −5μV, and −15μV, the Common Average Reference (CAR) value is +10μV.", "risposta": "F"}, {"domanda": "The RMS is the average of the squared value of the samples of a signal.", "risposta": "F"}, {"domanda": "The measurement of a single EMG signal requires three electrodes – two as input to the differential amplifier and one to provide the ground potential.", "risposta": "T"}, {"domanda": "Notch filters effectively remove powerline noise because they reject all signals above their corner frequency.", "risposta": "F"}, {"domanda": "An eyeblink produces an artifact which often interferes with the analysis of the beta band of the EEG.", "risposta": "F"}, {"domanda": "Quantization divides the input range of the ADC into (approximately) NBITS intervals, where NBITS is the number of bits of the ADC.", "risposta": "F"}, {"domanda": "The most common and theoretically perfect method for reconstructing an analog signal from its samples is by connecting the sample points with straight lines (linear interpolation).", "risposta": "F"}, {"domanda": "The DFT of a digital signal with N samples yields N/2 values of the signal's spectrum.", "risposta": "F"}, {"domanda": "The SOA is always greater than the ISI.", "risposta": "T"}, {"domanda": "The proper (visual) alpha rhythm is generated in the frontal lobe of the cerebral cortex.", "risposta": "F"}, {"domanda": "Given 100 independent and identically distributed random variables with variance equal to 4, the variance of their average is 0.04?", "risposta": "T"}, {"domanda": "A single cell of the muscular tissue is known as a muscle fiber.", "risposta": "T"}, {"domanda": "A 'run' is a portion of recording in an experimental protocol that contains no breaks, i.e. all samples contained therein have been acquired 1/fs seconds after the previous (fs being the sampling frequency).", "risposta": "T"}, {"domanda": "A key advantage of FIR filters is their ability to be designed with linear phase, thus avoiding the introduction of time-domain distortions.", "risposta": "T"}, {"domanda": "The Butterworth filter is a design method in the family of Finite Impulse Response filters.", "risposta": "F"}, {"domanda": "Averaging raw EEG trials before computing the power spectrum is the standard method for analyzing non-phase-locked induced activity.", "risposta": "F"}, {"domanda": "In a P300-based BCI, the user subjectively assigns saliency (relevance) to a stimulus so that their brain produces a P300 ERP every time the stimulus is administered.", "risposta": "T"}, {"domanda": "Event-Related Desynchronization/Synchronization (ERD/S) quantify phase-locked brain activity in response to an event.", "risposta": "F"}, {"domanda": "A FIR filter needs to be of a higher order to achieve the same quality specifications than a IIR filter.", "risposta": "T"}, {"domanda": "The N20 component of an EP occurs before the stimulus (negative latency) while the P300 occurs after the stimulus (positive latency).", "risposta": "F"}, {"domanda": "EEG signals recorded in monopolar configuration can be re-referenced to the Common Average Reference (CAR), by subtracting from each channel the instantaneous average of all channels. In ideal conditions, this would approximate taking the reference potential at infinity.", "risposta": "T"}, {"domanda": "Evoked Potentials are deflection of the EEG signal following the presentation of a sensory input.", "risposta": "T"}, {"domanda": "When recording EPs, the spontaneous EEG is to be considered a noise that completely masks the EPs on the recorded waveform.", "risposta": "T"}, {"domanda": "In ERP analysis, 'trials' are portions of the continuous EEG recording that start exactly at the time when a sensory stimulus was delivered.", "risposta": "F"}, {"domanda": "Aliasing occurs when an artifact corrupts an otherwise healthy EEG recording.", "risposta": "F"}, {"domanda": "The roll-off of a filter is the slope of its frequency response in the transition band. It is high when the transition band is narrow.", "risposta": "T"}, {"domanda": "The Shannon's theorem states that a continuous signal can be properly sampled only if it does not contain frequency components above the sampling rate.", "risposta": "F"}, {"domanda": "The contact impedances of a pair of electrodes should be large compared to the input impedance of the differential amplifier connected to them, otherwise the amplitude of the signal would be reduced as effect of the potential divider.", "risposta": "F"}, {"domanda": "Movements of the subject's head produces artifacts only in the gamma band.", "risposta": "F"}, {"domanda": "The powerline noise affects a very narrow frequency band of the recorded signal around 50 Hz (in Europe) and odd multiples of (150 Hz, 250 Hz, …).", "risposta": "T"}, {"domanda": "The frequency spectrum of white noise is flat, i.e. it has the same power at any frequency.", "risposta": "T"}, {"domanda": "An EEG recording is said to be bipolar when it comprises exactly two channels.", "risposta": "F"}, {"domanda": "The RMS and the ARV of a zero-mean signal have the same value (assume that the number of samples N -> ∞).", "risposta": "F"}, {"domanda": "In an ADC, quantization introduces a noise whose amplitude is proportional to the number L of discrete amplitude levels.", "risposta": "F"}, {"domanda": "EEG electrodes whose first letter of the label is \"C\" (e.g. \"Cz\") are located on the central region of the head, i.e. the region between the left and the right hemisphere.", "risposta": "F"}, {"domanda": "The 'waxing and waning' of the alpha rhythm is a change of amplitude whose duration is in the order of magnitude of 1 second.", "risposta": "T"}, {"domanda": "Evoked potential is synonymous of Event-Related Potentials.", "risposta": "F"}, {"domanda": "The alpha rhythm can be observed by filtering the spontaneous EEG signal using a narrowband filter, with cutoff frequencies at 14 and 30 Hz (approximately).", "risposta": "F"}, {"domanda": "The theta rhythm includes oscillations with a frequency of 5 Hz.", "risposta": "T"}, {"domanda": "With respect to the alpha rhythm, the oscillations of mu rhythm are more \"arc-shaped\", rather than resembling a regular sinewave.", "risposta": "T"}, {"domanda": "The input impedance of a biosignal amplifier must be many orders of magnitude higher than the contact impedance of the electrodes.", "risposta": "T"}, {"domanda": "The International 10-20 System for EEG electrodes placement takes its name from the fact that it describes the standard position of a set of at least 10 and up to 20 electrodes.", "risposta": "F"}, {"domanda": "Artifacts on biosignal recordings cannot have biological origin.", "risposta": "F"}, {"domanda": "EMG artifacts on a EEG recording mainly affects the alpha band and specifically the mu rhythm.", "risposta": "F"}, {"domanda": "EMG artifact can easily appear on the EEG recording unless the subjects are specifically instructed by the experimenter on how to relax their face muscles.", "risposta": "T"}, {"domanda": "The potential at the peak of the EP component N20 is lower than the potential at the peak of the P100 component.", "risposta": "T"}, {"domanda": "Induced activity is best analyzed by applying synchronized averaging to the EEG trials.", "risposta": "F"}, {"domanda": "The Nyquist frequency is the highest frequency of a component in an analog signal.", "risposta": "F"}, {"domanda": "Aliasing can be prevented by applying a digital low-pass filter with cutoff frequency lower than the Nyquist frequency.", "risposta": "F"}, {"domanda": "Sweating can affect the EEG, causing an increase of contact impedance and an increase of powerline noise.", "risposta": "F"}, {"domanda": "The SOA equals the ISI plus the duration of the stimulus.", "risposta": "T"}, {"domanda": "In the electrode labels of the International 10-20 System, odd numbers designate electrodes on the right side of the head.", "risposta": "F"}, {"domanda": "In an ADC, quantization introduces a noise whose amplitude is proportional to the width of the quantization interval: σ_quant = 1/sqrt(12) * LSB.", "risposta": "T"}, {"domanda": "The sample variance of a signal is given by s_X^2 = 1/(N-1) * sum((x_i - mean)^2), where the sum extends on the N samples of the signal X.", "risposta": "T"}, {"domanda": "The output of FIR filters is the linear combination of samples of the input. The output of IIR filters combines both samples of the input and past samples of the output.", "risposta": "T"}, {"domanda": "The amplitude of sensorimotor rhythms can be voluntarily modulated through the exercise of motor imagery, to build a cursor control based on a BCI.", "risposta": "T"}, {"domanda": "The amplitude of the mu rhythm is increased at the beginning of a motor task.", "risposta": "F"}, {"domanda": "In monopolar EEG recordings, the reference electrode is placed on scalp position that are assumed to be far from the electrical sources of interest, such as the earlobes.", "risposta": "T"}, {"domanda": "The amplitude of the electromyogram (EMG) originated from muscles never exceed 10 μV.", "risposta": "F"}, {"domanda": "Movement of the subject's head may produce slow artifacts that are less pronounced when non-polarizable electrodes are used.", "risposta": "T"}, {"domanda": "Digital processing can remove all significant artifacts, and thus it is not worth using the measurement time to reduce their presence on the raw recording.", "risposta": "F"}, {"domanda": "Powerline noise is an artifact caused by the capacitive coupling between the power supply conductors and the recording setup including the subject.", "risposta": "T"}, {"domanda": "The probability distribution of the average of N independent and identically distributed random variables is a normal distribution independently of the value of N.", "risposta": "T"}, {"domanda": "The higher is the sampling frequency of a digital signal, the higher is the frequency resolution of its spectrum.", "risposta": "F"}, {"domanda": "The spectral leakage phenomenon is observed, for instance, when comparing the spectrum of a signal with the spectrum of a short section of the same signal.", "risposta": "T"}, {"domanda": "The Inter-Stimulus Interval (ISI) equals the SOA minus the ITI.", "risposta": "F"}, {"domanda": "The mu rhythm and the alpha rhythm are EEG components that differ for their fundamental frequency of oscillation.", "risposta": "F"}, {"domanda": "In an ADC, quantization introduces a noise whose amplitude is proportional to the number L of discrete amplitude levels: σ_quant = 1/sqrt(12) * L = 1/sqrt(12) * 2^NBIT.", "risposta": "F"}, {"domanda": "The synchronized average of N trials containing only spontaneous EEG whose variance is var_trial = σ^2 is a signal whose variance var_avg = σ^2 / N.", "risposta": "T"}, {"domanda": "The CMRR of a bipolar amplifier measures how much higher is the gain of the potential difference between the input electrodes with respect to the gain of their average with respect to the electrical ground.", "risposta": "T"}, {"domanda": "In analog-to-digital conversion, each spectral component of the analog signal should have frequency below the Nyquist frequency.", "risposta": "T"}, {"domanda": "As a preliminary step to EEG data analysis, one or more channels can be removed from the dataset if they are extensively contaminated by artifacts.", "risposta": "T"}, {"domanda": "The advantage of a high CMRR amplifier is that it suppresses high frequency disturbance.", "risposta": "F"}, {"domanda": "The purpose a filter is to allow desired spectral component of a signal to pass almost unaltered, while attenuating undesired spectral components.", "risposta": "T"}, {"domanda": "In an ERP, the response to a stimulus has a reduced amplitude when the SOA is too short.", "risposta": "T"}, {"domanda": "The Inter-Stimulus Interval (ISI) measures the time interval between the end of a stimulus and the beginning of the following one.", "risposta": "T"}, {"domanda": "Appropriate application of a high-pass digital filter may prevent saturation by removing high amplitude slow artifacts.", "risposta": "F"}, {"domanda": "Increasing the Inter-Electrode Distance (IED) in a bipolar recording decreases the signal amplitude and increases selectivity.", "risposta": "F"}, {"domanda": "The EEG electrode Fz is located to the left of electrode Cz.", "risposta": "F"}, {"domanda": "In a typical single-trial recording, the peak amplitude of an Evoked Potential is larger than the amplitude of the background spontaneous EEG.", "risposta": "F"}, {"domanda": "In ERP analysis where preserving the exact shape of the waveform is critical, a linear-phase FIR filter is generally a better choice than an IIR filter.", "risposta": "T"}, {"domanda": "A sudden upwards movement of the eyes generates a positive deflection of EEG potentials (EOG) on the Fz channel.", "risposta": "T"}, {"domanda": "In Analog to Digital Conversion, the Nyquist frequency equals half of the sampling frequency.", "risposta": "T"}, {"domanda": "An eyeblink produces an artifact which often interferes with the analysis of the beta band of the EEG.", "risposta": "F"}, {"domanda": "The potential at the peak of the EP component P20 is lower than the potential at the peak of the N100 component.", "risposta": "F"}];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const datasets = [{ name: 'neuroengineering.csv', data: BUILTIN_DATA, active: true }];
+
+// Stats: per-question tracking
+// mistakeMap[question_text] = { wrong: N, asked: N }
+let mistakeMap = {};
+let sessionStats = [];          // [{correct, total}]
+let currentSession = { correct: 0, wrong: 0, total: 0 };
+let overallCorrect = 0, overallWrong = 0;
+
+// Quiz state
+let pool = [];           // shuffled questions for current session
+let sessionSize = 20;    // how many per session
+let cursor = 0;
+let currentQ = null;
+let answered = false;
+let sessionActive = false;
+
+// ── DOM refs ──────────────────────────────────────────────────────────────────
+const quizView = document.getElementById('quiz-view');
+const statsView = document.getElementById('stats-view');
+const sessionEnd = document.getElementById('session-end');
+const noQuestions = document.getElementById('no-questions');
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const list = document.getElementById('file-list');
+  list.innerHTML = '';
+  datasets.forEach((ds, i) => {
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = `
+      <input type="checkbox" ${ds.active ? 'checked' : ''} id="chk-${i}">
+      <label class="fname" for="chk-${i}" title="${ds.name}">${ds.name}</label>
+      <span class="fcount">${ds.data.length}</span>
+    `;
+    item.querySelector('input').addEventListener('change', e => {
+      datasets[i].active = e.target.checked;
+      startSession();
+    });
+    list.appendChild(item);
+  });
+}
+
+document.getElementById('toggle-sidebar').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+});
+
+document.getElementById('add-csv-btn').addEventListener('click', () => {
+  document.getElementById('csv-file-input').click();
+});
+
+document.getElementById('csv-file-input').addEventListener('change', e => {
+  Array.from(e.target.files).forEach(f => loadCSVFile(f));
+  e.target.value = '';
+});
+
+function loadCSVFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const lines = ev.target.result.trim().split('\n');
+    const rows = [];
+    let headers = null;
+    lines.forEach((line, li) => {
+      const cols = parseCSVLine(line);
+      if (li === 0) {
+        // check if it's a header
+        const h = cols.map(c => c.toLowerCase().trim());
+        if (h.includes('domanda') || h.includes('question') || h.includes('domande')) {
+          headers = h;
+          return;
+        }
+      }
+      if (!headers) {
+        // assume col 0 = question, col 1 = answer
+        if (cols.length >= 2) rows.push({ domanda: cols[0].trim(), risposta: cols[1].trim().toUpperCase() });
+      } else {
+        const qi = headers.findIndex(h => h === 'domanda' || h === 'question');
+        const ai = headers.findIndex(h => h === 'risposta' || h === 'answer' || h === 'risposta');
+        if (qi >= 0 && ai >= 0 && cols[qi] && cols[ai]) {
+          rows.push({ domanda: cols[qi].trim(), risposta: cols[ai].trim().toUpperCase() });
+        }
+      }
+    });
+    if (rows.length > 0) {
+      datasets.push({ name: file.name, data: rows, active: true });
+      renderSidebar();
+      startSession();
+    } else {
+      alert('No valid questions found in ' + file.name + '.\nExpected columns: domanda, risposta (T/F).');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { inQuotes = !inQuotes; }
+    else if (ch === ',' && !inQuotes) { result.push(current); current = ''; }
+    else { current += ch; }
+  }
+  result.push(current);
+  return result;
+}
+
+// ── Pool ──────────────────────────────────────────────────────────────────────
+function getActiveQuestions() {
+  let all = [];
+  datasets.forEach(ds => { if (ds.active) all = all.concat(ds.data); });
+  return all;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ── Session ───────────────────────────────────────────────────────────────────
+function startSession() {
+  const all = getActiveQuestions();
+  if (all.length === 0) {
+    showNoQuestions();
+    return;
+  }
+  pool = shuffle(all).slice(0, Math.min(sessionSize, all.length));
+  cursor = 0;
+  currentSession = { correct: 0, wrong: 0, total: 0 };
+  answered = false;
+  sessionActive = true;
+  hideStats();
+  hideSessionEnd();
+  quizView.style.display = 'flex';
+  noQuestions.style.display = 'none';
+  loadQuestion();
+  updateTopbar();
+}
+
+function loadQuestion() {
+  if (cursor >= pool.length) {
+    endSession();
+    return;
+  }
+  currentQ = pool[cursor];
+  answered = false;
+
+  // Reset buttons
+  const btnT = document.getElementById('btn-true');
+  const btnF = document.getElementById('btn-false');
+  btnT.className = 'ans-btn';
+  btnF.className = 'ans-btn';
+  btnT.disabled = false;
+  btnF.disabled = false;
+
+  document.getElementById('feedback-msg').textContent = '';
+  document.getElementById('feedback-msg').className = '';
+  document.getElementById('next-btn').style.display = 'none';
+
+  document.getElementById('q-tag').textContent = `Question ${cursor + 1} of ${pool.length}`;
+  document.getElementById('q-text').textContent = currentQ.domanda;
+
+  const pct = (cursor / pool.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${cursor} / ${pool.length}`;
+}
+
+function answer(choice) {
+  if (answered) return;
+  answered = true;
+
+  const correct = currentQ.risposta === choice;
+  const btnT = document.getElementById('btn-true');
+  const btnF = document.getElementById('btn-false');
+  btnT.disabled = true;
+  btnF.disabled = true;
+
+  // Track mistake
+  const key = currentQ.domanda;
+  if (!mistakeMap[key]) mistakeMap[key] = { wrong: 0, asked: 0 };
+  mistakeMap[key].asked++;
+
+  if (correct) {
+    (choice === 'T' ? btnT : btnF).className = 'ans-btn correct';
+    document.getElementById('feedback-msg').textContent = '✓ Correct';
+    document.getElementById('feedback-msg').className = 'correct';
+    currentSession.correct++;
+    overallCorrect++;
+  } else {
+    (choice === 'T' ? btnT : btnF).className = 'ans-btn wrong';
+    // reveal correct
+    (currentQ.risposta === 'T' ? btnT : btnF).className = 'ans-btn reveal-correct';
+    document.getElementById('feedback-msg').textContent = `✗ Wrong — correct answer: ${currentQ.risposta === 'T' ? 'TRUE' : 'FALSE'}`;
+    document.getElementById('feedback-msg').className = 'wrong';
+    currentSession.wrong++;
+    overallWrong++;
+    mistakeMap[key].wrong++;
+  }
+
+  currentSession.total++;
+  cursor++;
+  updateTopbar();
+  updateProgress();
+  document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  loadQuestion();
+}
+
+function endSession() {
+  sessionStats.push({ correct: currentSession.correct, total: currentSession.total });
+  quizView.style.display = 'none';
+  sessionEnd.style.display = 'flex';
+  const pct = currentSession.total > 0 ? Math.round(currentSession.correct / currentSession.total * 100) : 0;
+  const color = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('end-score').textContent = pct + '%';
+  document.getElementById('end-score').style.color = color;
+  document.getElementById('end-summary').textContent =
+    `${currentSession.correct} correct out of ${currentSession.total} questions.`;
+}
+
+// ── Topbar ────────────────────────────────────────────────────────────────────
+function updateTopbar() {
+  document.getElementById('tb-correct').textContent = overallCorrect;
+  document.getElementById('tb-wrong').textContent = overallWrong;
+  document.getElementById('tb-total').textContent = overallCorrect + overallWrong;
+}
+
+function updateProgress() {
+  const pct = (cursor / pool.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${cursor} / ${pool.length}`;
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+document.getElementById('stats-toggle').addEventListener('click', () => {
+  if (statsView.style.display === 'flex') hideStats();
+  else showStats();
+});
+
+document.getElementById('new-session-btn').addEventListener('click', startSession);
+
+function showStats() {
+  statsView.style.display = 'flex';
+  quizView.style.display = 'none';
+  sessionEnd.style.display = 'none';
+  noQuestions.style.display = 'none';
+  document.getElementById('stats-toggle').classList.add('active');
+  renderStats();
+}
+
+function hideStats() {
+  statsView.style.display = 'none';
+  document.getElementById('stats-toggle').classList.remove('active');
+  if (sessionActive && cursor < pool.length) {
+    quizView.style.display = 'flex';
+  }
+}
+
+function hideSessionEnd() {
+  sessionEnd.style.display = 'none';
+}
+function showNoQuestions() {
+  quizView.style.display = 'none';
+  noQuestions.style.display = 'flex';
+  sessionEnd.style.display = 'none';
+}
+
+function renderStats() {
+  const total = overallCorrect + overallWrong;
+  const acc = total > 0 ? (overallCorrect / total * 100).toFixed(1) : '—';
+
+  document.getElementById('st-total').textContent = total;
+  document.getElementById('st-correct').textContent = overallCorrect;
+  document.getElementById('st-wrong').textContent = overallWrong;
+  document.getElementById('st-acc').textContent = total > 0 ? acc + '%' : '—';
+
+  // Overall bar
+  const cp = total > 0 ? (overallCorrect / total * 100) : 0;
+  const wp = total > 0 ? (overallWrong / total * 100) : 0;
+  document.getElementById('perf-correct-bar').style.width = cp + '%';
+  document.getElementById('perf-wrong-bar').style.width = wp + '%';
+  document.getElementById('perf-label').textContent = total > 0 ? `${acc}% accuracy` : 'No data';
+
+  // Session history bars
+  const barsEl = document.getElementById('session-bars');
+  if (sessionStats.length === 0) {
+    barsEl.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0">No sessions yet.</div>';
+  } else {
+    barsEl.innerHTML = sessionStats.map((s, i) => {
+      const sp = s.total > 0 ? Math.round(s.correct / s.total * 100) : 0;
+      const col = sp >= 80 ? 'var(--green)' : sp >= 50 ? 'var(--yellow)' : 'var(--red)';
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);width:52px">S${i+1}</div>
+        <div class="perf-track" style="flex:1;height:6px">
+          <div style="height:100%;background:${col};border-radius:99px;width:${sp}%;transition:width .5s ease"></div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);width:64px;text-align:right">${s.correct}/${s.total} — ${sp}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Mistakes table
+  const tbody = document.getElementById('mistakes-body');
+  const entries = Object.entries(mistakeMap)
+    .filter(([, v]) => v.wrong > 0)
+    .sort((a, b) => b[1].wrong - a[1].wrong)
+    .slice(0, 20);
+
+  if (entries.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:20px">No mistakes yet — great job!</td></tr>';
+    return;
+  }
+
+  const maxWrong = entries[0][1].wrong;
+  tbody.innerHTML = entries.map(([q, v]) => {
+    const barW = maxWrong > 0 ? Math.round(v.wrong / maxWrong * 100) : 0;
+    return `<tr>
+      <td class="mistake-count">${v.wrong}</td>
+      <td>${q}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)">${v.wrong} / ${v.asked}</td>
+      <td class="bar-cell"><div class="mini-bar-track"><div class="mini-bar-fill" style="width:${barW}%"></div></div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Keyboard ──────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (statsView.style.display === 'flex') return;
+  if (sessionEnd.style.display === 'flex') {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startSession(); }
+    return;
+  }
+  if (!sessionActive || cursor > pool.length) return;
+
+  if (!answered) {
+    if (e.key === 't' || e.key === 'T') answer('T');
+    else if (e.key === 'f' || e.key === 'F') answer('F');
+  } else {
+    if (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'Enter') {
+      e.preventDefault();
+      nextQuestion();
+    }
+  }
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderSidebar();
+startSession();
+</script>
+</body>
+</html>

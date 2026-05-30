@@ -1,0 +1,640 @@
+\documentclass[10pt, letterpaper]{report}
+% !TeX program = xelatex
+
+%=============================================================================
+% PACCHETTI E CONFIGURAZIONI DI BASE
+%=============================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{nicefrac}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\geometry{margin=2.5cm}
+
+% Stile intestazioni e piè di pagina
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{Sezione \thesection}
+\fancyfoot[C]{\thepage}
+\fancyfoot[L]{Guida alla Preparazione - Neuroengineering}
+\fancyfoot[R]{A.A. 2024/2025}
+
+\title{Guida di Preparazione Eccellente per Neuroengineering\\(Focus sulla Risoluzione dei Problemi della Parte II)}
+\author{Sintesi e Formulario per il 30L}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+%=============================================================================
+\chapter{Architettura dei Segnali e Strumentazione di Acquisizione}
+%=============================================================================
+
+\section{Configurazione degli Elettrodi e Montaggi}
+Nelle prove d'esame della Parte II, un quesito ricorrente richiede di calcolare il numero ottimale di elettrodi da posizionare sul cranio o sull'arto del soggetto.
+Per evitare errori di conteggio, è necessario mappare rigorosamente la topologia del sistema.
+
+\subsection{Montaggi Monopolari (EEG)}
+Nello scalp-EEG monopolare (o referenziale), ogni canale misura la differenza di potenziale tra un elettrodo attivo posizionato sul cuoio capelluto (secondo il sistema internazionale 10-20 o 10-10) e un potenziale di riferimento comune.
+\begin{itemize}
+    \item \textbf{Elettrodi Attivi ($N_{\text{ch}}$)}: Pari al numero di canali registrati.
+    \item \textbf{Elettrodi di Riferimento ($N_{\text{ref}}$)}: Solitamente posizionati su zone elettricamente neutre (lobi auricolari o mastoidi).
+    Nel montaggio a mastoidi cortocircuitate (\emph{linked mastoids}), vengono impiegati fisicamente due elettrodi ($A_1$ e $A_2$), collegati insieme per creare un punto medio stabile.
+    \item \textbf{Elettrodo di Massa (Ground - $1$)}: Sempre indispensabile per fornire un potenziale stabile di modo comune agli stadi d'ingresso differenziali dell'amplificatore e drenare le correnti di dispersione.
+\end{itemize}
+\[
+N_{\text{tot, monopolar}} = N_{\text{ch}} + N_{\text{ref}} + 1_{\text{massa}}
+\]
+
+\subsection{Montaggi Bipolari}
+Nel montaggio bipolare, ogni canale registra la differenza di potenziale tra due elettrodi adiacenti sulla corteccia o sul muscolo (sEMG).
+\begin{itemize}
+    \item Non esiste un elettrodo di riferimento comune.
+    \item \textbf{Caso sEMG (2 canali bipolari)}: Ciascun canale richiede una coppia di elettrodi dedicati, più una massa comune condivisa sul soggetto.
+    \[
+    N_{\text{tot, bipolar}} = (2 \times N_{\text{ch}}) + 1_{\text{massa}}
+    \]
+    \item \textbf{Caso EEG Bipolare Longitudinale}: Se si registrano canali consecutivi sulla stessa linea (es. $T_7-C_3$, $C_3-C_z$, $C_z-C_4$, $C_4-T_8$), gli elettrodi intermedi sono condivisi tra i canali adiacenti.
+    Il numero di elettrodi attivi è pari al numero di nodi della catena.
+\end{itemize}
+
+\section{Proprietà degli Amplificatori Differenziali e Rumore}
+I segnali biologici hanno ampiezze molto ridotte (EEG: $10-100\ \mu\text{V}$; sEMG: $1-5\ \text{mV}$) e sono costantemente immersi in forti campi di disturbo ambientale, in particolare l'accoppiamento capacitivo con la rete elettrica a $50\ \text{Hz}$ (rumore di modo comune).
+
+\subsection{Common-Mode Rejection Ratio (CMRR)}
+L'amplificatore differenziale amplifica la differenza di potenziale tra i due terminali d'ingresso ($V_1 - V_2$) mediante il guadagno differenziale $G_d$, attenuando al contempo il segnale medio di modo comune mediante il guadagno di modo comune $G_c$.
+La capacità di rigetto è definita dal parametro adimensionale:
+\[
+\text{CMRR} = \frac{G_d}{G_c} \implies \text{CMRR}_{\text{dB}} = 20\log_{10}\left(\frac{G_d}{G_c}\right)
+\]
+In sede d'esame, la conversione tra valori in decibel e valori lineari è un passaggio cruciale per calcolare l'attenuazione dell'artefatto residuo:
+\[
+G_d = 10^{\frac{G_{d,\text{dB}}}{20}}, \quad G_c = 10^{\frac{G_{c,\text{dB}}}{20}} = 10^{\frac{G_{d,\text{dB}} - \text{CMRR}_{\text{dB}}}{20}}
+\]
+
+\subsection{Saturazione e Impedenza d'Ingresso}
+La catena di acquisizione deve rispettare la condizione per cui l'impedenza d'ingresso dell'amplificatore ($Z_{\text{in}}$) sia svariati ordini di grandezza superiore all'impedenza di contatto elettrodo-cute ($Z_{\text{el}}$):
+\[
+V_{\text{misurato}} = V_{\text{sorgente}} \cdot \frac{Z_{\text{in}}}{Z_{\text{in}} + Z_{\text{el}}} \approx V_{\text{sorgente}} \quad \text{per } Z_{\text{in}} \gg Z_{\text{el}}
+\]
+Se questa condizione decade (es. elettrodi secchi o gel mancante), si verifica una forte attenuazione del segnale dovuto all'effetto partitore di tensione. Inoltre, le asimmetrie di impedenza tra elettrodi adiacenti convertono il rumore di modo comune in segnale differenziale, vanificando l'azione del CMRR.
+
+%=============================================================================
+\chapter{Campionamento, Quantizzazione e Filtri Digitali}
+%=============================================================================
+
+\section{Conversione Analogico-Digitale (ADC)}
+La digitalizzazione di un segnale continuo richiede la discretizzazione del tempo (campionamento) e dell'ampiezza (quantizzazione).
+
+\subsection{Teorema del Campionamento di Shannon}
+Per evitare il fenomeno dell'aliasing (ripiegamento spettrale delle frequenze), la frequenza di campionamento $f_s$ del convertitore deve essere strettamente superiore al doppio della massima frequenza presente nel segnale analogico ($f_{\max}$):
+\[
+f_s > 2 f_{\max} \implies f_{\text{Nyq}} = \frac{f_s}{2}
+\]
+Ogni componente analogica con frequenza $f_{\text{sig}} > f_{\text{Nyq}}$ viene ricostruita erroneamente ad una frequenza fittizia (alias):
+\[
+f_{\text{alias}} = |f_s - f_{\text{sig}}| \quad \text{per } \frac{f_s}{2} \le f_{\text{sig}} < f_s
+\]
+
+\subsection{Risoluzione e Rumore di Quantizzazione}
+La quantizzazione mappa il valore continuo di ampiezza del segnale sul più vicino livello discreto rappresentabile su $N_{\text{bit}}$.
+La minima variazione rilevabile corrisponde al valore del bit meno significativo (LSB):
+\[
+V_{LSB} = \frac{V_{\text{range}}}{2^{N_{\text{bit}}}} = \frac{V_{\max} - V_{\min}}{2^{N_{\text{bit}}}}
+\]
+L'errore di quantizzazione si assume uniformemente distribuito nell'intervallo $[-\nicefrac{V_{LSB}}{2}, +\nicefrac{V_{LSB}}{2}]$.
+La sua deviazione standard (valore efficace del rumore di quantizzazione) è pari a:
+\[
+\sigma_{\text{quant}} = \frac{V_{LSB}}{\sqrt{12}}
+\]
+
+\section{Filtri Digitali: Tipologie e Criteri di Selezione}
+
+\subsection{Filtri FIR (Finite Impulse Response) vs IIR (Infinite Impulse Response)}
+\begin{itemize}
+    \item \textbf{Filtri FIR}: L'uscita dipende solo dagli ingressi correnti e passati.
+    Sono intrinsecamente stabili e possono essere progettati per avere una \textbf{fase perfettamente lineare} (ritardo di gruppo costante).
+    Questo aspetto è cruciale nell'analisi degli ERP (es. P300), dove è necessario preservare intatta la forma d'onda temporale e la latenza dei picchi senza introdurre distorsioni asimmetriche.
+    \item \textbf{Filtri IIR}: L'uscita dipende anche dalle uscite passate (retroazione).
+    Sono molto efficienti (raggiungono roll-off molto ripidi con ordini bassi), ma presentano fase non lineare e potenziali problemi di instabilità.
+\end{itemize}
+
+\subsection{Filtro Anti-Aliasing e Filtro Notch}
+\begin{itemize}
+    \item \textbf{Filtro Anti-Aliasing}: Deve essere necessariamente di tipo \textbf{analogico} e posizionato a monte dell'ADC.
+    Un filtro digitale non può rimuovere l'aliasing, poiché quest'ultimo avviene nel momento esatto del campionamento.
+    \item \textbf{Filtro Notch}: Un filtro elimina-banda estremamente stretto, tarato a $50\ \text{Hz}$ (o $60\ \text{Hz}$) per sopprimere l'interferenza di rete senza intaccare significativamente le frequenze adiacenti.
+\end{itemize}
+
+%=============================================================================
+\chapter{Analisi Spettrale Avanzata e Metodo di Welch}
+%=============================================================================
+
+\section{Risoluzione Spettrale e Leakage}
+L'applicazione della Discrete Fourier Transform (DFT) su un segnale di durata finita $T$ introduce delle distorsioni sistematiche.
+
+\subsection{Sanguinamento Spettrale (Spectral Leakage)}
+La finestratura rettangolare (troncamento temporale del segnale ad un intervallo $T$) equivale a convolvere lo spettro teorico del segnale con la trasformata di Fourier della finestra (una funzione $\text{sinc}$).
+Questo fa sì che l'energia spettrale di una singola frequenza "sanguini" sui lobi laterali del sinc.
+Per ridurre questo effetto si utilizzano finestre smussate (\emph{tapered} come Hamming o Blackman-Harris), che abbattono i lobi secondari (riducendo il leakage) a scapito di un allargamento del lobo principale (riducendo la risoluzione).
+
+\subsection{Zero-Padding}
+Consiste nell'aggiungere campioni nulli in coda al segnale nel dominio del tempo prima di calcolare la DFT.
+\begin{itemize}
+    \item \textbf{Cosa fa}: Riduce la distanza tra i punti calcolati nello spettro ($\Delta f_{\text{sampled}} = \nicefrac{f_s}{N_{\text{samples} + \text{zeros}}}$), agendo come un'interpolazione spettrale che rende la visualizzazione grafica più definita.
+    \item \textbf{Cosa NON fa}: Non migliora in alcun modo la risoluzione spettrale fisica del segnale, che rimane rigidamente limitata dalla durata originaria della registrazione temporale ($\Delta f = \nicefrac{1}{T_{\text{originale}}}$).
+\end{itemize}
+
+\section{Metodo di Welch per la Stima della PSD}
+Il periodogramma classico è uno stimatore non consistente della Densità Spettrale di Potenza (la sua varianza non tende a zero al tendere della durata del segnale all'infinito).
+Il metodo di Welch risolve questo problema mediando più periodogrammi.
+
+\subsection{La Pipeline Algoritmica}
+\begin{enumerate}
+    \item Suddividere il segnale di durata $T_{\text{epoch}}$ in segmenti di lunghezza $T_{\text{win}}$ sovrapposti per una frazione $O$ (es. $50\%$).
+    \item Moltiplicare ciascun segmento per una finestra tapered.
+    \item Calcolare il periodogramma per ciascun segmento finestrato.
+    \item Mediare linearmente i periodogrammi ottenuti.
+\end{enumerate}
+
+\subsection{Formule di Progettazione di Welch}
+\begin{itemize}
+    \item \textbf{Risoluzione Spettrale Fisica ($\Delta f$)}: Dipende esclusivamente dalla durata della finestra temporale scelta per il singolo segmento:
+    \[
+    \Delta f \approx \frac{1}{T_{\text{win}}} \implies T_{\text{win}} = \frac{1}{\Delta f}
+    \]
+    \item \textbf{Numero di Campioni per Finestra ($N_{\text{win}}$)}:
+    \[
+    \Big. N_{\text{win}} = T_{\text{win}} \cdot f_s
+    \]
+    \item \textbf{Passo di Spostamento (Shift - $T_{\text{shift}}$)}:
+    \[
+    T_{\text{shift}} = T_{\text{win}} \cdot (1 - O)
+    \]
+    \item \textbf{Numero di Segmenti/Periodogrammi ($M$)}:
+    \[
+    M = 1 + \left\lfloor \frac{T_{\text{epoch}} - T_{\text{win}}}{T_{\text{shift}}} \right\rfloor
+    \]
+\end{itemize}
+La varianza della stima della PSD si riduce approssimativamente di un fattore $\sqrt{M}$ (per segmenti non sovrapposti l'abbattimento è esattamente $\nicefrac{1}{M}$).
+
+%=============================================================================
+\chapter{Connettività Funzionale ed Effettiva}
+%=============================================================================
+
+\section{Tassonomia della Connettività}
+\begin{enumerate}
+    \item \textbf{Connettività Anatomica}: Descrive le strutture fisiche di collegamento (fasci assonali mappati tramite trattografia DTI).
+    È stabile nel breve termine.
+    \item \textbf{Connettività Funzionale}: Descrive la dipendenza statistica (sincronizzazione) tra segnali nel dominio del tempo o della frequenza.
+    Non assume alcun modello di interazione ed è intrinsecamente simmetrica (non direzionale).
+    \item \textbf{Connettività Causa/Effettiva (Effective)}: Descrive l'influenza diretta ed esplicita che un nodo esercita su un altro.
+    Richiede la definizione a priori di un modello causale e dinamico del sistema (direzionale).
+\end{enumerate}
+
+\section{Confronto Critico degli Estimatori}
+
+\subsection{Coerenza Ordinaria (Ordinary Coherence - OC)}
+È una misura bivariata di connettività funzionale definita nel dominio della frequenza:
+\[
+C_{xy}(f) = \frac{|P_{xy}(f)|^2}{P_{xx}(f)P_{yy}(f)} \quad \in [0, 1]
+\]
+\begin{itemize}
+    \item \textbf{Vantaggi}: Estremamente robusta alla scarsità di dati (*data paucity*), computazionalmente leggera.
+    \item \textbf{Svantaggi}: Non direzionale ($C_{xy} = C_{yx}$). Vulnerabile al problema della \textbf{sorgente comune} (*common source*): se un terzo nodo $z$ pilota sia $x$ che $y$, l'OC bivariata tra $x$ e $y$ risulterà elevata, identificando una connessione spuria inesistente.
+\end{itemize}
+
+\subsection{Causalità di Granger (Granger Causality - GC)}
+Si basa sul principio della precedenza temporale in modelli autoregressivi (AR).
+Il segnale $y$ causa il segnale $x$ se l'inclusione del passato di $y$ riduce l'errore di predizione del valore corrente di $x$ rispetto all'uso del solo passato di $x$:
+\[
+G_{y \to x} = \ln\left( \frac{V_{x|x}}{V_{x|x,y}} \right) \quad \in [0, +\infty)
+\]
+\begin{itemize}
+    \item \textbf{Vantaggi}: Misura direzionale (asimmetrica).
+    Robusta se applicata in modalità bivariata.
+    \item \textbf{Svantaggi}: Definita solo nel dominio del tempo nella sua formulazione classica (perde le informazioni spettrali dei ritmi cerebrali).
+\end{itemize}
+
+\subsection{Partial Directed Coherence (PDC)}
+È un estimatore multivariato, direzionale e spettrale basato sulla trasformata di Fourier dei coefficienti di un modello autoregressivo multivariato (MVAR):
+\[
+\pi_{ij}(f) = \frac{|\tilde{A}_{ij}(f)|}{\sqrt{\sum_{m=1}^N |\tilde{A}_{mj}(f)|^2}} \quad \in [0, 1]
+\]
+\begin{itemize}
+    \item \textbf{Vantaggi}: Direzionale, spettrale, e multivariata.
+    Risolve brillantemente il problema della sorgente comune modellando simultaneamente tutti i nodi della rete.
+    \item \textbf{Svantaggi}: Molto sensibile alla scarsità di dati. Essendo un modello MVAR di ordine $p$ su $N$ canali, richiede la stima di $p N^2$ parametri, necessitando di registrazioni temporali molto lunghe per evitare l'instabilità del modello.
+\end{itemize}
+
+%=============================================================================
+\chapter{Teoria dei Grafi e Topologia delle Reti}
+%=============================================================================
+
+\section{Rappresentazione e Caratterizzazione dei Grafi}
+Una rete neurale stimata (es. mediante matrice di coerenza o PDC) viene schematizzata come un grafo $G = (V, E)$, dove $V$ è l'insieme dei nodi (elettrodi/aree) ed $E$ l'insieme degli archi (connessioni).
+Il grafo è descritto matematicamente dalla \textbf{Matrice di Adiacenza ($A$)} binaria o pesata.
+
+\subsection{Densità ($k$) e Grado ($g$)}
+\begin{itemize}
+    \item \textbf{Grado ($g_i$)}: Per grafi non diretti, è il numero di archi incidenti sul nodo $i$: $g_i = \sum_{j} a_{ij}$.
+    \item \textbf{In-Degree / Out-Degree}: Per grafi diretti:
+    \[
+    g_i^{\text{IN}} = \sum_{j} a_{ji} \quad (\text{somma colonna}), \quad g_i^{\text{OUT}} = \sum_{j} a_{ij} \quad (\text{somma riga})
+    \]
+    \item \textbf{Densità ($k$)}: Frazione di archi presenti rispetto al massimo teorico:
+    \[
+    k_{\text{undirected}} = \frac{2L}{N(N-1)}, \quad k_{\text{directed}} = \frac{L}{N(N-1)}
+    \]
+\end{itemize}
+
+\subsection{Efficienza Spaziale e Topologica}
+\begin{itemize}
+    \item \textbf{Efficienza Globale ($E_g$)}: Misura l'integrazione di rete e la rapidità dello scambio informativo a lungo raggio:
+    \[
+    E_g = \frac{1}{N(N-1)} \sum_{i \neq j} \frac{1}{d_{ij}}
+    \]
+    dove $d_{ij}$ è lo \emph{shortest path} (distanza minima) tra $i$ e $j$.
+    Se non esiste percorso, $d_{ij} = \infty \implies \nicefrac{1}{d_{ij}} = 0$.
+    \item \textbf{Efficienza Locale ($E_l$)}: Valuta la segregazione locale ed è definita come la media delle efficienze globali calcolate sui sottografi locali composti dai soli vicini immediati di ciascun nodo.
+\end{itemize}
+
+\section{Metriche di Segregazione a Mesoscala}
+Utilizzate per quantificare se una rete ha una struttura organizzata in moduli (es. emisferi cerebrali o lobi funzionali).
+
+\subsection{Divisibilità ($D$)}
+Misura il grado di segregazione di una partizione in classi nota a priori (es. classi definite dal vettore $C$):
+\[
+D = \frac{L}{L + L_{\text{inter}}}
+\]
+dove $L_{\text{inter}}$ è il numero di archi che collegano nodi appartenenti a classi diverse:
+\[
+L_{\text{inter}} = \frac{1}{2} \sum_{i,j=1}^N a_{ij} [1 - \delta(C_i, C_j)]
+\]
+$D \in [0.5, 1]$ per due classi.
+Un valore vicino a $1$ indica che quasi tutti gli archi sono interni alle classi (forte segregazione).
+
+\subsection{Modularità ($Q$)}
+Quantifica la qualità di una partizione confrontando la frazione di archi interni ai moduli rispetto al caso nullo di una rete casuale equivalente (stessa distribuzione dei gradi):
+\[
+Q = \frac{1}{2L} \sum_{i,j=1}^N \left( a_{ij} - \frac{g_i g_j}{2L} \right) \delta(C_i, C_j)
+\]
+Valori positivi ($Q > 0$) indicano una struttura modulare statisticamente significativa.
+
+%=============================================================================
+\chapter{BCI Assistivi, Riabilitativi ed Elettromiografia}
+%=============================================================================
+
+\section{Interfacce Cervello-Computer (BCI)}
+
+\subsection{BCI Assistivi (Paradigma P300 Speller)}
+\begin{itemize}
+    \item \textbf{Fisiologia}: Si basa sul potenziale evocato P300, onda positiva ad ampiezza ridotta ($\approx 5-10\ \mu\text{V}$) con latenza nominale di $\sim 300\ \text{ms}$, evocata nel lobo parietale da stimoli rari e significativi (paradigma oddball).
+    \item \textbf{Funzionamento}: Righe e colonne di una matrice di caratteri lampeggiano casualmente. Quando lampeggia l'elemento fissato, viene generato il P300.
+    \item \textbf{Classificazione}: L'algoritmo Stepwise Linear Discriminant Analysis (SWLDA) viene addestrato sulle finestre temporali post-stimolo per discriminare la presenza o l'assenza del picco.
+\end{itemize}
+
+\subsection{BCI Riabilitativi (Motor Imagery e SMR)}
+\begin{itemize}
+    \item \textbf{Fisiologia}: Si basa sui ritmi sensomotori (SMR), in particolare sul ritmo Mu ($8-13\ \text{Hz}$) e Beta ($14-30\ \text{Hz}$) registrati sulle aree motorie (C3, Cz, C4).
+    \item \textbf{Modulazione}: L'immaginazione cinestesica del movimento (MI) provoca una desincronizzazione del ritmo (ERD, calo di potenza) nell'emisfero controlaterale.
+    Al termine del movimento o dell'immaginazione, si osserva una sincronizzazione di rimbalzo in banda Beta (ERS).
+    \item \textbf{Meccanismo Riabilitativo (Closed-Loop)}: Il rilevamento dell'intento motorio corticale (ERD) attiva istantaneamente una stimolazione elettrica funzionale (FES) o un esoscheletro sull'arto plegico.
+    La contingenza temporale tra comando motorio centrale ed input afferente periferico ripristina il loop sensomotorio, promuovendo la neuroplasticità (apprendimento hebbiano).
+\end{itemize}
+
+\section{Fisiologia ed Elaborazione sEMG}
+
+\subsection{Proprietà della Fibra e dell'Unità Motoria}
+\begin{itemize}
+    \item \textbf{Velocità di Conduzione della Fibra Muscolare (MFCV)}: Velocità di propagazione del potenziale (MFAP) lungo il sarcolemma, tipicamente pari a $2-6\ \text{m/s}$. Riduce del $10-20\%$ in caso di affaticamento muscolare.
+    \item \textbf{Modulazione della Forza}: Regolata dal SNC tramite il reclutamento spaziale (Henneman's Size Principle: prima le fibre piccole di tipo I resistenti alla fatica, poi le fibre grandi di tipo II) e il rate coding (modulazione della frequenza di scarica temporale).
+\end{itemize}
+
+\subsection{Feature Spettrali e Temporali}
+\begin{itemize}
+    \item \textbf{Indicatori di Ampiezza (Temporali)}: ARV (Average Rectified Value) e RMS (Root Mean Square).
+    \item \textbf{Indicatori di Fatica Muscolare (Spettrali)}: Durante la fatica muscolare, l'accumulo di acido lattico (riduzione del pH) e lo sbilanciamento ionico riducono la MFCV.
+    Questo si riflette nello spettro di potenza della sEMG come uno \textbf{spostamento verso il basso} (verso le basse frequenze) della frequenza media (MNF) e mediana (MDF).
+\end{itemize}
+
+\newpage
+%=============================================================================
+\chapter{Formulario Master}
+%=============================================================================
+
+Di seguito sono raccolte tutte le relazioni matematiche necessarie per risolvere i problemi quantitativi d'esame.
+\renewcommand{\arraystretch}{2}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{l X X}
+\toprule
+\textbf{Ambito} & \textbf{Nome Formula} & \textbf{Equazione} \\
+\midrule
+\multirow{2}{*}{\textbf{Biologia Cellulare}} & Equazione di Nernst & $E_j = -\frac{RT}{zF}\ln\left(\frac{[X]_{\text{in}}}{[X]_{\text{out}}}\right)$ \\
+& Costante di Spazio & $\lambda = \sqrt{\frac{r_m}{r_L}}$ \\
+\midrule
+\multirow{4}{*}{\textbf{Strumentazione}} & CMRR (Decibel) & $\text{CMRR}_{\text{dB}} = 20\log_{10}\left(\frac{G_d}{G_c}\right) = G_{d,\text{dB}} - G_{c,\text{dB}}$ \\
+& Guadagno di Modo Comune & $G_c = 10^{\frac{G_{d,\text{dB}} - \text{CMRR}_{\text{dB}}}{20}}$ \\
+& Tensione Misurata & $V_{\text{mis}} = V_{\text{sorg}} \cdot \frac{Z_{\text{in}}}{Z_{\text{in}} + Z_{\text{el}}}$ \\
+& Artefatto in Uscita (Picco) & $V_{\text{out, cm}} = V_{\text{in, cm}} \cdot G_c$ \\
+\midrule
+\multirow{3}{*}{\textbf{ADC}} & Risoluzione (Step Size LSB) & $V_{LSB} = \frac{V_{\text{range}}}{2^{N_{\text{bit}}}}$ \\
+& Rumore di Quantizzazione & $\sigma_{\text{quant}} = \frac{V_{LSB}}{\sqrt{12}}$ \\
+& Frequenza di Nyquist & $f_{\text{Nyq}} = \frac{f_s}{2}$ \\
+\midrule
+\multirow{5}{*}{\textbf{Stima Spettrale}} & Risoluzione Spettrale Welch & $\Delta f = \frac{1}{T_{\text{win}}} = \frac{f_s}{N_{\text{win}}}$ \\
+& Campioni per Finestra & $N_{\text{win}} = T_{\text{win}} \cdot f_s$ \\
+& Spostamento Finestra & $T_{\text{shift}} = T_{\text{win}} \cdot (1 - O)$ \\
+& Numero di Segmenti & $M = 1 + \left\lfloor \frac{T_{\text{epoch}} - T_{\text{win}}}{T_{\text{shift}}} \right\rfloor$ \\
+& Abbattimento Rumore (Media) & $\sigma_{\text{avg}} = \frac{\sigma_{\text{raw}}}{\sqrt{N_{\text{trial}}}}$ \\
+\midrule
+\multirow{5}{*}{\textbf{Grafi e Reti}} & Densità (Grafo Diretto) & $k = \frac{L}{N(N-1)}$ \\
+& Densità (Grafo Non Diretto) & $k = \frac{2L}{N(N-1)}$ \\
+& Efficienza Globale & $E_g = \frac{1}{N(N-1)} \sum_{i \neq j} \frac{1}{d_{ij}}$ \\
+& Divisibility (2 classi) & $D = \frac{L}{L + L_{\text{inter}}}$ \\
+& Modularità & $Q = \frac{1}{2L} \sum_{i,j} \left( a_{ij} - \frac{g_i g_j}{2L} \right) \delta(C_i, C_j)$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\renewcommand{\arraystretch}{1.0}
+
+\newpage
+%=============================================================================
+\chapter*{Appendice Pratica: Risoluzione Passo-Passo dei Problemi d'Esame}
+\addcontentsline{toc}{chapter}{Appendice Pratica: Risoluzione Passo-Passo dei Problemi d'Esame}
+%=============================================================================
+
+In questa appendice vengono analizzate le sei principali tipologie di problemi della Parte II degli scritti dal 2021 al 2025, illustrando per ciascuna la logica di risoluzione, i calcoli matematici e i trabocchetti più frequenti.
+
+\pagebreak
+%---
+
+\section{Tipologia 1: Calcolo dei Canali, Elettrodi e Montaggi (sEMG/EEG)}
+
+\subsection*{Testo Tipico}
+\emph{Un sistema sEMG prevede l'acquisizione di 2 canali differenziali posizionati su bicipite e tricipite.
+Un sistema EEG registra invece 16 canali monopolari con linked-mastoids reference.
+Calcolare il numero minimo di elettrodi da posizionare sul soggetto nei due casi.}
+
+\subsection*{Risoluzione Passo-Passo}
+\begin{enumerate}
+    \item \textbf{Caso sEMG (2 canali bipolari)}:
+    \begin{itemize}
+        \item Ogni canale sEMG bipolare necessita di $2$ elettrodi per rilevare la differenza di potenziale.
+        \item Canali totali $N_{\text{ch}} = 2 \implies 2 \times 2 = 4$ elettrodi attivi.
+        \item Si deve posizionare sul soggetto $1$ elettrodo di massa comune (ground), solitamente su un punto osseo elettricamente inattivo (es. olecrano o clavicola).
+        \item Risultato: $4 + 1 = 5$ elettrodi totali.
+    \end{itemize}
+    \item \textbf{Caso EEG (16 canali monopolari con linked-mastoids)}:
+    \begin{itemize}
+        \item Sono necessari $16$ elettrodi attivi sul cuoio capelluto (es. $F_3, C_3$, ecc.).
+        \item La referenza a mastoidi cortocircuitate (\emph{linked mastoids}) richiede fisicamente $2$ elettrodi ($A_1$ e $A_2$), posizionati sulle mastoidi sinistra e destra, cortocircuitati via hardware.
+        \item È richiesto $1$ elettrodo di massa sul soggetto (es. sulla fronte o sul lobo).
+        \item Risultato: $16 + 2 + 1 = 19$ elettrodi totali.
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Trappole Comuni}
+* Dimenticare l'elettrodo di massa (ground), indispensabile per stabilizzare il circuito.
+* Considerare la linked-mastoids come un solo elettrodo fisico invece di due elettrodi collegati insieme.
+
+---
+
+\section{Tipologia 2: Calcolo dei Parametri ADC (LSB, Rumore e Aliasing)}
+
+\subsection*{Testo Tipico}
+\emph{Un ADC a 12 bit acquisisce un segnale sEMG filtrato analogicamente tra $20\ \text{Hz}$ e $450\ \text{Hz}$.
+L'ADC lavora ad una frequenza di campionamento $f_s = 200\ \text{Hz}$ con un range d'ingresso simmetrico di $\pm 1.5\ \text{V}$.
+Calcolare lo step di quantizzazione ($V_{LSB}$) e determinare se vi sono problemi di aliasing.}
+
+\subsection*{Risoluzione Passo-Passo}
+\begin{enumerate}
+    \item \textbf{Calcolo dello Step di Quantizzazione ($V_{LSB}$)}:
+    \begin{itemize}
+        \item Il range simmetrico $\pm 1.5\ \text{V}$ implica un range totale di ampiezza pari a:
+        \[
+        V_{\text{range}} = (+1.5) - (-1.5) = 3.0\ \text{V}
+        \]
+        \item Il numero di livelli discreti per un convertitore a $12$ bit è $2^{12} = 4096$.
+        \item Applicando la formula:
+        \[
+        V_{LSB} = \frac{3.0\ \text{V}}{4096} \approx 0.0007324\ \text{V} = 732.4\ \mu\text{V}
+        \]
+    \end{itemize}
+    \item \textbf{Valutazione dell'Aliasing}:
+    \begin{itemize}
+        \item La frequenza di Nyquist del sistema digitalizzatore è:
+        \[
+        f_{\text{Nyq}} = \frac{f_s}{2} = \frac{200\ \text{Hz}}{2} = 100\ \text{Hz}
+        \]
+        \item Il filtro passa-banda analogico a monte ha una frequenza di taglio superiore pari a $f_c = 450\ \text{Hz}$.
+        \item Poiché $f_c = 450\ \text{Hz} > f_{\text{Nyq}} = 100\ \text{Hz}$, il filtro analogico non è in grado di bloccare le frequenze superiori a Nyquist.
+        Tutte le componenti del segnale sEMG comprese tra $100\ \text{Hz}$ e $450\ \text{Hz}$ verranno ripiegate in banda utile sotto forma di aliasing (es. una componente spettrale a $150\ \text{Hz}$ si ripiegherà a $|200 - 150| = 50\ \text{Hz}$).
+        Il sistema ha un grave difetto di progettazione.
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Trappole Comuni}
+* Considerare il range d'ingresso pari a $1.5\ \text{V}$ anziché alla differenza totale $3.0\ \text{V}$ per range simmetrici.
+* Esprimere l'aliasing come un problema risolvibile via software tramite filtraggio digitale. Una volta campionato il segnale, l'aliasing è irreversibile.
+
+---
+
+\section{Tipologia 3: Calcolo dei Guadagni e dell'Artefatto Residuo}
+
+\subsection*{Testo Tipico}
+\emph{Durante una registrazione sEMG, sulla cute del soggetto è presente un rumore di modo comune generato dai motori del robot di ampiezza pari a $150\ \text{mV}$ (picco).
+L'amplificatore ha un guadagno differenziale $G_d = 60\ \text{dB}$ e un $\text{CMRR} = 110\ \text{dB}$.
+Calcolare l'ampiezza dell'artefatto residuo (in $\mu\text{V}$, valore di picco e RMS) all'uscita dell'amplificatore.}
+
+\subsection*{Risoluzione Passo-Passo}
+\begin{enumerate}
+    \item \textbf{Calcolo del Guadagno di Modo Comune ($G_c$)}:
+    \begin{itemize}
+        \item Lavorando in decibel:
+        \[
+        G_{c,\text{dB}} = G_{d,\text{dB}} - \text{CMRR}_{\text{dB}} = 60\ \text{dB} - 110\ \text{dB} = -50\ \text{dB}
+        \]
+        \item Convertiamo il guadagno in scala lineare:
+        \[
+        G_{c,\text{lineare}} = 10^{\frac{-50}{20}} = 10^{-2.5} \approx 0.003162
+        \]
+    \end{itemize}
+    \item \textbf{Calcolo dell'Artefatto Residuo all'Uscita (Picco)}:
+    \begin{itemize}
+        \item Moltiplichiamo il disturbo in ingresso per il guadagno di modo comune:
+        \[
+        V_{\text{out, cm}} = V_{\text{in, cm}} \times G_{c,\text{lineare}} = 150\ \text{mV} \times 0.003162 \approx 0.4743\ \text{mV} = 474.3\ \mu\text{V}
+        \]
+    \end{itemize}
+    \item \textbf{Calcolo del Valore RMS dell'Artefatto Residuo}:
+    \begin{itemize}
+        \item Trattandosi di un rumore sinusoidale (hum a $50\ \text{Hz}$), il valore RMS si ottiene dividendo il picco per $\sqrt{2}$:
+        \[
+        V_{\text{out, cm, RMS}} = \frac{474.3\ \mu\text{V}}{\sqrt{2}} \approx 335.4\ \mu\text{V}
+        \]
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Trappole Comuni}
+* Sommare direttamente i decibel senza convertirli in valori lineari per la moltiplicazione con la tensione d'ingresso.
+* Dimenticare la conversione da valore di picco a valore RMS (divisione per $\sqrt{2}$) quando richiesto esplicitamente per rumori sinusoidali.
+
+---
+
+\section{Tipologia 4: Progettazione e Parametrizzazione di Welch}
+
+\subsection*{Testo Tipico}
+\emph{Si deve calcolare la PSD di un'epoca EEG di durata $T_{\text{epoch}} = 4.0\ \text{s}$, campionata a $f_s = 100\ \text{Hz}$.
+La risoluzione spettrale minima richiesta è $\Delta f = 2\ \text{Hz}$.
+Utilizzando il metodo di Welch con finestre di Hamming sovrapposte al $80\%$, calcolare la lunghezza della finestra in campioni, lo shift temporale e il numero di periodogrammi mediati.}
+
+\subsection*{Risoluzione Passo-Passo}
+\begin{enumerate}
+    \item \textbf{Lunghezza Finestra ($T_{\text{win}}$ e $N_{\text{win}}$)}:
+    \begin{itemize}
+        \item Dalla risoluzione spettrale desiderata $\Delta f = 2\ \text{Hz}$:
+        \[
+        T_{\text{win}} = \frac{1}{\Delta f} = \frac{1}{2\ \text{Hz}} = 0.5\ \text{s} = 500\ \text{ms}
+        \]
+        \item Calcoliamo la lunghezza della finestra espressa in numero di campioni:
+        \[
+        N_{\text{win}} = T_{\text{win}} \times f_s = 0.5\ \text{s} \times 100\ \text{Hz} = 50\ \text{campioni}
+        \]
+    \end{itemize}
+    \item \textbf{Passo di Spostamento (Shift - $T_{\text{shift}}$)}:
+    \begin{itemize}
+        \item L'overlap è $O = 80\% = 0.8$. Lo spostamento tra finestre successive è:
+        \[
+        T_{\text{shift}} = T_{\text{win}} \times (1 - O) = 0.5\ \text{s} \times (1 - 0.8) = 0.5 \times 0.2 = 0.1\ \text{s} = 100\ \text{ms}
+        \]
+        \item Espresso in campioni: $N_{\text{shift}} = 0.1\ \text{s} \times 100\ \text{Hz} = 10\ \text{campioni}$.
+    \end{itemize}
+    \item \textbf{Numero di Periodogrammi ($M$)}:
+    \begin{itemize}
+        \item Applichiamo la formula di Welch:
+        \[
+        M = 1 + \left\lfloor \frac{T_{\text{epoch}} - T_{\text{win}}}{T_{\text{shift}}} \right\rfloor = 1 + \left\lfloor \frac{4.0\ \text{s} - 0.5\ \text{s}}{0.1\ \text{s}} \right\rfloor = 1 + \left\lfloor \frac{3.5}{0.1} \right\rfloor = 1 + 35 = 36
+        \]
+        \item Verranno mediati esattamente $36$ periodogrammi per stimare la PSD di questa epoca.
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Trappole Comuni}
+* Usare la durata dell'intera epoca $T_{\text{epoch}}$ per calcolare i campioni della finestra di Fourier, azzerando la logica di Welch.
+* Sbagliare la formula del numero di segmenti dimenticando di sommare il valore $+1$ iniziale.
+
+---
+
+\section{Tipologia 5: Calcolo delle Metriche di Rete (Teoria dei Grafi)}
+
+\subsection*{Testo Tipico}
+\emph{Dato un grafo cerebrale non orientato a $N = 5$ nodi con i seguenti archi presenti: (1-2), (1-3), (2-3), (3-4), (4-5).
+Estrarre la matrice di adiacenza $A$, calcolare la densità $k$ e calcolare la divisibilità $D$ per la partizione in classi $C = [1, 1, 1, 2, 2]$.}
+
+\subsection*{Risoluzione Passo-Passo}
+\begin{enumerate}
+    \item \textbf{Estrazione della Matrice di Adiacenza ($A$)}:
+    \begin{itemize}
+        \item Essendo il grafo non orientato, la matrice è simmetrica. Scriviamo le righe impostando a $1$ le connessioni esistenti:
+        \[
+        A = \begin{pmatrix}
+        0 & 1 & 1 & 0 & 0 \\
+        1 & 0 & 1 & 0 & 0 \\
+        1 & 1 & 0 & 1 & 0 \\
+        0 & 0 & 1 & 0 & 1 \\
+        0 & 0 & 0 & 1 & 0
+        \end{pmatrix}
+        \]
+    \end{itemize}
+    \item \textbf{Calcolo della Densità ($k$)}:
+    \begin{itemize}
+        \item Il numero totale di archi fisici è $L = 5$.
+        \item Il numero massimo di archi possibili per un grafo non orientato a $5$ nodi è:
+        \[
+        L_{\text{tot}} = \frac{N(N-1)}{2} = \frac{5 \times 4}{2} = 10
+        \]
+        \item La densità vale:
+        \[
+        k = \frac{L}{L_{\text{tot}}} = \frac{5}{10} = 0.50 \quad (50\%)
+        \]
+    \end{itemize}
+    \item \textbf{Calcolo della Divisibilità ($D$)}:
+    \begin{itemize}
+        \item La partizione divide i nodi in due classi: la prima classe comprende i nodi $\{1, 2, 3\}$, la seconda classe i nodi $\{4, 5\}$.
+        \item Troviamo gli archi che connettono nodi appartenenti a classi diverse (archi inter-classe):
+        \begin{itemize}
+            \item L'unico arco che scavalca la partizione è l'arco (3-4), che collega il nodo $3$ (Classe 1) al nodo $4$ (Classe 2).
+            \item Di conseguenza, $L_{\text{inter}} = 1$.
+        \end{itemize}
+        \item Applichiamo la formula della divisibilità:
+        \[
+        D = \frac{L}{L + L_{\text{inter}}} = \frac{5}{5 + 1} = \frac{5}{6} \approx 0.833
+        \]
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Trappole Comuni}
+* Nei grafi orientati (*directed*), ricordarsi che la densità si calcola dividendo per $N(N-1)$ (senza dividere per 2).
+* Sbagliare a contare gli archi inter-classe dimenticando la distinzione dei nodi nelle partizioni.
+
+---
+
+\section{Tipologia 6: Tempo di Registrazione e Riduzione del Rumore (Averaging)}
+
+\subsection*{Testo Tipico}
+\emph{Un esperimento per registrare il potenziale evocato P300 utilizza un paradigma oddball visivo con stimoli presentati ogni $1000\ \text{ms}$ (SOA).
+La probabilità di comparsa dello stimolo target (raro) è $P = 20\%$.
+Sapendo che la deviazione standard del rumore EEG spontaneo è $\sigma_{\text{EEG}} = 25\ \mu\text{V}$, calcolare la durata complessiva della sessione di registrazione necessaria per ridurre il rumore residuo a $\sigma_{\text{residuo}} = 2.5\ \mu\text{V}$.}
+
+\subsection*{Risoluzione Passo-Passo}
+\begin{enumerate}
+    \item \textbf{Calcolo dei Trial Target Necessari ($N_{\text{target}}$)}:
+    \begin{itemize}
+        \item La deviazione standard del rumore deve essere ridotta di un fattore $K$:
+        \[
+        K = \frac{\sigma_{\text{EEG}}}{\sigma_{\text{residuo}}} = \frac{25\ \mu\text{V}}{2.5\ \mu\text{V}} = 10
+        \]
+        \item Per il Teorema del Limite Centrale applicato alla media sincronizzata, l'attenuazione del rumore è pari a $\sqrt{N}$. Impostiamo l'equazione:
+        \[
+        \sigma_{\text{residuo}} = \frac{\sigma_{\text{EEG}}}{\sqrt{N_{\text{target}}}} \implies \sqrt{N_{\text{target}}} = \frac{\sigma_{\text{EEG}}}{\sigma_{\text{residuo}}} = 10 \implies N_{\text{target}} = 10^2 = 100\ \text{trial target}
+        \]
+    \end{itemize}
+    \item \textbf{Calcolo dei Trial Complessivi ($N_{\text{tot}}$)}:
+    \begin{itemize}
+        \item Gli stimoli target compaiono con una probabilità del $20\% = 0.2$. Per raccogliere $100$ stimoli target, il numero totale di stimoli (compresi i non-target) deve essere:
+        \[
+        N_{\text{tot}} = \frac{N_{\text{target}}}{P} = \frac{100}{0.2} = 500\ \text{stimoli totali}
+        \]
+    \end{itemize}
+    \item \textbf{Calcolo della Durata della Sessione ($T_{\text{sessione}}$)}:
+    \begin{itemize}
+        \item Gli stimoli vengono presentati consecutivamente con cadenza temporale definita dal SOA ($1000\ \text{ms} = 1.0\ \text{s}$).
+        \item La durata minima della sessione è:
+        \[
+        T_{\text{sessione}} = N_{\text{tot}} \times \text{SOA} = 500 \times 1.0\ \text{s} = 500\ \text{secondi} \approx 8\ \text{minuti e } 20\ \text{secondi}
+        \]
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Trappole Comuni}
+* Elevare al quadrato solo il fattore di attenuazione senza rapportarlo alla probabilità del target, calcolando erroneamente la durata sui soli trial target ($100$ secondi anziché $500$).
+* Utilizzare l'ITI (Inter-Trial Interval) o la durata dello stimolo al posto del SOA (Stimulus Onset Asynchrony) per calcolare la durata complessiva della sessione, sottostimando il tempo reale.
+
+\end{document}
