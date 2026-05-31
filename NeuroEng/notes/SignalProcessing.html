@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elaborazione dei Biosegnali Neurali — Cap. 6</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js"></script>
+<style>
+  :root {
+    --primary: #1e64b4;
+    --primary-light: #e6f1fb;
+    --accent: #d85a30;
+    --accent-light: #faece7;
+    --teal: #0f6e56;
+    --teal-light: #e1f5ee;
+    --gray-dark: #3c3c3c;
+    --gray-mid: #888;
+    --gray-light: #f5f5f5;
+    --border: #e0e0e0;
+    --text: #1a1a1a;
+    --text-muted: #5a5a5a;
+    --bg: #fafaf8;
+    --white: #ffffff;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --radius: 6px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  /* ── Layout ── */
+  .page-wrap {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar TOC ── */
+  .toc {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    padding: 2rem 1.2rem;
+    font-family: var(--sans);
+  }
+  .toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-bottom: 1rem;
+  }
+  .toc a {
+    display: block;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 3px 0;
+    border-left: 2px solid transparent;
+    padding-left: 8px;
+    transition: all .15s;
+  }
+  .toc a:hover, .toc a.active {
+    color: var(--primary);
+    border-left-color: var(--primary);
+  }
+  .toc a.sub { padding-left: 20px; font-size: 12px; }
+
+  /* ── Main content ── */
+  main {
+    padding: 3rem 4rem 6rem;
+    min-width: 0;
+  }
+
+  /* ── Header ── */
+  .doc-header {
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  .doc-header h1 {
+    font-family: var(--sans);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--primary);
+    line-height: 1.25;
+    margin-bottom: .4rem;
+  }
+  .doc-header .subtitle {
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--gray-mid);
+  }
+
+  /* ── Sections ── */
+  section { margin-bottom: 3.5rem; }
+
+  h2 {
+    font-family: var(--sans);
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    padding-bottom: .3rem;
+    border-bottom: 1px solid var(--primary-light);
+  }
+  h3 {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-dark);
+    margin: 1.6rem 0 .6rem;
+  }
+  h4 {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 1.2rem 0 .4rem;
+  }
+
+  p { margin-bottom: .9rem; }
+
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+
+  ul, ol { padding-left: 1.4rem; margin-bottom: .9rem; }
+  li { margin-bottom: .3rem; }
+
+  /* ── Math display ── */
+  .math-block {
+    background: var(--gray-light);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: .8rem 1.2rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    font-size: 15px;
+  }
+  .math-block.boxed {
+    background: var(--primary-light);
+    border-left-color: var(--primary);
+  }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; margin: 1.2rem 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--sans);
+    font-size: 14px;
+  }
+  th {
+    background: var(--primary);
+    color: white;
+    font-weight: 500;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  td { padding: 7px 12px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: var(--gray-light); }
+  td strong { color: var(--primary); }
+  td.accent { color: var(--accent); font-weight: 600; }
+  td.teal { color: var(--teal); font-weight: 600; }
+
+  /* ── Callout boxes ── */
+  .box {
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin: 1.2rem 0;
+    font-size: 15.5px;
+  }
+  .box-title {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: .5rem;
+  }
+  .box.info { background: var(--primary-light); border-left: 4px solid var(--primary); }
+  .box.info .box-title { color: var(--primary); }
+  .box.warning { background: var(--accent-light); border-left: 4px solid var(--accent); }
+  .box.warning .box-title { color: var(--accent); }
+  .box.example { background: var(--gray-light); border-left: 4px solid #aaa; }
+  .box.example .box-title { color: var(--gray-dark); }
+  .box.key { background: var(--teal-light); border-left: 4px solid var(--teal); }
+  .box.key .box-title { color: var(--teal); }
+
+  /* ── Pipeline diagram ── */
+  .pipeline {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 0;
+    margin: 2rem 0;
+    font-family: var(--sans);
+    font-size: 13px;
+    overflow-x: auto;
+  }
+  .pipe-node {
+    background: var(--primary-light);
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    padding: 14px 10px 10px;
+    text-align: center;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 15px;
+    position: relative;
+  }
+  .pipe-node.teal { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+  .pipe-node.accent { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+  .pipe-node .pipe-sub {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--gray-mid);
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+  .pipe-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0 4px;
+  }
+  .pipe-connector .pipe-line {
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    position: relative;
+  }
+  .pipe-connector .pipe-line::after {
+    content: "▶";
+    position: absolute;
+    right: -6px;
+    top: -8px;
+    font-size: 10px;
+    color: var(--gray-mid);
+  }
+  .pipe-connector .pipe-label {
+    font-size: 10px;
+    color: var(--gray-mid);
+    white-space: nowrap;
+    margin-top: 4px;
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* ── Code ── */
+  code {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--gray-light);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+
+  /* ── Summary table (formule) ── */
+  .formula-table th { background: var(--teal); }
+  .formula-table td:nth-child(2) {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--primary);
+  }
+
+  /* ── Widget container ── */
+  .widget-container {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    box-shadow: var(--shadow);
+  }
+  .widget-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--gray-mid);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .widget-label::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4caf50;
+    box-shadow: 0 0 0 2px rgba(76,175,80,.25);
+  }
+
+  /* ── Widget internals ── */
+  .ctrl-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:13px; font-family:var(--sans); color:var(--text-muted); }
+  .ctrl-row input[type=range] { flex:1; }
+  .ctrl-val { font-weight:600; min-width:70px; color:var(--text); font-size:13px; font-family:var(--sans); }
+  .metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:1rem 0; }
+  .metric { background:var(--gray-light); border-radius:var(--radius); padding:8px 12px; text-align:center; }
+  .metric-label { font-family:var(--sans); font-size:11px; color:var(--gray-mid); margin-bottom:2px; }
+  .metric-value { font-family:var(--sans); font-size:18px; font-weight:600; color:var(--text); }
+  .w-legend { display:flex; flex-wrap:wrap; gap:14px; font-size:12px; font-family:var(--sans); margin:8px 0; color:var(--text-muted); }
+  .leg-item { display:flex; align-items:center; gap:5px; }
+  .leg-swatch { width:20px; height:3px; border-radius:2px; }
+  .w-infobox { background:var(--gray-light); border-radius:var(--radius); padding:10px 14px; font-size:13px; font-family:var(--sans); color:var(--text-muted); margin-top:10px; border-left:3px solid #ccc; }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .page-wrap { grid-template-columns: 1fr; }
+    .toc { display: none; }
+    main { padding: 2rem 1.2rem 4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+<!-- ══ SIDEBAR TOC ══ -->
+<nav class="toc" aria-label="Indice">
+  <div class="toc-title">Indice</div>
+  <a href="#s1">1. Dal segnale analogico al digitale</a>
+  <a href="#s2">2. Campionamento</a>
+  <a href="#s2-1" class="sub">2.1 Definizione formale</a>
+  <a href="#s2-2" class="sub">2.2 Dominio della frequenza</a>
+  <a href="#s2-3" class="sub">2.3 Repliche spettrali + widget</a>
+  <a href="#s2-3" class="sub">2.4 Filtro di ricostruzione</a>
+  <a href="#s2b">3. Randomness nei segnali</a>
+  <a href="#s2b-1" class="sub">3.1 Media, varianza, std</a>
+  <a href="#s2b-2" class="sub">3.2 Gaussian White Noise</a>
+  <a href="#s2b-3" class="sub">3.3 Teorema del Limite Centrale</a>
+  <a href="#s3">4. Teorema di Nyquist-Shannon</a>
+  <a href="#s4">5. L'Aliasing</a>
+  <a href="#s4-1" class="sub">5.1 Meccanismo di specchiamento</a>
+  <a href="#s4-2" class="sub">5.2 Widget interattivo</a>
+  <a href="#s4-3" class="sub">5.3 Specchiamento vs sovrapposizione</a>
+  <a href="#s4-4" class="sub">5.4 Caso concreto</a>
+  <a href="#s5">6. Filtro anti-aliasing e oversampling</a>
+  <a href="#s5-w" class="sub">Piano f_c vs f_m</a>
+  <a href="#s6">7. Quantizzazione</a>
+  <a href="#s_spectral">8. Analisi Spettrale (DFT)</a>
+  <a href="#s_dft" class="sub">8.1 DFT</a>
+  <a href="#s_relations" class="sub">8.2 Relazioni T/Ts/&Delta;f/fS</a>
+  <a href="#s_zeropad" class="sub">8.4 Zero Padding</a>
+  <a href="#s_windowing" class="sub">8.5 Windowing &amp; Leakage</a>
+  <a href="#s_welch" class="sub">8.6 Welch &amp; Spettrogramma</a>
+  <a href="#s_filters">9. Filtri Digitali</a>
+  <a href="#s_fir_iir" class="sub">9.3 FIR vs IIR</a>
+  <a href="#s7">10. Schema riassuntivo</a>
+  <a href="#s8">11. Formule chiave</a>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main>
+
+<header class="doc-header">
+  <h1>Elaborazione dei Biosegnali Neurali</h1>
+  <div class="subtitle">Campionamento, Quantizzazione e Teorema di Nyquist — Capitolo 6</div>
+</header>
+
+<!-- ── S1 ── -->
+<section id="s1">
+  <h2>1. Dal segnale analogico al digitale</h2>
+  <p>Un biosegnale neurale (ad esempio un EEG o un segnale intracorticale) è nella realtà fisica un fenomeno <strong>continuo</strong> in due sensi distinti:</p>
+  <ul>
+    <li><strong>Continuo nel tempo</strong>: esiste in ogni istante \(t \in \mathbb{R}\).</li>
+    <li><strong>Continuo nell'ampiezza</strong>: il voltaggio può assumere qualsiasi valore reale.</li>
+  </ul>
+  <p>Un computer non può lavorare con oggetti continui. Occorre una <em>digitalizzazione</em>, che avviene in <strong>due passaggi separati e indipendenti</strong>:</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Passaggio</th><th>Descrizione</th></tr>
+      <tr><td><strong>Campionamento (Sampling)</strong></td><td>Discretizzazione dell'asse del <em>tempo</em>: si misura il segnale ogni \(T_C\) secondi.</td></tr>
+      <tr><td><strong>Quantizzazione (Quantization)</strong></td><td>Discretizzazione dell'asse dell'<em>ampiezza</em>: ogni campione viene arrotondato al livello consentito più vicino.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ── S2 ── -->
+<section id="s2">
+  <h2>2. Campionamento (Sampling)</h2>
+
+  <h3 id="s2-1">2.1 Definizione formale</h3>
+  <p>Dato un segnale continuo \(x(t)\), il <strong>segnale campionato</strong> \(x^*(t)\) è definito come:</p>
+  <div class="math-block">$$x^*(t) = x(t) \cdot \sum_{n=-\infty}^{+\infty} \delta(t - n T_C)$$</div>
+  <p>dove \(T_C\) è il <em>periodo di campionamento</em> e \(\delta\) è la delta di Dirac. In pratica: si moltiplicano i valori del segnale per un "pettine" di impulsi equidistanti.</p>
+
+  <h3 id="s2-2">2.2 Relazioni fondamentali</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Simbolo</th><th>Significato</th><th>Formula</th></tr>
+      <tr><td>\(T_C\)</td><td>Periodo di campionamento</td><td>—</td></tr>
+      <tr><td>\(f_C = 1/T_C\)</td><td>Frequenza di campionamento</td><td>[Hz]</td></tr>
+      <tr><td>\(\omega_C = 2\pi f_C\)</td><td>Pulsazione di campionamento</td><td>[rad/s]</td></tr>
+      <tr><td>\(f_m\)</td><td>Frequenza massima del segnale</td><td>[Hz]</td></tr>
+      <tr><td>\(f_{Nyq} = f_C / 2\)</td><td>Limite di Nyquist</td><td>[Hz]</td></tr>
+    </table>
+  </div>
+
+  <h3>2.3 Cosa accade nel dominio della frequenza</h3>
+  <p>La trasformata di Fourier del segnale campionato non è semplicemente "quella del segnale originale ma digitale". Secondo la teoria della convoluzione ciclica, lo spettro \(X^*(j\omega)\) è una <strong>replica periodica</strong> dello spettro originale \(X(j\omega)\):</p>
+  <div class="math-block">$$X^*(j\omega) = \frac{1}{T_C} \sum_{k=-\infty}^{+\infty} X\!\left(j\left(\omega - k\omega_C\right)\right)$$</div>
+  <p>In parole: lo spettro originale viene <em>copiato e incollato</em> ogni \(\omega_C\) lungo l'asse delle frequenze. Il segnale analogico ha una copia (la "copia centrale"); il segnale campionato ne ha infinite.</p>
+
+  <div class="box warning" style="margin:1rem 0">
+    <div class="box-title">⚠ Dettaglio critico: il fattore 1/T<sub>C</sub></div>
+    <p style="margin:.3rem 0 .6rem">Il libro mostra nel grafico che le repliche <strong>non hanno la stessa ampiezza dell'originale</strong>. Il picco dello spettro campionato vale \(\frac{1}{T_C}\), non 1. Questo è il fattore di scala che compare davanti alla somma:</p>
+    <div class="math-block" style="margin:.4rem 0">$$|X^*(j\omega)| \text{ ha picco } = \frac{1}{T_C}$$</div>
+    <p style="margin:.6rem 0 .3rem">Ecco perché il filtro di ricostruzione \(G_R\) vale <strong>T<sub>C</sub></strong> (non 1) nella banda passante — serve esattamente a compensare quella scalatura:</p>
+    <div class="math-block" style="margin:.4rem 0">$$\underbrace{T_C}_{\text{filtro}} \times \underbrace{\frac{1}{T_C}}_{\text{scala del campionamento}} = 1 \quad \Rightarrow \quad \text{ampiezza originale recuperata}$$</div>
+    <p style="margin:.6rem 0 0">La formula \(|X(j\omega)| = |G_R(j\omega)| \cdot |X^*(j\omega)|\) funziona proprio perché questi due fattori si cancellano.</p>
+  </div>
+
+  <h3>2.3.1 Perché il campionamento crea repliche — spiegazione passo per passo</h3>
+
+  <p>Campionare significa moltiplicare il segnale per un "pettine" di delta di Dirac nel tempo. C'è una proprietà fondamentale della trasformata di Fourier: <strong>moltiplicare nel tempo equivale a convolvere in frequenza</strong>. Quindi occorre chiedersi: qual è la trasformata del pettine?</p>
+
+  <p>Il risultato — non intuitivo ma dimostrabile — è che un pettine di delta equidistanti nel tempo <em>rimane un pettine di delta</em> nel dominio della frequenza, con spaziatura invertita:</p>
+  <div class="math-block">$$\mathcal{F}\!\left\{\sum_n \delta(t - nT_C)\right\} = \frac{1}{T_C}\sum_k \delta(\omega - k\omega_C)$$</div>
+  <p>Più i campioni sono fitti nel tempo (T<sub>C</sub> piccolo), più le copie sono distanziate in frequenza (ω<sub>C</sub> grande). E viceversa — è un trade-off intrinseco.</p>
+
+  <p>La convoluzione con una singola delta sposta e copia. Convolve re X(jω) con <em>tante</em> delta spaziate di ω<sub>C</sub> produce quindi tante copie di X, ognuna centrata su un multiplo di ω<sub>C</sub>. Questo è esattamente il termine k nella somma della formula sopra.</p>
+
+  <div class="box info" style="margin:1rem 0">
+    <div class="box-title">La sequenza logica</div>
+    <ol style="margin:.4rem 0 0;padding-left:1.2rem">
+      <li>Campionare = moltiplicare per il pettine nel <strong>tempo</strong></li>
+      <li>Nel <strong>dominio della frequenza</strong> questo diventa convoluzione con il pettine spettrale</li>
+      <li>Convoluzione con il pettine = <strong>copie ripetute</strong> dello spettro ogni ω<sub>C</sub></li>
+      <li>Se le copie non si sovrappongono → recupero possibile con filtro passa-basso</li>
+      <li>Se le copie si sovrappongono → <strong>aliasing irreversibile</strong></li>
+    </ol>
+  </div>
+
+  <p>Il widget qui sotto mostra questa storia in tre pannelli sovrapposti. Usa i cursori per vedere cosa succede allo spettro al variare di f<sub>m</sub> e f<sub>C</sub>:</p>
+
+  <div class="widget-container">
+    <div class="widget-label">Widget interattivo — repliche spettrali nei tre domini</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div class="metric" style="background:var(--primary-light)">
+        <div class="metric-label">Frequenza massima segnale (f<sub>m</sub>)</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+          <input type="range" id="sp_fm" min="1" max="8" value="3" step="1" style="flex:1">
+          <span class="ctrl-val" id="sp_fm_v">3 Hz</span>
+        </div>
+      </div>
+      <div class="metric" style="background:var(--primary-light)">
+        <div class="metric-label">Frequenza campionamento (ω<sub>C</sub>)</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+          <input type="range" id="sp_fc" min="4" max="20" value="10" step="1" style="flex:1">
+          <span class="ctrl-val" id="sp_fc_v">10 Hz</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;margin-bottom:10px;font-family:var(--sans);color:var(--text-muted)">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:#1e64b4;border-radius:2px;display:inline-block"></span>spettro originale X(jω)</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:3px;background:#d85a30;border-radius:2px;display:inline-block"></span>repliche k≠0</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;border-top:1.5px dashed #0f6e56;display:inline-block"></span>filtro G<sub>R</sub></span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:20px;border-top:1.5px dashed #888;display:inline-block"></span>limite Nyquist</span>
+    </div>
+
+    <div style="font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-mid);margin:0 0 4px">① segnale originale — X(jω)</div>
+    <div style="position:relative;height:85px"><canvas id="sp_c1" role="img" aria-label="Spettro originale"></canvas></div>
+
+    <div style="font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-mid);margin:12px 0 4px">② segnale campionato — X*(jω) = copie ogni ω<sub>C</sub></div>
+    <div style="position:relative;height:85px"><canvas id="sp_c2" role="img" aria-label="Spettro campionato con repliche"></canvas></div>
+
+    <div style="font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-mid);margin:12px 0 4px">③ filtro G<sub>R</sub> applicato → recupero X(jω)</div>
+    <div style="position:relative;height:85px"><canvas id="sp_c3" role="img" aria-label="Filtro di ricostruzione applicato"></canvas></div>
+
+    <div style="background:var(--gray-light);border-radius:var(--radius);padding:10px 14px;font-size:13px;font-family:var(--sans);color:var(--text-muted);margin-top:10px;border-left:3px solid #ccc" id="sp_note">—</div>
+  </div>
+
+  <h3 id="s2-3">2.4 Ricostruzione: il filtro \(G_R\)</h3>
+  <p>Per recuperare il segnale originale dal campionato si applica un <strong>filtro passa-basso di ricostruzione</strong> \(G_R(j\omega)\):</p>
+  <div class="math-block">$$G_R(j\omega) = \begin{cases} T_C & \text{se } |\omega| \leq \omega_C / 2 \\ 0 & \text{altrimenti} \end{cases}$$</div>
+  <p>La formula di ricostruzione vale:</p>
+  <div class="math-block boxed">$$\boxed{|X(j\omega)| = |G_R(j\omega)| \cdot |X^*(j\omega)|}$$</div>
+  <p>Il filtro "lascia passare" solo la copia centrale (quella originale), azzerando tutte le repliche. Questo funziona <strong>solo se le repliche non si sovrappongono tra loro</strong> — condizione garantita dal Teorema di Nyquist-Shannon.</p>
+</section>
+
+<!-- ── S3 ── -->
+<section id="s3">
+  <h2>3. Il Teorema di Nyquist-Shannon</h2>
+  <div class="box info">
+    <div class="box-title">Teorema di Nyquist-Shannon</div>
+    Un segnale a banda limitata con frequenza massima \(f_m\) può essere campionato e ricostruito <em>senza errori</em> se e solo se la frequenza di campionamento soddisfa:
+    <div class="math-block boxed" style="margin-top:.6rem">$$\boxed{f_C \geq 2 f_m}$$</div>
+    La soglia \(f_{Nyq} = f_C / 2\) è detta <strong>frequenza di Nyquist</strong> (o <em>limite di Nyquist</em>).
+  </div>
+
+  <h3>Perché esattamente \(2f_m\)?</h3>
+  <p>Geometricamente: se le copie spettrali distano \(\omega_C\) tra loro, e ciascuna ha larghezza \(2\omega_m\), perché non si sovrappongano è necessario che \(\omega_C \geq 2\omega_m\), ovvero \(f_C \geq 2f_m\).</p>
+  <p>Se \(f_C &lt; 2f_m\), le copie si avvicinano troppo e si sovrappongono. Quella sovrapposizione è l'<strong>aliasing</strong>.</p>
+</section>
+
+<!-- ── S4 ── -->
+<section id="s4">
+  <h2>5. L'Aliasing: meccanismo e conseguenze</h2>
+
+  <p>L'aliasing è la <strong>distorsione irreversibile</strong> del segnale che si verifica quando \(f_C &lt; 2f_m\). Le repliche spettrali si sovrappongono alla copia centrale: componenti ad alta frequenza vengono "scambiate" per componenti a bassa frequenza.</p>
+
+  <h3 id="s4-1">4.1 Il meccanismo di specchiamento (frequency folding)</h3>
+  <p>Quando un segnale a frequenza \(f_s > f_{Nyq}\) viene campionato a \(f_C\), la sua frequenza alias è:</p>
+  <div class="math-block boxed">$$\boxed{f_{\text{alias}} = |f_s - k \cdot f_C|}, \quad k \in \mathbb{Z} \text{ scelto per minimizzare}$$</div>
+  <p>Per frequenze di poco superiori al limite di Nyquist: \(f_{\text{alias}} = f_C - f_s\)</p>
+
+  <div class="box example">
+    <div class="box-title">Esempio numerico</div>
+    \(f_C = 300\,\text{Hz}\), \(f_s = 280\,\text{Hz}\), \(f_{Nyq} = 150\,\text{Hz}\).
+    $$f_{\text{alias}} = |300 - 280| = 20\,\text{Hz}$$
+    Un ripple epilettico a 280 Hz appare nel file digitale come un'onda a 20 Hz che non esiste nella realtà biologica.
+  </div>
+
+  <!-- WIDGET 1: aliasing nel tempo -->
+  <h3 id="s4-2">4.2 Visualizzazione interattiva dell'aliasing</h3>
+
+  <div class="widget-container">
+    <div class="widget-label">Widget interattivo — aliasing nel dominio del tempo</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div class="metric" style="background:var(--primary-light);">
+        <div class="metric-label">Frequenza segnale (f<sub>m</sub>)</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+          <input type="range" id="w1_fm" min="1" max="20" value="5" step="1" style="flex:1;">
+          <span class="ctrl-val" id="w1_fm_val">5 Hz</span>
+        </div>
+      </div>
+      <div class="metric" style="background:var(--primary-light);">
+        <div class="metric-label">Frequenza campionamento (f<sub>c</sub>)</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+          <input type="range" id="w1_fc" min="2" max="40" value="20" step="1" style="flex:1;">
+          <span class="ctrl-val" id="w1_fc_val">20 Hz</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-legend">
+      <div class="leg-item"><div class="leg-swatch" style="background:#1e64b4;"></div>segnale originale</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#d85a30;border-top:2px dashed #d85a30;height:0;"></div>segnale percepito (alias)</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#0f6e56;width:8px;height:8px;border-radius:50%;"></div>campioni</div>
+    </div>
+
+    <div style="position:relative;width:100%;height:200px;">
+      <canvas id="w1_canvas" role="img" aria-label="Grafico aliasing nel tempo"></canvas>
+    </div>
+
+    <div class="w-infobox" id="w1_info">—</div>
+  </div>
+
+  <h3 id="s4-3">4.3 Specchiamento vs. sovrapposizione: la distinzione cruciale</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Concetto</th><th>Descrizione</th></tr>
+      <tr>
+        <td><strong style="color:var(--primary)">Specchiamento</strong></td>
+        <td>È il <em>meccanismo</em> con cui si calcola la frequenza alias. La frequenza \(f_s\) "rimbalza" attorno al limite di Nyquist verso frequenze più basse. È geometricamente una riflessione dello spettro attorno a \(f_{Nyq}\). Da solo, non sarebbe catastrofico: l'alias atterrerebbe in una zona vuota.</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">Sovrapposizione</strong></td>
+        <td>È la <em>conseguenza distruttiva</em>. L'alias, dopo il ribaltamento, atterra sopra componenti spettrali <em>reali</em> già presenti nel segnale. A quel punto vero segnale e segnale falso occupano esattamente la stessa frequenza: nessun filtro può separarli. Questo rende l'aliasing <strong>irreversibile</strong>.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="box warning">
+    <div class="box-title">⚠ Perché è irreversibile?</div>
+    Una volta che il segnale è stato digitalizzato con \(f_C &lt; 2f_m\), i dati a bassa frequenza nel file contengono la <em>somma</em> di:
+    <ul style="margin-top:.5rem;">
+      <li>Il vero segnale biologico a quella frequenza.</li>
+      <li>L'alias di un segnale ad alta frequenza ribaltato lì sopra.</li>
+    </ul>
+    Poiché i due contributi sono <strong>indistinguibili</strong> nel dominio digitale (stessa frequenza, stessa ampiezza apparente), non esiste algoritmo in grado di separarli. È come sentire due persone che parlano alla stessa tonalità contemporaneamente.
+  </div>
+
+  <h3 id="s4-4">4.4 Il caso concreto: diagnosi errata in neuroscienze</h3>
+  <div class="box example">
+    <div class="box-title">Scenario: monitoraggio epilettico in laboratorio</div>
+    <p><strong>Obiettivo</strong>: rilevare sharp-wave ripples (150–250 Hz) nell'ippocampo di un topo.<br>
+    <strong>Errore</strong>: sistema di acquisizione impostato a \(f_C = 300\,\text{Hz}\) senza filtro anti-aliasing adeguato.</p>
+    <div class="table-wrap" style="margin:.6rem 0">
+      <table>
+        <tr><td>Segnale reale</td><td>280 Hz (ripple epilettico)</td></tr>
+        <tr><td>Limite di Nyquist</td><td>150 Hz</td></tr>
+        <tr><td>Aliasing attivo?</td><td>Sì, perché \(280 > 150\)</td></tr>
+        <tr><td>Frequenza alias</td><td>\(|300 - 280| = 20\,\text{Hz}\) (banda Beta)</td></tr>
+      </table>
+    </div>
+    <p><strong>Risultato</strong>: il neuroscienziato vede onde a 20 Hz nel tracciato. Le interpreta come "attività beta anomala". L'esperimento viene interrotto, l'animale sacrificato inutilmente. In realtà il segnale di 20 Hz non esisteva mai nel cervello del topo.</p>
+  </div>
+</section>
+
+<!-- ── S5 ── -->
+<section id="s5">
+  <h2>6. La Soluzione: Filtro Anti-Aliasing e Oversampling</h2>
+
+  <p>La soluzione non è scegliere tra "alto campionamento" e "filtro", ma usare <strong>entrambi in modo coordinato</strong>.</p>
+
+  <h3>Il trade-off del filtro anti-aliasing</h3>
+  <p>Un filtro anti-aliasing posto <em>prima</em> del convertitore ADC taglia fisicamente le frequenze alte, impedendo che creino alias. Ma se il taglio è troppo basso, elimina anche il segnale di interesse.</p>
+  <p><strong>Soluzione: oversampling.</strong></p>
+  <ol>
+    <li>Identifica la banda di interesse: \(f_{\text{max}} = 250\,\text{Hz}\) (ripple).</li>
+    <li>Scegli una frequenza di campionamento molto superiore: \(f_C = 2000\,\text{Hz}\) (10× superiore al minimo teorico).</li>
+    <li>Imposta il filtro anti-aliasing a \(f_{\text{taglio}} = 400\,\text{Hz}\) (sopra i ripple, lontano dal limite di Nyquist).</li>
+  </ol>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Parametro</th><th>Scelta errata</th><th>Scelta corretta</th></tr>
+      <tr><td>Segnale utile</td><td>200 Hz</td><td>200 Hz</td></tr>
+      <tr><td>\(f_C\)</td><td>300 Hz</td><td>2000 Hz</td></tr>
+      <tr><td>Limite di Nyquist</td><td>150 Hz</td><td>1000 Hz</td></tr>
+      <tr><td>Filtro anti-aliasing</td><td>150 Hz (distrugge il segnale)</td><td>400 Hz (preserva il segnale)</td></tr>
+      <tr><td>Risultato sui ripple</td><td class="accent">ELIMINATI</td><td class="teal">PRESERVATI</td></tr>
+    </table>
+  </div>
+
+  <!-- WIDGET 2: piano fc vs fm -->
+  <h3 id="s5-w">Piano f<sub>c</sub> vs f<sub>m</sub> — visualizzazione interattiva</h3>
+
+  <div class="widget-container">
+    <div class="widget-label">Widget interattivo — spazio delle frequenze</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div class="metric" style="background:var(--primary-light);">
+        <div class="metric-label">Frequenza segnale (f<sub>m</sub>)</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+          <input type="range" id="w2_fm" min="10" max="500" value="200" step="10" style="flex:1;">
+          <span class="ctrl-val" id="w2_fm_val">200 Hz</span>
+        </div>
+      </div>
+      <div class="metric" style="background:var(--primary-light);">
+        <div class="metric-label">Freq. campionamento (f<sub>c</sub>)</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+          <input type="range" id="w2_fc" min="50" max="3000" value="2000" step="50" style="flex:1;">
+          <span class="ctrl-val" id="w2_fc_val">2000 Hz</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+      <div class="metric"><div class="metric-label">Nyquist (f<sub>c</sub>/2)</div><div class="metric-value" id="w2_nyq">1000 Hz</div></div>
+      <div class="metric"><div class="metric-label">Oversampling</div><div class="metric-value" id="w2_over">10×</div></div>
+      <div class="metric"><div class="metric-label">Stato</div><div class="metric-value" id="w2_status" style="font-size:14px;">Sicuro</div></div>
+    </div>
+
+    <div class="w-legend">
+      <div class="leg-item"><div class="leg-swatch" style="background:rgba(226,75,74,0.4);"></div>zona aliasing</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:rgba(239,159,39,0.4);"></div>zona rischiosa</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:rgba(99,153,34,0.4);"></div>zona sicura</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#1e64b4;width:8px;height:8px;border-radius:50%;"></div>punto corrente</div>
+    </div>
+
+    <div style="position:relative;width:100%;height:340px;">
+      <canvas id="w2_main" role="img" aria-label="Piano frequenza campionamento vs frequenza segnale"></canvas>
+    </div>
+
+    <div style="position:relative;width:100%;height:180px;margin-top:12px;">
+      <canvas id="w2_wave" role="img" aria-label="Segnale nel tempo"></canvas>
+    </div>
+
+    <div class="w-infobox" id="w2_info">—</div>
+  </div>
+</section>
+
+<!-- ── S6 ── -->
+<section id="s6">
+  <h2>7. Quantizzazione</h2>
+
+  <h3>Il processo di arrotondamento</h3>
+  <p>Una volta campionato il segnale, ogni valore misurato deve essere <strong>approssimato</strong> a uno dei livelli permessi dall'ADC. L'insieme dei livelli permessi è \(\mathcal{X} = \{a_1, a_2, \ldots, a_k\}\).</p>
+  <p>La regola di quantizzazione sceglie il livello più vicino al valore reale:</p>
+  <div class="math-block">$$x^*(t_0) = \operatorname*{arg\,min}_{a \in \mathcal{X}} \|x(t_0) - a\|$$</div>
+
+  <div class="box example">
+    <div class="box-title">Esempio numerico</div>
+    Segnale reale: \(x(t_0) = 2.73\,\mu\text{V}\). Livelli disponibili: \(\ldots,\, 2.5,\, 3.0,\, \ldots\)
+    $$|2.73 - 2.5| = 0.23 \qquad |2.73 - 3.0| = 0.27$$
+    Poiché \(0.23 &lt; 0.27\), il valore registrato è \(x^*(t_0) = 2.5\,\mu\text{V}\).
+  </div>
+
+  <h3>Il rumore di quantizzazione</h3>
+  <p>L'errore introdotto è \(n(t) = x(t) - x^*(t)\). Il parametro chiave è \(V_{\text{LSB}}\) (Least Significant Bit), cioè la distanza tra due livelli consecutivi. L'errore è distribuito <strong>uniformemente</strong>:</p>
+  <div class="math-block">$$n(t) \sim \mathcal{U}\!\left[-\tfrac{V_{\text{LSB}}}{2},\, +\tfrac{V_{\text{LSB}}}{2}\right]$$</div>
+  <p>Da questa distribuzione uniforme si ricavano:</p>
+  <ul>
+    <li><strong>Valore atteso</strong> (media): \(E[n] = 0\) — l'errore è in media nullo, senza bias.</li>
+    <li><strong>Deviazione standard</strong>: $$\sigma_q = \frac{V_{\text{LSB}}}{\sqrt{12}} \approx 0.29\, V_{\text{LSB}}$$</li>
+  </ul>
+
+  <h3>La relazione tra bit e risoluzione</h3>
+  <p>Se il convertitore usa \(N\) bit, il numero di livelli permessi è \(2^N\). Se il segnale ha un range totale \(R\):</p>
+  <div class="math-block">$$V_{\text{LSB}} = \frac{R}{2^N}$$</div>
+
+  <div class="box example">
+    <div class="box-title">Esempio numerico</div>
+    Segnale nell'intervallo \([0,\, 14]\,\text{mV}\), ADC a 8 bit:
+    $$V_{\text{LSB}} = \frac{14}{2^8} = \frac{14}{256} \approx 0.055\,\text{mV}$$
+    Raddoppiare i bit (da 8 a 16) riduce \(V_{\text{LSB}}\) di un fattore \(2^8 = 256\), riducendo il rumore di \(\sqrt{256} = 16\) volte.
+  </div>
+
+  <h3>Il rumore totale del segnale</h3>
+  <p>Il segnale neurale porta già con sé un rumore di fondo \(\sigma_{\text{signal}}\). Poiché i due rumori sono <strong>statisticamente indipendenti</strong>, le varianze si sommano:</p>
+  <div class="math-block boxed">$$\boxed{\sigma_{\text{tot}} = \sqrt{\sigma_{\text{signal}}^2 + \sigma_q^2}}$$</div>
+
+  <div class="box key">
+    <strong>Regola pratica</strong>: ha senso investire in un ADC ad alta risoluzione solo se \(\sigma_q \ll \sigma_{\text{signal}}\). Se il rumore biologico è già 10 μV e \(\sigma_q = 5\,\mu\text{V}\), il rumore totale è \(\sqrt{100+25} \approx 11.2\,\mu\text{V}\): un miglioramento modesto del 12%. Se invece \(\sigma_q = 0.1\,\mu\text{V}\), il contributo è trascurabile.
+  </div>
+</section>
+
+<!-- ── S_SPECTRAL ── -->
+<section id="s_spectral">
+  <h2>8. Analisi Spettrale (DFT)</h2>
+  <p>L'analisi spettrale permette di passare dal dominio del tempo al dominio della frequenza, rivelando <strong>quali frequenze</strong> sono presenti nel segnale e con quale ampiezza. In neuroingegneria lavoreremo sempre con segnali campionati e a durata limitata, quindi useremo la <strong>DFT (Discrete Fourier Transform)</strong>.</p>
+
+  <h3 id="s_dft">8.1 La DFT</h3>
+  <p>La DFT mappa N campioni temporali \(x[n]\) in N coefficienti complessi \(X[m]\), ognuno dei quali rappresenta ampiezza e fase di una specifica frequenza:</p>
+  <div class="math-block boxed">$$X[m] = \sum_{n=0}^{N-1} x[n]\, e^{-j2\pi mn/N}$$</div>
+  <p>La trasformata inversa (IDFT) ricostruisce il segnale dal dominio della frequenza:</p>
+  <div class="math-block">$$x[n] = \frac{1}{N}\sum_{m=0}^{N-1} X[m]\, e^{j2\pi mn/N}$$</div>
+
+  <div class="box info">
+    <div class="box-title">Interpretazione geometrica</div>
+    Il coefficiente \(X[m]\) è il <strong>prodotto scalare</strong> tra il segnale \(x[n]\) e l'armonica di frequenza \(m\). Misura quanto quella frequenza è presente nel segnale. Il segno \(-\) nell'esponenziale prende il complesso coniugato dell'armonica, realizzando il prodotto scalare nello spazio delle funzioni periodiche.
+  </div>
+
+  <h3 id="s_relations">8.2 Relazioni fondamentali T / T<sub>S</sub> / &Delta;f / f<sub>S</sub></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Simbolo</th><th>Significato</th><th>Relazione</th></tr>
+      <tr><td>\(T\)</td><td>Durata totale del segnale (periodo)</td><td>\(T = N \cdot T_S\)</td></tr>
+      <tr><td>\(T_S\)</td><td>Periodo di campionamento</td><td>\(T_S = 1/f_S\)</td></tr>
+      <tr><td>\(N\)</td><td>Numero totale di campioni</td><td>\(N = T / T_S\)</td></tr>
+      <tr><td>\(\Delta f\)</td><td>Risoluzione frequenziale (distanza tra bin)</td><td>\(\Delta f = 1/T = 1/(N \cdot T_S)\)</td></tr>
+      <tr><td>\(f_S\)</td><td>Frequenza di campionamento</td><td>\(f_S = 1/T_S\)</td></tr>
+    </table>
+  </div>
+  <div class="box key">
+    <strong>Trade-off chiave:</strong> per avere buona risoluzione frequenziale (&Delta;f piccolo) serve un segnale <em>lungo</em> (T grande). Per coprire frequenze alte serve campionare <em>veloce</em> (f<sub>S</sub> grande). Le due esigenze sono indipendenti ma entrambe aumentano N.
+  </div>
+
+  <h3>8.3 Spettro di ampiezza e fase</h3>
+  <p>La DFT produce coefficienti complessi. Si visualizzano con due grafici:</p>
+  <ul>
+    <li><strong>Spettro di ampiezza</strong> \(|X[m]|\): simmetrico rispetto a \(f=0\) per segnali reali.</li>
+    <li><strong>Spettro di fase</strong> \(\angle X[m]\): antisimmetrico per segnali reali.</li>
+  </ul>
+  <p>Poiché per un segnale reale vale \(X(f) = X^*(-f)\), la metà \(f &lt; 0\) non aggiunge informazione — in pratica si mostrano solo le frequenze \(f \geq 0\).</p>
+
+  <h3 id="s_zeropad">8.4 Zero Padding</h3>
+  <div class="box info">
+    <div class="box-title">Definizione — Zero Padding</div>
+    Aggiungere zeri in coda al segnale aumenta <em>artificialmente</em> la risoluzione visiva dello spettro, senza aggiungere informazione reale. &Egrave; un miglioramento puramente visivo.
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th></th><th>Senza zero padding</th><th>Con zero padding (T &times; 4)</th></tr>
+      <tr><td>Durata T</td><td>0.5 s</td><td>2 s</td></tr>
+      <tr><td>Campioni aggiunti</td><td>—</td><td>1500 zeri</td></tr>
+      <tr><td>Risoluzione &Delta;f</td><td>2 Hz</td><td>0.5 Hz</td></tr>
+      <tr><td>Informazione reale</td><td>Identica</td><td>Identica</td></tr>
+    </table>
+  </div>
+
+  <h3 id="s_windowing">8.5 Windowing e Leakage Spettrale</h3>
+  <p>Registrare un segnale per un tempo finito equivale a moltiplicarlo per una <strong>finestra rettangolare</strong> \(w(t)\). Nel dominio della frequenza (moltiplicazione nel tempo = convoluzione in frequenza):</p>
+  <div class="math-block">$$x'(t) = x(t) \cdot w(t) \;\xleftrightarrow{\mathcal{F}}\; X'(f) = X(f) * W(f)$$</div>
+  <p>La trasformata di una finestra rettangolare &egrave; una <strong>sinc</strong>. Convolvere lo spettro con una sinc fa "spalmare" la potenza di ogni componente sulle frequenze vicine: questo &egrave; il <strong>leakage spettrale</strong>.</p>
+
+  <div class="box warning">
+    <div class="box-title">&#9888; Perch&eacute; la finestra rettangolare causa leakage</div>
+    I bordi netti introducono <strong>discontinuit&agrave;</strong> nel segnale registrato. Le discontinuit&agrave; generano energia ad alte frequenze che non era presente nell'originale: <em>"Discontinuity introduces energy at new frequencies"</em> (Obs. 6.2.1).
+  </div>
+
+  <p>La soluzione &egrave; usare <strong>finestre non rettangolari</strong> (Hamming, Blackman, Hann) che partono e finiscono da zero con transizioni morbide, eliminando le discontinuit&agrave; ai bordi.</p>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Parametro</th><th>Effetto</th><th>Trade-off</th></tr>
+      <tr>
+        <td><strong>Lobo principale</strong></td>
+        <td>Pi&ugrave; stretto = migliore risoluzione (si distinguono frequenze vicine)</td>
+        <td>Non si pu&ograve; restringere senza allargare i lobi secondari</td>
+      </tr>
+      <tr>
+        <td><strong>Lobi secondari</strong></td>
+        <td>Pi&ugrave; bassi = meno leakage (la potenza non si spande)</td>
+        <td>Non si possono abbassare senza allargare il lobo principale</td>
+      </tr>
+    </table>
+  </div>
+  <div class="box key">
+    <strong>Trade-off fondamentale:</strong> &egrave; impossibile minimizzare contemporaneamente la larghezza del lobo principale (risoluzione) e l'ampiezza dei lobi secondari (leakage). Ogni finestra &egrave; un compromesso diverso.
+  </div>
+
+  <h3 id="s_welch">8.6 Segnali Stocastici &mdash; Periodogramma e Metodo di Welch</h3>
+  <div class="box info">
+    <div class="box-title">Power Spectrum (Densit&agrave; Spettrale di Potenza)</div>
+    <p>La PSD descrive la potenza del segnale in ogni banda di frequenza. Stima di base &mdash; il <strong>periodogramma</strong>:</p>
+    <div class="math-block" style="margin:.4rem 0">$$PS(f) = |DFT(x(t))|^2$$</div>
+  </div>
+  <p>Il periodogramma &egrave; uno stimatore <strong>non consistente</strong>: anche con segnali pi&ugrave; lunghi, la varianza della stima non diminuisce. Il <strong>metodo di Welch</strong> risolve questo problema mediando pi&ugrave; periodogrammi:</p>
+  <div class="box example">
+    <div class="box-title">Metodo di Welch &mdash; procedura</div>
+    <ol style="margin:.4rem 0 0;padding-left:1.2rem">
+      <li>Prendi un segmento breve di lunghezza \(n_{samples}\).</li>
+      <li>Applica una funzione di windowing \(win(t)\).</li>
+      <li>Calcola il periodogramma finestratto \(|DFT(win \cdot x)|^2\) e memorizzalo.</li>
+      <li>Sposta la finestra (con o senza sovrapposizione) e ripeti fino alla fine del segnale.</li>
+      <li>Calcola la <strong>media</strong> di tutti i periodogrammi.</li>
+    </ol>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Parametro</th><th>Effetto</th></tr>
+      <tr><td>Risoluzione &Delta;f</td><td>\(\Delta f \propto 1/n_{samples}\) &mdash; dipende dalla lunghezza del segmento</td></tr>
+      <tr><td>Riduzione variabilit&agrave;</td><td>Fattore \(\sqrt{n_{samp}}\) mediando \(n_{samp}\) segmenti indipendenti</td></tr>
+      <tr><td>Segmenti sovrapposti</td><td>CLT non si applica direttamente, ma la varianza si riduce comunque parzialmente</td></tr>
+    </table>
+  </div>
+  <div class="box info">
+    <div class="box-title">Spettrogramma (STFT) per segnali non stazionari</div>
+    Quando le propriet&agrave; spettrali del segnale cambiano nel tempo (segnale <strong>non stazionario</strong>), la PSD globale non &egrave; rappresentativa. Si usa la <strong>Short-Time Fourier Transform (STFT)</strong>: si calcola la DFT su finestre temporali brevi sovrapposte. Ogni colonna verticale dello spettrogramma &egrave; uno spettro istantaneo.
+  </div>
+</section>
+
+<!-- ── S_FILTERS ── -->
+<section id="s_filters">
+  <h2>9. Filtri Digitali</h2>
+  <p>Un filtro serve a <strong>separare il segnale utile dal rumore</strong>. Segnale e rumore occupano spesso bande di frequenza diverse: il filtro lascia passare le frequenze di interesse e attenua le altre, migliorando il rapporto segnale-rumore (SNR).</p>
+
+  <h3>9.1 Le quattro famiglie di filtri</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Tipo</th><th>Cosa lascia passare</th><th>Applicazione tipica EEG</th></tr>
+      <tr><td><strong>Low-pass</strong></td><td>Frequenze sotto f<sub>c</sub></td><td>Eliminare rumore ad alta frequenza</td></tr>
+      <tr><td><strong>High-pass</strong></td><td>Frequenze sopra f<sub>c</sub></td><td>Rimuovere deriva lenta (DC drift)</td></tr>
+      <tr><td><strong>Band-pass</strong></td><td>Banda [f<sub>1</sub>, f<sub>2</sub>]</td><td>Isolare onde &alpha; (8&ndash;13 Hz) o &beta; (13&ndash;30 Hz)</td></tr>
+      <tr><td><strong>Band-stop (notch)</strong></td><td>Tutto tranne una banda</td><td>Eliminare interferenza a 50 Hz</td></tr>
+    </table>
+  </div>
+
+  <h3>9.2 Propriet&agrave; di un buon filtro</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Propriet&agrave;</th><th>Cosa misura</th><th>Ideale</th></tr>
+      <tr><td><strong>Roll-off</strong></td><td>Velocit&agrave; di transizione passband&rarr;stopband</td><td>Pi&ugrave; ripido possibile</td></tr>
+      <tr><td><strong>Passband ripple</strong></td><td>Variazioni di ampiezza nella banda passante</td><td>Zero &mdash; il segnale utile deve passare inalterato</td></tr>
+      <tr><td><strong>Stopband attenuation</strong></td><td>Attenuazione delle frequenze bloccate</td><td>Massima possibile</td></tr>
+    </table>
+  </div>
+  <p>La <strong>cutoff frequency</strong> separa passband da transition band. Nei filtri analogici &egrave; la frequenza alla quale l'ampiezza scende a \(0.707\) volte l'ingresso (&minus;3 dB).</p>
+
+  <h3 id="s_fir_iir">9.3 FIR vs IIR</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th></th><th>FIR (Finite Impulse Response)</th><th>IIR (Infinite Impulse Response)</th></tr>
+      <tr><td><strong>Formula</strong></td>
+          <td>\(y[i] = \sum_{k=0}^{N} b_k\, x[i-k]\)</td>
+          <td>\(y[i] = \sum_{k=0}^{M} b_k\, x[i-k] - \sum_{k=1}^{N} a_k\, y[i-k]\)</td></tr>
+      <tr><td><strong>Dipende da</strong></td><td>Solo ingressi passati</td><td>Ingressi passati + uscite passate (feedback)</td></tr>
+      <tr><td><strong>Stabilit&agrave;</strong></td><td>Sempre stabile (no feedback)</td><td>Pu&ograve; essere instabile</td></tr>
+      <tr><td><strong>Efficienza</strong></td><td>Meno efficiente</td><td>Pi&ugrave; efficiente a parit&agrave; di roll-off</td></tr>
+      <tr><td><strong>Design methods</strong></td><td>Windowed sinc, minimax</td><td>Butterworth, Chebyshev (I/II), Ellittico</td></tr>
+    </table>
+  </div>
+  <div class="box info">
+    <div class="box-title">L'ordine del filtro</div>
+    L'ordine &egrave; \(\max(N, M)\) &mdash; il numero di campioni recenti usati per calcolare l'uscita. Ordine pi&ugrave; alto = roll-off pi&ugrave; ripido, ma anche maggiore latenza computazionale. Il filtro RC analogico &egrave; il pi&ugrave; semplice filtro di Butterworth del primo ordine.
+  </div>
+  <div class="box example">
+    <div class="box-title">Effetti di un filtro low-pass su un segnale EEG</div>
+    Applicando un filtro low-pass con cutoff a 30 Hz:
+    <ul style="margin:.4rem 0 0;padding-left:1.2rem">
+      <li>Componenti &le; 20 Hz passano <strong>inalterate</strong> (passband).</li>
+      <li>Sopra 30 Hz inizia l'attenuazione (transition band).</li>
+      <li>Il segnale appare pi&ugrave; "liscio" &mdash; le oscillazioni rapide sono attenuate.</li>
+      <li>Si osserva uno <strong>shift temporale</strong> (ritardo di fase) &mdash; effetto intrinseco dei filtri causali.</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ── S7 ── -->
+<section id="s7">
+  <h2>10. Schema riassuntivo</h2>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Concetto</th><th>Cosa introduce</th><th>Come si riduce</th></tr>
+      <tr>
+        <td><strong style="color:var(--primary)">Campionamento</strong></td>
+        <td>Potenziale perdita di informazione (aliasing) se \(f_C &lt; 2f_m\)</td>
+        <td>Oversampling; filtro anti-aliasing prima dell'ADC</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--primary)">Quantizzazione</strong></td>
+        <td>Rumore di quantizzazione \(\sigma_q \approx 0.29\,V_{\text{LSB}}\)</td>
+        <td>Aumentare il numero di bit (\(V_{\text{LSB}}\) si riduce)</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--primary)">Aliasing</strong></td>
+        <td>Distorsione irreversibile per specchiamento + sovrapposizione</td>
+        <td>Rispettare Nyquist: \(f_C \geq 2f_m\)</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--primary)">Randomness / Rumore</strong></td>
+        <td>Varianza nella stima dei parametri del segnale</td>
+        <td>Media di N trial: SNR migliora di \(\sqrt{N}\) (CLT)</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--primary)">Leakage spettrale</strong></td>
+        <td>Dispersione della potenza nelle frequenze vicine (windowing)</td>
+        <td>Finestre non rettangolari (Hamming, Blackman)</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--primary)">Stima PSD (periodogramma)</strong></td>
+        <td>Alta varianza della stima &mdash; non consistente</td>
+        <td>Metodo di Welch: media di \(n\) segmenti, varianza ridotta di \(\sqrt{n}\)</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--primary)">Filtro digitale</strong></td>
+        <td>Trade-off roll-off / ripple / attenuazione</td>
+        <td>FIR (stabile, semplice) o IIR (efficiente, feedback)</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3>La sequenza corretta in un sistema di acquisizione</h3>
+  <div class="pipeline">
+    <div class="pipe-node">
+      x(t)
+      <span class="pipe-sub">segnale neurale<br>analogico</span>
+    </div>
+    <div class="pipe-connector">
+      <div class="pipe-line"></div>
+      <span class="pipe-label">filtro anti-aliasing<br>(passa-basso)</span>
+    </div>
+    <div class="pipe-node teal">
+      x̃(t)
+      <span class="pipe-sub">banda limitata<br>a f<sub>m</sub></span>
+    </div>
+    <div class="pipe-connector">
+      <div class="pipe-line"></div>
+      <span class="pipe-label">ADC<br>f<sub>C</sub> ≥ 2f<sub>m</sub></span>
+    </div>
+    <div class="pipe-node">
+      x*[n]
+      <span class="pipe-sub">campionato<br>discreto nel tempo</span>
+    </div>
+    <div class="pipe-connector">
+      <div class="pipe-line"></div>
+      <span class="pipe-label">quantizzazione<br>N bit</span>
+    </div>
+    <div class="pipe-node accent">
+      x<sub>q</sub>[n]
+      <span class="pipe-sub">segnale digitale<br>discreto in ampiezza</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── S8 ── -->
+<section id="s8">
+  <h2>11. Riepilogo delle formule chiave</h2>
+  <div class="table-wrap">
+    <table class="formula-table">
+      <tr><th>Concetto</th><th>Formula</th><th>Note</th></tr>
+
+      <tr><td colspan="3" style="background:var(--primary-light);color:var(--primary);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px">Campionamento &amp; Aliasing</td></tr>
+      <tr><td>Teorema di Nyquist</td><td>\(f_C \geq 2 f_m\)</td><td>Condizione necessaria per evitare l'aliasing</td></tr>
+      <tr><td>Repliche spettrali</td><td>\(X^*(j\omega) = \frac{1}{T_C}\sum_k X(j(\omega - k\omega_C))\)</td><td>Lo spettro si ripete ogni \(\omega_C\), scalato di \(1/T_C\)</td></tr>
+      <tr><td>Filtro di ricostruzione</td><td>\(G_R(j\omega) = T_C\) se \(|\omega| \leq \omega_C/2\), 0 altrove</td><td>Compensa la scala \(1/T_C\) e isola la copia centrale</td></tr>
+      <tr><td>Ricostruzione spettrale</td><td>\(|X| = |G_R| \cdot |X^*|\)</td><td>Vale solo se Nyquist &egrave; rispettato</td></tr>
+      <tr><td>Frequenza alias</td><td>\(f_{\text{alias}} = |f_s - k f_C|\)</td><td>\(k\) intero che minimizza il risultato</td></tr>
+
+      <tr><td colspan="3" style="background:var(--primary-light);color:var(--primary);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px">Quantizzazione</td></tr>
+      <tr><td>Regola di quantizzazione</td><td>\(x^*(t_0) = \arg\min_{a \in \mathcal{X}} |x(t_0) - a|\)</td><td>Arrotondamento al livello pi&ugrave; vicino</td></tr>
+      <tr><td>Risoluzione ADC</td><td>\(V_{\text{LSB}} = \text{range} / 2^N\)</td><td>\(N\) = numero di bit</td></tr>
+      <tr><td>Rumore di quantizzazione</td><td>\(\sigma_q = V_{\text{LSB}} / \sqrt{12}\)</td><td>Distribuzione uniforme su \([-V_{LSB}/2, +V_{LSB}/2]\)</td></tr>
+      <tr><td>Rumore totale</td><td>\(\sigma_{\text{tot}} = \sqrt{\sigma_s^2 + \sigma_q^2}\)</td><td>Rumori statisticamente indipendenti</td></tr>
+
+      <tr><td colspan="3" style="background:var(--primary-light);color:var(--primary);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px">Randomness &amp; Statistica</td></tr>
+      <tr><td>Media campionata</td><td>\(\bar{X} = \frac{1}{N}\sum_{i=0}^{N-1} x_i\)</td><td>Stima di \(\mu_X\); converge con \(N \to \infty\)</td></tr>
+      <tr><td>Varianza campionata</td><td>\(s_X^2 = \frac{1}{N-1}\sum_{i=0}^{N-1}(x_i - \bar{X})^2\)</td><td>Divisione per \(N-1\): stimatore non distorto</td></tr>
+      <tr><td>CLT &mdash; deviazione standard</td><td>\(\sigma_Z = \frac{\sigma_X}{\sqrt{N}}\)</td><td>Media di N variabili: rumore ridotto di \(\sqrt{N}\)</td></tr>
+
+      <tr><td colspan="3" style="background:var(--primary-light);color:var(--primary);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px">Analisi Spettrale (DFT)</td></tr>
+      <tr><td>DFT</td><td>\(X[m] = \sum_{n=0}^{N-1} x[n]\, e^{-j2\pi mn/N}\)</td><td>Da dominio del tempo a dominio della frequenza</td></tr>
+      <tr><td>IDFT</td><td>\(x[n] = \frac{1}{N}\sum_{m=0}^{N-1} X[m]\, e^{j2\pi mn/N}\)</td><td>Ricostruzione dal dominio della frequenza</td></tr>
+      <tr><td>Risoluzione frequenziale</td><td>\(\Delta f = 1/T = 1/(N \cdot T_S)\)</td><td>Segnale pi&ugrave; lungo = bin pi&ugrave; fitti</td></tr>
+      <tr><td>Power Spectrum</td><td>\(PS(f) = |DFT(x(t))|^2\)</td><td>Periodogramma &mdash; non consistente per segnali stocastici</td></tr>
+      <tr><td>Welch &mdash; riduzione varianza</td><td>varianza ridotta di \(\sqrt{n_{samp}}\)</td><td>Mediando \(n_{samp}\) segmenti indipendenti</td></tr>
+
+      <tr><td colspan="3" style="background:var(--primary-light);color:var(--primary);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px">Filtri Digitali</td></tr>
+      <tr><td>FIR</td><td>\(y[i] = \sum_{k=0}^{N} b_k\, x[i-k]\)</td><td>Solo ingressi passati &mdash; sempre stabile</td></tr>
+      <tr><td>IIR</td><td>\(y[i] = \sum_{k=0}^{M} b_k x[i-k] - \sum_{k=1}^{N} a_k y[i-k]\)</td><td>Ingressi + uscite passate (feedback) &mdash; pi&ugrave; efficiente</td></tr>
+      <tr><td>Cutoff (analogico)</td><td>\(|H(f_c)| = 0.707 = 1/\sqrt{2}\)</td><td>&minus;3 dB rispetto alla banda passante</td></tr>
+    </table>
+  </div>
+</section>
+
+<footer style="margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--border);font-family:var(--sans);font-size:12px;color:var(--gray-mid);text-align:center;">
+  Appunti di Signal Processing — Capitolo 6 &nbsp;·&nbsp; Documento ibrido HTML con widget interattivi
+</footer>
+
+</main>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     WIDGET SCRIPTS
+══════════════════════════════════════════════ -->
+<script>
+// ── Widget 1: aliasing nel tempo ──
+(function(){
+  const fmEl = document.getElementById('w1_fm');
+  const fcEl = document.getElementById('w1_fc');
+  const fmValEl = document.getElementById('w1_fm_val');
+  const fcValEl = document.getElementById('w1_fc_val');
+  const infoEl = document.getElementById('w1_info');
+
+  const ctx = document.getElementById('w1_canvas').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label: 'originale', data: [], type: 'line', borderColor: '#1e64b4', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.3 },
+        { label: 'alias', data: [], type: 'line', borderColor: '#d85a30', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.3, borderDash: [6,3] },
+        { label: 'campioni', data: [], backgroundColor: '#0f6e56', pointRadius: 5, showLine: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { type:'linear', title:{ display:true, text:'tempo (ms)', font:{size:11} }, ticks:{color:'#888'}, grid:{color:'rgba(0,0,0,0.06)'} },
+        y: { min:-1.3, max:1.3, ticks:{color:'#888'}, grid:{color:'rgba(0,0,0,0.06)'} }
+      }
+    }
+  });
+
+  function update(){
+    const fm = parseInt(fmEl.value), fc = parseInt(fcEl.value);
+    fmValEl.textContent = fm + ' Hz';
+    fcValEl.textContent = fc + ' Hz';
+    const dur = 0.05, pts = 500;
+    const orig = [], samp = [], alias = [];
+    for(let i=0;i<=pts;i++){ const t=(i/pts)*dur; orig.push({x:+(t*1000).toFixed(3),y:+Math.sin(2*Math.PI*fm*t).toFixed(4)}); }
+    const ns = Math.floor(fc*dur);
+    for(let k=0;k<=ns;k++){ const t=k/fc; if(t<=dur) samp.push({x:+(t*1000).toFixed(3),y:+Math.sin(2*Math.PI*fm*t).toFixed(4)}); }
+    const fA = Math.abs(fm - Math.round(fm/fc)*fc);
+    for(let i=0;i<=pts;i++){ const t=(i/pts)*dur; alias.push({x:+(t*1000).toFixed(3),y:+Math.sin(2*Math.PI*fA*t).toFixed(4)}); }
+    chart.data.datasets[0].data = orig;
+    chart.data.datasets[1].data = alias;
+    chart.data.datasets[2].data = samp;
+    chart.update('none');
+    if(fc < 2*fm){
+      infoEl.style.borderLeftColor='#d85a30';
+      infoEl.innerHTML=`<strong style="color:#a32d2d">Aliasing attivo.</strong> f<sub>Nyq</sub> = ${Math.round(fc/2)} Hz &lt; f<sub>m</sub> = ${fm} Hz. Il segnale viene percepito come un'onda a <strong>${fA} Hz</strong> — frequenza inesistente nel segnale originale.`;
+    } else {
+      infoEl.style.borderLeftColor='#0f6e56';
+      infoEl.innerHTML=`<strong style="color:#0f6e56">Nyquist rispettato ✓</strong> f<sub>c</sub> = ${fc} Hz ≥ 2 × ${fm} Hz. I campioni descrivono correttamente il segnale originale.`;
+    }
+  }
+  fmEl.addEventListener('input', update);
+  fcEl.addEventListener('input', update);
+  update();
+})();
+
+// ── Widget 2: piano fc vs fm ──
+(function(){
+  const fmEl = document.getElementById('w2_fm');
+  const fcEl = document.getElementById('w2_fc');
+  const fmValEl = document.getElementById('w2_fm_val');
+  const fcValEl = document.getElementById('w2_fc_val');
+  const nyqEl = document.getElementById('w2_nyq');
+  const overEl = document.getElementById('w2_over');
+  const statusEl = document.getElementById('w2_status');
+  const infoEl = document.getElementById('w2_info');
+  const MAX_FC = 3000, MAX_FM = 500;
+  const gc = document.getElementById('w2_main').getContext('2d');
+  const wc = document.getElementById('w2_wave').getContext('2d');
+
+  const fcVals = [];
+  for(let v=0;v<=MAX_FC;v+=50) fcVals.push(v);
+  const nyqLine = fcVals.map(v=>({x:v,y:v/2}));
+  const riskyLine = fcVals.map(v=>({x:v,y:v/4}));
+
+  const mainChart = new Chart(gc, {
+    type:'scatter',
+    data:{
+      datasets:[
+        { label:'Limite Nyquist', data:nyqLine, type:'line', borderColor:'#d85a30', borderWidth:2, pointRadius:0, fill:false, tension:0, order:1 },
+        { label:'Soglia 4×', data:riskyLine, type:'line', borderColor:'#e89a44', borderWidth:1.5, pointRadius:0, fill:false, tension:0, borderDash:[6,4], order:2 },
+        { label:'Punto corrente', data:[{x:2000,y:200}], backgroundColor:'#1e64b4', pointRadius:9, order:0 }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ type:'linear', min:0, max:MAX_FC, title:{display:true,text:'Frequenza campionamento f_c (Hz)',font:{size:11}}, grid:{color:'rgba(0,0,0,0.06)'}, ticks:{color:'#888',stepSize:500} },
+        y:{ type:'linear', min:0, max:MAX_FM, title:{display:true,text:'Frequenza segnale f_m (Hz)',font:{size:11}}, grid:{color:'rgba(0,0,0,0.06)'}, ticks:{color:'#888',stepSize:100} }
+      }
+    },
+    plugins:[{
+      id:'zones',
+      beforeDatasetsDraw(chart){
+        const {ctx,chartArea:{left,right,top,bottom},scales:{x,y}} = chart;
+        const toX=v=>x.getPixelForValue(v), toY=v=>y.getPixelForValue(v);
+        ctx.save(); ctx.beginPath(); ctx.rect(left,top,right-left,bottom-top); ctx.clip();
+        const S=60, fcS=MAX_FC/S, fmS=MAX_FM/S;
+        for(let fc=0;fc<=MAX_FC;fc+=fcS){
+          for(let fm=0;fm<=MAX_FM;fm+=fmS){
+            const px=toX(fc),py=toY(fm),pw=toX(fc+fcS)-px,ph=toY(fm+fmS)-py;
+            ctx.fillStyle = fc<2*fm?'rgba(226,75,74,0.18)':fc<4*fm?'rgba(239,159,39,0.14)':'rgba(99,153,34,0.11)';
+            ctx.fillRect(px,py,pw,ph);
+          }
+        }
+        const py200=toY(200);
+        ctx.strokeStyle='rgba(30,100,180,0.4)'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(left,py200); ctx.lineTo(right,py200); ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle='rgba(30,100,180,0.7)'; ctx.font='11px DM Sans,sans-serif';
+        ctx.fillText('ripple epilettico 200 Hz',left+6,py200-5);
+        ctx.restore();
+      }
+    }]
+  });
+
+  const waveChart = new Chart(wc, {
+    type:'scatter',
+    data:{
+      datasets:[
+        { label:'originale', data:[], type:'line', borderColor:'#1e64b4', borderWidth:2, pointRadius:0, fill:false, tension:0.3 },
+        { label:'alias', data:[], type:'line', borderColor:'#d85a30', borderWidth:2, pointRadius:0, fill:false, tension:0.3, borderDash:[6,3] },
+        { label:'campioni', data:[], backgroundColor:'#0f6e56', pointRadius:4, showLine:false }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{type:'linear',title:{display:true,text:'tempo (ms)',font:{size:11}},ticks:{color:'#888'},grid:{color:'rgba(0,0,0,0.06)'}},
+        y:{min:-1.3,max:1.3,ticks:{color:'#888'},grid:{color:'rgba(0,0,0,0.06)'}}
+      }
+    }
+  });
+
+  function update(){
+    const fm=parseInt(fmEl.value), fc=parseInt(fcEl.value);
+    fmValEl.textContent=fm+' Hz'; fcValEl.textContent=fc+' Hz';
+    nyqEl.textContent=Math.round(fc/2)+' Hz';
+    overEl.textContent=(fc/fm).toFixed(1)+'×';
+    mainChart.data.datasets[2].data=[{x:fc,y:fm}];
+    mainChart.update('none');
+
+    const dur=0.05,pts=500;
+    const orig=[],samp=[],alias=[];
+    for(let i=0;i<=pts;i++){const t=(i/pts)*dur;orig.push({x:+(t*1000).toFixed(3),y:+Math.sin(2*Math.PI*fm*t).toFixed(4)});}
+    const ns=Math.floor(fc*dur);
+    for(let k=0;k<=ns;k++){const t=k/fc;if(t<=dur)samp.push({x:+(t*1000).toFixed(3),y:+Math.sin(2*Math.PI*fm*t).toFixed(4)});}
+    const fA=Math.abs(fm-Math.round(fm/fc)*fc);
+    for(let i=0;i<=pts;i++){const t=(i/pts)*dur;alias.push({x:+(t*1000).toFixed(3),y:+Math.sin(2*Math.PI*fA*t).toFixed(4)});}
+    waveChart.data.datasets[0].data=orig;
+    waveChart.data.datasets[1].data=alias;
+    waveChart.data.datasets[2].data=samp;
+    waveChart.update('none');
+
+    const nyquist=fc/2, safe=fc>=4*fm, ali=fc<2*fm;
+    if(ali){ statusEl.textContent='Aliasing!'; statusEl.style.color='#a32d2d'; infoEl.style.borderLeftColor='#d85a30'; infoEl.innerHTML=`<strong style="color:#a32d2d">Aliasing attivo.</strong> f<sub>Nyq</sub> = ${Math.round(nyquist)} Hz &lt; f<sub>m</sub> = ${fm} Hz. Il segnale appare come un'onda a ${fA} Hz.`; }
+    else if(!safe){ statusEl.textContent='Margine stretto'; statusEl.style.color='#854f0b'; infoEl.style.borderLeftColor='#e89a44'; infoEl.innerHTML=`<strong style="color:#854f0b">Zona rischiosa.</strong> Nyquist rispettato, ma il margine è stretto. Consigliato almeno 4× oversampling → f<sub>c</sub> ≥ ${4*fm} Hz.`; }
+    else { statusEl.textContent='Sicuro'; statusEl.style.color='#0f6e56'; infoEl.style.borderLeftColor='#0f6e56'; infoEl.innerHTML=`<strong style="color:#0f6e56">Zona sicura.</strong> Oversampling ${(fc/fm).toFixed(1)}×. Margine di ${Math.round(nyquist-fm)} Hz sopra il segnale utile.`; }
+  }
+  fmEl.addEventListener('input',update);
+  fcEl.addEventListener('input',update);
+  update();
+})();
+
+// ── Widget 3: repliche spettrali ──
+(function(){
+  const MAXF=22, N=400;
+  const freqs=Array.from({length:N},(_,i)=>-MAXF+(i/(N-1))*2*MAXF);
+  function tri(f,c,w){const d=Math.abs(f-c);return d<w?1-d/w:0;}
+  function buildData(fm,fc){
+    const orig=freqs.map(f=>tri(f,0,fm));
+    const samp=freqs.map(f=>{let v=0;for(let k=-6;k<=6;k++)v+=tri(f,k*fc,fm);return v;});
+    const filt=freqs.map(f=>Math.abs(f)<=fc/2?1:0);
+    const recv=freqs.map((f,i)=>filt[i]*samp[i]);
+    return {orig,samp,filt,recv};
+  }
+  const gc1=document.getElementById('sp_c1').getContext('2d');
+  const gc2=document.getElementById('sp_c2').getContext('2d');
+  const gc3=document.getElementById('sp_c3').getContext('2d');
+  const gridC='rgba(128,128,128,0.1)',tickC='rgba(128,128,128,0.65)';
+  function mkChart(ctx,ds){
+    return new Chart(ctx,{type:'line',data:{datasets:ds.map(d=>({data:freqs.map((f,i)=>({x:f,y:d.y[i]})),borderColor:d.color,borderWidth:d.bw||2,pointRadius:0,fill:d.fill||false,backgroundColor:d.bg||'transparent',tension:0,borderDash:d.dash||[]}))},options:{responsive:true,maintainAspectRatio:false,animation:{duration:150},plugins:{legend:{display:false}},scales:{x:{type:'linear',min:-MAXF,max:MAXF,grid:{color:gridC},ticks:{color:tickC,font:{size:10},stepSize:5}},y:{min:0,max:1.2,grid:{color:gridC},ticks:{color:tickC,font:{size:10},maxTicksLimit:3}}}}});
+  }
+  let ch1,ch2,ch3;
+  const nyqPlugin={id:'nyq2',afterDraw(chart){
+    if(!chart._showNyq)return;
+    const {ctx,chartArea,scales}=chart;
+    if(!chartArea)return;
+    ctx.save();
+    [-chart._fc/2,chart._fc/2].forEach(x=>{
+      const px=scales.x.getPixelForValue(x);
+      ctx.strokeStyle='rgba(128,128,128,0.4)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(px,chartArea.top);ctx.lineTo(px,chartArea.bottom);ctx.stroke();
+    });
+    ctx.setLineDash([]);ctx.restore();
+  }};
+  Chart.register(nyqPlugin);
+  function update(){
+    const fm=parseInt(document.getElementById('sp_fm').value);
+    const fc=parseInt(document.getElementById('sp_fc').value);
+    document.getElementById('sp_fm_v').textContent=fm+' Hz';
+    document.getElementById('sp_fc_v').textContent=fc+' Hz';
+    const {orig,samp,filt,recv}=buildData(fm,fc);
+    const aliasing=fc<2*fm;
+    const sc=aliasing?'#E24B4A':'#D85A30', sb=aliasing?'rgba(226,75,74,0.12)':'rgba(216,90,48,0.10)';
+    if(ch1)ch1.destroy();if(ch2)ch2.destroy();if(ch3)ch3.destroy();
+    ch1=mkChart(gc1,[{y:orig,color:'#1e64b4',fill:{target:'origin',above:'rgba(30,100,180,0.15)'},bg:'rgba(30,100,180,0.15)'}]);
+    ch2=mkChart(gc2,[{y:samp,color:sc,fill:{target:'origin',above:sb},bg:sb}]);
+    ch2._showNyq=true;ch2._fc=fc;
+    ch3=mkChart(gc3,[{y:filt,color:'#0f6e56',bw:1.5,dash:[5,3]},{y:recv,color:'#1e64b4',fill:{target:'origin',above:'rgba(30,100,180,0.15)'},bg:'rgba(30,100,180,0.15)',bw:2.5}]);
+    ch3._showNyq=true;ch3._fc=fc;
+    const note=document.getElementById('sp_note');
+    const gap=fc-2*fm;
+    if(aliasing){note.style.borderLeftColor='#d85a30';note.innerHTML='<strong style="color:#993c1d">Aliasing!</strong> f<sub>C</sub>='+fc+' Hz &lt; 2f<sub>m</sub>='+2*fm+' Hz. Le repliche si sovrappongono alla copia centrale (pannello ②, zona rossa). Il filtro G<sub>R</sub> non può isolarla: recupero impossibile.';}
+    else if(gap<fc*0.3){note.style.borderLeftColor='#ba7517';note.innerHTML='<strong style="color:#854f0b">Margine stretto</strong> (gap='+gap+' Hz). Le copie non si toccano, ma un filtro reale inizierebbe ad attenuare il segnale utile vicino al limite di Nyquist.';}
+    else{note.style.borderLeftColor='#0f6e56';note.innerHTML='<strong style="color:#0f6e56">Nyquist rispettato ✓</strong> Gap tra copie='+gap+' Hz. Il filtro G<sub>R</sub> isola perfettamente la copia centrale: lo spettro recuperato (pannello ③, blu) coincide con l\'originale.';}
+  }
+  document.getElementById('sp_fm').addEventListener('input',update);
+  document.getElementById('sp_fc').addEventListener('input',update);
+  update();
+})();
+
+// ── TOC active link on scroll ──
+(function(){
+  const links = document.querySelectorAll('.toc a');
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ links.forEach(l=>l.classList.remove('active')); const l=document.querySelector(`.toc a[href="#${e.target.id}"]`); if(l) l.classList.add('active'); } });
+  },{threshold:0.3});
+  document.querySelectorAll('section[id],h3[id]').forEach(el=>observer.observe(el));
+})();
+</script>
+</body>
+</html>

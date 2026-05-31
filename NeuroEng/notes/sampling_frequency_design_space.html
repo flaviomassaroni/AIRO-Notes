@@ -1,0 +1,359 @@
+
+<style>
+  body { margin: 0; }
+  .ctrl { display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:13px; color:var(--color-text-secondary); }
+  .ctrl input[type=range] { flex:1; }
+  .val { font-weight:500; min-width:70px; color:var(--color-text-primary); font-size:13px; }
+  .legend { display:flex; flex-wrap:wrap; gap:16px; font-size:12px; margin:10px 0 6px; color:var(--color-text-secondary); }
+  .leg { display:flex; align-items:center; gap:5px; }
+  .legbox { width:14px; height:10px; border-radius:2px; }
+  .status-pill { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:500; margin-left:6px; }
+  canvas { width:100% !important; display:block; }
+</style>
+
+<h2 class="sr-only">Piano xy frequenza campionamento vs frequenza del segnale: mostra le zone di aliasing, sicurezza, e oversampling con il ripple epilettico come esempio</h2>
+
+<div style="padding:1rem 0 0;">
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+    <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px;">
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:2px;">Frequenza segnale (f<sub>m</sub>)</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="range" id="fm" min="10" max="500" value="200" step="10" style="flex:1;">
+        <span class="val" id="fm-val">200 Hz</span>
+      </div>
+    </div>
+    <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px;">
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:2px;">Freq. campionamento (f<sub>c</sub>)</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <input type="range" id="fc" min="50" max="3000" value="2000" step="50" style="flex:1;">
+        <span class="val" id="fc-val">2000 Hz</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px;">
+    <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:8px 12px; text-align:center;">
+      <div style="font-size:11px; color:var(--color-text-secondary);">Nyquist (f<sub>c</sub>/2)</div>
+      <div style="font-size:18px; font-weight:500; color:var(--color-text-primary);" id="nyq-val">1000 Hz</div>
+    </div>
+    <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:8px 12px; text-align:center;">
+      <div style="font-size:11px; color:var(--color-text-secondary);">Oversampling factor</div>
+      <div style="font-size:18px; font-weight:500; color:var(--color-text-primary);" id="over-val">10×</div>
+    </div>
+    <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:8px 12px; text-align:center;">
+      <div style="font-size:11px; color:var(--color-text-secondary);">Stato</div>
+      <div style="font-size:14px; font-weight:500;" id="status-val">OK</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="legbox" style="background:#E24B4A;"></div>zona aliasing (f<sub>c</sub> &lt; 2f<sub>m</sub>)</div>
+    <div class="leg"><div class="legbox" style="background:#EF9F27;"></div>zona rischiosa (f<sub>c</sub> &lt; 4f<sub>m</sub>)</div>
+    <div class="leg"><div class="legbox" style="background:#639922;"></div>zona sicura (oversampling)</div>
+    <div class="leg"><div class="legbox" style="background:#378ADD; border-radius:50%;"></div>punto corrente</div>
+  </div>
+
+  <div style="position:relative; width:100%; height:380px;">
+    <canvas id="mainChart" role="img" aria-label="Piano xy frequenza campionamento vs frequenza segnale con zone di aliasing e sicurezza">Diagramma delle zone di aliasing e sicurezza per il campionamento.</canvas>
+  </div>
+
+  <div style="margin-top:12px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px; font-size:13px; color:var(--color-text-secondary); border-left:3px solid #ccc;" id="infobox">
+    Caricamento...
+  </div>
+
+  <div style="margin-top:12px; position:relative; width:100%; height:200px;">
+    <canvas id="waveChart" role="img" aria-label="Confronto segnale originale e campionato nel tempo">Grafico del segnale nel tempo.</canvas>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const fmSlider = document.getElementById('fm');
+const fcSlider = document.getElementById('fc');
+const fmValEl = document.getElementById('fm-val');
+const fcValEl = document.getElementById('fc-val');
+const nyqEl = document.getElementById('nyq-val');
+const overEl = document.getElementById('over-val');
+const statusEl = document.getElementById('status-val');
+const infoEl = document.getElementById('infobox');
+
+const MAX_FC = 3000;
+const MAX_FM = 500;
+
+function makeScatterZone(xMin, xMax, yMin, yMax, steps) {
+  const pts = [];
+  const sx = (xMax - xMin) / steps;
+  const sy = (yMax - yMin) / steps;
+  for (let x = xMin; x <= xMax; x += sx) {
+    for (let y = yMin; y <= yMax; y += sy) {
+      if (y < x / 2) pts.push({ x, y });
+    }
+  }
+  return pts;
+}
+
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)';
+const textColor = isDark ? '#b4b2a9' : '#5f5e5a';
+const axisColor = isDark ? '#888780' : '#888780';
+
+const fcValues = [];
+for (let fc = 0; fc <= MAX_FC; fc += 50) fcValues.push(fc);
+
+const aliasingLine = fcValues.map(fc => ({ x: fc, y: fc / 2 }));
+const riskyLine    = fcValues.map(fc => ({ x: fc, y: fc / 4 }));
+
+const ctx1 = document.getElementById('mainChart').getContext('2d');
+const mainChart = new Chart(ctx1, {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {
+        label: 'Limite Nyquist (f_m = f_c/2)',
+        data: aliasingLine,
+        type: 'line',
+        borderColor: '#E24B4A',
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: false,
+        tension: 0,
+        borderDash: [],
+        order: 1
+      },
+      {
+        label: 'Soglia oversampling 4× (f_m = f_c/4)',
+        data: riskyLine,
+        type: 'line',
+        borderColor: '#EF9F27',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: false,
+        tension: 0,
+        borderDash: [6, 4],
+        order: 2
+      },
+      {
+        label: 'Punto corrente',
+        data: [{ x: 2000, y: 200 }],
+        backgroundColor: '#378ADD',
+        pointRadius: 9,
+        pointHoverRadius: 11,
+        order: 0
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            if (ctx.datasetIndex === 2) {
+              return ` f_c = ${Math.round(ctx.raw.x)} Hz  |  f_m = ${Math.round(ctx.raw.y)} Hz`;
+            }
+            return '';
+          }
+        }
+      },
+      annotation: {}
+    },
+    scales: {
+      x: {
+        type: 'linear',
+        min: 0,
+        max: MAX_FC,
+        title: { display: true, text: 'Frequenza di campionamento f_c (Hz)', color: textColor, font: { size: 12 } },
+        grid: { color: gridColor },
+        ticks: { color: textColor, stepSize: 500 }
+      },
+      y: {
+        type: 'linear',
+        min: 0,
+        max: MAX_FM,
+        title: { display: true, text: 'Frequenza segnale f_m (Hz)', color: textColor, font: { size: 12 } },
+        grid: { color: gridColor },
+        ticks: { color: textColor, stepSize: 100 }
+      }
+    }
+  },
+  plugins: [{
+    id: 'zones',
+    beforeDatasetsDraw(chart) {
+      const { ctx, chartArea: { left, right, top, bottom }, scales: { x, y } } = chart;
+
+      const toX = v => x.getPixelForValue(v);
+      const toY = v => y.getPixelForValue(v);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(left, top, right - left, bottom - top);
+      ctx.clip();
+
+      const steps = 80;
+      const fcStep = MAX_FC / steps;
+      const fmStep = MAX_FM / steps;
+
+      for (let fc = 0; fc <= MAX_FC; fc += fcStep) {
+        for (let fm = 0; fm <= MAX_FM; fm += fmStep) {
+          const px = toX(fc);
+          const py = toY(fm);
+          const pw = toX(fc + fcStep) - px;
+          const ph = toY(fm + fmStep) - py;
+          let color = null;
+          if (fc < 2 * fm) {
+            color = 'rgba(226,75,74,0.18)';
+          } else if (fc < 4 * fm) {
+            color = 'rgba(239,159,39,0.15)';
+          } else {
+            color = 'rgba(99,153,34,0.12)';
+          }
+          ctx.fillStyle = color;
+          ctx.fillRect(px, py, pw, ph);
+        }
+      }
+
+      const fm200 = 200;
+      const py200 = toY(fm200);
+      ctx.strokeStyle = isDark ? 'rgba(175,169,236,0.5)' : 'rgba(83,74,183,0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(left, py200);
+      ctx.lineTo(right, py200);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = isDark ? '#AFA9EC' : '#534AB7';
+      ctx.font = '11px sans-serif';
+      ctx.fillText('ripple epilettico 200 Hz', left + 6, py200 - 5);
+
+      ctx.restore();
+    }
+  }]
+});
+
+const ctx2 = document.getElementById('waveChart').getContext('2d');
+
+function buildWaveData(fm, fc) {
+  const duration = 0.05;
+  const pts = 600;
+  const origData = [], sampData = [], aliasData = [];
+  for (let i = 0; i <= pts; i++) {
+    const t = (i / pts) * duration;
+    origData.push({ x: +(t * 1000).toFixed(3), y: +Math.sin(2 * Math.PI * fm * t).toFixed(4) });
+  }
+  const nSamp = Math.floor(fc * duration);
+  for (let k = 0; k <= nSamp; k++) {
+    const t = k / fc;
+    if (t <= duration) sampData.push({ x: +(t * 1000).toFixed(3), y: +Math.sin(2 * Math.PI * fm * t).toFixed(4) });
+  }
+  const fAlias = Math.abs(fm - Math.round(fm / fc) * fc);
+  for (let i = 0; i <= pts; i++) {
+    const t = (i / pts) * duration;
+    aliasData.push({ x: +(t * 1000).toFixed(3), y: +Math.sin(2 * Math.PI * fAlias * t).toFixed(4) });
+  }
+  return { origData, sampData, aliasData, fAlias };
+}
+
+const waveChart = new Chart(ctx2, {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {
+        label: 'segnale originale',
+        data: [],
+        type: 'line',
+        borderColor: '#378ADD',
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false
+      },
+      {
+        label: 'segnale percepito (alias)',
+        data: [],
+        type: 'line',
+        borderColor: '#E24B4A',
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        borderDash: [6, 3],
+        fill: false
+      },
+      {
+        label: 'campioni',
+        data: [],
+        backgroundColor: '#639922',
+        pointRadius: 5,
+        pointStyle: 'circle',
+        showLine: false
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        type: 'linear',
+        title: { display: true, text: 'tempo (ms)', color: textColor, font: { size: 11 } },
+        grid: { color: gridColor },
+        ticks: { color: textColor }
+      },
+      y: {
+        min: -1.3, max: 1.3,
+        grid: { color: gridColor },
+        ticks: { color: textColor }
+      }
+    }
+  }
+});
+
+function update() {
+  const fm = parseInt(fmSlider.value);
+  const fc = parseInt(fcSlider.value);
+  fmValEl.textContent = fm + ' Hz';
+  fcValEl.textContent = fc + ' Hz';
+  nyqEl.textContent = Math.round(fc / 2) + ' Hz';
+  overEl.textContent = (fc / fm).toFixed(1) + '×';
+
+  mainChart.data.datasets[2].data = [{ x: fc, y: fm }];
+  mainChart.update('none');
+
+  const { origData, sampData, aliasData, fAlias } = buildWaveData(fm, fc);
+  waveChart.data.datasets[0].data = origData;
+  waveChart.data.datasets[1].data = aliasData;
+  waveChart.data.datasets[2].data = sampData;
+  waveChart.update('none');
+
+  const nyquist = fc / 2;
+  const safe = fc >= 4 * fm;
+  const alias = fc < 2 * fm;
+
+  if (alias) {
+    statusEl.textContent = 'Aliasing!';
+    statusEl.style.color = '#A32D2D';
+    infoEl.style.borderLeftColor = '#E24B4A';
+    infoEl.innerHTML = `<strong style="color:var(--color-text-danger)">Aliasing attivo.</strong> La frequenza di Nyquist (${Math.round(nyquist)} Hz) è sotto la frequenza del segnale (${fm} Hz). Il segnale viene "specchiato" come un'onda a ${fAlias} Hz — una frequenza falsa che non esiste nel segnale originale.`;
+  } else if (!safe) {
+    statusEl.textContent = 'Margine stretto';
+    statusEl.style.color = '#854F0B';
+    infoEl.style.borderLeftColor = '#EF9F27';
+    infoEl.innerHTML = `<strong style="color:var(--color-text-warning)">Zona rischiosa.</strong> Nyquist rispettato (${Math.round(nyquist)} Hz &gt; ${fm} Hz), ma il margine è stretto. Un filtro anti-aliasing reale inizierebbe ad attenuare il segnale utile già prima di ${fm} Hz. Consigliato almeno 4× oversampling → f<sub>c</sub> ≥ ${4 * fm} Hz.`;
+  } else {
+    statusEl.textContent = 'Sicuro';
+    statusEl.style.color = '#3B6D11';
+    infoEl.style.borderLeftColor = '#639922';
+    const margin = Math.round(nyquist - fm);
+    infoEl.innerHTML = `<strong style="color:var(--color-text-success)">Zona sicura.</strong> Oversampling ${(fc/fm).toFixed(1)}×. La frequenza di Nyquist (${Math.round(nyquist)} Hz) lascia ${margin} Hz di margine sopra il segnale (${fm} Hz). Il filtro anti-aliasing può tagliare comodamente sopra la banda di interesse senza distorcerla.`;
+  }
+}
+
+fmSlider.addEventListener('input', update);
+fcSlider.addEventListener('input', update);
+update();
+</script>

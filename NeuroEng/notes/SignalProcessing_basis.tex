@@ -1,0 +1,520 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{tcolorbox}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{lmodern}
+\usepackage{parskip}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs} % Necessario per \toprule, \midrule, \bottomrule
+\usepackage{xcolor}   % Necessario per i colori
+\usepackage{array}
+
+\geometry{
+  top=2.5cm, bottom=2.5cm,
+  left=3cm, right=3cm
+}
+
+\definecolor{primary}{RGB}{30, 100, 180}
+\definecolor{accent}{RGB}{216, 90, 48}
+\definecolor{tealcolor}{RGB}{15, 110, 86}
+\definecolor{lightgray}{RGB}{245,245,245}
+\definecolor{darkgray}{RGB}{60,60,60}
+\definecolor{warningbg}{RGB}{250,236,231}
+\definecolor{warningfg}{RGB}{153,60,29}
+\definecolor{infobg}{RGB}{230,241,251}
+\definecolor{infofg}{RGB}{12,68,124}
+
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{definitionbox}[1][]{
+  colback=infobg, colframe=primary,
+  fonttitle=\bfseries\color{infofg},
+  title=#1, sharp corners=south,
+  left=6pt, right=6pt, top=4pt, bottom=4pt,
+  breakable
+}
+
+\newtcolorbox{warningbox}[1][]{
+  colback=warningbg, colframe=accent,
+  fonttitle=\bfseries\color{warningfg},
+  title=#1, sharp corners=south,
+  left=6pt, right=6pt, top=4pt, bottom=4pt,
+  breakable
+}
+
+\newtcolorbox{examplebox}[1][]{
+  colback=lightgray, colframe=darkgray!40,
+  fonttitle=\bfseries\color{darkgray},
+  title=#1, sharp corners=south,
+  left=6pt, right=6pt, top=4pt, bottom=4pt,
+  breakable
+}
+
+\newtcolorbox{keybox}{
+  colback=tealcolor!8, colframe=tealcolor,
+  sharp corners=south,
+  left=6pt, right=6pt, top=4pt, bottom=4pt,
+  breakable
+}
+
+\titleformat{\section}[block]
+  {\large\bfseries\color{primary}}
+  {\thesection.}{0.5em}{}[\vspace{0.5pt}\color{primary}\hrule\vspace{2pt}]
+
+\titleformat{\subsection}[block]
+  {\normalsize\bfseries\color{darkgray}}
+  {\thesubsection.}{0.5em}{}
+
+\titleformat{\subsubsection}[runin]
+  {\normalsize\bfseries\color{accent}}
+  {\thesubsubsection.}{0.5em}{}[.\quad]
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=primary,
+  urlcolor=tealcolor,
+  citecolor=accent
+}
+
+\title{
+  \vspace{-1.5cm}
+  {\color{primary}\rule{\linewidth}{2pt}}\\[0.4em]
+  {\LARGE\bfseries\color{primary} Elaborazione dei Biosegnali Neurali}\\[0.3em]
+  {\large\color{darkgray} Campionamento, Quantizzazione e Teorema di Nyquist}\\[0.2em]
+  {\color{primary}\rule{\linewidth}{1pt}}
+}
+\author{\color{darkgray} Appunti di Signal Processing --- Capitolo 6}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+% =========================================================
+\section{Dal Segnale Analogico al Digitale}
+% =========================================================
+
+Un biosegnale neurale (ad esempio un EEG o un segnale intracorticale) è nella realtà fisica un
+fenomeno \textbf{continuo} in due sensi distinti:
+\begin{itemize}
+  \item \textbf{Continuo nel tempo}: esiste in ogni istante $t \in \mathbb{R}$.
+  \item \textbf{Continuo nell'ampiezza}: il voltaggio può assumere qualsiasi valore reale.
+\end{itemize}
+
+Un computer non può lavorare con oggetti continui. Occorre una \textit{digitalizzazione}, che avviene
+in \textbf{due passaggi separati e indipendenti}:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{p{4.5cm} p{9.5cm}}
+\toprule
+\textbf{Passaggio} & \textbf{Descrizione} \\
+\midrule
+\textbf{Campionamento (Sampling)} & Discretizzazione dell'asse del \textit{tempo}: si misura il segnale ogni $T_C$ secondi. \\
+\textbf{Quantizzazione (Quantization)} & Discretizzazione dell'asse dell'\textit{ampiezza}: ogni campione viene arrotondato al livello consentito più vicino. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =========================================================
+\section{Campionamento (Sampling)}
+% =========================================================
+
+\subsection{Definizione formale}
+
+Dato un segnale continuo $x(t)$, il \textbf{segnale campionato} $x^*(t)$ è definito come:
+\begin{equation}
+  x^*(t) = x(t) \cdot \sum_{n=-\infty}^{+\infty} \delta(t - n T_C)
+\end{equation}
+dove $T_C$ è il \textit{periodo di campionamento} e $\delta$ è la delta di Dirac.
+In pratica: si moltiplicano i valori del segnale per un ``pettine'' di impulsi equidistanti.
+
+\subsection{Relazioni fondamentali}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{>{\bfseries}c p{7cm} c}
+\toprule
+Simbolo & Significato & Formula \\
+\midrule
+$T_C$ & Periodo di campionamento & --- \\
+$f_C = 1/T_C$ & Frequenza di campionamento & $[\text{Hz}]$ \\
+$\omega_C = 2\pi f_C$ & Pulsazione di campionamento & $[\text{rad/s}]$ \\
+$f_m$ & Frequenza massima del segnale & $[\text{Hz}]$ \\
+$f_{Nyq} = f_C / 2$ & Limite di Nyquist & $[\text{Hz}]$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Cosa accade nel dominio della frequenza}
+
+La trasformata di Fourier del segnale campionato non è semplicemente ``quella del segnale originale
+ma digitale''. Secondo la teoria della convoluzione ciclica, lo spettro $X^*(j\omega)$ è una
+\textbf{replica periodica} dello spettro originale $X(j\omega)$:
+
+\begin{equation}
+  X^*(j\omega) = \frac{1}{T_C} \sum_{k=-\infty}^{+\infty} X\!\left(j\left(\omega - k\omega_C\right)\right)
+\end{equation}
+
+In parole: lo spettro originale viene \textit{copiato e incollato} ogni $\omega_C$ lungo l'asse delle
+frequenze. Il segnale analogico ha una copia (la ``copia centrale''); il segnale campionato ne ha
+infinite.
+
+\subsection{Ricostruzione: il filtro $G_R$}
+
+Per recuperare il segnale originale dal campionato si applica un \textbf{filtro passa-basso di
+ricostruzione} $G_R(j\omega)$, così definito:
+
+\begin{equation}
+  G_R(j\omega) =
+  \begin{cases}
+    T_C & \text{se } |\omega| \leq \omega_C / 2 \\
+    0   & \text{altrimenti}
+  \end{cases}
+\end{equation}
+
+La formula di ricostruzione vale:
+\begin{equation}
+  \boxed{|X(j\omega)| = |G_R(j\omega)| \cdot |X^*(j\omega)|}
+\end{equation}
+
+Il filtro ``lascia passare'' solo la copia centrale (quella originale), azzerando tutte le repliche.
+Questo funziona \textbf{solo se le repliche non si sovrappongono tra loro} — condizione garantita
+dal Teorema di Nyquist-Shannon.
+
+% =========================================================
+\section{Il Teorema di Nyquist-Shannon}
+% =========================================================
+
+\begin{definitionbox}[Teorema di Nyquist-Shannon]
+Un segnale a banda limitata con frequenza massima $f_m$ può essere campionato e ricostruito
+\emph{senza errori} se e solo se la frequenza di campionamento soddisfa:
+\begin{equation}
+  \boxed{f_C \geq 2 f_m}
+\end{equation}
+La soglia $f_{Nyq} = f_C / 2$ è detta \textbf{frequenza di Nyquist} (o \emph{limite di Nyquist}).
+\end{definitionbox}
+
+\subsection{Perché esattamente $2f_m$?}
+
+Geometricamente: se le copie spettrali distano $\omega_C$ tra loro, e ciascuna ha larghezza
+$2\omega_m$, perché non si sovrappongano è necessario che $\omega_C \geq 2\omega_m$, ovvero
+$f_C \geq 2f_m$.
+
+Se $f_C < 2f_m$, le copie si avvicinano troppo e si sovrappongono. Quella sovrapposizione è
+l'\textbf{aliasing}.
+
+% =========================================================
+\section{L'Aliasing: meccanismo e conseguenze}
+% =========================================================
+
+\subsection{Cos'è l'aliasing}
+
+L'aliasing è la \textbf{distorsione irreversibile} del segnale che si verifica quando
+$f_C < 2f_m$. Le repliche spettrali si sovrappongono alla copia centrale: componenti ad alta
+frequenza vengono ``scambiate'' per componenti a bassa frequenza.
+
+\subsection{Il meccanismo di specchiamento (frequency folding)}
+
+Questo è il \textit{come} l'alias si genera. Quando un segnale a frequenza $f_s > f_{Nyq}$
+viene campionato a $f_C$, la sua frequenza alias è:
+
+\begin{equation}
+  \boxed{f_{\text{alias}} = |f_s - k \cdot f_C|}, \quad k \in \mathbb{Z} \text{ scelto per minimizzare}
+\end{equation}
+
+In pratica, per frequenze di poco superiori al limite di Nyquist:
+\begin{equation}
+  f_{\text{alias}} = f_C - f_s
+\end{equation}
+
+\subsubsection*{Esempio numerico}
+$f_C = 300\,\text{Hz}$, $f_s = 280\,\text{Hz}$, $f_{Nyq} = 150\,\text{Hz}$.
+\[
+  f_{\text{alias}} = |300 - 280| = 20\,\text{Hz}
+\]
+Un ripple epilettico a 280 Hz appare nel file digitale come un'onda a 20 Hz che non esiste
+nella realtà biologica.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.92\textwidth]{aliasing_widget.png}
+  \caption{Interfaccia interattiva di visualizzazione dell'aliasing. In alto: il pannello di controllo
+    con i cursori per la frequenza del segnale e del campionamento; le metriche mostrano la frequenza
+    originale, il limite di Nyquist e la frequenza alias risultante. In basso: il grafico
+    tempo-dominio con la curva originale (blu), i punti campionati (verde) e l'alias ricostruito
+    (arancione). L'asse spettrale in basso visualizza il ``ribaltamento'' della frequenza attorno al
+    limite di Nyquist.}
+  \label{fig:aliasing_widget}
+\end{figure}
+
+Come si vede in Figura~\ref{fig:aliasing_widget}, l'interfaccia interattiva mostra esattamente questo
+fenomeno: la barra spettrale arancione ``rimbalza'' indietro verso lo zero nel momento in cui il
+segnale supera il limite di Nyquist.
+
+\subsection{Specchiamento vs.\ sovrapposizione: la distinzione cruciale}
+
+Questi due termini descrivono \textbf{aspetti diversi} dello stesso fenomeno:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{>{\bfseries\color{primary}}p{4cm} p{10cm}}
+\toprule
+Concetto & Descrizione \\
+\midrule
+Specchiamento & È il \emph{meccanismo} con cui si calcola la frequenza alias.
+  La frequenza $f_s$ ``rimbalza'' attorno al limite di Nyquist verso frequenze più basse.
+  È geometricamente una riflessione dello spettro attorno a $f_{Nyq}$.
+  Da solo, non sarebbe catastrofico: l'alias atterrerebbe in una zona vuota. \\
+\addlinespace
+Sovrapposizione & È la \emph{conseguenza distruttiva}. L'alias, dopo il ribaltamento,
+  atterra sopra componenti spettrali \emph{reali} già presenti nel segnale.
+  A quel punto vero segnale e segnale falso occupano esattamente la stessa frequenza:
+  nessun filtro può separarli. Questo rende l'aliasing \textbf{irreversibile}. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warningbox}[Perché è irreversibile?]
+Una volta che il segnale è stato digitalizzato con $f_C < 2f_m$, i dati a bassa frequenza
+nel file contengono la \emph{somma} di:
+\begin{itemize}
+  \item Il vero segnale biologico a quella frequenza.
+  \item L'alias di un segnale ad alta frequenza ribaltato lì sopra.
+\end{itemize}
+Poiché i due contributi sono \textbf{indistinguibili} nel dominio digitale (stessa frequenza,
+stessa ampiezza apparente), non esiste algoritmo in grado di separarli.
+È come sentire due persone che parlano alla stessa tonalità contemporaneamente: non si riesce
+a capire chi dice cosa, nemmeno con la migliore tecnologia audio.
+\end{warningbox}
+
+\subsection{Il caso concreto: diagnosi errata in neuroscienze}
+
+\begin{examplebox}[Scenario: monitoraggio epilettico in laboratorio]
+\textbf{Obiettivo}: rilevare sharp-wave ripples (150--250 Hz) nell'ippocampo di un topo.\\
+\textbf{Errore}: sistema di acquisizione impostato a $f_C = 300\,\text{Hz}$ senza filtro
+anti-aliasing adeguato.
+
+\medskip
+\begin{tabular}{ll}
+  Segnale reale: & 280 Hz (ripple epilettico) \\
+  Limite di Nyquist: & 150 Hz \\
+  Aliasing attivo? & Sì, perché $280 > 150$ \\
+  Frequenza alias: & $|300 - 280| = 20\,\text{Hz}$ (banda Beta) \\
+\end{tabular}
+
+\medskip
+\textbf{Risultato}: il neuroscienziato vede onde a 20 Hz nel tracciato. Le interpreta come
+``attività beta anomala'' o, se l'alias fosse caduto a 2 Hz, come ``onde delta patologiche''
+tipiche di danno cerebrale. L'esperimento viene interrotto, l'animale sacrificato inutilmente.
+In realtà il segnale di 20 Hz non esisteva mai nel cervello del topo.
+\end{examplebox}
+
+% =========================================================
+\section{La Soluzione: Filtro Anti-Aliasing e Oversampling}
+% =========================================================
+
+La soluzione non è scegliere tra ``alto campionamento'' e ``filtro'', ma usare \textbf{entrambi
+in modo coordinato}.
+
+\subsection{Il trade-off del filtro anti-aliasing}
+
+Un filtro anti-aliasing posto \emph{prima} del convertitore ADC taglia fisicamente le frequenze
+alte, impedendo che creino alias. Ma se il taglio è troppo basso, elimina anche il segnale
+di interesse.
+
+\textbf{Soluzione: oversampling.}
+
+\begin{enumerate}
+  \item Identifica la banda di interesse: $f_{\text{max}} = 250\,\text{Hz}$ (ripple).
+  \item Scegli una frequenza di campionamento molto superiore: $f_C = 2000\,\text{Hz}$
+        (10$\times$ superiore al minimo teorico).
+  \item Imposta il filtro anti-aliasing a $f_{\text{taglio}} = 400\,\text{Hz}$
+        (sopra i ripple, lontano dal limite di Nyquist).
+\end{enumerate}
+
+Con $f_C = 2000\,\text{Hz}$, il limite di Nyquist è $1000\,\text{Hz}$: il filtro a 400 Hz
+può quindi attenuare dolcemente e non tocca i ripple a 200--250 Hz.
+
+\medskip
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{>{\bfseries}p{5cm} p{4.5cm} p{4.5cm}}
+\toprule
+Parametro & Scelta errata & Scelta corretta \\
+\midrule
+Segnale utile & 200 Hz & 200 Hz \\
+$f_C$ & 300 Hz & 2000 Hz \\
+Limite di Nyquist & 150 Hz & 1000 Hz \\
+Filtro anti-aliasing & 150 Hz (distrugge il segnale) & 400 Hz (preserva il segnale) \\
+Risultato sui ripple & \textcolor{accent}{\textbf{ELIMINATI}} & \textcolor{tealcolor}{\textbf{PRESERVATI}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =========================================================
+\section{Quantizzazione}
+% =========================================================
+
+\subsection{Il processo di arrotondamento}
+
+Una volta campionato il segnale, ogni valore misurato deve essere \textbf{approssimato} a uno
+dei livelli permessi dall'ADC. L'insieme dei livelli permessi è:
+\[
+  \mathcal{X} = \{a_1, a_2, \ldots, a_k\}
+\]
+
+La regola di quantizzazione sceglie il livello più vicino al valore reale:
+\begin{equation}
+  x^*(t_0) = \operatorname*{arg\,min}_{a \in \mathcal{X}} \|x(t_0) - a\|
+\end{equation}
+
+\textbf{In parole}: dato il valore reale $x(t_0)$, si calcola la distanza da ogni livello permesso
+e si sceglie il livello con distanza minima. È una regola di arrotondamento al ``gradino'' più vicino.
+
+\subsubsection*{Esempio numerico}
+Segnale reale: $x(t_0) = 2.73\,\mu\text{V}$.\\
+Livelli disponibili: $\ldots,\, 2.5,\, 3.0,\, \ldots$
+
+\begin{align*}
+  |2.73 - 2.5| &= 0.23 \\
+  |2.73 - 3.0| &= 0.27
+\end{align*}
+Poiché $0.23 < 0.27$, il valore registrato è $x^*(t_0) = 2.5\,\mu\text{V}$.
+
+\subsection{Il rumore di quantizzazione}
+
+L'errore introdotto è:
+\[
+  n(t) = x(t) - x^*(t)
+\]
+
+Il parametro chiave è $V_{\text{LSB}}$ (Least Significant Bit), cioè la distanza tra due livelli
+consecutivi. L'errore $n(t)$ è distribuito \textbf{uniformemente} nell'intervallo:
+\[
+  n(t) \sim \mathcal{U}\!\left[-\tfrac{V_{\text{LSB}}}{2},\, +\tfrac{V_{\text{LSB}}}{2}\right]
+\]
+
+Da questa distribuzione uniforme si ricavano:
+\begin{itemize}
+  \item \textbf{Valore atteso} (media): $E[n] = 0$ (l'errore è in media nullo, senza bias).
+  \item \textbf{Deviazione standard}:
+    \begin{equation}
+      \sigma_q = \frac{1}{\sqrt{12}} V_{\text{LSB}} \approx 0.29\, V_{\text{LSB}}
+    \end{equation}
+\end{itemize}
+
+La formula $\sigma = 1/\sqrt{12}$ non è casuale: per una distribuzione uniforme su $[a, b]$
+la varianza è $(b-a)^2/12$; qui $b - a = V_{\text{LSB}}$, quindi
+$\text{Var} = V_{\text{LSB}}^2/12$ e $\sigma = V_{\text{LSB}}/\sqrt{12}$.
+
+\subsection{La relazione tra bit e risoluzione}
+
+Se il convertitore usa $N$ bit, il numero di livelli permessi è $2^N$. Se il segnale ha un
+range totale $R$ (da min a max), allora:
+
+\begin{equation}
+  V_{\text{LSB}} = \frac{R}{2^N}
+\end{equation}
+
+\subsubsection*{Esempio numerico}
+Segnale nell'intervallo $[0,\, 14]\,\text{mV}$, ADC a 8 bit:
+\[
+  V_{\text{LSB}} = \frac{14}{2^8} = \frac{14}{256} \approx 0.055\,\text{mV}
+\]
+
+Raddoppiare il numero di bit (da 8 a 16) dimezza ogni volta $V_{\text{LSB}}$ di un fattore
+$2^{16-8} = 256$, riducendo il rumore di quantizzazione di $\sqrt{256} = 16$ volte.
+
+\subsection{Il rumore totale del segnale}
+
+Il segnale neurale porta già con sé un rumore di fondo (biologico, elettrico, di amplificazione)
+$\sigma_{\text{signal}}$. Il processo di quantizzazione aggiunge $\sigma_q$. Poiché i due rumori
+sono \textbf{statisticamente indipendenti}, le loro varianze si sommano:
+
+\begin{equation}
+  \boxed{\sigma_{\text{tot}} = \sqrt{\sigma_{\text{signal}}^2 + \sigma_q^2}}
+\end{equation}
+
+\begin{keybox}
+\textbf{Regola pratica}: ha senso investire in un ADC ad alta risoluzione solo se
+$\sigma_q \ll \sigma_{\text{signal}}$. Se il rumore biologico è già 10 $\mu$V e
+$\sigma_q = 5\,\mu$V, il rumore totale è $\sqrt{100+25} \approx 11.2\,\mu$V: un miglioramento
+modesto del 12\%. Se invece $\sigma_q = 0.1\,\mu$V, il contributo è trascurabile.
+\end{keybox}
+
+% =========================================================
+\section{Connessione tra i Concetti: Schema Riassuntivo}
+% =========================================================
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{>{\bfseries\color{primary}}p{3.5cm} p{5.5cm} p{5cm}}
+\toprule
+Concetto & Cosa introduce & Come si riduce \\
+\midrule
+Campionamento & Potenziale perdita di informazione (aliasing) se $f_C < 2f_m$ &
+  Aumentare $f_C$ (oversampling); filtro anti-aliasing \\
+\addlinespace
+Quantizzazione & Rumore di quantizzazione $\sigma_q \approx 0.29\,V_{\text{LSB}}$ &
+  Aumentare il numero di bit ($V_{\text{LSB}}$ si riduce) \\
+\addlinespace
+Aliasing & Distorsione irreversibile per specchiamento + sovrapposizione &
+  Rispettare Nyquist: $f_C \geq 2f_m$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La sequenza corretta in un sistema di acquisizione di biosegnali è:
+
+\[
+  \underbrace{x(t)}_{\text{segnale neurale}}
+  \;\xrightarrow{\text{filtro anti-alias}}\;
+  \underbrace{\tilde{x}(t)}_{\text{banda limitata a } f_m}
+  \;\xrightarrow{\text{ADC} \atop f_C \geq 2f_m}\;
+  \underbrace{x^*[n]}_{\text{campionato}}
+  \;\xrightarrow{\text{quantizzazione} \atop N \text{ bit}}\;
+  \underbrace{x_q[n]}_{\text{digitale}}
+\]
+
+% =========================================================
+\section{Riepilogo delle Formule Chiave}
+% =========================================================
+
+\begin{center}
+\renewcommand{\arraystretch}{2.0}
+\begin{tabular}{>{\bfseries}p{6cm} c p{5cm}}
+\toprule
+Concetto & Formula & Note \\
+\midrule
+Teorema di Nyquist & $f_C \geq 2 f_m$ & Condizione necessaria per evitare l'aliasing \\
+Frequenza alias & $f_{\text{alias}} = |f_s - k f_C|$ & $k$ intero che minimizza il risultato \\
+Ricostruzione spettrale & $|X| = |G_R| \cdot |X^*|$ & Vale solo se Nyquist è rispettato \\
+Regola di quantizzazione & $x^*(t_0) = \operatorname{arg\,min}_{a \in \mathcal{X}} |x(t_0) - a|$ & Arrotondamento al livello più vicino \\
+Rumore di quantizzazione & $\sigma_q = V_{\text{LSB}} / \sqrt{12}$ & Distribuzione uniforme \\
+Risoluzione ADC & $V_{\text{LSB}} = \text{range} / 2^N$ & $N$ = numero di bit \\
+Rumore totale & $\sigma_{\text{tot}} = \sqrt{\sigma_s^2 + \sigma_q^2}$ & Rumori indipendenti \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vfill
+\begin{center}
+  \color{darkgray}\small
+  Documento generato per lo studio del Capitolo 6 --- Signal Processing per i Biosegnali Neurali
+\end{center}
+
+\end{document}
