@@ -252,6 +252,34 @@
     \item \textbf{Teorema di Wiener-Khinchin}: Se una serie temporale non è direttamente trasformabile secondo Fourier, è comunque possibile calcolarne la PSD calcolando la trasformata di Fourier della sua \textbf{funzione di autocorrelazione} (Vero).
 \end{itemize}
 
+\section{Welch: Il Trade-off fondamentale}
+La stima della Densità Spettrale di Potenza (PSD) di un segnale stocastico (es. EEG spontaneo) tramite un singolo periodogramma è **non consistente**: all'aumentare della durata del segnale, la varianza dell'estimatore non diminuisce, rendendo il risultato "rumoroso" e inattendibile.
+
+Il \textbf{Metodo di Welch} risolve questo problema introducendo la media di periodogrammi ottenuti da segmenti del segnale:
+\begin{itemize}
+    \item \textbf{Riduzione della varianza}: La varianza della stima si riduce di un fattore $\approx \nicefrac{1}{M}$, dove $M$ è il numero di segmenti mediati.
+    \item \textbf{Costo in risoluzione}: La risoluzione spettrale $\Delta f$ peggiora poiché dipende dalla lunghezza del singolo segmento ($T_{\text{win}}$) e non dalla durata totale dell'epoca ($T_{\text{epoch}}$):
+    \[ \Delta f \approx \frac{1}{T_{\text{win}}} \]
+\end{itemize}
+
+\subsection{Procedura Operativa per l'Esame}
+1. \textbf{Scelta della finestra}: La lunghezza $T_{\text{win}}$ deve essere tale da garantire la $\Delta f$ minima richiesta (es. $\Delta f = 2\ \text{Hz} \implies T_{\text{win}} = 0.5\ \text{s}$).
+2. \textbf{Gestione dell'Overlap}: L'overlap (es. $50\%$) serve a recuperare parte delle informazioni perse dal windowing ai bordi dei segmenti, aumentando il numero $M$ di segmenti utilizzabili.
+3. \textbf{Calcolo M}:
+   \[ M = 1 + \left\lfloor \frac{T_{\text{epoch}} - T_{\text{win}}}{T_{\text{shift}}} \right\rfloor \quad \text{con } T_{\text{shift}} = T_{\text{win}}(1 - \text{overlap}) \]
+
+---
+
+\chapter{Causalità e Connettività}
+\section{Interpretazione dei Grafi di Causalità}
+Negli esercizi, spesso ti verrà chiesto di interpretare matrici di adiacenza $A$.
+\begin{itemize}
+    \item \textbf{Matrice $A$}: L'elemento $a_{ij} = 1$ indica un flusso diretto da $j$ a $i$ (colonna $\to$ riga). \textbf{Attenzione}: Controlla sempre la convenzione del testo (alcuni usano riga $\to$ colonna).
+    \item \textbf{Modelli MVAR (Multivariate Autoregressive)}: Sono lo standard per la PDC. Se il testo cita "lunghe registrazioni", punta sempre verso modelli multivariati (PDC) per mitigare il *common source*. Se il testo cita "dati limitati", giustifica la scelta bivariata (Granger) come compromesso necessario per non sovra-parametrizzare il modello.
+\end{itemize}
+
+
+
 \section*{Trabocchetti d'Esame - Capitolo 6}
 \addcontentsline{toc}{section}{Trabocchetti d'Esame - Capitolo 6}
 \begin{itemize}

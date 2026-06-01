@@ -31,8 +31,7 @@
 \fancyfoot[L]{Guida alla Preparazione - Neuroengineering}
 \fancyfoot[R]{A.A. 2024/2025}
 
-\title{Guida di Preparazione Eccellente per Neuroengineering\\(Focus sulla Risoluzione dei Problemi della Parte II)}
-\author{Sintesi e Formulario per il 30L}
+\title{Guida di Preparazione per Neuroengineering\\(Focus sulla Risoluzione dei Problemi della Parte II)}
 \date{}
 
 \begin{document}
@@ -123,6 +122,22 @@ La sua deviazione standard (valore efficace del rumore di quantizzazione) è par
 \sigma_{\text{quant}} = \frac{V_{LSB}}{\sqrt{12}}
 \]
 
+\section{Temporizzazione del Protocollo Sperimentale}
+I problemi d'esame richiedono spesso di calcolare i parametri temporali del paradigma di stimolazione, in particolare la distinzione tra SOA e ISI.
+
+\subsection{Definizioni Fondamentali}
+\begin{itemize}
+    \item \textbf{Stimulus Duration ($T_{\text{stim}}$)}: Durata fisica dello stimolo (es. durata di un tono puro in ms).
+    \item \textbf{Stimulus Onset Asynchrony (SOA)}: Intervallo di tempo tra l'inizio di uno stimolo e l'inizio del successivo.
+    Il SOA definisce la \emph{cadenza} della presentazione degli stimoli.
+    \item \textbf{Inter-Stimulus Interval (ISI)}: Intervallo di silenzio/vuoto tra la fine di uno stimolo e l'inizio del successivo.
+\end{itemize}
+La relazione che lega i tre parametri è:
+\[
+\text{ISI} = \text{SOA} - T_{\text{stim}}
+\]
+\textbf{Attenzione}: SOA $>$ ISI sempre (il SOA include la durata dello stimolo). Se il problema richiede l'ISI, non riportare il SOA.
+
 \section{Filtri Digitali: Tipologie e Criteri di Selezione}
 
 \subsection{Filtri FIR (Finite Impulse Response) vs IIR (Infinite Impulse Response)}
@@ -134,12 +149,85 @@ La sua deviazione standard (valore efficace del rumore di quantizzazione) è par
     Sono molto efficienti (raggiungono roll-off molto ripidi con ordini bassi), ma presentano fase non lineare e potenziali problemi di instabilità.
 \end{itemize}
 
-\subsection{Filtro Anti-Aliasing e Filtro Notch}
+\subsection{Il Filtro Media Mobile (Moving Average) come Caso Speciale di FIR}
+Il filtro media mobile di lunghezza $L$ calcola la media dei più recenti $L$ campioni in ingresso:
+\[
+y[n] = \frac{1}{L} \sum_{k=0}^{L-1} x[n-k]
+\]
+\textbf{È un filtro FIR}: l'uscita dipende solo da un numero finito di campioni d'ingresso passati.
+Non vi è nessun termine ricorsivo (retroazione sulle uscite passate), che caratterizzerebbe invece un filtro IIR.
+
+\paragraph{Effetto della lunghezza $L$ sulla stabilità del segnale di controllo}
+La ``Control Signal Stability'' è definita come la \textbf{deviazione standard} del segnale filtrato durante una fase di forza costante. Un valore più basso significa un segnale più stabile:
+\begin{itemize}
+    \item \textbf{Finestra più corta} ($L$ ridotto $\implies T_{\text{win}}$ minore): media su meno campioni $\to$ stima più rumorosa $\to$ deviazione standard \textbf{aumenta} (segnale meno stabile).
+    \item \textbf{Finestra più lunga} ($L$ aumentato $\implies T_{\text{win}}$ maggiore): media su più campioni $\to$ stima più liscia $\to$ deviazione standard \textbf{diminuisce} (segnale più stabile), al costo di un maggiore ritardo (lag).
+\end{itemize}
+Questo è una diretta conseguenza del Teorema del Limite Centrale: la varianza della media di $L$ campioni i.i.d. di varianza $\sigma^2$ è $\sigma^2 / L$.
+
+\section{Rilevazione dell'Onset Muscolare: Algoritmo a Doppia Soglia}
+Per passare da modalità \emph{standby} ad \emph{active} in un sistema di controllo protesico, si utilizza spesso un algoritmo a doppia soglia applicato all'inviluppo del segnale sEMG rettificato.
+
+\subsection{Come Funziona l'Algoritmo}
+Vengono definite due soglie:
+\begin{itemize}
+    \item $A_c$ (\textbf{soglia di ampiezza}): L'inviluppo deve superare $A_c$.
+    \item $T_c$ (\textbf{soglia di durata}): Il superamento deve mantenersi continuativamente per almeno $T_c$ millisecondi.
+\end{itemize}
+Un \textbf{onset valido} viene dichiarato solo quando entrambe le condizioni sono soddisfatte:
+\begin{enumerate}
+    \item L'inviluppo supera $A_c$ al tempo $t_0$.
+    \item L'inviluppo rimane \emph{continuativamente} sopra $A_c$ per tutti gli istanti $t \in [t_0,\, t_0 + T_c]$.
+\end{enumerate}
+Se l'inviluppo scende sotto $A_c$ prima che sia trascorso $T_c$, il potenziale onset viene scartato come falso allarme (\emph{false alarm}) e il contatore di durata viene azzerato.
+
+\subsection{Latenza dell'Onset e Latenza di Commutazione}
+La \textbf{latenza dell'onset muscolare} corrisponde all'istante $t_0$ in cui l'inviluppo supera per la prima volta (validamente) la soglia $A_c$.
+\[
+t_{\text{onset}} = t_0
+\]
+La \textbf{latenza di commutazione} (quando il sistema passa effettivamente ad \emph{active}) avviene in ritardo rispetto all'onset:
+\[
+t_{\text{switch}} = t_0 + T_c
+\]
+poiché il microcontrollore deve attendere la conferma della durata $T_c$ prima di dichiarare l'onset.
 \begin{itemize}
     \item \textbf{Filtro Anti-Aliasing}: Deve essere necessariamente di tipo \textbf{analogico} e posizionato a monte dell'ADC.
     Un filtro digitale non può rimuovere l'aliasing, poiché quest'ultimo avviene nel momento esatto del campionamento.
     \item \textbf{Filtro Notch}: Un filtro elimina-banda estremamente stretto, tarato a $50\ \text{Hz}$ (o $60\ \text{Hz}$) per sopprimere l'interferenza di rete senza intaccare significativamente le frequenze adiacenti.
 \end{itemize}
+
+\subsection{Scelta della Frequenza di Taglio Anti-Alias con Roll-off Non Ideale}
+Un filtro reale del primo ordine ha un roll-off finito (es. $-20\ \text{dB/decade}$), per cui non attenua istantaneamente tutte le frequenze superiori alla frequenza di taglio $f_c$.
+Per prevenire l'aliasing, la frequenza di taglio deve essere scelta \textbf{sufficientemente al di sotto} della frequenza di Nyquist:
+\[
+f_c < f_{\text{Nyq}} = \frac{f_s}{2}
+\]
+\textbf{Regola pratica}: scegliere $f_c$ in modo che le frequenze di interesse siano nella banda passante, ma che i lobi di roll-off siano già abbastanza attenuati a $f_{\text{Nyq}}$.
+\begin{itemize}
+    \item Per EEG con $f_s = 100\ \text{Hz}$ e contenuto informativo fino a $\sim 30\ \text{Hz}$ (banda beta): scegliere $f_c \approx 40\ \text{Hz}$ (lascia margine prima di Nyquist a $50\ \text{Hz}$).
+    \item Non scegliere $f_c = f_{\text{Nyq}}$: le frequenze appena al di sopra di $f_c$ non sarebbero attenuate abbastanza prima del campionamento.
+\end{itemize}
+
+\section{Budget del Rumore: Somma di Componenti Indipendenti}
+Quando più sorgenti di rumore indipendenti (a media nulla) contribuiscono al segnale totale all'ingresso dell'ADC, le loro potenze si sommano (non le ampiezze):
+\[
+\sigma_{\text{tot}}^2 = \sigma_1^2 + \sigma_2^2 + \ldots + \sigma_n^2 \implies \sigma_{\text{tot}} = \sqrt{\sigma_1^2 + \sigma_2^2 + \ldots + \sigma_n^2}
+\]
+Nella pratica EEG/sEMG, le due componenti principali sono:
+\begin{enumerate}
+    \item \textbf{Segnale biologico amplificato} (EEG o sEMG): il suo valore RMS è $\sigma_{\text{bio}} = \sigma_{\text{bio, ingresso}} \times G_d$.
+    \item \textbf{Artefatto di modo comune residuo}: un disturbo sinusoidale (es. $50\ \text{Hz}$) con ampiezza di picco $V_{\text{peak, cm}}$ diventa, dopo l'attenuazione CMRR:
+    \[
+    V_{\text{out, cm, peak}} = V_{\text{in, cm, peak}} \times G_c, \quad \sigma_{\text{cm}} = \frac{V_{\text{out, cm, peak}}}{\sqrt{2}}
+    \]
+    (per un segnale sinusoidale: $\text{RMS} = \text{picco} / \sqrt{2}$)
+\end{enumerate}
+Il rumore totale RMS all'ingresso dell'ADC è quindi:
+\[
+\boxed{\sigma_{\text{ADC}} = \sqrt{\sigma_{\text{bio}}^2 + \sigma_{\text{cm}}^2}}
+\]
+Se $\sigma_{\text{ADC}} \leq \sigma_{\text{specifica}}$, il sistema soddisfa la specifica di rumore.
 
 %=============================================================================
 \chapter{Analisi Spettrale Avanzata e Metodo di Welch}
@@ -242,9 +330,95 @@ G_{y \to x} = \ln\left( \frac{V_{x|x}}{V_{x|x,y}} \right) \quad \in [0, +\infty)
     \item \textbf{Svantaggi}: Molto sensibile alla scarsità di dati. Essendo un modello MVAR di ordine $p$ su $N$ canali, richiede la stima di $p N^2$ parametri, necessitando di registrazioni temporali molto lunghe per evitare l'instabilità del modello.
 \end{itemize}
 
+
+\section{Come Scegliere l'Estimatore: Guida alla Decisione}
+
+Negli esami viene spesso chiesto di giustificare la scelta dell'estimatore di connettività in base alle caratteristiche dello scenario.
+La decisione dipende da quattro criteri chiave, da valutare nell'ordine indicato:
+
+\subsection{Criteri Decisionali}
+
+\begin{enumerate}
+    \item \textbf{Direzionalità richiesta?}
+    Se lo studio vuole costruire \textbf{reti dirette} (distinguere chi pilota chi), è necessario un estimatore direzionale.
+    La Coerenza Ordinaria è simmetrica ($C_{xy} = C_{yx}$) e va scartata.
+    Rimangono: GC bivariata o PDC multivariata.
+
+    \item \textbf{Il segnale è nel dominio della frequenza?}
+    Se i ritmi di interesse sono definiti in bande specifiche (Theta, Alpha, Beta, Gamma), è necessario un estimatore \textbf{spettrale} (nel dominio della frequenza).
+    La GC classica è definita solo nel dominio del tempo: non fornisce informazioni su quale banda porta il flusso causale.
+    La PDC è la scelta naturale.
+
+    \item \textbf{Quante regioni si registrano?}
+    Se si studiano più di 2 regioni simultaneamente, l'approccio \textbf{bivariato} (OC o GC bivariata) soffre del problema della \textbf{sorgente comune}: una terza area $z$ che pilota sia $x$ che $y$ crea un link spurio tra $x$ e $y$.
+    La PDC, essendo \textbf{multivariata}, modella tutte le aree insieme ed elimina i link spuri.
+
+    \item \textbf{Quanti dati sono disponibili?}
+    La PDC richiede la stima di $p \cdot N^2$ parametri (con $p$ ordine del modello e $N$ numero di canali).
+    Con \textbf{pochi dati} (registrazioni brevi, molti canali), il modello MVAR può diventare instabile e la PDC inaffidabile.
+    In questi casi, la GC bivariata o la Coerenza sono compromessi accettabili.
+\end{enumerate}
+
+\subsection{Tabella Riassuntiva degli Estimatori}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.18\linewidth} X X X}
+\toprule
+ & \textbf{OC} & \textbf{GC bivariata} & \textbf{PDC} \\
+\midrule
+Direzionalità & No (simmetrica) & Sì & Sì \\
+Dominio & Frequenza & Tempo & Frequenza \\
+Approccio & Bivariato & Bivariato/Multiv. & Multivariato \\
+Sorgente comune & Vulnerabile & Vulnerabile (se biv.) & Robusta \\
+Dati richiesti & Pochi & Pochi/Medi & Molti \\
+Complessità & Bassa & Media & Alta \\
+\bottomrule
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+
+\subsection{Tipologia d'Esame: Scelta dell'Estimatore per Reti Cerebrali Dirette}
+
+\subsubsection*{Scenario Tipico (esame reale)}
+\emph{Un paziente con epilessia farmacoresistente viene monitorato con EEG intracranico prima e dopo la neurochirurgia.}
+\emph{L'obiettivo è costruire reti cerebrali dirette, confrontare le proprietà di rete Pre e Post,
+e quantificare il ruolo di specifiche regioni.
+Le regioni di interesse sono tutte subcorticali.
+I ritmi cerebrali di interesse si trovano nelle bande Theta e Alpha.}
+
+\subsubsection*{Risposta Giustificata}
+L'\textbf{estimatore più appropriato è la PDC} (Partial Directed Coherence), per le seguenti ragioni:
+
+\begin{enumerate}
+    \item \textbf{Direzionalità}: Lo studio richiede reti \textbf{dirette} per identificare quali regioni guidano le altre.
+    La PDC è direzionale ($\pi_{ij} \neq \pi_{ji}$ in generale), a differenza della OC che è simmetrica.
+
+    \item \textbf{Analisi in frequenza}: Le bande Theta ($4$-$8\ \text{Hz}$) e Alpha ($8$-$13\ \text{Hz}$) sono le bande di interesse.
+    La PDC è definita nel \textbf{dominio della frequenza} e permette di quantificare la causalità \emph{per banda}, identificando in quale banda il nodo $j$ influenza il nodo $i$.
+    La GC classica è solo nel dominio del tempo e questa informazione andrebbe persa.
+
+    \item \textbf{Approccio multivariato}: Registrare più regioni subcorticali contemporaneamente espone a falsi positivi da sorgente comune.
+    La PDC, essendo \textbf{multivariata} (modello MVAR), stima simultaneamente tutte le connessioni tra tutti i nodi, eliminando i link spuri.
+
+    \item \textbf{Dati disponibili}: Le registrazioni pre e post-chirurgia si estendono per \textbf{diverse ore}, garantendo un numero sufficiente di dati per stimare in modo stabile il modello MVAR.
+    La principale limitazione della PDC (richiedere molti dati) è quindi mitigata in questo contesto.
+\end{enumerate}
+
+\subsubsection*{Pro e Contro della PDC}
+\begin{itemize}
+    \item[$+$] \textbf{Pro}: Direzionale; spettrale (analisi per banda); multivariata (risolve sorgente comune); normalizzata in $[0,1]$.
+    \item[$-$] \textbf{Contro}: Richiede molti dati per stimare il modello MVAR in modo stabile; il numero di parametri scala come $p \cdot N^2$; sensibile alla scelta dell'ordine $p$ del modello.
+\end{itemize}
+
+\subsubsection*{Perché non OC?}
+La OC è simmetrica: non distingue se la regione A pilota B o viceversa.
+In uno studio che vuole identificare il focolaio epilettico (nodo \emph{sorgente}) e le sue proiezioni verso altri nodi, questa limitazione è insuperabile.
+
+\subsubsection*{Perché non GC bivariata?}
+La GC bivariata è direzionale, ma è definita nel dominio del tempo: non permette di separare il contributo causale nella banda Theta da quello nella banda Alpha.
+Inoltre, nella sua versione bivariata, soffre ancora del problema della sorgente comune.
+
 %=============================================================================
-\chapter{Teoria dei Grafi e Topologia delle Reti}
-%=============================================================================
+
 
 \section{Rappresentazione e Caratterizzazione dei Grafi}
 Una rete neurale stimata (es. mediante matrice di coerenza o PDC) viene schematizzata come un grafo $G = (V, E)$, dove $V$ è l'insieme dei nodi (elettrodi/aree) ed $E$ l'insieme degli archi (connessioni).
@@ -318,6 +492,26 @@ Valori positivi ($Q > 0$) indicano una struttura modulare statisticamente signif
     La contingenza temporale tra comando motorio centrale ed input afferente periferico ripristina il loop sensomotorio, promuovendo la neuroplasticità (apprendimento hebbiano).
 \end{itemize}
 
+\subsection{Calcolo del Vettore Feature per il Classificatore BCI}
+Nei BCI basati su SMR/PSD, le feature vengono estratte dai bin in frequenza della PSD calcolata nelle bande di interesse (tipicamente alpha $8$-$13\ \text{Hz}$ e beta $13$-$30\ \text{Hz}$).
+
+\paragraph{Conteggio dei Bin in Frequenza}
+Con risoluzione spettrale $\Delta f$ e banda $[f_{\text{low}}, f_{\text{high}}]$:
+\[
+N_{\text{bin}} = \frac{f_{\text{high}} - f_{\text{low}}}{\Delta f}
+\]
+\textbf{Attenzione alla convenzione (edge vs. center)}: il numero di bin può differire di $\pm 1$ a seconda che si considerino le frequenze come centri o come bordi dei bin. Entrambe le convenzioni sono accettabili, purché esplicitate.
+
+\paragraph{Vettore Feature con Canali Multipli}
+Se il classificatore utilizza $N_{\text{ch}}$ canali EEG e le feature di ciascun canale sono i $N_{\text{bin}}$ valori PSD:
+\[
+\text{Lunghezza del vettore feature} = N_{\text{ch}} \times N_{\text{bin}}
+\]
+Esempio (esame Giugno 2025): $N_{\text{ch}} = 2$ (C3 e C4), bande alpha ($8$-$13\ \text{Hz}$) e beta ($13$-$30\ \text{Hz}$) con $\Delta f = 2\ \text{Hz}$:
+\[
+N_{\text{bin}} = \frac{13-8}{2} + \frac{30-13}{2} = 2.5 + 8.5 \approx 12 \text{ bin per canale} \implies 2 \times 12 = 24\ \text{feature totali}
+\]
+
 \section{Fisiologia ed Elaborazione sEMG}
 
 \subsection{Proprietà della Fibra e dell'Unità Motoria}
@@ -338,41 +532,172 @@ Valori positivi ($Q > 0$) indicano una struttura modulare statisticamente signif
 \chapter{Formulario Master}
 %=============================================================================
 
-Di seguito sono raccolte tutte le relazioni matematiche necessarie per risolvere i problemi quantitativi d'esame.
-\renewcommand{\arraystretch}{2}
-\begin{table}[H]
-\centering
-\begin{tabularx}{\textwidth}{l X X}
+Di seguito sono raccolte tutte le relazioni matematiche necessarie, organizzate per ambito tematico.
+Ogni blocco è una tabella indipendente: la colonna sinistra è il nome della formula, quella destra l'equazione.
+
+\renewcommand{\arraystretch}{1.7}
+
+%--------------------------------------------------------------
+\subsection*{\large 1 \;—\; Biologia Cellulare}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.38\linewidth} X}
 \toprule
-\textbf{Ambito} & \textbf{Nome Formula} & \textbf{Equazione} \\
-\midrule
-\multirow{2}{*}{\textbf{Biologia Cellulare}} & Equazione di Nernst & $E_j = -\frac{RT}{zF}\ln\left(\frac{[X]_{\text{in}}}{[X]_{\text{out}}}\right)$ \\
-& Costante di Spazio & $\lambda = \sqrt{\frac{r_m}{r_L}}$ \\
-\midrule
-\multirow{4}{*}{\textbf{Strumentazione}} & CMRR (Decibel) & $\text{CMRR}_{\text{dB}} = 20\log_{10}\left(\frac{G_d}{G_c}\right) = G_{d,\text{dB}} - G_{c,\text{dB}}$ \\
-& Guadagno di Modo Comune & $G_c = 10^{\frac{G_{d,\text{dB}} - \text{CMRR}_{\text{dB}}}{20}}$ \\
-& Tensione Misurata & $V_{\text{mis}} = V_{\text{sorg}} \cdot \frac{Z_{\text{in}}}{Z_{\text{in}} + Z_{\text{el}}}$ \\
-& Artefatto in Uscita (Picco) & $V_{\text{out, cm}} = V_{\text{in, cm}} \cdot G_c$ \\
-\midrule
-\multirow{3}{*}{\textbf{ADC}} & Risoluzione (Step Size LSB) & $V_{LSB} = \frac{V_{\text{range}}}{2^{N_{\text{bit}}}}$ \\
-& Rumore di Quantizzazione & $\sigma_{\text{quant}} = \frac{V_{LSB}}{\sqrt{12}}$ \\
-& Frequenza di Nyquist & $f_{\text{Nyq}} = \frac{f_s}{2}$ \\
-\midrule
-\multirow{5}{*}{\textbf{Stima Spettrale}} & Risoluzione Spettrale Welch & $\Delta f = \frac{1}{T_{\text{win}}} = \frac{f_s}{N_{\text{win}}}$ \\
-& Campioni per Finestra & $N_{\text{win}} = T_{\text{win}} \cdot f_s$ \\
-& Spostamento Finestra & $T_{\text{shift}} = T_{\text{win}} \cdot (1 - O)$ \\
-& Numero di Segmenti & $M = 1 + \left\lfloor \frac{T_{\text{epoch}} - T_{\text{win}}}{T_{\text{shift}}} \right\rfloor$ \\
-& Abbattimento Rumore (Media) & $\sigma_{\text{avg}} = \frac{\sigma_{\text{raw}}}{\sqrt{N_{\text{trial}}}}$ \\
-\midrule
-\multirow{5}{*}{\textbf{Grafi e Reti}} & Densità (Grafo Diretto) & $k = \frac{L}{N(N-1)}$ \\
-& Densità (Grafo Non Diretto) & $k = \frac{2L}{N(N-1)}$ \\
-& Efficienza Globale & $E_g = \frac{1}{N(N-1)} \sum_{i \neq j} \frac{1}{d_{ij}}$ \\
-& Divisibility (2 classi) & $D = \frac{L}{L + L_{\text{inter}}}$ \\
-& Modularità & $Q = \frac{1}{2L} \sum_{i,j} \left( a_{ij} - \frac{g_i g_j}{2L} \right) \delta(C_i, C_j)$ \\
+Formula & Equazione \\ \midrule
+Equazione di Nernst &
+  $\displaystyle E_j = -\frac{RT}{zF}\ln\!\left(\frac{[X]_{\mathrm{in}}}{[X]_{\mathrm{out}}}\right)$ \\
+Costante di spazio &
+  $\displaystyle \lambda = \sqrt{\dfrac{r_m}{r_L}}$ \\
 \bottomrule
 \end{tabularx}
-\end{table}
+
+\bigskip
+%--------------------------------------------------------------
+\subsection*{\large 2 \;—\; Strumentazione — Amplificatore}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.38\linewidth} X}
+\toprule
+Formula & Equazione \\ \midrule
+CMRR (dB) &
+  $\mathrm{CMRR}_{\mathrm{dB}}
+   = G_{d,\mathrm{dB}} - G_{c,\mathrm{dB}}
+   = 20\log_{10}\!\bigl(G_d/G_c\bigr)$ \\
+Guadagno diff.\ lineare &
+  $G_d = 10^{\,G_{d,\mathrm{dB}}/20}$ \\
+Guadagno modo comune &
+  $G_c = 10^{\,(G_{d,\mathrm{dB}}-\mathrm{CMRR}_{\mathrm{dB}})/20}$ \\
+Tensione misurata &
+  $\displaystyle V_{\mathrm{mis}}
+   = V_{\mathrm{sorg}}\cdot\frac{Z_{\mathrm{in}}}{Z_{\mathrm{in}}+Z_{\mathrm{el}}}$ \\
+Artefatto in uscita (picco) &
+  $V_{\mathrm{out,cm}} = V_{\mathrm{in,cm}}\cdot G_c$ \\
+\bottomrule
+\end{tabularx}
+
+\bigskip
+%--------------------------------------------------------------
+\subsection*{\large 3 \;—\; Budget del Rumore all'ADC}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.38\linewidth} X}
+\toprule
+Formula & Equazione \\ \midrule
+Segnale bio amplificato (RMS) &
+  $\sigma_{\mathrm{bio,out}} = \sigma_{\mathrm{bio,in}}\times G_d$ \\
+Artefatto CM residuo (RMS, sinusoide) &
+  $\displaystyle \sigma_{\mathrm{cm}}
+   = \frac{V_{\mathrm{in,cm,peak}}\times G_c}{\sqrt{2}}$ \\
+Rumore totale RMS &
+  $\sigma_{\mathrm{tot}}
+   = \sqrt{\sigma_1^2+\sigma_2^2+\cdots+\sigma_n^2}$ \\
+ISI vs.\ SOA &
+  $\mathrm{ISI} = \mathrm{SOA} - T_{\mathrm{stim}}$ \\
+\bottomrule
+\end{tabularx}
+
+\bigskip
+%--------------------------------------------------------------
+\subsection*{\large 4 \;—\; ADC e Campionamento}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.38\linewidth} X}
+\toprule
+Formula & Equazione \\ \midrule
+Step di quantizzazione (LSB) &
+  $\displaystyle V_{LSB}
+   = \frac{V_{\max}-V_{\min}}{2^{N_{\mathrm{bit}}}}$ \\
+Rumore di quantizzazione (RMS) &
+  $\displaystyle \sigma_{\mathrm{quant}}
+   = \frac{V_{LSB}}{\sqrt{12}}$ \\
+Frequenza di Nyquist &
+  $\displaystyle f_{\mathrm{Nyq}} = \frac{f_s}{2}$ \\
+Frequenza dell'alias &
+  $f_{\mathrm{alias}} = \lvert f_s - f_{\mathrm{sig}}\rvert$
+  \quad per $f_s/2 \le f_{\mathrm{sig}} < f_s$ \\
+\bottomrule
+\end{tabularx}
+
+\bigskip
+%--------------------------------------------------------------
+\subsection*{\large 5 \;—\; Stima Spettrale (Welch)}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.38\linewidth} X}
+\toprule
+Formula & Equazione \\ \midrule
+Risoluzione spettrale &
+  $\displaystyle \Delta f
+   = \frac{1}{T_{\mathrm{win}}} = \frac{f_s}{N_{\mathrm{win}}}$ \\
+Campioni per finestra &
+  $N_{\mathrm{win}} = T_{\mathrm{win}}\cdot f_s$ \\
+Passo di spostamento &
+  $T_{\mathrm{shift}} = T_{\mathrm{win}}\cdot(1-O)$ \\
+Numero di periodogrammi &
+  $\displaystyle M
+   = 1+\!\left\lfloor\frac{T_{\mathrm{epoch}}-T_{\mathrm{win}}}
+                          {T_{\mathrm{shift}}}\right\rfloor$ \\
+Abbattimento rumore &
+  $\displaystyle \sigma_{\mathrm{avg}}
+   = \frac{\sigma_{\mathrm{raw}}}{\sqrt{N_{\mathrm{trial}}}}$ \\
+\bottomrule
+\end{tabularx}
+
+\bigskip
+%--------------------------------------------------------------
+\subsection*{\large 6 \;—\; Onset sEMG — Doppia Soglia}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.38\linewidth} X}
+\toprule
+Formula & Equazione \\ \midrule
+Latenza onset valido &
+  $t_{\mathrm{onset}}=t_0$
+  \quad (crossing di $A_c$ che regge $\ge T_c$) \\
+Latenza di commutazione &
+  $t_{\mathrm{switch}} = t_0 + T_c$ \\
+Varianza della media mobile &
+  $\sigma^2_{\mathrm{MA}} = \sigma^2_{\mathrm{input}}\,/\,L$ \\
+\bottomrule
+\end{tabularx}
+
+\bigskip
+%--------------------------------------------------------------
+\subsection*{\large 7 \;—\; Feature Vector BCI}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.38\linewidth} X}
+\toprule
+Formula & Equazione \\ \midrule
+Bin per banda &
+  $\displaystyle N_{\mathrm{bin}}
+   = \frac{f_{\mathrm{high}}-f_{\mathrm{low}}}{\Delta f}$ \\
+Lunghezza vettore feature &
+  $\mathrm{len} = N_{\mathrm{ch}}\times N_{\mathrm{bin}}$ \\
+Elettrodi SMR ottimali &
+  C3 (mano destra) / C4 (mano sinistra) \\
+\bottomrule
+\end{tabularx}
+
+\bigskip
+%--------------------------------------------------------------
+\subsection*{\large 8 \;—\; Grafi e Metriche di Rete}
+\begin{tabularx}{\linewidth}{>{\bfseries}p{0.38\linewidth} X}
+\toprule
+Formula & Equazione \\ \midrule
+Densità (grafo non orientato) &
+  $\displaystyle k = \frac{2L}{N(N-1)}$ \\
+Densità (grafo orientato) &
+  $\displaystyle k = \frac{L}{N(N-1)}$ \\
+Efficienza globale &
+  $\displaystyle E_g
+   = \frac{1}{N(N-1)}\sum_{i\neq j}\frac{1}{d_{ij}}$ \\
+Divisibilità (2 classi) &
+  $\displaystyle D
+   = \frac{L}{L+L_{\mathrm{inter}}}$
+  \quad $D\in[0.5,\,1]$ \\
+Modularità &
+  $\displaystyle Q
+   = \frac{1}{2L}\sum_{i,j}\!\left(a_{ij}
+     -\frac{g_i g_j}{2L}\right)\!\delta(C_i,C_j)$ \\
+Causalità di Granger &
+  $\displaystyle G_{y\to x}
+   = \ln\!\left(\frac{V_{x|x}}{V_{x|x,y}}\right) \ge 0$ \\
+Coerenza ordinaria &
+  $\displaystyle C_{xy}(f)
+   = \frac{|P_{xy}(f)|^2}{P_{xx}(f)\,P_{yy}(f)}
+   \in [0,1]$ \\
+\bottomrule
+\end{tabularx}
+
 \renewcommand{\arraystretch}{1.0}
+
 
 \newpage
 %=============================================================================
@@ -380,12 +705,7 @@ Di seguito sono raccolte tutte le relazioni matematiche necessarie per risolvere
 \addcontentsline{toc}{chapter}{Appendice Pratica: Risoluzione Passo-Passo dei Problemi d'Esame}
 %=============================================================================
 
-In questa appendice vengono analizzate le sei principali tipologie di problemi della Parte II degli scritti dal 2021 al 2025, illustrando per ciascuna la logica di risoluzione, i calcoli matematici e i trabocchetti più frequenti.
-
-\pagebreak
-%---
-
-\section{Tipologia 1: Calcolo dei Canali, Elettrodi e Montaggi (sEMG/EEG)}
+\section{Tipologia 1: Elettrodi e Montaggi (sEMG/EEG)}
 
 \subsection*{Testo Tipico}
 \emph{Un sistema sEMG prevede l'acquisizione di 2 canali differenziali posizionati su bicipite e tricipite.
@@ -633,8 +953,175 @@ Sapendo che la deviazione standard del rumore EEG spontaneo è $\sigma_{\text{EE
     \end{itemize}
 \end{enumerate}
 
+---
+
+\section{Tipologia 7: Budget del Rumore Totale all'Ingresso ADC}
+
+\subsection*{Testo Tipico}
+\emph{Un amplificatore EEG ha guadagno differenziale $G_d = 80\ \text{dB}$ e CMRR $= 90\ \text{dB}$.
+Il segnale EEG ha una deviazione standard (RMS) di $15\ \mu\text{V}$.
+Sulla cute è presente un artefatto di rete sinusoidale a $50\ \text{Hz}$ con ampiezza di picco $150\ \text{mV}$.
+La specifica di rumore totale all'ingresso ADC è $\leq 160\ \text{mV}$ RMS.
+Il sistema soddisfa la specifica?}
+
+\subsection*{Risoluzione Passo-Passo}
+\begin{enumerate}
+    \item \textbf{Calcolo del guadagno differenziale lineare ($G_d$)}:
+    \[
+    G_d = 10^{\frac{80}{20}} = 10^4 = 10000
+    \]
+    \item \textbf{RMS del segnale EEG amplificato}:
+    \[
+    \sigma_{\text{bio}} = \sigma_{\text{EEG, in}} \times G_d = 15\ \mu\text{V} \times 10000 = 150\ \text{mV}
+    \]
+    \item \textbf{Calcolo del guadagno di modo comune ($G_c$)}:
+    \[
+    G_{c,\text{dB}} = G_{d,\text{dB}} - \text{CMRR}_{\text{dB}} = 80 - 90 = -10\ \text{dB}
+    \implies G_c = 10^{-10/20} \approx 0.3162
+    \]
+    \item \textbf{Ampiezza di picco dell'artefatto residuo in uscita}:
+    \[
+    V_{\text{cm, out, peak}} = 150\ \text{mV} \times 0.3162 \approx 47.4\ \text{mV}
+    \]
+    \item \textbf{RMS dell'artefatto residuo} (sinusoide: RMS = picco / $\sqrt{2}$):
+    \[
+    \sigma_{\text{cm}} = \frac{47.4\ \text{mV}}{\sqrt{2}} \approx 33.5\ \text{mV}
+    \]
+    \item \textbf{Rumore totale RMS} (somma in quadratura di componenti indipendenti):
+    \[
+    \sigma_{\text{tot}} = \sqrt{\sigma_{\text{bio}}^2 + \sigma_{\text{cm}}^2} = \sqrt{150^2 + 33.5^2} \approx \sqrt{22500 + 1122} \approx \sqrt{23622} \approx 153.7\ \text{mV}
+    \]
+    \item \textbf{Verifica della specifica}: $153.7\ \text{mV} < 160\ \text{mV}$ $\implies$ \textbf{Specifica soddisfatta}.
+\end{enumerate}
+
 \subsection*{Trappole Comuni}
-* Elevare al quadrato solo il fattore di attenuazione senza rapportarlo alla probabilità del target, calcolando erroneamente la durata sui soli trial target ($100$ secondi anziché $500$).
-* Utilizzare l'ITI (Inter-Trial Interval) o la durata dello stimolo al posto del SOA (Stimulus Onset Asynchrony) per calcolare la durata complessiva della sessione, sottostimando il tempo reale.
+* Sommare direttamente le ampiezze ($150 + 33.5 = 183.5$) invece di sommarle in quadratura, violando l'ipotesi di indipendenza delle sorgenti.
+* Dimenticare la conversione da ampiezza di picco a RMS (divisione per $\sqrt{2}$) per l'artefatto sinusoidale.
+* Confondere il guadagno differenziale applicato al segnale biologico con il guadagno di modo comune applicato all'artefatto.
+
+---
+
+\section{Tipologia 8: Rilevamento dell'Onset con Algoritmo a Doppia Soglia}
+
+\subsection*{Testo Tipico}
+\emph{Il grafico mostra l'inviluppo sEMG stimato dal microcontrollore. L'algoritmo a doppia soglia usa $A_c = 15\ \mu\text{V}$ e $T_c = 60\ \text{ms}$, con campionamento ogni $10\ \text{ms}$.
+I superamenti della soglia si verificano ai tempi: $400\ \text{ms}$ (dura $40\ \text{ms}$), $440\ \text{ms}$ (falso), $570\ \text{ms}$ (dura $10\ \text{ms}$), $590\ \text{ms}$ (dura $>60\ \text{ms}$).
+Qual è la latenza dell'onset valido?}
+
+\subsection*{Risoluzione Passo-Passo}
+\begin{enumerate}
+    \item \textbf{Identificare tutti i candidati} (punti in cui l'inviluppo supera $A_c$):
+    a $400\ \text{ms}$, $440\ \text{ms}$, $570\ \text{ms}$ e $590\ \text{ms}$.
+    \item \textbf{Verificare la condizione di durata} ($T_c = 60\ \text{ms}$) per ciascun candidato:
+    \begin{itemize}
+        \item $400\ \text{ms}$: crossing dura $40\ \text{ms} < 60\ \text{ms}$ $\to$ \textbf{falso allarme}.
+        \item $440\ \text{ms}$: falso, scende subito $\to$ \textbf{falso allarme}.
+        \item $570\ \text{ms}$: crossing dura $10\ \text{ms} < 60\ \text{ms}$ $\to$ \textbf{falso allarme}.
+        \item $590\ \text{ms}$: crossing si mantiene per almeno $60\ \text{ms}$ $\to$ \textbf{Onset valido}.
+    \end{itemize}
+    \item \textbf{Latenza dell'onset muscolare}: $t_{\text{onset}} = 590\ \text{ms}$.
+    \item \textbf{Latenza di commutazione} (quando il sistema entra effettivamente in \emph{active}):
+    \[
+    t_{\text{switch}} = t_{\text{onset}} + T_c = 590\ \text{ms} + 60\ \text{ms} = 650\ \text{ms}
+    \]
+\end{enumerate}
+
+\subsection*{Trappole Comuni}
+* Confondere la \emph{latenza dell'onset muscolare} ($590\ \text{ms}$) con la \emph{latenza di commutazione} ($650\ \text{ms}$): la domanda chiede quando inizia l'attività muscolare, non quando il sistema la rileva.
+* Accettare il primo superamento della soglia come onset senza verificare la durata minima $T_c$.
+* Non azzerare il contatore di durata quando l'inviluppo scende sotto $A_c$: ogni nuova risalita ricomincia il conto da zero.
+
+---
+
+\section{Tipologia 9: Studio di Connettività in Reti Dirette (Scenario Epilessia)}
+
+\subsection*{Scenario d'Esame}
+\emph{Un paziente con epilessia farmacoresistente viene monitorato con EEG per diverse ore prima e dopo neurochirurgia.}
+\emph{Lo scopo è costruire reti cerebrali dirette tra regioni subcorticali,
+per quantificare il ruolo di regioni specifiche e confrontare la topologia Pre e Post intervento.
+I segnali di riposo operano nelle bande Theta e Alpha.}
+
+\subsection*{Q1 — Metodo di Acquisizione EEG}
+
+Le regioni da monitorare sono \textbf{tutte subcorticali}. Questo vincola fortemente la scelta del metodo:
+\begin{itemize}
+    \item L'\textbf{EEG di scalpo} (non invasivo) ha risoluzione spaziale limitata e le sorgenti profonde/subcorticali subiscono forte attenuazione e dispersione volumetrica. Non è adatto.
+    \item L'\textbf{ECoG} (griglia subdurale/epidurale) registra dalla superficie corticale ma non raggiunge le strutture profonde.
+    \item Lo \textbf{sEEG} (\emph{stereo-EEG}) o \textbf{depth electrodes} sono la scelta corretta: elettrodi profondi impiantati chirurgicamente che raggiungono direttamente le strutture subcorticali (ippocampo, amigdala, gangli della base, talamo).
+    Garantiscono alta SNR, alta risoluzione spaziale e accesso diretto alle aree di interesse.
+\end{itemize}
+\textbf{Risposta}: metodo \textbf{invasivo intraparenchimale (sEEG / depth electrodes)}, poiché le strutture di interesse sono subcorticali e inaccessibili dall'esterno.
+
+\subsection*{Q2 — Scelta dell'Estimatore di Connettività}
+
+\textbf{Estimatore scelto: PDC} (Partial Directed Coherence).
+\begin{itemize}
+    \item Reti \textbf{dirette} $\Rightarrow$ serve direzionalità: la OC è esclusa (simmetrica).
+    \item Bande Theta e Alpha $\Rightarrow$ serve analisi \textbf{spettrale}: la GC classica (solo nel tempo) è esclusa.
+    \item Più regioni simultanee $\Rightarrow$ serve approccio \textbf{multivariato} per eliminare sorgenti comuni.
+    \item Registrazioni di \textbf{ore} $\Rightarrow$ dati sufficienti per stimare il modello MVAR con stabilità.
+\end{itemize}
+\textbf{Pro}: direzionale; spettrale; multivariata; $\pi_{ij} \in [0,1]$.
+\textbf{Contro}: richiede molti dati; il numero di parametri da stimare scala come $p \cdot N^2$.
+
+\subsection*{Q3 — Calcolo Metriche su Grafi Diretti}
+
+Di seguito viene mostrato un esempio numerico su un grafo diretto a $N = 4$ nodi, analogo a quelli che compaiono negli esami con matrici di adiacenza Pre/Post.
+Sia data la matrice di adiacenza \textbf{diretta} $A$ (la riga $i$ indica le connessioni \emph{uscenti} dal nodo $i$, la colonna $j$ quelle \emph{entranti} nel nodo $j$):
+\[
+A = \begin{pmatrix}
+0 & 1 & 0 & 1 \\
+0 & 0 & 1 & 0 \\
+1 & 0 & 0 & 1 \\
+0 & 1 & 0 & 0
+\end{pmatrix}
+\]
+
+\textbf{Convenzione} (verificare sempre nel testo dell'esame):
+$a_{ij} = 1$ indica un arco che va \emph{da} $i$ \emph{verso} $j$ (riga = sorgente, colonna = destinazione).
+
+\paragraph{Densità del grafo diretto}
+\[
+L = \text{numero di 1 in } A = 6, \quad
+L_{\text{max}} = N(N-1) = 4 \times 3 = 12
+\]
+\[
+k = \frac{L}{N(N-1)} = \frac{6}{12} = 0.50
+\]
+
+\paragraph{Out-degree e In-degree per ogni nodo}
+\begin{itemize}
+    \item \textbf{Out-degree} $g_i^{\text{OUT}}$: somma della riga $i$ di $A$ (quanti archi \emph{escono} dal nodo $i$).
+    \item \textbf{In-degree} $g_i^{\text{IN}}$: somma della colonna $i$ di $A$ (quanti archi \emph{entrano} nel nodo $i$).
+\end{itemize}
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{cccc}
+\toprule
+Nodo & Out-degree & In-degree & Totale \\
+\midrule
+1 & $0+1+0+1=2$ & $0+0+1+0=1$ & 3 \\
+2 & $0+0+1+0=1$ & $1+0+0+1=2$ & 3 \\
+3 & $1+0+0+1=2$ & $0+1+0+0=1$ & 3 \\
+4 & $0+1+0+0=1$ & $1+0+1+0=2$ & 3 \\
+\bottomrule
+\end{tabular}
+\renewcommand{\arraystretch}{1.0}
+\end{center}
+\textbf{Verifica}: $\sum g_i^{\text{OUT}} = \sum g_i^{\text{IN}} = L = 6$.
+
+\paragraph{Interpretazione del cambiamento Pre $\to$ Post}
+Quando si confrontano due grafi (Pre e Post intervento), le domande tipiche chiedono di:
+\begin{enumerate}
+    \item Confrontare la \textbf{densità}: una densità inferiore Post indica che la chirurgia ha ridotto il numero di connessioni attive (meno sincronizzazione patologica).
+    \item Confrontare \textbf{in-degree e out-degree} dei singoli nodi: un nodo con alto out-degree Pre che si riduce Post è un candidato come \emph{hub} epilettico resecato.
+    \item Identificare se la rete è diventata \textbf{meno connessa} (la patologia epilettica di solito aumenta la connettività; la chirurgia mira a ridurla).
+\end{enumerate}
+
+\subsection*{Trappole Comuni}
+* In un grafo \textbf{diretto}, usare per errore la formula della densità per grafi \emph{non diretti} ($2L / N(N-1)$) invece di $L / N(N-1)$.
+* Confondere in-degree e out-degree: l'out-degree si calcola sulla \textbf{riga}, l'in-degree sulla \textbf{colonna}.
+* Interpretare la convenzione della matrice al contrario: verificare sempre se $a_{ij} = 1$ significa $i \to j$ oppure $j \to i$.
+* Dimenticare la verifica $\sum g^{\text{OUT}} = \sum g^{\text{IN}} = L$ come controllo della correttezza dei calcoli.
 
 \end{document}
