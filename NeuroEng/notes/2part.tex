@@ -470,6 +470,14 @@ Q = \frac{1}{2L} \sum_{i,j=1}^N \left( a_{ij} - \frac{g_i g_j}{2L} \right) \delt
 \]
 Valori positivi ($Q > 0$) indicano una struttura modulare statisticamente significativa.
 
+\section{Metriche di Rete}
+\begin{itemize}
+    \item \textbf{Densità ($k$)}: Per grafi orientati $k = L / [N(N-1)]$.
+    \item \textbf{Efficienza Globale ($E_g$)}: $E_g = \frac{1}{N(N-1)} \sum_{i \neq j} \frac{1}{d_{ij}}$.
+    \item \textbf{Divisibilità ($D$)}: $D = \frac{L}{L + L_{\text{inter}}}$.
+    \item \textbf{Modularità ($Q$)}: $Q = \frac{1}{2L} \sum_{i,j} (a_{ij} - \frac{g_i g_j}{2L}) \delta(C_i, C_j)$.
+\end{itemize}
+
 %=============================================================================
 \chapter{BCI Assistivi, Riabilitativi ed Elettromiografia}
 %=============================================================================
@@ -541,6 +549,7 @@ Ogni blocco è una tabella indipendente: la colonna sinistra è il nome della fo
 \subsection*{\large 1 \;—\; Biologia Cellulare}
 \begin{tabularx}{\linewidth}{>{\bfseries}p{0.38\linewidth} X}
 \toprule
+<<<<<<< Updated upstream
 Formula & Equazione \\ \midrule
 Equazione di Nernst &
   $\displaystyle E_j = -\frac{RT}{zF}\ln\!\left(\frac{[X]_{\mathrm{in}}}{[X]_{\mathrm{out}}}\right)$ \\
@@ -630,6 +639,46 @@ Numero di periodogrammi &
 Abbattimento rumore &
   $\displaystyle \sigma_{\mathrm{avg}}
    = \frac{\sigma_{\mathrm{raw}}}{\sqrt{N_{\mathrm{trial}}}}$ \\
+=======
+\textbf{Ambito} & \textbf{Nome Formula} & \textbf{Equazione} \\
+\midrule
+\multirow{2}{*}{\textbf{Biologia Cellulare}} & Equazione di Nernst & $E_j = -\frac{RT}{zF}\ln\left(\frac{[X]_{\text{in}}}{[X]_{\text{out}}}\right)$ \\
+& Costante di Spazio & $\lambda = \sqrt{\frac{r_m}{r_L}}$ \\
+\midrule
+\multirow{4}{*}{\textbf{Strumentazione}} & CMRR (Decibel) & $\text{CMRR}_{\text{dB}} = 20\log_{10}\left(\frac{G_d}{G_c}\right) = G_{d,\text{dB}} - G_{c,\text{dB}}$ \\
+& Guadagno di Modo Comune & $G_c = 10^{\frac{G_{d,\text{dB}} - \text{CMRR}_{\text{dB}}}{20}}$ \\
+& Tensione Misurata & $V_{\text{mis}} = V_{\text{sorg}} \cdot \frac{Z_{\text{in}}}{Z_{\text{in}} + Z_{\text{el}}}$ \\
+& Artefatto in Uscita (Picco) & $V_{\text{out, cm}} = V_{\text{in, cm}} \cdot G_c$ \\
+\midrule
+\multirow{3}{*}{\textbf{ADC}} & Risoluzione (Step Size LSB) & $V_{LSB} = \frac{V_{\text{range}}}{2^{N_{\text{bit}}}}$ \\
+& Rumore di Quantizzazione & $\sigma_{\text{quant}} = \frac{V_{LSB}}{\sqrt{12}}$ \\
+& Frequenza di Nyquist & $f_{\text{Nyq}} = \frac{f_s}{2}$ \\
+\midrule
+\multirow{5}{*}{\textbf{Stima Spettrale}} & Risoluzione Spettrale Welch & $\Delta f = \frac{1}{T_{\text{win}}} = \frac{f_s}{N_{\text{win}}}$ \\
+& Campioni per Finestra & $N_{\text{win}} = T_{\text{win}} \cdot f_s$ \\
+& Spostamento Finestra & $T_{\text{shift}} = T_{\text{win}} \cdot (1 - O)$ \\
+& Numero di Segmenti & $M = 1 + \left\lfloor \frac{T_{\text{epoch}} - T_{\text{win}}}{T_{\text{shift}}} \right\rfloor$ \\
+& Abbattimento Rumore (Media) & $\sigma_{\text{avg}} = \frac{\sigma_{\text{raw}}}{\sqrt{N_{\text{trial}}}}$ \\
+\midrule
+\multirow{5}{*}{\textbf{Grafi e Reti}} & Densità (Grafo Diretto) & $k = \frac{L}{N(N-1)}$ \\
+& Densità (Grafo Non Diretto) & $k = \frac{2L}{N(N-1)}$ \\
+& Efficienza Globale & $E_g = \frac{1}{N(N-1)} \sum_{i \neq j} \frac{1}{d_{ij}}$ \\
+& Divisibility (2 classi) & $D = \frac{L}{L + L_{\text{inter}}}$ \\
+& Modularità & $Q = \frac{1}{2L} \sum_{i,j} \left( a_{ij} - \frac{g_i g_j}{2L} \right) \delta(C_i, C_j)$ \\
+\textbf{Ambito} & \textbf{Nome Formula} & \textbf{Equazione} \\
+\midrule
+\multirow{2}{*}{\textbf{Biologia}} & Nernst & \(E_j = -\frac{RT}{zF}\ln(\frac{[X]_{\text{in}}}{[X]_{\text{out}}})\) \\
+& Costante di Spazio & \(\lambda = \sqrt{r_m/r_L}\) \\
+\midrule
+\multirow{2}{*}{\textbf{Strumentazione}} & CMRR (dB) & \(20\log_{10}(G_d/G_c)\) \\
+& Artefatto (RMS) & \(V_{\text{res, RMS}} = \frac{V_{\text{in}} \cdot 10^{(G_d - CMRR)/20}}{\sqrt{2}}\) \\
+\midrule
+\multirow{2}{*}{\textbf{Causalità}} & Granger & \(G_{y \to x} = \ln(V_{x|x} / V_{x|x,y})\) \\
+& PDC & \(\pi_{ij}(f) = \frac{|\tilde{A}_{ij}(f)|}{\sqrt{\sum_{m=1}^N |\tilde{A}_{mj}(f)|^2}}\) \\
+\midrule
+\multirow{2}{*}{\textbf{Welch}} & Risoluzione & \(\Delta f \approx 1/T_{\text{win}}\) \\
+& N. Segmenti & \(M = 1 + \lfloor (T_{\text{epoch}} - T_{\text{win}})/T_{\text{shift}} \rfloor\) \\
+>>>>>>> Stashed changes
 \bottomrule
 \end{tabularx}
 
@@ -1123,5 +1172,14 @@ Quando si confrontano due grafi (Pre e Post intervento), le domande tipiche chie
 * Confondere in-degree e out-degree: l'out-degree si calcola sulla \textbf{riga}, l'in-degree sulla \textbf{colonna}.
 * Interpretare la convenzione della matrice al contrario: verificare sempre se $a_{ij} = 1$ significa $i \to j$ oppure $j \to i$.
 * Dimenticare la verifica $\sum g^{\text{OUT}} = \sum g^{\text{IN}} = L$ come controllo della correttezza dei calcoli.
+
+\section*{Tipologia 7: Esercizio Causalità (Granger)}
+\textbf{Testo}: \emph{Si valuti la causalità da $y$ a $x$. La varianza dell'errore di predizione bivariato è $V_{x|x,y} = 0.8$, quella univariata è $V_{x|x} = 1.0$. Calcolare l'indice di Granger.}
+
+\textbf{Soluzione}:
+\[
+G_{y \to x} = \ln\left( \frac{V_{x|x}}{V_{x|x,y}} \right) = \ln\left( \frac{1.0}{0.8} \right) = \ln(1.25) \approx 0.223
+\]
+\textbf{Commento}: Essendo $G > 0$, il segnale $y$ fornisce un contributo predittivo significativo per il segnale $x$, confermando una relazione di causalità nel senso di Granger.
 
 \end{document}
