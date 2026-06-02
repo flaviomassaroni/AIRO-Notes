@@ -639,46 +639,7 @@ Numero di periodogrammi &
 Abbattimento rumore &
   $\displaystyle \sigma_{\mathrm{avg}}
    = \frac{\sigma_{\mathrm{raw}}}{\sqrt{N_{\mathrm{trial}}}}$ \\
-=======
-\textbf{Ambito} & \textbf{Nome Formula} & \textbf{Equazione} \\
-\midrule
-\multirow{2}{*}{\textbf{Biologia Cellulare}} & Equazione di Nernst & $E_j = -\frac{RT}{zF}\ln\left(\frac{[X]_{\text{in}}}{[X]_{\text{out}}}\right)$ \\
-& Costante di Spazio & $\lambda = \sqrt{\frac{r_m}{r_L}}$ \\
-\midrule
-\multirow{4}{*}{\textbf{Strumentazione}} & CMRR (Decibel) & $\text{CMRR}_{\text{dB}} = 20\log_{10}\left(\frac{G_d}{G_c}\right) = G_{d,\text{dB}} - G_{c,\text{dB}}$ \\
-& Guadagno di Modo Comune & $G_c = 10^{\frac{G_{d,\text{dB}} - \text{CMRR}_{\text{dB}}}{20}}$ \\
-& Tensione Misurata & $V_{\text{mis}} = V_{\text{sorg}} \cdot \frac{Z_{\text{in}}}{Z_{\text{in}} + Z_{\text{el}}}$ \\
-& Artefatto in Uscita (Picco) & $V_{\text{out, cm}} = V_{\text{in, cm}} \cdot G_c$ \\
-\midrule
-\multirow{3}{*}{\textbf{ADC}} & Risoluzione (Step Size LSB) & $V_{LSB} = \frac{V_{\text{range}}}{2^{N_{\text{bit}}}}$ \\
-& Rumore di Quantizzazione & $\sigma_{\text{quant}} = \frac{V_{LSB}}{\sqrt{12}}$ \\
-& Frequenza di Nyquist & $f_{\text{Nyq}} = \frac{f_s}{2}$ \\
-\midrule
-\multirow{5}{*}{\textbf{Stima Spettrale}} & Risoluzione Spettrale Welch & $\Delta f = \frac{1}{T_{\text{win}}} = \frac{f_s}{N_{\text{win}}}$ \\
-& Campioni per Finestra & $N_{\text{win}} = T_{\text{win}} \cdot f_s$ \\
-& Spostamento Finestra & $T_{\text{shift}} = T_{\text{win}} \cdot (1 - O)$ \\
-& Numero di Segmenti & $M = 1 + \left\lfloor \frac{T_{\text{epoch}} - T_{\text{win}}}{T_{\text{shift}}} \right\rfloor$ \\
-& Abbattimento Rumore (Media) & $\sigma_{\text{avg}} = \frac{\sigma_{\text{raw}}}{\sqrt{N_{\text{trial}}}}$ \\
-\midrule
-\multirow{5}{*}{\textbf{Grafi e Reti}} & Densità (Grafo Diretto) & $k = \frac{L}{N(N-1)}$ \\
-& Densità (Grafo Non Diretto) & $k = \frac{2L}{N(N-1)}$ \\
-& Efficienza Globale & $E_g = \frac{1}{N(N-1)} \sum_{i \neq j} \frac{1}{d_{ij}}$ \\
-& Divisibility (2 classi) & $D = \frac{L}{L + L_{\text{inter}}}$ \\
-& Modularità & $Q = \frac{1}{2L} \sum_{i,j} \left( a_{ij} - \frac{g_i g_j}{2L} \right) \delta(C_i, C_j)$ \\
-\textbf{Ambito} & \textbf{Nome Formula} & \textbf{Equazione} \\
-\midrule
-\multirow{2}{*}{\textbf{Biologia}} & Nernst & \(E_j = -\frac{RT}{zF}\ln(\frac{[X]_{\text{in}}}{[X]_{\text{out}}})\) \\
-& Costante di Spazio & \(\lambda = \sqrt{r_m/r_L}\) \\
-\midrule
-\multirow{2}{*}{\textbf{Strumentazione}} & CMRR (dB) & \(20\log_{10}(G_d/G_c)\) \\
-& Artefatto (RMS) & \(V_{\text{res, RMS}} = \frac{V_{\text{in}} \cdot 10^{(G_d - CMRR)/20}}{\sqrt{2}}\) \\
-\midrule
-\multirow{2}{*}{\textbf{Causalità}} & Granger & \(G_{y \to x} = \ln(V_{x|x} / V_{x|x,y})\) \\
-& PDC & \(\pi_{ij}(f) = \frac{|\tilde{A}_{ij}(f)|}{\sqrt{\sum_{m=1}^N |\tilde{A}_{mj}(f)|^2}}\) \\
-\midrule
-\multirow{2}{*}{\textbf{Welch}} & Risoluzione & \(\Delta f \approx 1/T_{\text{win}}\) \\
-& N. Segmenti & \(M = 1 + \lfloor (T_{\text{epoch}} - T_{\text{win}})/T_{\text{shift}} \rfloor\) \\
->>>>>>> Stashed changes
+
 \bottomrule
 \end{tabularx}
 
