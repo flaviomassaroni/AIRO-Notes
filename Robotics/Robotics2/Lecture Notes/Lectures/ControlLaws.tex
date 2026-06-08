@@ -1,0 +1,108 @@
+\section{Control Laws in Robotics}
+
+\subsection{Proportional-Derivative (PD)}
+\label{subsec:pd_control}
+
+Proportional-Derivative (PD) control is the cornerstone of robotic motion control. In Robotics 2,
+ we move beyond simple linear systems to consider the full non-linear dynamics of an $n$-DOF manipulator, typically expressed as:
+\begin{equation}
+    B(\bm{q})\ddot{\bm{q}} + \bm{C}(\bm{q}, \dot{\bm{q}})\dot{\bm{q}} + \bm{g}(\bm{q}) = \bm{\tau}
+\end{equation}
+where $B(\bm{q})$ is the inertia matrix, $\bm{C}$ represents Coriolis/centrifugal terms, and $\bm{g}$ is the gravity vector. 
+PD control is used to compute the torque $\bm{\tau}$ required to achieve a specific task.
+It calculates control output based on both the current error and the rate of change of that error, making it effective for systems
+requiring fast response and minimal overshoot.
+It functions as a tracker for a system to a reference point.
+
+\subsubsection{Regulation and the Mechanical Analogy}
+For a regulation task (reaching a constant set-point $\bm{q}_d$), the PD control law is:
+\begin{equation}
+    \bm{\tau} = \bm{K}_P (\bm{q}_d - \bm{q}) - \bm{K}_D \dot{\bm{q}}
+\end{equation}
+This can be physically interpreted as an \textbf{Impedance Control} strategy. 
+
+The controller shapes the robot's behavior so that it mimics a passive mechanical system where the joints are connected to $\bm{q}_d$ via virtual springs ($\bm{K}_P$)
+and virtual dampers ($\bm{K}_D$). This analogy is crucial because it ensures that, in the absence of gravity, the system is inherently stable due to its passive nature.
+
+\begin{framed}
+\noindent \textit{Notes: Impedance control is a robotics strategy that regulates 
+the dynamic interaction between a robot and its environment by defining a desired relationship between applied 
+force and resulting motion (mass-spring-damper system). The \textbf{Core Principle} is that the robot's end-effector is controlled to follow a 
+specified impedance behavior, governed by the following dynamic equation:
+\begin{equation}
+    \bm{F} = \bm{M}\bm{a} + \bm{C}\bm{v} + \bm{K}\bm{x} + \bm{f} + \bm{s}
+\end{equation}
+where $\bm{F}$ is the interaction force, $\bm{x}$ is the position, $\bm{v}$ the velocity, and $\bm{a}$ the acceleration. 
+The parameters $\bm{K}$, $\bm{C}$, and $\bm{M}$ represent the stiffness, damping, and inertial matrices respectively, 
+while $\bm{f}$ accounts for friction and $\bm{s}$ for static forces.}
+\end{framed}
+
+\subsubsection{Stability Analysis via Lyapunov}
+A fundamental result in Robotics 2 is the stability proof for PD control. 
+By choosing a Lyapunov candidate function based on the total energy of the system (kinetic + potential error):
+\begin{equation}
+    V(\bm{e}, \dot{\bm{q}}) = \frac{1}{2}\dot{\bm{q}}^T B(\bm{q})\dot{\bm{q}} + \frac{1}{2}\bm{e}^T \bm{K}_P \bm{e}
+\end{equation}
+it can be shown that $\dot{V} = -\dot{\bm{q}}^T \bm{K}_D \dot{\bm{q}} \leq 0$. 
+Using LaSalle's Invariance Principle, we conclude that the system is \textbf{Asymptotically Stable}, 
+meaning the robot will eventually stop at the desired configuration $\bm{q}_d$, provided that gravity is compensated.
+
+
+
+[Image of a mass-spring-damper system model]
+
+
+\subsubsection{PD with Gravity Compensation}
+The primary drawback of a pure PD controller is the presence of a steady-state error $\bm{e}_{\infty}$ 
+caused by the gravity vector $\bm{g}(\bm{q})$. To achieve zero error without using an Integral (I) term—which can introduce instability—we employ 
+\textbf{PD with Gravity Compensation}:
+\begin{equation}
+    \bm{\tau} = \bm{K}_P \bm{e} - \bm{K}_D \dot{\bm{q}} + \bm{g}(\bm{q})
+\end{equation}
+This model-based approach "cancels" the gravitational pull at every configuration, effectively making the robot behave as if it were in a zero-G environment.
+
+\subsubsection{Extension to Task Space Control}
+In many applications, the control objective is defined in the operational space (Cartesian coordinates $\bm{x}$) rather than joint space. 
+The PD law is then mapped through the \textbf{Analytic Jacobian} $\bm{J}(\bm{q})$:
+\begin{equation}
+    \bm{\tau} = \bm{J}^T(\bm{q}) \left[ \bm{K}_P (\bm{x}_d - \bm{x}) - \bm{K}_D \dot{\bm{x}} \right] + \bm{g}(\bm{q})
+\end{equation}
+This allows the controller to define the stiffness and damping directly at the end-effector level, which is essential for interaction tasks and human-robot collaboration.
+
+
+\subsection{Proportional-Integral-Derivative (PID)}
+\label{subsec:pid_control}
+
+The PD control law previously discussed exhibits a fundamental limitation: it cannot eliminate the \textbf{steady-state error} 
+($e_{\infty}$) when the system is subject to persistent, unmodeled forces. In robotics, these typically include gravity, joint friction,
+or sensor calibration offsets. Since a PD controller requires a non-zero error to generate a static compensation torque, the system will settle at 
+an equilibrium point where the proportional action exactly balances the external disturbance, but $e \neq 0$.
+
+To address this, an \textbf{Integral (I)} term is added, which considers the cumulative sum of past errors. The resulting PID control law in the time domain is:
+\begin{equation}
+    u(t) = K_P e(t) + K_I \int_{0}^{t} e(\tau) d\tau + K_D \dot{e}(t)
+\end{equation}
+where $K_I$ is the integral gain. In the Laplace domain, the transfer function of the controller is expressed as:
+\begin{equation}
+    K(s) = K_P + \frac{K_I}{s} + K_D s
+\end{equation}
+
+\subsubsection{Role of the Integral Term}
+The integral action provides a "memory" for the controller. As long as a residual error exists, the integral term will continue to grow, 
+increasing the control output until the error is driven to zero. This effectively provides \textbf{automatic compensation} for constant disturbances 
+without requiring an explicit model of the force (e.g., without needing to know the exact value of the gravitational vector $g(q)$).
+
+\begin{framed}
+\noindent \textit{Notes: While the integral term eliminates steady-state error, it can introduce instability. 
+In robotics, excessive $K_I$ leads to \textbf{overshoot} and oscillations. Furthermore, practical implementations must account 
+for \textbf{Integrator Wind-up}, a phenomenon where the integral term grows excessively when the actuators saturate, 
+leading to large overshoots when the error finally changes sign.}
+\end{framed}
+
+\subsubsection{Summary of Control Modes}
+The synergy of the three terms allows for comprehensive control:
+\begin{itemize}
+    \item \textbf{Proportional (P):} Provides immediate corrective action based on the current error magnitude.
+    \item \textbf{Integral (I):} Eliminates steady-state offsets by considering the error history.
+    \item \textbf{Derivative (D):} Predicts future error trends to dampen the response and improve stability.
+\end{itemize}
