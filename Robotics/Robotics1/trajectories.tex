@@ -114,15 +114,12 @@
 
 {\centering
   {\Large\bfseries Trajectory Planning --- Cheat Sheet}\\[3pt]
-  {\normalsize Robotics 1 $\cdot$ Prof.\ De Luca $\cdot$ Open Book}\\[2pt]
   \hrule
   \vspace{6pt}
 }
 
 % ════════════════════════════════════════════════════════════
 \section{Diagramma Decisionale}
-
-Rispondi in ordine prima di iniziare a calcolare.
 
 \begin{amberbox}
 \textbf{Q1 --- Dove si pianifica il moto?}\\
@@ -356,6 +353,155 @@ T_{s,i} = T_0 + \frac{|\dot{q}_i(T_0)|}{A_{\max,i}} \qquad T_s = \max_i\{T_{s,i}
 
 % ════════════════════════════════════════════════════════════
 \newpage
+\section{LTS --- Lift--Travel--Setdown}
+
+Un \textbf{LTS} divide il moto di un giunto in 3 fasi raccordate $C^2$:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}llp{7cm}@{}}
+\toprule
+\textbf{Fase} & \textbf{Intervallo} & \textbf{Condizioni forti}\\
+\midrule
+Lift     & $[0,\, t_1]$      & $\dot{q}=\ddot{q}=0$ a $t=0$ \quad (polinomio grado 4)\\
+Travel   & $[t_1,\, t_2]$    & nessuna \quad (polinomio grado 3)\\
+Setdown  & $[t_2,\, t_f]$    & $\dot{q}=\ddot{q}=0$ a $t=t_f$ \quad (polinomio grado 4)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le \textbf{incognite} sono le velocit\`a ai raccordi: $v_1 = \dot{q}(t_1)$ e $v_2 = \dot{q}(t_2)$.
+
+% ── STEP 1 ──────────────────────────────────────────────────
+\subsection{Step 1 --- Polinomio di Travel}
+
+Poni $\tau = t - t_1$, $h = t_2 - t_1$, $\Delta q_T = q(t_2) - q(t_1)$.
+\[
+q_T(\tau) = q(t_1) + v_1\tau + a_2\tau^2 + a_3\tau^3, \qquad \tau\in[0,h]
+\]
+\[
+a_2 = \frac{3\Delta q_T - (2v_1+v_2)\,h}{h^2} \qquad
+a_3 = \frac{-2\Delta q_T + (v_1+v_2)\,h}{h^3}
+\]
+Deriva per ottenere:
+\[
+\dot{q}_T(\tau) = v_1 + 2a_2\tau + 3a_3\tau^2 \qquad
+\ddot{q}_T(\tau) = 2a_2 + 6a_3\tau
+\]
+
+% ── STEP 2 ──────────────────────────────────────────────────
+\subsection{Step 2 --- Polinomio di Lift}
+
+Poni $\tau = t$, intervallo $[0,t_1]$, grado 4:
+\[
+q_L(\tau) = a_0 + a_1\tau + a_2\tau^2 + a_3\tau^3 + a_4\tau^4
+\]
+
+Le condizioni alle due estremit\`a danno:
+\[
+a_0 = q_i, \qquad a_1 = 0, \qquad a_2 = 0
+\]
+Le restanti due ($q_L(t_1)=q(t_1)$ e $\dot{q}_L(t_1)=v_1$) formano un \textbf{sistema 2$\times$2} in $a_3,a_4$:
+\[
+\begin{cases}
+a_3 t_1^3 + a_4 t_1^4 = q(t_1) - q_i\\[4pt]
+3a_3 t_1^2 + 4a_4 t_1^3 = v_1
+\end{cases}
+\quad\Rightarrow\quad
+a_3 = \frac{4[q(t_1)-q_i] - v_1 t_1}{t_1^3}, \quad
+a_4 = \frac{-3[q(t_1)-q_i] + v_1 t_1}{t_1^4}
+\]
+Deriva per ottenere:
+\[
+\ddot{q}_L(\tau) = 6a_3\tau + 12a_4\tau^2
+\]
+
+% ── STEP 3 ──────────────────────────────────────────────────
+\subsection{Step 3 --- Polinomio di Setdown}
+
+Poni $\tau = t - t_2$, intervallo $[0,\, t_f-t_2]$, grado 4. Sia $T_S = t_f - t_2$:
+\[
+q_S(\tau) = a_0 + a_1\tau + a_2\tau^2 + a_3\tau^3 + a_4\tau^4
+\]
+Le condizioni in $\tau=0$ danno subito:
+\[
+a_0 = q(t_2), \qquad a_1 = v_2
+\]
+Le tre condizioni in $\tau = T_S$ ($q_S = q_f$, $\dot{q}_S = 0$, $\ddot{q}_S = 0$) formano un \textbf{sistema 3$\times$3} in $a_2,a_3,a_4$:
+\[
+\begin{cases}
+a_2 T_S^2 + a_3 T_S^3 + a_4 T_S^4 = q_f - q(t_2) - v_2 T_S\\[4pt]
+2a_2 T_S + 3a_3 T_S^2 + 4a_4 T_S^3 = -v_2\\[4pt]
+2a_2 + 6a_3 T_S + 12a_4 T_S^2 = 0
+\end{cases}
+\]
+
+\begin{cyanbox}
+\textbf{Soluzione esplicita} (sostituendo $\Delta q_S = q_f - q(t_2)$):
+\[
+a_2 = \frac{10\Delta q_S - 6v_2 T_S}{T_S^2}, \quad
+a_3 = \frac{-15\Delta q_S + 7v_2 T_S}{T_S^3}, \quad
+a_4 = \frac{6\Delta q_S - 3v_2 T_S}{T_S^4}
+\]
+Deriva per ottenere $\ddot{q}_S(\tau) = 2a_2 + 6a_3\tau + 12a_4\tau^2$.
+\end{cyanbox}
+
+\begin{redbox}
+\textbf{Attenzione:} Setdown \`e speculare al Lift ma le condizioni forti sono alla \emph{fine},
+non all'inizio $\Rightarrow$ il sistema \`e \textbf{3$\times$3} (non 2$\times$2).
+\end{redbox}
+
+% ── STEP 4 ──────────────────────────────────────────────────
+\subsection{Step 4 --- Continuit\`a $C^2$ ai raccordi}
+
+Eguaglia le accelerazioni ai due raccordi:
+\[
+\ddot{q}_L(t_1) = \ddot{q}_T(0) \quad\Rightarrow\quad
+6a_3^{(L)}\,t_1 + 12a_4^{(L)}\,t_1^2 = 2a_2^{(T)}
+\]
+\[
+\ddot{q}_T(h) = \ddot{q}_S(0) \quad\Rightarrow\quad
+2a_2^{(T)} + 6a_3^{(T)}\,h = 2a_2^{(S)}
+\]
+Sostituendo le espressioni dei coefficienti ottenute negli Step 1--3, si ottiene
+un \textbf{sistema lineare 2$\times$2 in $v_1$ e $v_2$}. Risolvi numericamente.
+
+\textit{Nota: $v_2 < 0$ \`e possibile (il giunto supera il target e ritorna).}
+
+% ── STEP 5 ──────────────────────────────────────────────────
+\subsection{Step 5 --- Leggi esplicite del moto}
+
+Sostituisci $v_1$ e $v_2$ trovati nei tre polinomi e scrivi
+$q(t)$, $\dot{q}(t)$, $\ddot{q}(t)$ per ogni fase con le rispettive variabili locali $\tau$.
+
+% ── STEP 6 ──────────────────────────────────────────────────
+\subsection{Step 6 --- Verifica vincoli cinematici}
+
+Per ogni fase, trovare il massimo di $|\dot{q}|$ e $|\ddot{q}|$:
+\begin{enumerate}
+  \item Poni la derivata uguale a zero per trovare i punti stazionari interni.
+  \item Valuta la funzione nei punti interni \textbf{e} ai bordi dell'intervallo.
+  \item Prendi il massimo assoluto tra tutti i candidati.
+  \item Confronta con $\dot{q}_{\max}$ e $\ddot{q}_{\max}$ imposti dal problema.
+\end{enumerate}
+
+\begin{redbox}
+Il massimo di $|\ddot{q}|$ pu\`o trovarsi a un \textit{bordo}, non al punto stazionario
+interno --- valuta sempre tutti i candidati.
+\end{redbox}
+
+% ── STEP 7 ──────────────────────────────────────────────────
+\subsection{Step 7 --- Verifica $C^2$ numerica}
+
+Controlla ai due raccordi:
+\[
+\ddot{q}_L(t_1) = \ddot{q}_T(0) \;\checkmark \qquad\qquad \ddot{q}_T(h) = \ddot{q}_S(0) \;\checkmark
+\]
+Posizione e velocit\`a sono continue \emph{per costruzione}: \`e sufficiente
+verificare solo le accelerazioni. Piccole discrepanze decimali sono normali.
+
+% ════════════════════════════════════════════════════════════
+
 \section{Pattern dagli Esami (2024--2026)}
 
 \begin{center}
