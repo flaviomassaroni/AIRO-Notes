@@ -13,7 +13,7 @@
   --bg:#0e0f11;--surface:#161719;--surface2:#1e2023;--border:#2a2d31;
   --text:#e8e9eb;--muted:#6b7280;--accent:#4f9cf9;--accent-dim:rgba(79,156,249,.12);
   --green:#34d399;--green-dim:rgba(52,211,153,.12);--red:#f87171;--red-dim:rgba(248,113,113,.12);
-  --yellow:#fbbf24;--purple:#a78bfa;--sidebar-w:260px;
+  --yellow:#fbbf24;--purple:#a78bfa;--orange:#fb923c;--teal:#2dd4bf;--sidebar-w:260px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;display:flex;height:100vh;overflow:hidden;}
@@ -53,6 +53,60 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
 #add-csv-btn{width:100%;padding:7px;background:var(--surface2);border:1px dashed var(--border);border-radius:6px;color:var(--muted);font-family:'IBM Plex Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
 #add-csv-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
 #csv-file-input{display:none;}
+
+/* ── AI settings (sidebar) ── */
+.ai-status-row{display:flex;align-items:center;gap:7px;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);}
+.ai-status-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.ai-status-dot.ok{background:var(--green);}
+.ai-status-dot.bad{background:var(--red);}
+.ai-model-btns{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
+.ai-model-btn{padding:6px 10px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);font-size:11px;cursor:pointer;text-align:left;transition:all .15s;width:100%;font-family:'IBM Plex Mono',monospace;}
+.ai-model-btn:hover{border-color:var(--accent);color:var(--accent);}
+.ai-model-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+#ai-wizard-btn{width:100%;margin-top:8px;padding:7px;background:var(--surface2);border:1px dashed var(--border);border-radius:6px;color:var(--muted);font-family:'IBM Plex Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;}
+#ai-wizard-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+
+/* ── AI guided-setup modal ── */
+.ai-wizard-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:24px;}
+.ai-wizard-overlay.show{display:flex;}
+.ai-wizard-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:640px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;}
+.ai-wizard-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ai-wizard-header h2{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--text);font-weight:500;}
+.ai-wizard-header button{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;}
+.ai-wizard-header button:hover{color:var(--text);}
+.ai-wizard-body{padding:18px 20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:22px;}
+.ai-wizard-body::-webkit-scrollbar{width:4px;}
+.ai-wizard-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.ai-step{display:flex;flex-direction:column;gap:10px;}
+.ai-step-title{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:.08em;}
+.ai-step-num{width:18px;height:18px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.ai-step-body{font-size:12px;color:var(--muted);line-height:1.7;display:flex;flex-direction:column;gap:10px;}
+.ai-endpoint-row{display:flex;gap:8px;align-items:center;}
+.ai-endpoint-row input{flex:1;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px;}
+.ai-endpoint-row input:focus{outline:none;border-color:var(--accent);}
+.ai-test-btn{padding:6px 14px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap;}
+.ai-test-btn:hover:not(:disabled){opacity:.85;}
+.ai-test-btn:disabled{opacity:.5;cursor:default;}
+.ai-test-result{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:8px 10px;border-radius:6px;display:none;}
+.ai-test-result.show{display:block;}
+.ai-test-result.ok{background:var(--green-dim);color:var(--green);}
+.ai-test-result.bad{background:var(--red-dim);color:var(--red);}
+.ai-os-tabs{display:flex;gap:4px;}
+.ai-os-tab{padding:5px 11px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);cursor:pointer;border:1px solid var(--border);border-radius:5px;background:none;}
+.ai-os-tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.ai-code-block{position:relative;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text);white-space:pre-wrap;word-break:break-all;}
+.ai-copy-btn{position:absolute;top:8px;right:8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:10px;padding:3px 8px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
+.ai-copy-btn:hover{color:var(--accent);border-color:var(--accent);}
+.ai-model-list{display:flex;flex-direction:column;gap:6px;}
+.ai-model-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;}
+.ai-model-item:hover{border-color:var(--accent);}
+.ai-model-item.selected{border-color:var(--accent);background:var(--accent-dim);}
+.ai-model-item .ami-name{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text);flex:1;}
+.ai-model-item .ami-tag{font-size:9px;padding:2px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace;}
+.ami-tag.found{background:var(--green-dim);color:var(--green);}
+.ami-tag.missing{background:rgba(251,191,36,.15);color:var(--yellow);}
+.ai-wizard-save{align-self:flex-end;padding:8px 20px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:500;cursor:pointer;}
+.ai-wizard-save:hover{opacity:.85;}
 
 /* ── Main ── */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
@@ -95,10 +149,17 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
 .q-type-tag.tf{background:var(--accent-dim);color:var(--accent);}
 .q-type-tag.mc{background:rgba(167,139,250,.15);color:var(--purple);}
 .q-type-tag.formula{background:rgba(251,191,36,.15);color:var(--yellow);}
+.q-type-tag.img{background:rgba(251,146,60,.15);color:var(--orange);}
+.q-type-tag.open{background:rgba(45,212,191,.15);color:var(--teal);}
 .mastery-badge{font-size:10px;padding:2px 7px;border-radius:3px;}
 .mastery-badge.streak{background:rgba(52,211,153,.15);color:var(--green);}
 .mastery-badge.learned{background:rgba(52,211,153,.25);color:var(--green);}
 .q-text{font-size:15px;font-weight:400;line-height:1.65;color:var(--text);}
+
+/* ── Question image (img question type flag) ── */
+.q-image-wrap{margin-bottom:16px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;max-height:360px;}
+.q-image-wrap img{display:block;max-width:100%;max-height:360px;object-fit:contain;}
+.q-image-missing{margin-bottom:16px;padding:14px 16px;border-radius:10px;border:1px dashed var(--red);background:var(--red-dim);color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;}
 
 .tf-buttons{display:flex;gap:12px;}
 .tf-btn{flex:1;padding:15px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.05em;}
@@ -165,6 +226,43 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
 .correct-formula-box .cf-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.08em;}
 .correct-formula-box .cf-raw{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);word-break:break-all;}
 .correct-formula-box .cf-render{font-size:20px;color:var(--text);display:flex;align-items:center;justify-content:center;min-height:36px;}
+
+/* ── Open question (AI-graded) ── */
+.open-area{display:flex;flex-direction:column;gap:10px;}
+#open-input{width:100%;min-height:110px;padding:14px 16px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.55;outline:none;resize:vertical;transition:border-color .15s;}
+#open-input:focus{border-color:var(--accent);}
+#open-input:disabled{cursor:default;opacity:.8;}
+.open-submit-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.open-hint{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);opacity:.6;}
+#open-submit{padding:7px 18px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .15s;}
+#open-submit:hover:not(:disabled){opacity:.85;}
+#open-submit:disabled{opacity:.4;cursor:default;}
+
+.ai-grading-row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:12px;}
+.ai-spinner{width:13px;height:13px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--accent);animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ai-grading-row .ai-cancel{margin-left:auto;background:none;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:11px;padding:3px 9px;cursor:pointer;}
+.ai-grading-row .ai-cancel:hover{color:var(--red);border-color:var(--red);}
+
+.ai-feedback-box{padding:16px 18px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);display:flex;flex-direction:column;gap:10px;}
+.ai-feedback-box.is-correct{border-color:rgba(52,211,153,.35);}
+.ai-feedback-box.is-wrong{border-color:rgba(248,113,113,.35);}
+.ai-fb-head{display:flex;align-items:center;gap:10px;}
+.ai-fb-verdict{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;}
+.ai-fb-verdict.ok{color:var(--green);}
+.ai-fb-verdict.no{color:var(--red);}
+.ai-fb-score{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+.ai-score-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.ai-score-fill{height:100%;border-radius:2px;transition:width .4s ease;}
+.ai-fb-text{font-size:13px;line-height:1.65;color:var(--text);white-space:pre-wrap;}
+.ai-fb-ref{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.6;padding-top:6px;border-top:1px solid var(--border);}
+
+.ai-error-box{padding:14px 16px;border-radius:10px;border:1px dashed var(--red);background:var(--red-dim);color:var(--red);font-size:12px;line-height:1.6;display:flex;flex-direction:column;gap:10px;}
+.ai-error-box .ai-err-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.ai-error-box button{font-family:'IBM Plex Sans',sans-serif;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;}
+.ai-retry-btn{background:var(--accent);border:none;color:#fff;}
+.ai-self-btn{background:none;border:1px solid var(--border);color:var(--text);}
+.ai-self-btn:hover{border-color:var(--text);}
 
 /* ── Stats ── */
 #stats-view{width:100%;max-width:800px;display:none;flex-direction:column;gap:24px;}
@@ -269,7 +367,23 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
       <button class="qtype-btn" id="btn-qtype-formula" onclick="setQType('formula')">
         <span class="qtype-dot"></span> Formula only
       </button>
+      <button class="qtype-btn" id="btn-qtype-open" onclick="setQType('open')">
+        <span class="qtype-dot"></span> Domande aperte
+      </button>
     </div>
+  </div>
+
+  <div class="sb-section">
+    <h3>AI Locale (correzione domande aperte)</h3>
+    <div class="ai-model-btns" id="ai-model-quickpick">
+      <button class="ai-model-btn" id="ai-mb-phi4-mini" onclick="quickSetModel('phi4-mini')">phi4-mini</button>
+      <button class="ai-model-btn" id="ai-mb-llama32" onclick="quickSetModel('llama3.2')">llama3.2</button>
+    </div>
+    <div class="ai-status-row">
+      <span class="ai-status-dot" id="ai-status-dot"></span>
+      <span id="ai-status-text">non testato</span>
+    </div>
+    <button id="ai-wizard-btn" onclick="openAIWizard()">⚙ Configurazione guidata</button>
   </div>
 
   <div class="add-file-area">
@@ -316,6 +430,7 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
           <span id="q-tag">Q 1</span>
           <span id="mastery-badge-el"></span>
         </div>
+        <div id="q-image-area"></div>
         <div class="q-text" id="q-text"></div>
       </div>
 
@@ -394,6 +509,16 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
 
 <div id="toast"></div>
 
+<div class="ai-wizard-overlay" id="ai-wizard-overlay" onclick="if(event.target===this) closeAIWizard()">
+  <div class="ai-wizard-modal">
+    <div class="ai-wizard-header">
+      <h2>// configurazione guidata — AI locale</h2>
+      <button onclick="closeAIWizard()">✕</button>
+    </div>
+    <div class="ai-wizard-body" id="ai-wizard-body"><!-- popolato da renderAIWizard() --></div>
+  </div>
+</div>
+
 <script>
 // ── STORAGE KEYS ──────────────────────────────────────────────────────────────
 const LS_DATASETS = 'quizzer_datasets_v2';
@@ -401,6 +526,7 @@ const LS_QMAP     = 'quizzer_qmap_v2';
 const LS_OVERALL  = 'quizzer_overall_v2';
 const LS_SESSIONS = 'quizzer_sessions_v2';
 const LS_FITAB    = 'quizzer_fitab_v1'; // formula input tab preference
+const LS_AICONFIG = 'quizzer_aiconfig_v1'; // local AI (Ollama) endpoint + model
 
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
 const MASTERY_STREAK  = 5;
@@ -423,6 +549,9 @@ const ov         = lsGet(LS_OVERALL, {correct:0, wrong:0});
 let overallCorrect = ov.correct, overallWrong = ov.wrong;
 let sessionStats = lsGet(LS_SESSIONS, []);
 let formulaTab   = lsGet(LS_FITAB, 'text'); // 'text' | 'visual'
+let aiConfig     = lsGet(LS_AICONFIG, { endpoint: 'http://localhost:11434', model: 'phi4-mini' });
+
+function persistAIConfig() { lsSet(LS_AICONFIG, aiConfig); }
 
 function persistDatasets() { lsSet(LS_DATASETS, datasets); }
 function persistQMap()     { lsSet(LS_QMAP, qMap); }
@@ -440,6 +569,8 @@ let currentOptions = null;
 let answered    = false;
 let sessionActive = false;
 let sessionCorrect = 0, sessionWrong = 0;
+let gradingInProgress = false;   // true while waiting for the local AI to grade an open answer
+let gradingAbort      = null;    // AbortController for the in-flight grading request
 
 // ── DOM REFS ──────────────────────────────────────────────────────────────────
 const quizView   = document.getElementById('quiz-view');
@@ -659,12 +790,119 @@ const PALETTE = [
 ];
 
 // ── CSV LOADER ────────────────────────────────────────────────────────────────
+//
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  GUIDA AL FORMATO CSV — leggi qui per generare un CSV compatibile          ║
+// ║  (questo blocco è pensato per essere letto anche da un assistente AI in   ║
+// ║  una conversazione futura: contiene tutte le regole necessarie a produrre ║
+// ║  un CSV valido per The Quizzer+)                                          ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+//
+// ── SCHEMA UNIFICATO: UN SOLO HEADER PER TUTTI I TIPI DI DOMANDA ──────────────
+// Non esistono CSV "speciali" per tipo: c'è UNA sola riga di intestazione che
+// copre Vero/Falso, Multiple Choice, Formula e Aperta. Ogni riga del CSV usa
+// solo le colonne che le servono e lascia vuote le altre — puoi mischiare
+// liberamente tutti i tipi nello stesso file. Header consigliato (riutilizzabile
+// sempre, per qualsiasi materia):
+//
+//   domanda,risposta,tipo,opzione_b,opzione_c,opzione_d,opzione_e,immagine
+//
+// COLONNE (case-insensitive, ordine libero, alias tra parentesi):
+//   domanda   (question)                  — OBBLIGATORIA. Testo della domanda.
+//   risposta  (answer, risposta_corretta) — OBBLIGATORIA. Significato secondo "tipo":
+//                 tf/vero_falso → T o F (anche TRUE/FALSE/VERO/FALSO/V)
+//                 mc/scelta_multipla → il testo dell'opzione corretta
+//                 formula → la formula corretta (testo o LaTeX)
+//                 aperta → la RISPOSTA DI RIFERIMENTO usata per la correzione AI,
+//                          NON quello che scriverà lo studente
+//   tipo      (type, kind) — CONSIGLIATA SEMPRE ESPLICITA per chiarezza, valori:
+//                 tf  (alias: vero_falso, v_f, vf)
+//                 mc  (alias: scelta_multipla, multipla, multiple_choice)
+//                 formula
+//                 aperta  (alias: open, domanda_aperta)
+//                 Se la lasci vuota, l'app prova a indovinare da sola (T/F se
+//                 "risposta" è T/F/V/F, MC se ci sono opzione_b..e, altrimenti
+//                 MC semplice) — utile per CSV scritti a mano veloci, ma
+//                 dichiararla sempre esplicitamente è più robusto e leggibile.
+//   opzione_b / opzione_c / opzione_d / opzione_e  (option_b... / b,c,d,e)
+//             — solo per tipo=mc: distrattori oltre alla risposta corretta.
+//               Anche solo opzione_b è sufficiente, le altre restano vuote.
+//               Ignorate per tutti gli altri tipi.
+//   risposta_alternativa (alternative, alt_answer, alt)
+//             — solo per tipo=formula: forme alternative ugualmente valide per
+//               il match ESATTO veloce, es. risposta="V=I*R" + risposta_alternativa="I*R=V"
+//               (non è necessaria per coprire forme equivalenti più "esotiche":
+//               quelle le riconosce comunque l'AI, vedi sotto).
+//   immagine  (image, img, foto) — UNIVERSALE: funziona per OGNI tipo (tf, mc,
+//               formula, aperta). Se la riga ha un'immagine, viene mostrata
+//               sopra la domanda; se non c'è, la domanda si comporta in modo
+//               identico a una senza immagine. Vedi sezione IMMAGINI sotto.
+//
+// ── CORREZIONE DI FORMULA E APERTA: stesso motore AI, due modalità ───────────
+//   • Aperta: lo studente scrive liberamente, l'AI locale (Ollama) confronta il
+//     significato con la risposta di riferimento e dà corretto/sbagliato +
+//     punteggio 0-100 + feedback dettagliato.
+//   • Formula: prima c'è un confronto ESATTO istantaneo e gratuito (ignora
+//     spazi, notazione *, ^, LaTeX equivalente, ecc — vedi normalizeFormula()).
+//     Se NON corrisponde esattamente, invece di segnarla subito sbagliata
+//     (il comportamento vecchio, poco affidabile per formule riarrangiate
+//     algebricamente tipo "F=ma" vs "ma=F") la stessa AI locale viene
+//     interpellata per giudicare se è comunque matematicamente equivalente,
+//     con un prompt dedicato a notazione/formule (vedi callOllamaGrade()).
+//   In entrambi i casi, se l'AI locale non è raggiungibile, l'app offre un
+//   fallback di autovalutazione manuale invece di bloccare la sessione.
+//
+// ── IMMAGINI: come organizzarle (CONVENZIONE CARTELLA = NOME DEL CSV) ─────────
+//
+//   Le immagini NON vengono mai incorporate nel CSV o salvate nei dati dell'app:
+//   restano semplici file sul disco, caricati dal browser al volo. Questo permette
+//   di usarne centinaia senza nessun limite pratico di spazio.
+//
+//   Regola: per un file "<nome>.csv" caricato nell'app, le immagini vanno cercate
+//   in una cartella chiamata "<nome>" posta ALLO STESSO LIVELLO del file .html
+//   (non dentro la cartella del csv — accanto al file quizzerplus.html stesso).
+//   Nella colonna "immagine" scrivi SOLO il nome del file (o un sottopercorso).
+//
+//   Esempio struttura cartelle sul disco:
+//     /quiz/
+//       quizzerplus.html
+//       chimica.csv              ← caricato con "Add CSV" nella sidebar
+//       chimica/                 ← cartella immagini, stesso nome del csv (senza .csv)
+//         struttura_atomo.png
+//         tavola_periodica.jpg
+//         legami/
+//           covalente.png
+//
+//   Note:
+//   • Se scrivi un sottopercorso (es. "legami/covalente.png") viene cercato
+//     DENTRO la cartella del dataset (qui: chimica/legami/covalente.png).
+//   • Se il valore inizia con "http://" o "https://" viene usato come URL diretto
+//     (utile per immagini online, in alternativa alla cartella locale).
+//   • Se un'immagine non viene trovata, l'app mostra un avviso al posto della
+//     foto invece di bloccare il quiz — così un nome sbagliato su 1 domanda
+//     su 300 non rompe la sessione.
+//   • Formati supportati: qualunque formato che il browser visualizza nativamente
+//     (png, jpg/jpeg, webp, gif, svg).
+//
+// ── ESEMPIO COMPLETO: un solo CSV, header unico, tutti i tipi mischiati ──────
+//   domanda,risposta,tipo,opzione_b,opzione_c,opzione_d,opzione_e,immagine
+//   "L'immagine mostra un legame ionico",F,tf,,,,,struttura_atomo.png
+//   "Simbolo chimico del sodio",Na,mc,K,Ca,Mg,,tavola_periodica.jpg
+//   "Seconda legge della dinamica",F=m*a,formula,,,,,
+//   "Spiega cos'è un legame covalente",Condivisione di una coppia di elettroni tra due atomi non metallici,aperta,,,,,legami/covalente.png
+//
+// ───────────────────────────────────────────────────────────────────────────
 function loadCSVFile(file) {
   const reader = new FileReader();
   reader.onload = ev => {
     const lines = ev.target.result.trim().split(/\r?\n/);
     const rows = [];
     let headers = null;
+    // Cartella immagini per questo dataset = nome file csv senza estensione.
+    // Viene attaccata a OGNI riga (non solo al dataset) così l'informazione
+    // resta valida anche quando le domande di più csv vengono mescolate nel
+    // pool della sessione.
+    const imgFolder = file.name.replace(/\.csv$/i, '');
 
     lines.forEach((line, li) => {
       if (!line.trim()) return;
@@ -675,7 +913,7 @@ function loadCSVFile(file) {
           headers = h; return;
         }
       }
-      let domanda, risposta, opB, opC, opD, opE, tipoVal = '';
+      let domanda, risposta, opB, opC, opD, opE, tipoVal = '', immagine = '';
       if (headers) {
         const qi  = headers.findIndex(h => ['domanda','question'].includes(h));
         const ai  = headers.findIndex(h => ['risposta','answer','risposta_corretta'].includes(h));
@@ -685,6 +923,7 @@ function loadCSVFile(file) {
         const di  = headers.findIndex(h => ['opzione_d','option_d','d'].includes(h));
         const ei  = headers.findIndex(h => ['opzione_e','option_e','e'].includes(h));
         const ti  = headers.findIndex(h => ['tipo','type','kind'].includes(h));
+        const imi = headers.findIndex(h => ['immagine','image','img','foto'].includes(h));
         if (qi < 0 || ai < 0) return;
         domanda = cols[qi] || ''; risposta = cols[ai] || '';
         // Append alternative answers as pipe-separated variants
@@ -696,22 +935,35 @@ function loadCSVFile(file) {
         opD = di >= 0 ? (cols[di] || '') : '';
         opE = ei >= 0 ? (cols[ei] || '') : '';
         tipoVal = ti >= 0 ? (cols[ti] || '').trim().toLowerCase() : '';
+        immagine = imi >= 0 ? (cols[imi] || '').trim() : '';
       } else {
         [domanda, risposta, opB, opC, opD, opE] = cols;
         opB = opB||''; opC = opC||''; opD = opD||''; opE = opE||'';
       }
       if (!domanda || !risposta) return;
 
-      let options = null, isFormula = false;
+      let options = null, isFormula = false, isOpen = false;
+      const TF_TIPI = ['vero_falso', 'tf', 'v_f', 'vf'];
+      const MC_TIPI = ['scelta_multipla', 'mc', 'multipla', 'multiple_choice'];
       if (tipoVal === 'formula') {
         isFormula = true;
+      } else if (tipoVal === 'aperta' || tipoVal === 'open' || tipoVal === 'domanda_aperta') {
+        isOpen = true;
+      } else if (TF_TIPI.includes(tipoVal)) {
+        // tipo dichiarato esplicitamente come vero/falso
+        risposta = normalizeTF(risposta);
+      } else if (MC_TIPI.includes(tipoVal)) {
+        // tipo dichiarato esplicitamente come scelta multipla
+        const extras = [opB, opC, opD, opE].filter(x => x.trim() !== '');
+        options = [risposta, ...extras];
       } else if (isTF(risposta)) {
+        // tipo non dichiarato (colonna vuota): auto-rilevato dal contenuto di "risposta"
         risposta = normalizeTF(risposta);
       } else {
         const extras = [opB, opC, opD, opE].filter(x => x.trim() !== '');
         options = [risposta, ...extras];
       }
-      rows.push({ domanda, risposta, options, isFormula });
+      rows.push({ domanda, risposta, options, isFormula, isOpen, immagine, imgFolder });
     });
 
     if (rows.length > 0) {
@@ -722,16 +974,248 @@ function loadCSVFile(file) {
           datasets.splice(datasets.indexOf(existing), 1);
         } else return;
       }
-      datasets.push({ name, data: rows, active: true });
+      const imgCount = rows.filter(q => q.immagine).length;
+      datasets.push({ name, data: rows, active: true, imgFolder });
       persistDatasets();
       renderSidebar();
       startSession();
-      showToast(`✓ Loaded "${name}" — ${rows.length} questions`);
+      showToast(`✓ Loaded "${name}" — ${rows.length} questions${imgCount ? ` (${imgCount} con immagine, cercate in "${imgFolder}/")` : ''}`);
     } else {
       alert('No valid questions found in ' + file.name);
     }
   };
   reader.readAsText(file);
+}
+
+// ── IMAGE PATH RESOLUTION ─────────────────────────────────────────────────────
+// Turns the raw "immagine" CSV value into a usable <img src>.
+//   • Valore vuoto              → null (nessuna immagine)
+//   • Inizia con http(s)://     → usato così com'è (URL diretto/online)
+//   • Altrimenti                → risolto dentro la cartella del dataset,
+//                                  es. immagine="fig1.png" + imgFolder="chimica"
+//                                  → "chimica/fig1.png"
+function resolveImagePath(q) {
+  if (!q || !q.immagine) return null;
+  if (/^https?:\/\//i.test(q.immagine)) return q.immagine;
+  return q.imgFolder ? `${q.imgFolder}/${q.immagine}` : q.immagine;
+}
+
+// ── AI CONFIG (sidebar quick controls) ────────────────────────────────────────
+function quickSetModel(name) {
+  aiConfig.model = name;
+  persistAIConfig();
+  updateAIStatusUI();
+  showToast(`Modello AI impostato: ${name}`);
+}
+
+function updateAIStatusUI(testResult) {
+  // testResult: undefined = non testato in questa sessione, true = ok, false = errore
+  document.querySelectorAll('.ai-model-btn').forEach(b => b.classList.remove('active'));
+  const known = { 'phi4-mini': 'ai-mb-phi4-mini', 'llama3.2': 'ai-mb-llama32' };
+  if (known[aiConfig.model]) {
+    const el = document.getElementById(known[aiConfig.model]);
+    if (el) el.classList.add('active');
+  }
+  const dot = document.getElementById('ai-status-dot');
+  const txt = document.getElementById('ai-status-text');
+  if (!dot || !txt) return;
+  dot.classList.remove('ok', 'bad');
+  if (testResult === true) { dot.classList.add('ok'); txt.textContent = `${aiConfig.model} — connesso`; }
+  else if (testResult === false) { dot.classList.add('bad'); txt.textContent = `${aiConfig.model} — non raggiungibile`; }
+  else { txt.textContent = `${aiConfig.model} — non testato`; }
+}
+
+// ── AI GUIDED SETUP WIZARD ─────────────────────────────────────────────────────
+let wizardModels = [];          // model names detected via /api/tags on last test
+let wizardSelectedModel = null; // model chosen inside the wizard, not yet saved
+let wizardTestStatus = null;    // null = untested, true = ok, false = failed
+let wizardTestError = '';
+let wizardOS = detectOS();
+let wizardCmdMap = {};          // id -> raw command text, for copy buttons
+
+function detectOS() {
+  const p = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent || '').toLowerCase();
+  if (p.includes('win')) return 'win';
+  if (p.includes('mac')) return 'mac';
+  return 'linux';
+}
+
+function openAIWizard() {
+  wizardSelectedModel = aiConfig.model;
+  document.getElementById('ai-wizard-overlay').classList.add('show');
+  renderAIWizard();
+  wizardTestConnection();
+}
+function closeAIWizard() {
+  document.getElementById('ai-wizard-overlay').classList.remove('show');
+}
+
+function switchWizardOS(os) { wizardOS = os; renderAIWizard(); }
+
+function selectWizardModel(name) {
+  if (!name) return;
+  wizardSelectedModel = name;
+  renderAIWizard();
+}
+
+function pullCmdBlock(name) {
+  const id = 'wiz-pull-' + name.replace(/[^a-z0-9]/gi, '');
+  wizardCmdMap[id] = `ollama pull ${name}`;
+  return `<div class="ai-code-block" id="${id}">ollama pull ${name}<button class="ai-copy-btn" onclick="copyBlock('${id}', this)">Copia</button></div>`;
+}
+
+function osCmdBlock(idx, cmd) {
+  const id = 'wiz-os-cmd-' + idx;
+  wizardCmdMap[id] = cmd;
+  return `<div class="ai-code-block" id="${id}">${cmd}<button class="ai-copy-btn" onclick="copyBlock('${id}', this)">Copia</button></div>`;
+}
+
+function copyBlock(id, btnEl) {
+  const text = wizardCmdMap[id];
+  if (!text) return;
+  const done = () => { const old = btnEl.textContent; btnEl.textContent = 'Copiato!'; setTimeout(() => { btnEl.textContent = old; }, 1500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  if (cb) cb();
+}
+
+function renderModelList() {
+  let html = '';
+  if (wizardModels.length > 0) {
+    html += '<div class="ai-model-list">' + wizardModels.map(name => `
+      <div class="ai-model-item ${wizardSelectedModel === name ? 'selected' : ''}" onclick="selectWizardModel('${name.replace(/'/g, "\\'")}')">
+        <span class="ami-name">${name}</span>
+        <span class="ami-tag found">installato</span>
+      </div>`).join('') + '</div>';
+  } else {
+    html += '<div style="font-style:italic">Nessun modello rilevato — testa la connessione al passo 1.</div>';
+  }
+  const hasPhi   = wizardModels.some(n => n.toLowerCase().startsWith('phi4-mini'));
+  const hasLlama = wizardModels.some(n => n.toLowerCase().startsWith('llama3.2'));
+  html += '<div style="margin-top:4px">Modelli consigliati per CPU (i più precisi tra i piccoli):</div>';
+  if (!hasPhi)   html += pullCmdBlock('phi4-mini');
+  if (!hasLlama) html += pullCmdBlock('llama3.2');
+  if (hasPhi && hasLlama) html += '<div style="color:var(--green)">✓ Entrambi i modelli consigliati sono già installati.</div>';
+  html += `<div style="margin-top:6px;display:flex;align-items:center;gap:6px">Altro modello: <input id="wiz-custom-model" type="text" placeholder="es. llama3.1:8b" value="${(!wizardModels.includes(wizardSelectedModel) && wizardSelectedModel) ? wizardSelectedModel : ''}" style="padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:11px;flex:1" onchange="selectWizardModel(this.value.trim())"></div>`;
+  return html;
+}
+
+function renderAIWizard() {
+  const body = document.getElementById('ai-wizard-body');
+  if (!body) return;
+  const osCmds = {
+    win:   [ osCmdBlock(0, 'setx OLLAMA_ORIGINS "*"') + '<div style="margin-top:-4px">(poi chiudi e riapri Ollama dalla system tray)</div>' ],
+    mac:   [ osCmdBlock(1, 'launchctl setenv OLLAMA_ORIGINS "*"') + '<div style="margin-top:-4px">poi riavvia Ollama (icona nella barra menu → Quit, poi riapri l\'app)</div>',
+             '<div style="margin-top:6px">Per renderlo permanente anche dopo un riavvio del Mac:</div>' + osCmdBlock(2, 'echo \'export OLLAMA_ORIGINS="*"\' >> ~/.zshrc') ],
+    linux: [ '<div>Se hai installato Ollama come servizio systemd:</div>' + osCmdBlock(3, 'sudo systemctl edit ollama.service'),
+             '<div style="margin-top:-4px">Incolla queste due righe nel file che si apre, salva ed esci:</div>' + osCmdBlock(4, '[Service]\nEnvironment="OLLAMA_ORIGINS=*"'),
+             osCmdBlock(5, 'sudo systemctl daemon-reload && sudo systemctl restart ollama') ]
+  };
+  body.innerHTML = `
+    <div class="ai-step">
+      <div class="ai-step-title"><span class="ai-step-num">1</span>Indirizzo e connessione</div>
+      <div class="ai-step-body">
+        <div class="ai-endpoint-row">
+          <input id="wiz-endpoint" type="text" value="${aiConfig.endpoint}">
+          <button class="ai-test-btn" id="wiz-test-btn" onclick="wizardTestConnection()">Testa connessione</button>
+        </div>
+        <div class="ai-test-result ${wizardTestStatus === true ? 'show ok' : wizardTestStatus === false ? 'show bad' : ''}">
+          ${wizardTestStatus === true ? `✓ Connesso — ${wizardModels.length} modelli installati trovati.` : wizardTestStatus === false ? `✗ ${wizardTestError}` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-step">
+      <div class="ai-step-title"><span class="ai-step-num">2</span>Se la connessione fallisce: abilita CORS</div>
+      <div class="ai-step-body">
+        <div>Va fatto una sola volta per computer: bisogna dire a Ollama di accettare richieste dalla pagina del quiz.</div>
+        <div class="ai-os-tabs">
+          <button class="ai-os-tab ${wizardOS === 'win' ? 'active' : ''}" onclick="switchWizardOS('win')">Windows</button>
+          <button class="ai-os-tab ${wizardOS === 'mac' ? 'active' : ''}" onclick="switchWizardOS('mac')">macOS</button>
+          <button class="ai-os-tab ${wizardOS === 'linux' ? 'active' : ''}" onclick="switchWizardOS('linux')">Linux</button>
+        </div>
+        ${osCmds[wizardOS].join('')}
+      </div>
+    </div>
+
+    <div class="ai-step">
+      <div class="ai-step-title"><span class="ai-step-num">3</span>Modello da usare per la correzione</div>
+      <div class="ai-step-body">${renderModelList()}</div>
+    </div>
+
+    <div class="ai-step">
+      <div class="ai-step-title"><span class="ai-step-num">4</span>Test rapido di correzione</div>
+      <div class="ai-step-body">
+        <button class="ai-test-btn" onclick="wizardRunQuickTest()">Esegui test di correzione</button>
+        <div id="wiz-quick-test-result"></div>
+      </div>
+    </div>
+
+    <button class="ai-wizard-save" onclick="saveAIWizard()">Salva e chiudi</button>
+  `;
+}
+
+async function wizardTestConnection() {
+  const inp = document.getElementById('wiz-endpoint');
+  const btn = document.getElementById('wiz-test-btn');
+  if (!inp) return;
+  const endpoint = (inp.value || '').trim().replace(/\/+$/, '') || 'http://localhost:11434';
+  aiConfig.endpoint = endpoint;
+  if (btn) { btn.disabled = true; btn.textContent = 'Verifica…'; }
+  try {
+    const res = await fetch(endpoint + '/api/tags');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    wizardModels = (data.models || []).map(m => m.name || m.model || '').filter(Boolean);
+    wizardTestStatus = true; wizardTestError = '';
+    if (!wizardModels.includes(wizardSelectedModel) && wizardModels.length) {
+      // mantieni la selezione manuale se l'utente aveva digitato un nome custom
+    }
+  } catch (e) {
+    wizardModels = [];
+    wizardTestStatus = false;
+    wizardTestError = 'Connessione rifiutata. Ollama è avviato? Hai configurato OLLAMA_ORIGINS (punto 2 qui sotto)?';
+  }
+  updateAIStatusUI(wizardTestStatus);
+  renderAIWizard();
+}
+
+async function wizardRunQuickTest() {
+  aiConfig.model = wizardSelectedModel || aiConfig.model;
+  const resultEl = document.getElementById('wiz-quick-test-result');
+  resultEl.innerHTML = '<div class="ai-status-row"><span class="ai-spinner"></span> Test in corso…</div>';
+  try {
+    const ac = new AbortController();
+    const res = await callOllamaGrade(
+      'La capitale della Francia è Parigi?',
+      'Vero, Parigi è la capitale della Francia.',
+      'Si, è Parigi.',
+      ac.signal
+    );
+    resultEl.innerHTML = `<div class="ai-test-result show ok">✓ Funziona! Verdetto: ${res.corretto ? 'corretto' : 'sbagliato'} (${res.punteggio}/100)<br>"${res.feedback}"</div>`;
+  } catch (e) {
+    resultEl.innerHTML = `<div class="ai-test-result show bad">✗ ${e.message}</div>`;
+  }
+}
+
+function saveAIWizard() {
+  const inp = document.getElementById('wiz-endpoint');
+  if (inp) aiConfig.endpoint = (inp.value || aiConfig.endpoint || 'http://localhost:11434').trim().replace(/\/+$/, '');
+  aiConfig.model = wizardSelectedModel || aiConfig.model;
+  persistAIConfig();
+  updateAIStatusUI(wizardTestStatus);
+  closeAIWizard();
+  showToast('Configurazione AI salvata ✓');
 }
 
 function removeDataset(i) {
@@ -761,13 +1245,17 @@ function renderSidebar() {
   datasets.forEach((ds, i) => {
     const item = document.createElement('div');
     item.className = 'file-item';
-    const tfCount = ds.data.filter(q => !q.options && !q.isFormula).length;
+    const tfCount = ds.data.filter(q => !q.options && !q.isFormula && !q.isOpen).length;
     const mcCount = ds.data.filter(q =>  q.options).length;
     const fCount  = ds.data.filter(q =>  q.isFormula).length;
+    const oCount  = ds.data.filter(q =>  q.isOpen).length;
+    const imgCount = ds.data.filter(q => q.immagine).length;
     const parts = [];
     if (tfCount) parts.push(`${tfCount} T/F`);
     if (mcCount) parts.push(`${mcCount} MC`);
     if (fCount)  parts.push(`${fCount} ƒ`);
+    if (oCount)  parts.push(`${oCount} aperte`);
+    if (imgCount) parts.push(`${imgCount} 🖼`);
     item.innerHTML = `
       <input type="checkbox" ${ds.active ? 'checked' : ''} id="chk-${i}">
       <label class="fname" for="chk-${i}" title="${ds.name}">${ds.name}</label>
@@ -819,7 +1307,7 @@ function setMode(m) {
 
 function setQType(t) {
   qTypeFilter = t;
-  ['all','tf','mc','formula'].forEach(x =>
+  ['all','tf','mc','formula','open'].forEach(x =>
     document.getElementById('btn-qtype-'+x).classList.toggle('active', x === t));
   startSession();
 }
@@ -828,9 +1316,10 @@ function setQType(t) {
 function getActiveQuestions() {
   let all = [];
   datasets.forEach(ds => { if (ds.active) all = all.concat(ds.data); });
-  if (qTypeFilter === 'tf')      all = all.filter(q => !q.options && !q.isFormula);
+  if (qTypeFilter === 'tf')      all = all.filter(q => !q.options && !q.isFormula && !q.isOpen);
   if (qTypeFilter === 'mc')      all = all.filter(q =>  q.options && !q.isFormula);
   if (qTypeFilter === 'formula') all = all.filter(q =>  q.isFormula);
+  if (qTypeFilter === 'open')    all = all.filter(q =>  q.isOpen);
   return all;
 }
 
@@ -907,7 +1396,7 @@ function loadQuestion() {
     currentQ = weightedPick(getActiveQuestions());
   }
   answered = false;
-  if (currentQ.isFormula) {
+  if (currentQ.isFormula || currentQ.isOpen) {
     currentOptions = null;
   } else {
     currentOptions = currentQ.options !== null ? buildMCOptions(currentQ) : null;
@@ -924,10 +1413,13 @@ function renderQuestion() {
   const key = currentQ.domanda;
   const d   = qMap[key];
   const isFormula = !!currentQ.isFormula;
-  const isMC = !isFormula && currentOptions !== null;
-  const qType  = isFormula ? 'formula' : isMC ? 'mc' : 'tf';
-  const qLabel = isFormula ? 'FORMULA' : isMC ? 'MC' : 'T/F';
-  const typeTag = `<span class="q-type-tag ${qType}">${qLabel}</span>`;
+  const isOpenQ   = !!currentQ.isOpen;
+  const isMC = !isFormula && !isOpenQ && currentOptions !== null;
+  const qType  = isFormula ? 'formula' : isOpenQ ? 'open' : isMC ? 'mc' : 'tf';
+  const qLabel = isFormula ? 'FORMULA' : isOpenQ ? 'APERTA' : isMC ? 'MC' : 'T/F';
+  const imgPath = resolveImagePath(currentQ);
+  const typeTag = `<span class="q-type-tag ${qType}">${qLabel}</span>` +
+    (imgPath ? `<span class="q-type-tag img">🖼 IMG</span>` : '');
 
   const qmeta = document.getElementById('q-tag');
   if (mode === 'normal') {
@@ -950,9 +1442,23 @@ function renderQuestion() {
 
   document.getElementById('q-text').textContent = key;
 
+  const imgArea = document.getElementById('q-image-area');
+  if (imgPath) {
+    // onerror: se il file non viene trovato (nome sbagliato, cartella mancante,
+    // ecc.) mostriamo un avviso invece di un'icona "immagine rotta" del browser,
+    // così una domanda con un riferimento errato non blocca tutta la sessione.
+    imgArea.innerHTML = `<div class="q-image-wrap"><img src="${imgPath}" alt="" loading="lazy"
+      onerror="this.closest('.q-image-wrap').outerHTML='<div class=&quot;q-image-missing&quot;>⚠ Immagine non trovata: ${imgPath.replace(/'/g,"&#39;").replace(/"/g,'&quot;')}<br>Verifica che il file esista nella cartella accanto a quizzerplus.html.</div>'"></div>`;
+  } else {
+    imgArea.innerHTML = '';
+  }
+
   if (isFormula) {
     renderFormulaInput();
-    document.getElementById('kbd-hint').textContent = 'Type formula and press Enter to submit  |  Space / → — next after answer';
+    document.getElementById('kbd-hint').textContent = 'Invio per inviare — match esatto istantaneo, altrimenti verifica l\'AI locale';
+  } else if (isOpenQ) {
+    renderOpenInput();
+    document.getElementById('kbd-hint').textContent = 'Scrivi la risposta e premi Ctrl+Invio per inviare alla correzione AI';
   } else if (isMC) {
     renderMCButtons();
     document.getElementById('kbd-hint').textContent = `1–${currentOptions.length} — answer  |  Space / → — next`;
@@ -1056,12 +1562,242 @@ function paletteInsert(sym) {
 }
 
 function submitFormula() {
-  if (answered) return;
+  if (answered || gradingInProgress) return;
   const inp = document.getElementById('formula-input');
   if (!inp) return;
   const val = inp.value.trim();
   if (!val) { inp.focus(); return; }
-  answerFormula(val);
+  if (formulaMatch(val, currentQ.risposta)) {
+    answerFormulaInstant(val);
+  } else {
+    gradeAnswerWithAI(val, 'formula');
+  }
+}
+
+// ── OPEN QUESTION (correzione AI locale via Ollama) ───────────────────────────
+function renderOpenInput() {
+  answerArea.innerHTML = `
+    <div class="open-area">
+      <textarea id="open-input" placeholder="Scrivi qui la tua risposta…" autocomplete="off" spellcheck="true"></textarea>
+      <div class="open-submit-row">
+        <span class="open-hint">Modello: ${aiConfig.model || '—'}</span>
+        <button id="open-submit" onclick="submitOpen()">Invia per la correzione →</button>
+      </div>
+    </div>`;
+  const inp = document.getElementById('open-input');
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); submitOpen(); }
+  });
+  inp.focus();
+}
+
+function submitOpen() {
+  if (answered || gradingInProgress) return;
+  const inp = document.getElementById('open-input');
+  if (!inp) return;
+  const val = inp.value.trim();
+  if (!val) { inp.focus(); return; }
+  gradeAnswerWithAI(val, 'open');
+}
+
+// Chiede al modello AI locale (Ollama) di correggere la risposta dello studente.
+// Manda: la domanda, la risposta di riferimento (dal csv) e la risposta scritta.
+// Si aspetta come output un JSON {corretto, punteggio, feedback} — vedi prompt sotto.
+// kind: 'open' (domanda aperta) | 'formula' (formula matematica/fisica/chimica).
+// Per le formule viene usato un prompt diverso, perché qui il match esatto è già
+// stato provato prima (vedi submitFormula): l'AI deve giudicare solo se due
+// formule scritte in modo diverso sono comunque EQUIVALENTI.
+async function callOllamaGrade(domanda, expectedAnswer, userAnswer, signal, kind) {
+  kind = kind || 'open';
+  const endpoint = (aiConfig.endpoint || 'http://localhost:11434').replace(/\/+$/, '');
+  const systemPrompt = kind === 'formula'
+    ? `Sei un correttore di quiz scolastici specializzato in formule matematiche, fisiche o chimiche. Il confronto automatico carattere-per-carattere tra la formula dello studente e quella di riferimento NON ha trovato una corrispondenza esatta: il tuo compito è stabilire se le due formule sono comunque EQUIVALENTI nel contenuto, anche se scritte in modo diverso (ordine dei termini, forma riarrangiata algebricamente, notazione diversa, simboli diversi per la stessa grandezza, LaTeX vs notazione semplice, presenza/assenza di costanti banali). Sii rigoroso sul contenuto matematico/scientifico ma tollerante sulla notazione. Se la formula è concettualmente sbagliata o rappresenta una relazione diversa, è da considerarsi sbagliata.
+Rispondi SOLO con un oggetto JSON valido, senza nessun testo prima o dopo, con esattamente questi campi:
+{"corretto": true oppure false, "punteggio": intero da 0 a 100, "feedback": stringa con una spiegazione chiara in italiano del perché la formula è (o non è) equivalente a quella di riferimento}`
+    : `Sei un correttore di quiz scolastici. Ricevi una domanda aperta, una risposta di riferimento e la risposta scritta da uno studente. Valuta se la risposta dello studente è sostanzialmente corretta nel CONTENUTO, anche se formulata con parole diverse dalla risposta di riferimento: non penalizzare formulazioni diverse se il significato è giusto, ma penalizza errori concettuali, omissioni importanti o risposte vaghe/fuori tema.
+Rispondi SOLO con un oggetto JSON valido, senza nessun testo prima o dopo, con esattamente questi campi:
+{"corretto": true oppure false, "punteggio": intero da 0 a 100, "feedback": stringa con una spiegazione chiara e dettagliata in italiano di cosa è giusto e cosa è sbagliato o mancante nella risposta dello studente}`;
+  const userPrompt = kind === 'formula'
+    ? `Domanda: ${domanda}\nFormula di riferimento: ${expectedAnswer.split('|')[0].trim()}\nFormula scritta dallo studente: ${userAnswer}`
+    : `Domanda: ${domanda}\nRisposta di riferimento: ${expectedAnswer}\nRisposta dello studente: ${userAnswer}`;
+
+  let res;
+  try {
+    res = await fetch(endpoint + '/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal,
+      body: JSON.stringify({
+        model: aiConfig.model || 'phi4-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        stream: false,
+        format: 'json'
+      })
+    });
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error('CANCELLED');
+    throw new Error('Impossibile contattare Ollama. È in esecuzione? Hai configurato OLLAMA_ORIGINS? (vedi Configurazione guidata)');
+  }
+  if (!res.ok) {
+    if (res.status === 404) throw new Error(`Modello "${aiConfig.model}" non trovato su Ollama. Scaricalo con: ollama pull ${aiConfig.model}`);
+    throw new Error(`Ollama ha risposto con errore HTTP ${res.status}.`);
+  }
+  let data;
+  try { data = await res.json(); }
+  catch (e) { throw new Error('Risposta di Ollama non leggibile (non è JSON valido).'); }
+
+  const raw = data && data.message && data.message.content ? data.message.content : '';
+  let parsed;
+  try {
+    // Tolleranza: se il modello ha comunque incluso ```json ... ``` o testo attorno, estraggo il blocco { ... }
+    const m = raw.match(/\{[\s\S]*\}/);
+    parsed = JSON.parse(m ? m[0] : raw);
+  } catch (e) {
+    throw new Error('Il modello non ha restituito un JSON valido. Prova un modello diverso o riprova.');
+  }
+  if (typeof parsed.corretto !== 'boolean') throw new Error('Risposta AI incompleta (manca il campo "corretto").');
+  return {
+    corretto: parsed.corretto,
+    punteggio: typeof parsed.punteggio === 'number' ? Math.max(0, Math.min(100, Math.round(parsed.punteggio))) : (parsed.corretto ? 100 : 0),
+    feedback: typeof parsed.feedback === 'string' && parsed.feedback.trim() ? parsed.feedback.trim() : '(nessun feedback testuale fornito dal modello)'
+  };
+}
+
+// Ritorna gli elementi di input/submit dell'UI attualmente in uso (aperta o
+// formula), così le funzioni di grading/retry/fallback restano uniche per
+// entrambi i tipi invece di duplicare la logica.
+function getAnswerInputEls() {
+  if (currentQ && currentQ.isOpen)    return { input: document.getElementById('open-input'),    submit: document.getElementById('open-submit') };
+  if (currentQ && currentQ.isFormula) return { input: document.getElementById('formula-input'), submit: document.getElementById('formula-submit') };
+  return { input: null, submit: null };
+}
+
+async function gradeAnswerWithAI(userAnswer, kind) {
+  gradingInProgress = true;
+  const els = getAnswerInputEls();
+  if (els.submit) els.submit.disabled = true;
+  if (els.input)  els.input.disabled = true;
+
+  const waitMsg = kind === 'formula'
+    ? `Il confronto esatto non corrisponde: verifico con l'AI ("${aiConfig.model}") se è comunque una forma equivalente…`
+    : `Correzione in corso con "${aiConfig.model}"… può richiedere qualche secondo, soprattutto su CPU.`;
+  answerArea.insertAdjacentHTML('beforeend', `
+    <div class="ai-grading-row" id="ai-grading-row">
+      <span class="ai-spinner"></span>
+      <span>${waitMsg}</span>
+      <button class="ai-cancel" onclick="cancelGrading()">Annulla</button>
+    </div>`);
+
+  gradingAbort = new AbortController();
+  const timeoutId = setTimeout(() => gradingAbort.abort(), 60000); // timeout di sicurezza: 60s
+
+  const key = currentQ.domanda;
+  const d = getQData(key);
+
+  try {
+    const result = await callOllamaGrade(currentQ.domanda, currentQ.risposta, userAnswer, gradingAbort.signal, kind);
+    clearTimeout(timeoutId);
+    gradingInProgress = false;
+    answered = true;
+    d.asked++;
+    renderOpenResult(result, userAnswer, kind);
+    recordResult(d, result.corretto, key);
+  } catch (err) {
+    clearTimeout(timeoutId);
+    gradingInProgress = false;
+    const row = document.getElementById('ai-grading-row');
+    if (row) row.remove();
+    if (err.message === 'CANCELLED') {
+      renderOpenFallback(userAnswer, null, kind);
+    } else {
+      renderOpenFallback(userAnswer, err.message, kind);
+    }
+  }
+}
+
+function cancelGrading() {
+  if (gradingAbort) gradingAbort.abort();
+}
+
+function renderOpenResult(result, userAnswer, kind) {
+  const row = document.getElementById('ai-grading-row');
+  if (row) row.remove();
+  const col = result.punteggio >= 80 ? 'var(--green)' : result.punteggio >= 50 ? 'var(--yellow)' : 'var(--red)';
+  const primaryAnswer = currentQ.risposta.split('|')[0].trim();
+  const box = document.createElement('div');
+  box.className = 'ai-feedback-box ' + (result.corretto ? 'is-correct' : 'is-wrong');
+  box.innerHTML = `
+    <div class="ai-fb-head">
+      <span class="ai-fb-verdict ${result.corretto ? 'ok' : 'no'}">${result.corretto ? '✓ Corretto' : '✗ Da rivedere'}</span>
+      <span class="ai-fb-score">${result.punteggio}/100</span>
+    </div>
+    <div class="ai-score-track"><div class="ai-score-fill" style="width:${result.punteggio}%;background:${col}"></div></div>
+    <div class="ai-fb-text"></div>
+    <div class="ai-fb-ref">${kind === 'formula' ? 'Formula' : 'Risposta'} di riferimento: ${primaryAnswer}</div>
+    ${kind === 'formula' ? '<div class="cf-render" id="ai-fb-formula-render"></div>' : ''}`;
+  box.querySelector('.ai-fb-text').textContent = result.feedback;
+  answerArea.appendChild(box);
+  if (kind === 'formula') {
+    setTimeout(() => renderLatexInto(document.getElementById('ai-fb-formula-render'), primaryAnswer), 50);
+    const inp = document.getElementById('formula-input');
+    const prev = document.getElementById('formula-preview');
+    if (inp) inp.classList.add(result.corretto ? 'correct' : 'wrong');
+    if (prev) { prev.classList.toggle('correct-preview', result.corretto); prev.classList.toggle('wrong-preview', !result.corretto); }
+  }
+}
+
+// Fallback quando l'AI locale non è raggiungibile (o l'utente annulla): si può
+// riprovare, oppure autovalutarsi a mano confrontando la propria risposta con
+// quella di riferimento mostrata qui sotto. Vale sia per domande aperte che
+// per formule (kind distingue le etichette dei pulsanti).
+function renderOpenFallback(userAnswer, errorMsg, kind) {
+  const primaryAnswer = currentQ.risposta.split('|')[0].trim();
+  const refLabel = kind === 'formula' ? 'Formula di riferimento' : 'Risposta di riferimento';
+  const safeAnswer = userAnswer.replace(/'/g, "&#39;").replace(/"/g, '&quot;');
+  const box = document.createElement('div');
+  box.className = 'ai-error-box';
+  box.innerHTML = `
+    ${errorMsg ? `<div>⚠ ${errorMsg}</div>` : '<div>Correzione annullata.</div>'}
+    <div style="color:var(--text)">La tua risposta: <i>${userAnswer}</i></div>
+    <div style="color:var(--text)">${refLabel}: <b>${primaryAnswer}</b></div>
+    <div>Puoi riprovare la correzione AI, oppure valutarti da solo/a:</div>
+    <div class="ai-err-actions">
+      <button class="ai-retry-btn" onclick="retryGrading('${safeAnswer}','${kind}')">↺ Riprova con l'AI</button>
+      <button class="ai-self-btn" onclick="selfAssessOpen(true,'${kind}')">${kind === 'formula' ? 'Era equivalente ✓' : 'Sapevo la risposta ✓'}</button>
+      <button class="ai-self-btn" onclick="selfAssessOpen(false,'${kind}')">${kind === 'formula' ? 'Era sbagliata ✗' : 'Non la sapevo ✗'}</button>
+    </div>`;
+  answerArea.appendChild(box);
+}
+
+function retryGrading(userAnswer, kind) {
+  const boxes = answerArea.querySelectorAll('.ai-error-box');
+  boxes.forEach(b => b.remove());
+  const els = getAnswerInputEls();
+  if (els.submit) els.submit.disabled = true;
+  if (els.input)  els.input.disabled = true;
+  gradeAnswerWithAI(userAnswer, kind);
+}
+
+function selfAssessOpen(wasCorrect, kind) {
+  if (answered) return;
+  answered = true;
+  const boxes = answerArea.querySelectorAll('.ai-error-box');
+  boxes.forEach(b => b.remove());
+  const key = currentQ.domanda;
+  const d = getQData(key);
+  d.asked++;
+  answerArea.insertAdjacentHTML('beforeend',
+    `<div class="ai-fb-ref" style="margin-top:-4px">(valutazione manuale — AI locale non disponibile in questo momento)</div>`);
+  if (kind === 'formula') {
+    const inp = document.getElementById('formula-input');
+    const prev = document.getElementById('formula-preview');
+    if (inp) inp.classList.add(wasCorrect ? 'correct' : 'wrong');
+    if (prev) { prev.classList.toggle('correct-preview', wasCorrect); prev.classList.toggle('wrong-preview', !wasCorrect); }
+  }
+  recordResult(d, wasCorrect, key);
 }
 
 // ── ANSWER ────────────────────────────────────────────────────────────────────
@@ -1100,58 +1836,25 @@ function answer(choice) {
   recordResult(d, correct, key);
 }
 
-function answerFormula(userInput) {
-  if (answered) return;
+// Formula: prima un confronto veloce e gratuito (normalizeFormula/formulaMatch,
+// gestisce notazione/spazi/sinonimi LaTeX equivalenti). Se NON corrisponde,
+// invece di segnarla subito sbagliata (il vecchio comportamento, poco
+// affidabile per formule riarrangiate algebricamente) chiediamo conferma
+// all'AI locale, che capisce meglio l'equivalenza matematica reale.
+function answerFormulaInstant(userInput) {
   answered = true;
-
   const key = currentQ.domanda;
   const d   = getQData(key);
   d.asked++;
 
-  const correct = formulaMatch(userInput, currentQ.risposta);
-
-  // Style the input & preview
   const inp  = document.getElementById('formula-input');
   const prev = document.getElementById('formula-preview');
-  if (inp) {
-    inp.disabled = true;
-    inp.classList.add(correct ? 'correct' : 'wrong');
-  }
+  if (inp) { inp.disabled = true; inp.classList.add('correct'); }
   const submitBtn = document.getElementById('formula-submit');
   if (submitBtn) submitBtn.disabled = true;
+  if (prev) prev.classList.add('correct-preview');
 
-  if (prev) {
-    prev.classList.toggle('correct-preview', correct);
-    prev.classList.toggle('wrong-preview', !correct);
-  }
-
-  // Show correct formula if wrong
-  if (!correct) {
-    const box = document.createElement('div');
-    box.className = 'correct-formula-box';
-    // Show only primary answer (before any pipe-separated alternatives)
-    const primaryAnswer = currentQ.risposta.split('|')[0].trim();
-    const rawSpan  = document.createElement('div');
-    rawSpan.className = 'cf-raw';
-    rawSpan.textContent = 'Correct: ' + primaryAnswer;
-    const normSpan = document.createElement('div');
-    normSpan.className = 'cf-raw';
-    normSpan.style.opacity = '0.45';
-    normSpan.style.fontSize = '10px';
-    normSpan.style.marginTop = '2px';
-    normSpan.textContent = 'normalized → ' + normalizeFormula(primaryAnswer) + '   (yours → ' + normalizeFormula(document.getElementById('formula-input') ? document.getElementById('formula-input').value : '') + ')';
-    const renderDiv = document.createElement('div');
-    renderDiv.className = 'cf-render';
-    box.innerHTML = '<div class="cf-label">Correct Answer</div>';
-    box.appendChild(rawSpan);
-    box.appendChild(normSpan);
-    box.appendChild(renderDiv);
-    answerArea.appendChild(box);
-    // Render after KaTeX is ready
-    setTimeout(() => renderLatexInto(renderDiv, primaryAnswer), 50);
-  }
-
-  recordResult(d, correct, key);
+  recordResult(d, true, key);
 }
 
 function recordResult(d, correct, key) {
@@ -1254,9 +1957,11 @@ function switchTab(tab) {
 
 function getTypeTag(qobj) {
   if (!qobj) return '<span class="q-type-tag tf">T/F</span>';
-  if (qobj.isFormula) return '<span class="q-type-tag formula">ƒ</span>';
-  if (qobj.options)   return '<span class="q-type-tag mc">MC</span>';
-  return '<span class="q-type-tag tf">T/F</span>';
+  const base = qobj.isFormula ? '<span class="q-type-tag formula">ƒ</span>'
+             : qobj.isOpen    ? '<span class="q-type-tag open">APERTA</span>'
+             : qobj.options   ? '<span class="q-type-tag mc">MC</span>'
+             : '<span class="q-type-tag tf">T/F</span>';
+  return base + (resolveImagePath(qobj) ? '<span class="q-type-tag img">🖼</span>' : '');
 }
 
 function renderStats() {
@@ -1339,13 +2044,14 @@ document.addEventListener('keydown', e => {
   }
   if (!sessionActive) return;
 
-  // If formula input is focused, don't intercept keystrokes
+  // If formula/open input is focused, don't intercept keystrokes
   const activeEl = document.activeElement;
   const isFormulaFocused = activeEl && activeEl.id === 'formula-input';
+  const isOpenFocused    = activeEl && activeEl.id === 'open-input';
 
   if (!answered) {
-    if (currentQ && currentQ.isFormula) {
-      // Formula: Enter is handled by the input's own keydown listener
+    if (currentQ && (currentQ.isFormula || currentQ.isOpen)) {
+      // Formula / Open: submission is handled by the input's own keydown listener
       return;
     } else if (currentOptions === null) {
       // T/F
@@ -1357,8 +2063,8 @@ document.addEventListener('keydown', e => {
       if (!isNaN(n) && n >= 1 && n <= currentOptions.length) answer(n - 1);
     }
   } else {
-    // After answer: advance with Space / → / Enter (but not if typing in formula input)
-    if (!isFormulaFocused && (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'Enter')) {
+    // After answer: advance with Space / → / Enter (but not while typing in formula/open input)
+    if (!isFormulaFocused && !isOpenFocused && (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'Enter')) {
       e.preventDefault();
       nextQuestion();
     }
@@ -1368,6 +2074,7 @@ document.addEventListener('keydown', e => {
 // ── INIT ──────────────────────────────────────────────────────────────────────
 updateTopbar();
 renderSidebar();
+updateAIStatusUI();
 startSession();
 </script>
 </body>
