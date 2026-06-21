@@ -1,0 +1,530 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[a4paper, top=1.8cm, bottom=1.8cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{parskip}
+
+
+% ── COLORS ──────────────────────────────────────────────────
+\definecolor{amber}{HTML}{7A4500}
+\definecolor{cyanc}{HTML}{004A7A}
+\definecolor{greenc}{HTML}{1A5C1A}
+\definecolor{redc}{HTML}{7A1A1A}
+\definecolor{purplec}{HTML}{4A1A7A}
+\definecolor{greyc}{HTML}{444444}
+\definecolor{lightbg}{HTML}{F5F5F5}
+\definecolor{bordercol}{HTML}{CCCCCC}
+
+% ── SECTION TITLES ──────────────────────────────────────────
+\titleformat{\section}[block]
+  {\normalfont\bfseries\large\color{amber}}
+  {\thesection.}{0.5em}{}
+  [\vspace{1pt}\hrule\vspace{2pt}]
+\titlespacing{\section}{0pt}{10pt}{4pt}
+
+\titleformat{\subsection}[runin]
+  {\normalfont\bfseries\normalsize\color{cyanc}}
+  {\thesubsection.}{0.4em}{}[ — ]
+\titlespacing{\subsection}{0pt}{6pt}{2pt}
+
+% ── BOX ENVIRONMENTS ────────────────────────────────────────
+\newmdenv[
+  backgroundcolor=lightbg,
+  linecolor=amber,
+  linewidth=1pt,
+  innerleftmargin=8pt,
+  innerrightmargin=8pt,
+  innertopmargin=6pt,
+  innerbottommargin=6pt,
+  skipabove=5pt,
+  skipbelow=5pt
+]{amberbox}
+
+\newmdenv[
+  backgroundcolor=lightbg,
+  linecolor=cyanc,
+  linewidth=1pt,
+  innerleftmargin=8pt,
+  innerrightmargin=8pt,
+  innertopmargin=6pt,
+  innerbottommargin=6pt,
+  skipabove=5pt,
+  skipbelow=5pt
+]{cyanbox}
+
+\newmdenv[
+  backgroundcolor=lightbg,
+  linecolor=greenc,
+  linewidth=1pt,
+  innerleftmargin=8pt,
+  innerrightmargin=8pt,
+  innertopmargin=6pt,
+  innerbottommargin=6pt,
+  skipabove=5pt,
+  skipbelow=5pt
+]{greenbox}
+
+\newmdenv[
+  backgroundcolor=lightbg,
+  linecolor=purplec,
+  linewidth=1pt,
+  innerleftmargin=8pt,
+  innerrightmargin=8pt,
+  innertopmargin=6pt,
+  innerbottommargin=6pt,
+  skipabove=5pt,
+  skipbelow=5pt
+]{purplebox}
+
+\newmdenv[
+  backgroundcolor=lightbg,
+  linecolor=redc,
+  linewidth=1pt,
+  innerleftmargin=8pt,
+  innerrightmargin=8pt,
+  innertopmargin=6pt,
+  innerbottommargin=6pt,
+  skipabove=5pt,
+  skipbelow=5pt
+]{redbox}
+
+% ── LISTS ───────────────────────────────────────────────────
+\setlist[itemize]{leftmargin=14pt, itemsep=2pt, parsep=0pt, topsep=3pt}
+\setlist[enumerate]{leftmargin=16pt, itemsep=2pt, parsep=0pt, topsep=3pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+
+% ── MATH SHORTCUTS ──────────────────────────────────────────
+\newcommand{\Tr}{T_r}
+\newcommand{\dt}{\dot{s}}
+\newcommand{\ddt}{\ddot{s}}
+
+% ────────────────────────────────────────────────────────────
+\begin{document}
+
+{\centering
+  {\Large\bfseries Trajectory Planning --- Cheat Sheet}\\[3pt]
+  \hrule
+  \vspace{6pt}
+}
+
+% ════════════════════════════════════════════════════════════
+\section{Diagramma Decisionale}
+
+\begin{amberbox}
+\textbf{Q1 --- Dove si pianifica il moto?}\\
+Il moto \`e specificato nel \textbf{joint space}? \quad$\Rightarrow$\quad \textbf{Caso A}\\
+Il moto \`e specificato nel \textbf{Cartesian space}? \quad$\Rightarrow$\quad Q2
+
+\medskip
+\textbf{Q2 --- Hai un path geometrico o solo i due estremi?}\\
+Solo punti iniziale/finale? \quad$\Rightarrow$\quad \textbf{Caso A}\\
+Path geometrico dato (linea, cerchio, \ldots)? \quad$\Rightarrow$\quad Q3
+
+\medskip
+\textbf{Q3 --- I vincoli di velocit\`a/accelerazione sono su giunti o cartesiani?}\\
+Bounds cartesiani diretti su $\|\dot{p}\|$, $\|\ddot{p}\|$? \quad$\Rightarrow$\quad \textbf{Caso B}\\
+Bounds sui giunti $V_i$, $A_i$? \quad$\Rightarrow$\quad \textbf{Caso C}
+\end{amberbox}
+
+% ════════════════════════════════════════════════════════════
+\section{Caso A --- Joint Space PTP}
+
+\begin{cyanbox}
+\begin{enumerate}
+  \item Calcola $\Delta q_i = q_{f,i} - q_{i,i}$ per ogni giunto.
+  \item Scegli il profilo: trapezoidale / cubica / quintica (vedi Sezioni 5--6).
+  \item \textbf{Coordinazione:} $T = \max_i\{T_{\min,i}\}$; il giunto pi\`u lento detta il tempo.
+  \item Gli altri giunti vengono scalati: \quad $k_i = T / T_{\min,i}$,\\
+        \hspace*{1cm} $V_i^{\text{new}} = V_i / k_i$, \quad $A_i^{\text{new}} = A_i / k_i^2$.
+  \item Scrivi $q_i(t)$ esplicitamente per ogni giunto.
+\end{enumerate}
+\end{cyanbox}
+
+% ════════════════════════════════════════════════════════════
+\section{Caso B --- Path Cartesiano con Bounds Diretti}
+
+\begin{greenbox}
+\begin{enumerate}
+  \item Parametrizza $p(s)$ con parametro $s$ (lunghezza d'arco se possibile). Calcola $L$.
+  \item Calcola $dp/ds$ e $d^2p/ds^2$ in funzione di $s$.
+  \item Ricava $V$ dai bounds cartesiani diretti su $\|\dot{p}\|$.
+  \item \textbf{Path lineare:} $\|\dot{p}\| = |\dt|$, $\|\ddot{p}\| = |\ddt|$. Bounds diretti.
+  \item \textbf{Path circolare} (raggio $R$): vedi Sezione 7.
+  \item Controlla $L$ rispetto a $V^2/A$ per scegliere tra b-c-b e bang-bang.
+  \item Calcola $T$. Se serve $q(t)$: applica la cinematica inversa + Jacobiano.
+\end{enumerate}
+\end{greenbox}
+
+% ════════════════════════════════════════════════════════════
+\section{Caso C --- Bounds dai Giunti, Path Cartesiano}
+
+\begin{purplebox}
+\begin{enumerate}
+  \item Applica la IK nei punti chiave: inizio, fine, e punti di \textbf{inversione}.
+  \item Per ogni giunto, calcola la distanza totale percorsa.\\
+        \textbf{Attenzione alle inversioni:} somma i tratti separatamente.\\
+        \hspace*{1cm} $d_i = |q_{m,i} - q_{i,i}| + |q_{f,i} - q_{m,i}|$
+  \item Stima del tempo minimo (accelerazione infinita):\quad $T_{\min,i} = d_i / V_i$.
+  \item Giunto limitante: $i^* = \arg\max_i\{T_{\min,i}\}$.
+  \item Worst-case geometrico: trova il punto del path dove $\|j_{i^*}\|$ \`e minimo.
+  \item Bound sulla velocit\`a: \quad $V = \|j_{i^*}\|_{\min} \cdot V_{i^*}$.
+  \item Poi procedi come il \textbf{Caso B}.
+\end{enumerate}
+
+\smallskip
+\textit{Esempio (Jul 2024, robot RP):} $\|j_1\| = q_2$, minimo nel punto del path pi\`u vicino
+all'origine. \quad $V = q_{2,\min} \cdot V_1$.
+\end{purplebox}
+
+\newpage
+% ════════════════════════════════════════════════════════════
+\section{Formule Trapezoidale (Bang-Coast-Bang)}
+
+\begin{amberbox}
+\textbf{Bang-Coast-Bang (b-c-b):} \quad condizione: $L > V^2/A$
+\[
+T_r = \frac{V}{A} \qquad\qquad T = \frac{L}{V} + \frac{V}{A} = \frac{AL + V^2}{AV}
+\]
+
+\textbf{Bang-Bang (se $L \leq V^2/A$):}
+\[
+\bar{T} = \sqrt{\frac{4L}{A}} \qquad\qquad \bar{V} = \frac{A\,\bar{T}}{2} \leq V_{\max}
+\]
+
+\textbf{Profilo $\sigma(t)$ esplicito (b-c-b):}
+\[
+\sigma(t) =
+\begin{cases}
+\dfrac{A\,t^2}{2} & 0 \leq t \leq T_r \\[8pt]
+V\!\left(t - \dfrac{T_r}{2}\right) & T_r \leq t \leq T - T_r \\[8pt]
+L - \dfrac{A\,(T-t)^2}{2} & T - T_r \leq t \leq T
+\end{cases}
+\]
+\end{amberbox}
+
+% ════════════════════════════════════════════════════════════
+\section{Riscalamento Temporale}
+
+\begin{cyanbox}
+\textbf{Riscalamento uniforme} (fattore $k = \bar{T}/T \geq 1$):
+\[
+T_r^{\text{new}} = k\,T_r \qquad V^{\text{new}} = \frac{V}{k} \qquad A^{\text{new}} = \frac{A}{k^2}
+\]
+
+\textbf{Riscalamento con $T_r$ fisso} (esame Jan 2026):
+\[
+\bar{V} = \frac{L}{\bar{T} - T_r} \qquad \bar{A} = \frac{\bar{V}}{T_r}
+\]
+
+\textit{I due metodi danno risultati diversi. Leggi con attenzione il testo dell'esercizio.}
+\end{cyanbox}
+
+% ════════════════════════════════════════════════════════════
+\section{Path Circolare --- Accelerazione Centripeta}
+
+\begin{greenbox}
+Per un path circolare di raggio $R$, parametrizzato ad arco $s$:
+\[
+\|\dot{p}\| = |\dt| \qquad\qquad
+\|\ddot{p}\| = \sqrt{\ddt^2 + \frac{\dt^4}{R^2}} \leq a_{\max}
+\]
+
+In fase di \textbf{cruise} ($\ddt = 0$): \quad $\|\ddot{p}\| = \dfrac{V^2}{R} \leq a_{\max}$
+
+In fase di \textbf{accelerazione} ($\dt = 0$): \quad $\|\ddot{p}\| = |\ddt| \leq a_{\max}$
+
+\medskip
+\textbf{Bounds ottimali:}
+\[
+V = \min\!\left\{v_{\max},\; \sqrt{R\,a_{\max}}\right\}
+\qquad
+A = \sqrt{a_{\max}^2 - \frac{V^4}{R^2}}
+\]
+
+\textit{Se $V = \sqrt{R\,a_{\max}}$ allora $A = 0$: non esiste soluzione in forma chiusa, \`e bang-bang.}
+\end{greenbox}
+
+% ════════════════════════════════════════════════════════════
+\newpage
+\section{Profili Polinomiali}
+
+\subsection{Cubica (4 condizioni)}
+
+Impone $q_i,\, q_f,\, \dot{q}(0) = v_i,\, \dot{q}(T) = v_f$.
+\[
+q(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3
+\]
+\[
+a_0 = q_i \quad a_1 = v_i \quad
+a_2 = \frac{3\Delta q - (2v_i + v_f)T}{T^2} \quad
+a_3 = \frac{-2\Delta q + (v_i + v_f)T}{T^3}
+\]
+
+\textbf{Timing law rest-to-rest} ($v_i = v_f = 0$), in $\tau = t/T \in [0,1]$:
+\[
+s(\tau) = 3\tau^2 - 2\tau^3 \qquad \dot{s}(\tau) = \frac{6\tau(1-\tau)}{T}
+\]
+\[
+\dot{s}_{\max} \text{ a } \tau=0.5:\quad
+\begin{cases}
+\dfrac{3}{2T} & \text{se } s\in[0,1] \\[6pt]
+\dfrac{3L}{2T} & \text{se } s\in[0,L],\; s(\tau)=L(3\tau^2-2\tau^3)
+\end{cases}
+\]
+
+\subsection{Quintica (6 condizioni)}
+
+Aggiunge $\ddot{q}(0) = \ddot{q}(T) = 0$ alla cubica, in $\tau = t/T$:
+\[
+q(\tau) = q_i + \Delta q\,(10\tau^3 - 15\tau^4 + 6\tau^5)
+\]
+\[
+|\dot{q}|_{\max} = \frac{30\,|\Delta q|}{16\,T} \quad \text{a } t = T/2
+\qquad
+|\ddot{q}|_{\max} = \frac{60\,|\Delta q|}{T^2}\cdot 0.0962 \quad \text{a } t \approx 0.21\,T
+\]
+
+Tempo minimo (coordinazione), con $|k| = 0.0962$:
+\[
+T^* = \max_i\!\left\{\,\frac{30\,|\Delta q_i|}{16\,V_{\max,i}},\quad
+\sqrt{\frac{60\,|k|\,|\Delta q_i|}{A_{\max,i}}}\,\right\}
+\]
+
+% ════════════════════════════════════════════════════════════
+\section{Velocit\`a nei Punti Chiave}
+
+\begin{amberbox}
+\begin{tabular}{@{}p{3.5cm}p{10cm}@{}}
+$t = 0,\; T$ & $\dot{p} = 0 \;\Rightarrow\; \dot{q} = 0$ \quad (condizione rest-to-rest)\\[4pt]
+$t = T/2$ & $\dt = V$;\quad $\dot{p}_m = V\,\dfrac{p_f - p_i}{L}$;\quad $\dot{q}_m = J^{-1}(q_m)\,\dot{p}_m$\\[6pt]
+$t = T_r$ & $\dt = V$, $\ddt = 0$: solo accelerazione centripeta $V^2/R$ (path circolare)\\[4pt]
+$t = 0^+$ & $\dt = 0$, $\ddt = A$: solo accelerazione tangenziale $A$\\
+\end{tabular}
+\end{amberbox}
+
+\subsection{Emergency Stop da $t = T_0$}
+
+Il robot inizia a decelerare massimamente da $T_0$:
+\[
+\dot{q}_i(t) = \dot{q}_i(T_0) - \operatorname{sign}\!\bigl(\dot{q}_i(T_0)\bigr)\cdot A_{\max,i}\,(t - T_0)
+\]
+\[
+q_i(t) = q_i(T_0) + \dot{q}_i(T_0)\,(t-T_0) - \tfrac{1}{2}\,\operatorname{sign}(\dot{q}_i)\cdot A_{\max,i}\,(t-T_0)^2
+\]
+\[
+T_{s,i} = T_0 + \frac{|\dot{q}_i(T_0)|}{A_{\max,i}} \qquad T_s = \max_i\{T_{s,i}\}
+\]
+
+% ════════════════════════════════════════════════════════════
+\section{Trappole Comuni}
+
+\begin{redbox}
+\begin{itemize}
+  \item \textbf{Giunto che inverte il moto:} $q_i = q_f$ non significa giunto fermo.
+        La distanza percorsa \`e $|q_m - q_i| + |q_f - q_m| \neq 0$.
+
+  \item \textbf{Accelerazione centripeta:} per path circolari $\|\ddot{p}\| \neq |\ddt|$.
+        Il termine centripeto $\dt^4/R^2$ non \`e trascurabile ad alta velocit\`a.
+
+  \item \textbf{Bang-bang dimenticato:} controlla \textit{sempre} la condizione $L$ vs $V^2/A$
+        prima di usare la formula b-c-b.
+
+  \item \textbf{Riscalamento uniforme vs $T_r$ fisso:} i due approcci danno risultati diversi.
+        Non confonderli.
+
+  \item \textbf{Quintica:} $T^*$ dipende da \textit{entrambi} i bounds $V$ e $A$.
+        Non basta imporre solo il vincolo di velocit\`a.
+
+  \item \textbf{Worst-case geometrico (robot RP):} $\|j_1\| = q_2$ \`e minimo nel punto
+        del path pi\`u vicino all'origine, non necessariamente a met\`a arco.
+\end{itemize}
+\end{redbox}
+
+% ════════════════════════════════════════════════════════════
+\newpage
+\section{LTS --- Lift--Travel--Setdown}
+
+Un \textbf{LTS} divide il moto di un giunto in 3 fasi raccordate $C^2$:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}llp{7cm}@{}}
+\toprule
+\textbf{Fase} & \textbf{Intervallo} & \textbf{Condizioni forti}\\
+\midrule
+Lift     & $[0,\, t_1]$      & $\dot{q}=\ddot{q}=0$ a $t=0$ \quad (polinomio grado 4)\\
+Travel   & $[t_1,\, t_2]$    & nessuna \quad (polinomio grado 3)\\
+Setdown  & $[t_2,\, t_f]$    & $\dot{q}=\ddot{q}=0$ a $t=t_f$ \quad (polinomio grado 4)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Le \textbf{incognite} sono le velocit\`a ai raccordi: $v_1 = \dot{q}(t_1)$ e $v_2 = \dot{q}(t_2)$.
+
+% ── STEP 1 ──────────────────────────────────────────────────
+\subsection{Step 1 --- Polinomio di Travel}
+
+Poni $\tau = t - t_1$, $h = t_2 - t_1$, $\Delta q_T = q(t_2) - q(t_1)$.
+\[
+q_T(\tau) = q(t_1) + v_1\tau + a_2\tau^2 + a_3\tau^3, \qquad \tau\in[0,h]
+\]
+\[
+a_2 = \frac{3\Delta q_T - (2v_1+v_2)\,h}{h^2} \qquad
+a_3 = \frac{-2\Delta q_T + (v_1+v_2)\,h}{h^3}
+\]
+Deriva per ottenere:
+\[
+\dot{q}_T(\tau) = v_1 + 2a_2\tau + 3a_3\tau^2 \qquad
+\ddot{q}_T(\tau) = 2a_2 + 6a_3\tau
+\]
+
+% ── STEP 2 ──────────────────────────────────────────────────
+\subsection{Step 2 --- Polinomio di Lift}
+
+Poni $\tau = t$, intervallo $[0,t_1]$, grado 4:
+\[
+q_L(\tau) = a_0 + a_1\tau + a_2\tau^2 + a_3\tau^3 + a_4\tau^4
+\]
+
+Le condizioni alle due estremit\`a danno:
+\[
+a_0 = q_i, \qquad a_1 = 0, \qquad a_2 = 0
+\]
+Le restanti due ($q_L(t_1)=q(t_1)$ e $\dot{q}_L(t_1)=v_1$) formano un \textbf{sistema 2$\times$2} in $a_3,a_4$:
+\[
+\begin{cases}
+a_3 t_1^3 + a_4 t_1^4 = q(t_1) - q_i\\[4pt]
+3a_3 t_1^2 + 4a_4 t_1^3 = v_1
+\end{cases}
+\quad\Rightarrow\quad
+a_3 = \frac{4[q(t_1)-q_i] - v_1 t_1}{t_1^3}, \quad
+a_4 = \frac{-3[q(t_1)-q_i] + v_1 t_1}{t_1^4}
+\]
+Deriva per ottenere:
+\[
+\ddot{q}_L(\tau) = 6a_3\tau + 12a_4\tau^2
+\]
+
+% ── STEP 3 ──────────────────────────────────────────────────
+\subsection{Step 3 --- Polinomio di Setdown}
+
+Poni $\tau = t - t_2$, intervallo $[0,\, t_f-t_2]$, grado 4. Sia $T_S = t_f - t_2$:
+\[
+q_S(\tau) = a_0 + a_1\tau + a_2\tau^2 + a_3\tau^3 + a_4\tau^4
+\]
+Le condizioni in $\tau=0$ danno subito:
+\[
+a_0 = q(t_2), \qquad a_1 = v_2
+\]
+Le tre condizioni in $\tau = T_S$ ($q_S = q_f$, $\dot{q}_S = 0$, $\ddot{q}_S = 0$) formano un \textbf{sistema 3$\times$3} in $a_2,a_3,a_4$:
+\[
+\begin{cases}
+a_2 T_S^2 + a_3 T_S^3 + a_4 T_S^4 = q_f - q(t_2) - v_2 T_S\\[4pt]
+2a_2 T_S + 3a_3 T_S^2 + 4a_4 T_S^3 = -v_2\\[4pt]
+2a_2 + 6a_3 T_S + 12a_4 T_S^2 = 0
+\end{cases}
+\]
+
+\begin{cyanbox}
+\textbf{Soluzione esplicita} (sostituendo $\Delta q_S = q_f - q(t_2)$):
+\[
+a_2 = \frac{10\Delta q_S - 6v_2 T_S}{T_S^2}, \quad
+a_3 = \frac{-15\Delta q_S + 7v_2 T_S}{T_S^3}, \quad
+a_4 = \frac{6\Delta q_S - 3v_2 T_S}{T_S^4}
+\]
+Deriva per ottenere $\ddot{q}_S(\tau) = 2a_2 + 6a_3\tau + 12a_4\tau^2$.
+\end{cyanbox}
+
+\begin{redbox}
+\textbf{Attenzione:} Setdown \`e speculare al Lift ma le condizioni forti sono alla \emph{fine},
+non all'inizio $\Rightarrow$ il sistema \`e \textbf{3$\times$3} (non 2$\times$2).
+\end{redbox}
+
+% ── STEP 4 ──────────────────────────────────────────────────
+\subsection{Step 4 --- Continuit\`a $C^2$ ai raccordi}
+
+Eguaglia le accelerazioni ai due raccordi:
+\[
+\ddot{q}_L(t_1) = \ddot{q}_T(0) \quad\Rightarrow\quad
+6a_3^{(L)}\,t_1 + 12a_4^{(L)}\,t_1^2 = 2a_2^{(T)}
+\]
+\[
+\ddot{q}_T(h) = \ddot{q}_S(0) \quad\Rightarrow\quad
+2a_2^{(T)} + 6a_3^{(T)}\,h = 2a_2^{(S)}
+\]
+Sostituendo le espressioni dei coefficienti ottenute negli Step 1--3, si ottiene
+un \textbf{sistema lineare 2$\times$2 in $v_1$ e $v_2$}. Risolvi numericamente.
+
+\textit{Nota: $v_2 < 0$ \`e possibile (il giunto supera il target e ritorna).}
+
+% ── STEP 5 ──────────────────────────────────────────────────
+\subsection{Step 5 --- Leggi esplicite del moto}
+
+Sostituisci $v_1$ e $v_2$ trovati nei tre polinomi e scrivi
+$q(t)$, $\dot{q}(t)$, $\ddot{q}(t)$ per ogni fase con le rispettive variabili locali $\tau$.
+
+% ── STEP 6 ──────────────────────────────────────────────────
+\subsection{Step 6 --- Verifica vincoli cinematici}
+
+Per ogni fase, trovare il massimo di $|\dot{q}|$ e $|\ddot{q}|$:
+\begin{enumerate}
+  \item Poni la derivata uguale a zero per trovare i punti stazionari interni.
+  \item Valuta la funzione nei punti interni \textbf{e} ai bordi dell'intervallo.
+  \item Prendi il massimo assoluto tra tutti i candidati.
+  \item Confronta con $\dot{q}_{\max}$ e $\ddot{q}_{\max}$ imposti dal problema.
+\end{enumerate}
+
+\begin{redbox}
+Il massimo di $|\ddot{q}|$ pu\`o trovarsi a un \textit{bordo}, non al punto stazionario
+interno --- valuta sempre tutti i candidati.
+\end{redbox}
+
+% ── STEP 7 ──────────────────────────────────────────────────
+\subsection{Step 7 --- Verifica $C^2$ numerica}
+
+Controlla ai due raccordi:
+\[
+\ddot{q}_L(t_1) = \ddot{q}_T(0) \;\checkmark \qquad\qquad \ddot{q}_T(h) = \ddot{q}_S(0) \;\checkmark
+\]
+Posizione e velocit\`a sono continue \emph{per costruzione}: \`e sufficiente
+verificare solo le accelerazioni. Piccole discrepanze decimali sono normali.
+
+% ════════════════════════════════════════════════════════════
+
+\section{Pattern dagli Esami (2024--2026)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}p{2.6cm}p{11.5cm}@{}}
+\toprule
+\textbf{Esame} & \textbf{Pattern chiave}\\
+\midrule
+Jan 2026 & Trapezoidale con riscalamento a $T_r$ fisso. $\bar{V} = L/(\bar{T}-T_r)$, $\bar{A} = \bar{V}/T_r$.\\
+Feb 2026 & Path circolare, scelta b-c-b vs b-b. $V = \min\{v_{\max}, \sqrt{Ra_{\max}}\}$, check $L$ vs $V^2/A$.\\
+Jul 2025 & Path circolare bang-bang. $\|\ddot{p}\|_{\max} = \sqrt{A^2 + (V^2/R)^2}$ al punto medio.\\
+Jun 2025 & Quintica coordinata + emergency stop. $T^* = \max\{T_{v,i}, T_{a,i}\}$ su tutti i giunti.\\
+Jul 2024 & Path lineare robot RP, bounds da giunti. $V = q_{2,\min}\cdot V_1$. Giunto 2 inverte.\\
+Sep 2024 & Coordinazione 2 giunti trapezoidali. $T = \max\{T_{\min,2}, T_{\min,3}\}$, scala il pi\`u veloce.\\
+Feb 2025 & Trapezoidale con $v_i, v_f \neq 0$. Profilo b-c-b generalizzato; condizione cruise diversa.\\
+Jun 2024 & Path in joint space $s\in[0,1]$. $\dot{q}(t) = q'(s)\,\dot{s}(t)$, $\dot{p}(t) = J(q)\,\dot{q}(t)$.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{6pt}
+\hrule
+\vspace{4pt}
+{\centering\small Robotics 1 $\cdot$ Prof.\ De Luca $\cdot$ Esami 2024--2026\par}
+
+\end{document}
