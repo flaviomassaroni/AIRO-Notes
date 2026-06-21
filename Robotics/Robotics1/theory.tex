@@ -1,0 +1,722 @@
+%% ============================================================
+%%  Dispensa Teorica di Robotica 1
+%%  Generata da Teoria.tsx — Robotica 1, Sapienza Università di Roma
+%%  Compilare con: pdflatex o xelatex
+%% ============================================================
+\documentclass[11pt, a4paper]{article}
+
+% ---------- Encoding & lingua ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+
+% ---------- Matematica ----------
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{bm}          % bold math (\bm)
+\usepackage{mathtools}   % pmatrix*, ecc.
+
+% ---------- Layout ----------
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{parskip}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{array, booktabs, tabularx}
+\usepackage{multicol}
+
+% ---------- Grafica / Colori ----------
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% ---------- Hyperlinks ----------
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks = true,
+  linkcolor  = cyan!70!black,
+  urlcolor   = cyan!70!black,
+  citecolor  = cyan!70!black,
+  pdftitle   = {Dispensa Teorica di Robotica 1},
+  pdfauthor  = {Generata da Teoria.tsx},
+}
+
+% ---------- Font (opzionale — richiede xelatex) ----------
+% \usepackage{fontspec}
+% \setmainfont{Source Serif Pro}
+% \setmonofont{Fira Code}
+
+% ============================================================
+% COLORI TEMA
+% ============================================================
+\definecolor{cyan400}{HTML}{22D3EE}
+\definecolor{cyan800}{HTML}{155E75}
+\definecolor{purple400}{HTML}{C084FC}
+\definecolor{purple800}{HTML}{6B21A8}
+\definecolor{emerald400}{HTML}{34D399}
+\definecolor{emerald800}{HTML}{065F46}
+\definecolor{amber400}{HTML}{FBBF24}
+\definecolor{amber800}{HTML}{92400E}
+\definecolor{red400}{HTML}{F87171}
+\definecolor{red800}{HTML}{991B1B}
+\definecolor{slate100}{HTML}{F1F5F9}
+\definecolor{slate300}{HTML}{CBD5E1}
+\definecolor{slate700}{HTML}{334155}
+\definecolor{slate800}{HTML}{1E293B}
+\definecolor{slate900}{HTML}{0F172A}
+
+% ============================================================
+% AMBIENTI COLORATI
+% ============================================================
+
+% Box formula neutro (sfondo slate scuro)
+\newtcolorbox{formulabox}{
+  colback   = slate800,
+  colframe  = slate700,
+  colupper  = slate300,
+  arc       = 4pt,
+  boxrule   = 0.5pt,
+  left      = 8pt, right = 8pt,
+  top       = 6pt, bottom = 6pt,
+  breakable
+}
+
+% Box trucco d'esame — AVVISO (ambra)
+\newtcolorbox{examtip}[1][]{
+  colback   = amber800!25,
+  colframe  = amber400,
+  colupper  = amber400!80!white,
+  title     = {\small\bfseries\ttfamily\color{amber400} \faWarning\ TRUCCO D'ESAME — #1},
+  arc       = 4pt,
+  boxrule   = 0.8pt,
+  fonttitle = \small,
+  left      = 8pt, right = 8pt,
+  top       = 6pt, bottom = 6pt,
+  breakable
+}
+
+% Box trucco d'esame — INFO (viola)
+\newtcolorbox{examinfo}[1][]{
+  colback   = purple800!25,
+  colframe  = purple400,
+  colupper  = purple400!80!white,
+  title     = {\small\bfseries\ttfamily\color{purple400} ℹ TRUCCO D'ESAME — #1},
+  arc       = 4pt,
+  boxrule   = 0.8pt,
+  left      = 8pt, right = 8pt,
+  top       = 6pt, bottom = 6pt,
+  breakable
+}
+
+% Box trucco d'esame — CHECK (verde)
+\newtcolorbox{examcheck}[1][]{
+  colback   = emerald800!25,
+  colframe  = emerald400,
+  colupper  = emerald400!80!white,
+  title     = {\small\bfseries\ttfamily\color{emerald400} ✓ REQUISITO CRITICO — #1},
+  arc       = 4pt,
+  boxrule   = 0.8pt,
+  left      = 8pt, right = 8pt,
+  top       = 6pt, bottom = 6pt,
+  breakable
+}
+
+% ---------- Titolo di sezione personalizzato ----------
+\titleformat{\section}[block]
+  {\large\bfseries\color{cyan800}}
+  {\thesection.}{0.6em}{}[\vspace{2pt}\hrule\vspace{4pt}]
+
+\titleformat{\subsection}[block]
+  {\normalsize\bfseries\color{slate700}}
+  {\thesubsection.}{0.5em}{}
+
+\titleformat{\subsubsection}[block]
+  {\small\bfseries\ttfamily\color{cyan800!70}}
+  {\thesubsubsection.}{0.4em}{}
+
+% ---------- Macro utili ----------
+\newcommand{\mbf}[1]{\bm{#1}}
+\newcommand{\Rot}{\mathrm{Rot}}
+\newcommand{\Trans}{\mathrm{Trans}}
+\newcommand{\atan}{\operatorname{atan2}}
+
+% ============================================================
+% DOCUMENTO
+% ============================================================
+\begin{document}
+
+% ---- COPERTINA ----
+\begin{titlepage}
+  \centering
+  \vspace*{3cm}
+  {\small\ttfamily\color{cyan800} CONOSCENZA RIGOROSA}\par
+  \vspace{0.8cm}
+  {\Huge\bfseries Dispensa Teorica di Robotica 1}\par
+  \vspace{0.4cm}
+  {\large Sapienza Università di Roma --- Intelligenza Artificiale e Robotica}\par
+  \vspace{1.2cm}
+  {\normalsize
+    Questa dispensa raccoglie le note d'esame complete, elaborate in accordo con i
+    programmi didattici accademici del corso di Robotica 1.
+    Ogni modulo copre un argomento fondamentale: parametri DH, orientamento, cinematica
+    diretta e inversa, Jacobiano, pseudo-inversa, traiettorie e statica.
+  }\par
+  \vfill
+  {\small Generata automaticamente da \texttt{Teoria.tsx} --- \today}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ===========================================================
+\section{Parametri di Denavit-Hartenberg (DH)}
+% ===========================================================
+
+\subsection{I quattro parametri DH}
+
+Per descrivere la posa relativa tra due bracci consecutivi (link $i{-}1$ e link $i$),
+la convenzione DH individua 4 parametri geometrici associati alla terna solidale omonima:
+
+\vspace{4pt}
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{lp{6.5cm}cc}
+\toprule
+\textbf{Parametro} & \textbf{Significato} & \textbf{Asse} & \textbf{Variabile se}\\
+\midrule
+$a_i$       & Lunghezza del braccio: distanza ortogonale tra $z_{i-1}$ e $z_i$              & $x_i$     & — fisso\\
+$\alpha_i$  & Angolo di twist: torsione tra asse $z_{i-1}$ ed asse $z_i$                    & $x_i$     & — fisso\\
+$d_i$       & Coordinata di sfilamento: distanza dall'origine $O_{i-1}$ al piede della normale & $z_{i-1}$ & Joint Prismatico (P)\\
+$\theta_i$  & Angolo di rotazione: angolo tra $x_{i-1}$ e $x_i$                             & $z_{i-1}$ & Joint Revoluto (R)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Matrice di roto-traslazione elementare DH}
+
+La matrice omogenea ${}^{i-1}A_i(q_i)$ si ottiene dalla composizione:
+\begin{formulabox}
+\[
+{}^{i-1}A_i = \Rot_z(\theta_i)\cdot\Trans_z(d_i)\cdot\Trans_x(a_i)\cdot\Rot_x(\alpha_i)
+\]
+
+\medskip
+\textbf{Formulazione esplicita:}
+\[
+{}^{i-1}A_i =
+\begin{pmatrix}
+\cos\theta_i & -\sin\theta_i\cos\alpha_i &  \sin\theta_i\sin\alpha_i & a_i\cos\theta_i \\
+\sin\theta_i &  \cos\theta_i\cos\alpha_i & -\cos\theta_i\sin\alpha_i & a_i\sin\theta_i \\
+0            &  \sin\alpha_i             &  \cos\alpha_i             & d_i             \\
+0            &  0                        &  0                        & 1
+\end{pmatrix}
+\]
+\end{formulabox}
+
+\begin{examtip}[Assegnamento Frame DH]
+\begin{itemize}[leftmargin=1.2em, itemsep=3pt]
+  \item \textbf{Asse $z$ del giunto $i$:} allinea sempre $z_{i-1}$ all'asse di rotazione/traslazione
+        del giunto $i$. Errore comune: confondere l'indice --- l'asse del giunto 1 è $z_0$.
+  \item \textbf{Asse $x$ del giunto $i$:} deve essere perpendicolare sia a $z_{i-1}$ che a $z_i$.
+        Se i due assi sono incidenti, orienta $x_i$ lungo il loro prodotto vettoriale;
+        se paralleli, poni $d_i = 0$ per semplicità.
+  \item \textbf{Giunti incidenti consecutivi:} quando due assi si intersecano ($a_i = 0$),
+        l'origine $O_i$ giace sull'intersezione.
+\end{itemize}
+\end{examtip}
+
+% ===========================================================
+\section{Orientamento, SO(3) e Quaternioni}
+% ===========================================================
+
+\subsection{Matrici di rotazione e il gruppo SO(3)}
+
+Ogni matrice $R \in SO(3)$ è ortonormale e definisce i vettori unitari del frame ruotato
+proiettati su quello fisso:
+\begin{formulabox}
+\[
+R^T R = I_3, \qquad \det(R) = +1
+\]
+
+\medskip
+\textbf{Rappresentanza per colonne dei versori:}
+\[
+R = \begin{pmatrix} \mathbf{n} & \mathbf{s} & \mathbf{a} \end{pmatrix}
+  = \begin{pmatrix} n_x & s_x & a_x \\ n_y & s_y & a_y \\ n_z & s_z & a_z \end{pmatrix}
+\]
+\end{formulabox}
+
+\subsection{Rotazioni elementari}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Attorno a X (Roll)} & \textbf{Attorno a Y (Pitch)} & \textbf{Attorno a Z (Yaw)}\\
+\midrule
+$R_x(\phi) = \begin{pmatrix} 1 & 0 & 0 \\ 0 & c\phi & -s\phi \\ 0 & s\phi & c\phi \end{pmatrix}$
+&
+$R_y(\theta) = \begin{pmatrix} c\theta & 0 & s\theta \\ 0 & 1 & 0 \\ -s\theta & 0 & c\theta \end{pmatrix}$
+&
+$R_z(\psi) = \begin{pmatrix} c\psi & -s\psi & 0 \\ s\psi & c\psi & 0 \\ 0 & 0 & 1 \end{pmatrix}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Angoli di Eulero vs Roll-Pitch-Yaw}
+
+\begin{itemize}[itemsep=4pt]
+  \item \textbf{Angoli di Eulero Z-X-Z} (assi mobili): le rotazioni avvengono rispetto agli assi
+        del sistema in movimento. La matrice si moltiplica \textbf{da sinistra a destra}:
+        \[
+          R_{\text{Eulero}} = R_z(\phi)\cdot R_{x'}(\theta)\cdot R_{z''}(\psi)
+        \]
+  \item \textbf{Roll-Pitch-Yaw Z-Y-X} (assi fissi): le rotazioni avvengono rispetto agli assi del
+        frame base. La matrice si accumula \textbf{da destra a sinistra}:
+        \[
+          R_{\text{RPY}} = R_z(\phi)\cdot R_y(\theta)\cdot R_x(\psi)
+        \]
+\end{itemize}
+
+\subsection{Composizione Y-Z-X e analisi singolarità}
+
+\begin{formulabox}
+\[
+R_{YZX}(\phi,\theta,\psi) = R_y(\phi)\cdot R_z(\theta)\cdot R_x(\psi)
+\]
+\[
+R_{YZX} =
+\begin{pmatrix}
+ c\phi c\theta &  s\phi s\psi - c\phi s\theta c\psi &  c\phi s\theta s\psi + s\phi c\psi \\
+ s\theta       &  c\theta c\psi                      & -c\theta s\psi                     \\
+-s\phi c\theta &  s\phi s\theta c\psi + c\phi s\psi  & -s\phi s\theta s\psi + c\phi c\psi
+\end{pmatrix}
+\]
+\end{formulabox}
+
+\textbf{Analisi singolarità:} avviene quando $\cos\theta = 0$ (ovvero $\theta = \pm90°$).
+In questa condizione gli assi di rotazione iniziale (y) e finale (x) si allineano
+parallelamente, lasciando determinabile unicamente la somma/differenza $\phi \pm \psi$.
+
+\subsection{Rappresentazione asse-angolo e Quaternioni}
+
+I quaternioni unitari $Q = \{\eta, \boldsymbol{\epsilon}\}$ eliminano l'ambiguità e le singolarità
+trigonometriche (Gimbal Lock) mappando la rotazione attorno a un asse $\mathbf{r}$ di angolo $\theta$:
+\begin{formulabox}
+\[
+Q = \left\{ \cos\!\left(\tfrac{\theta}{2}\right),\; \sin\!\left(\tfrac{\theta}{2}\right)\mathbf{r} \right\}
+  \in \mathbb{S}^3
+\]
+\[
+\eta^2 + \epsilon_x^2 + \epsilon_y^2 + \epsilon_z^2 = 1
+\]
+\end{formulabox}
+
+\begin{examinfo}[Singolarità d'Orientamento]
+All'esame, quando devi invertire una matrice di rotazione numerica per ricavare gli angoli di
+Eulero, controlla subito l'elemento corrispondente al ``pitch'' cardinale
+(es.\ $R_{31}$ per RPY o $R_{33}$ per Eulero).
+Se questo elemento è $\pm1$, sei in una \textbf{singolarità}!
+Non usare le formule classiche (il denominatore andrebbe a zero).
+Imposta $\phi = 0$ come convenzione e risolvi per la differenza/somma d'angoli rimanente.
+\end{examinfo}
+
+% ===========================================================
+\section{Cinematica Diretta e Workspace}
+% ===========================================================
+
+\subsection{Definizione matematica e catena cinematica}
+
+La cinematica diretta (Forward Kinematics) associa le posizioni dei giunti
+$\mathbf{q} \in \mathbb{R}^n$ alla posa dell'end-effector $\mathbf{r} \in \mathbb{R}^m$:
+\begin{formulabox}
+\[
+\mathbf{r} = f(\mathbf{q})
+\]
+\[
+{}^0T_n(\mathbf{q}) = {}^0A_1(q_1)\;{}^1A_2(q_2)\;\cdots\;{}^{n-1}A_n(q_n)
+\]
+\end{formulabox}
+
+\subsection{Spazio di lavoro (Workspace)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{p{5.5cm}p{7cm}}
+\toprule
+\textbf{Workspace Primario (Reachable)} & \textbf{Workspace Secondario (Dextrous)}\\
+\midrule
+Insieme dei punti cartesiani raggiungibili
+dall'end-effector con \textbf{almeno un'orientazione}
+del polso. &
+Area interna raggiungibile assumendo
+\textbf{qualsiasi orientamento desiderato}
+del polso 3D.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ===========================================================
+\section{Cinematica Inversa (IK)}
+% ===========================================================
+
+\subsection{Problematiche di un sistema non lineare}
+
+Data la posa desiderata, ricaviamo $\mathbf{q}$. Il problema trigonometrico non lineare
+può presentare: (a) zero soluzioni (punto fuori dal workspace), (b) numero finito di
+soluzioni (es.\ gomito alto/basso), (c) infinite soluzioni (singolarità interne o ridondanza).
+
+\subsection{Soluzione analitica del manipolatore 2R planare}
+
+Considerando la cinematica diretta:
+$x = l_1 c_1 + l_2 c_{12}$ e $y = l_1 s_1 + l_2 s_{12}$,
+elevando al quadrato ed addizionando:
+
+\begin{formulabox}
+\[
+P_x^2 + P_y^2 = l_1^2 + l_2^2 + 2l_1 l_2\cos q_2
+\implies
+\cos q_2 = \frac{P_x^2 + P_y^2 - l_1^2 - l_2^2}{2l_1 l_2}
+\]
+
+\medskip
+\textbf{Due soluzioni (gomito alto / basso):}
+\[
+q_2^\pm = \atan\!\left(\pm\sqrt{1-\cos^2 q_2},\; \cos q_2\right)
+\]
+
+\medskip
+\textbf{Poi si ricava $q_1$:}
+\[
+q_1 = \atan(P_y,\; P_x) - \atan\!\left(l_2\sin q_2,\; l_1 + l_2\cos q_2\right)
+\]
+\end{formulabox}
+
+\begin{examcheck}[L'uso obbligatorio di atan2(y, x)]
+Non usare mai \textbf{arcsin} o \textbf{arccos} al compito d'esame!
+\begin{itemize}[itemsep=2pt]
+  \item $\arccos\alpha$ perde l'informazione sul segno ($\pm\theta$ danno lo stesso coseno).
+  \item L'arcotangente semplice ha un intervallo limitato ($(-\pi/2, \pi/2)$) e non riconosce
+        il quadrante quando $x < 0$.
+  \item \textbf{atan2(y, x)} controlla separatamente i segni di $y$ e $x$, restituendo l'angolo
+        univocamente nell'intero intervallo $(-\pi, \pi]$.
+\end{itemize}
+\end{examcheck}
+
+% ===========================================================
+\section{Cinematica Differenziale e Jacobiano}
+% ===========================================================
+
+\subsection{Mappatura differenziale della velocità}
+
+Lo Jacobiano geometrico $J(\mathbf{q})$ mappa la velocità di giunto nello spazio cartesiano
+(velocità lineare $\mathbf{v}$ ed angolare $\boldsymbol{\omega}$):
+\begin{formulabox}
+\[
+\begin{pmatrix} \mathbf{v} \\ \boldsymbol{\omega} \end{pmatrix}
+= J(\mathbf{q})\,\dot{\mathbf{q}}
+= \begin{pmatrix} J_L \\ J_A \end{pmatrix} \dot{\mathbf{q}}
+\]
+\end{formulabox}
+
+\subsection{Calcolo rapido delle colonne per giunti R o P}
+
+La colonna $i$-esima del Jacobiano $J_i = \bigl(J_{Li}^T\; J_{Ai}^T\bigr)^T$ dipende
+dal tipo di giunto:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Giunto Revoluto (R)} & \textbf{Giunto Prismatico (P)}\\
+\midrule
+$J_i = \begin{pmatrix} \mathbf{z}_{i-1} \times (\mathbf{p}_E - \mathbf{p}_{i-1}) \\ \mathbf{z}_{i-1} \end{pmatrix}$
+&
+$J_i = \begin{pmatrix} \mathbf{z}_{i-1} \\ \mathbf{0} \end{pmatrix}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+dove $\mathbf{z}_{i-1}$ è l'asse del giunto nel frame 0, $\mathbf{p}_{i-1}$ è l'origine del frame
+$i{-}1$ e $\mathbf{p}_E$ è la posizione dell'end-effector.
+
+\subsection{Singolarità cinematiche e perdita di rango}
+
+Una configurazione è \textbf{singolare} quando il Jacobiano perde rango massimo
+($\operatorname{rank}(J) < m$). Per matrici quadrate:
+\begin{formulabox}
+\[
+\det\!\bigl(J(\mathbf{q})\bigr) = 0
+\]
+\end{formulabox}
+
+\textbf{Conseguenze fisiche:}
+\begin{enumerate}[itemsep=2pt]
+  \item Perdita di mobilità in direzioni cartesiane vincolate.
+  \item Sforzi cinematici infiniti ai motori per traiettorie in quella direzione.
+  \item Esplosione del modello di calcolo differenziale inverso.
+\end{enumerate}
+
+\subsection{Ellissoide di Manipolabilità}
+
+Con il vincolo $\|\dot{\mathbf{q}}\|^2 \le 1$, le velocità cartesiane raggiungibili formano un
+ellissoide:
+\begin{formulabox}
+\[
+\mathbf{v}^T(JJ^T)^{-1}\mathbf{v} \le 1
+\]
+\textbf{Indice di manipolabilità di Yoshikawa:}
+\[
+w = \sqrt{\det(JJ^T)}
+\]
+All'approssimarsi della singolarità, $w \to 0$ e l'ellissoide collassa in una forma piatta.
+\end{formulabox}
+
+% ===========================================================
+\section{Cinematica Inversa Differenziale e Pseudo-inversa}
+% ===========================================================
+
+\subsection{Pseudo-inversa Moore-Penrose per robot ridondanti ($n > m$)}
+
+La formula di minimizzazione della norma energetica $\|\dot{\mathbf{q}}\|^2$ definisce:
+\begin{formulabox}
+\[
+J^\# = J^T(JJ^T)^{-1}
+\]
+\[
+\dot{\mathbf{q}} = J^\#\,\mathbf{v}
+\]
+\end{formulabox}
+
+\subsection{Le 4 proprietà di Moore-Penrose (fondamentale all'orale)}
+
+Una matrice $X$ è la pseudo-inversa $J^\#$ se e solo se soddisfa simultaneamente:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.8}
+\begin{tabular}{clcl}
+\toprule
+\textbf{N.} & \textbf{Nome} & & \textbf{Condizione}\\
+\midrule
+1 & Proiezione di $J$            & & $JXJ = J$\\
+2 & Proiezione della pseudo-inv. & & $XJX = X$\\
+3 & Simmetria cartesiana ($JX$)  & & $(JX)^T = JX$\\
+4 & Simmetria giunti ($XJ$)      & & $(XJ)^T = XJ$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Gestione della ridondanza (Null-Space Control)}
+
+Sfruttando la ridondanza strutturale ($n > m$), si sovrappone una velocità ausiliaria
+senza influenzare la traiettoria cartesiana dell'end-effector:
+\begin{formulabox}
+\[
+\dot{\mathbf{q}} = J^\#\,\mathbf{v} + (I - J^\#J)\,\boldsymbol{\xi}
+\]
+\end{formulabox}
+
+L'operatore $(I - J^\#J)$ proietta $\boldsymbol{\xi}$ nel \textbf{Null-Space} del Jacobiano.
+È utile per massimizzare la distanza dai limiti fisici dei giunti, ottimizzare la
+manipolabilità o evitare ostacoli.
+
+\subsection{Metodo DLS (Damped Least Squares)}
+
+Per stabilizzare l'inversione numerica in prossimità delle singolarità, si inserisce
+un fattore smorzante $\lambda$:
+\begin{formulabox}
+\[
+J_{\text{DLS}} = J^T\bigl(JJ^T + \lambda^2 I_m\bigr)^{-1}
+\]
+\end{formulabox}
+
+Il parametro $\lambda$ baratta la precisione cartesiana dell'end-effector con la stabilità
+numerica e fisica dei rotori.
+
+% ===========================================================
+\section{Pianificazione delle Traiettorie}
+% ===========================================================
+
+\subsection{Differenza tra Path e Traiettoria}
+
+Un \textbf{Path} (percorso) rappresenta il luogo geometrico dei punti nello spazio
+\emph{senza} vincoli temporali. Una \textbf{Traiettoria} è il path accoppiato ad una
+\textbf{Legge Oraria} $s(t)$ che ne descrive il profilo temporale.
+
+\subsection{Profilo trapezoidale (Bang-Coast-Bang)}
+
+\begin{formulabox}
+\textbf{Tre fasi temporali distinte:}
+\begin{enumerate}[itemsep=2pt]
+  \item \textbf{Bang:} accelerazione costante massima $a_{\max}$.
+  \item \textbf{Coast:} velocità di regime massima costante $v_{\max}$.
+  \item \textbf{Bang:} decelerazione costante massima $-a_{\max}$.
+\end{enumerate}
+
+\medskip
+\textbf{Tempo minimo per percorrere la distanza geometrica $L$:}
+\[
+T = \frac{L\cdot a_{\max} + v_{\max}^2}{a_{\max}\cdot v_{\max}}, \qquad
+L \ge \frac{v_{\max}^2}{a_{\max}}
+\]
+\end{formulabox}
+
+\textbf{Nota bene:} se $L < v_{\max}^2/a_{\max}$, lo spazio non consente di raggiungere il
+coasting e la pianificazione si contrae ad un profilo \textbf{triangolare}.
+
+\subsubsection{Forma esplicita di $\sigma(t)$}
+
+\[
+\sigma(t) =
+\begin{cases}
+\dfrac{a_{\max} t^2}{2} & t \in [0,\, T_s] \\[8pt]
+v_{\max}\,t - \dfrac{v_{\max}^2}{2a_{\max}} & t \in [T_s,\, T-T_s] \\[8pt]
+-\dfrac{a_{\max}(t-T)^2}{2} + L & t \in [T-T_s,\, T]
+\end{cases}
+\qquad T_s = \frac{v_{\max}}{a_{\max}}
+\]
+
+\subsection{Profili polinomiali di grado dispari (PTP)}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.6}
+\begin{tabular}{p{6cm}p{7.5cm}}
+\toprule
+\textbf{Polinomio Cubico (3° ordine)} & \textbf{Polinomio Quintico (5° ordine)}\\
+\midrule
+Richiede 4 vincoli ($q_i, q_f$ a velocità iniziale e finale nulle).
+Garantisce la \textbf{continuità delle velocità}, ma produce discontinuità
+sull'accelerazione. &
+Fissa 6 condizioni aggiungendo l'obbligo di accelerazione nulla iniziale e finale.
+Garantisce la \textbf{continuità delle accelerazioni} e limita il Jerk.\\[4pt]
+$q(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3$ &
+$q(t) = a_0 + a_1 t + a_2 t^2 + a_3 t^3 + a_4 t^4 + a_5 t^5$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Rest-to-rest in $\tau = t/T$}
+
+Cubico rest-to-rest:
+\[
+q(\tau) = q_i + \Delta q\,(3\tau^2 - 2\tau^3)
+\]
+
+Quintico rest-to-rest:
+\[
+q(\tau) = q_i + \Delta q\,(10\tau^3 - 15\tau^4 + 6\tau^5)
+\]
+
+\subsubsection{Bounds su $\dot{s}$ con vincoli di velocità e accelerazione}
+
+\begin{formulabox}
+\[
+\mathcal{M}\nu_i = \max_{s\in[0,1]} \left|\frac{dq_i}{ds}\right|, \qquad
+|\dot{s}| \le V = \min_i \frac{v_{i,\max}}{\mathcal{M}\nu_i}
+\]
+\[
+\mathcal{M}\alpha_i = \max_{s\in[0,1]} \left|\frac{d^2q_i}{ds^2}\right|, \qquad
+|\ddot{s}| \le \min_i \frac{a_{i,\max} - V^2 \mathcal{M}\alpha_i}{\mathcal{M}\nu_i}
+\]
+\end{formulabox}
+
+\subsection{Curvatura geometrica e accelerazione centripeta}
+
+Nelle traiettorie cartesiane 3D, l'accelerazione si scompone in componente tangenziale e
+normale:
+\begin{formulabox}
+\[
+\mathbf{a}_c = \kappa\,\|\dot{\mathbf{p}}\|^2\,\mathbf{n}
+\qquad\text{con}\qquad
+\kappa = \frac{\|\dot{\mathbf{p}} \times \ddot{\mathbf{p}}\|}{\|\dot{\mathbf{p}}\|^3}
+\]
+\end{formulabox}
+
+\subsection{Spline cubica e LTS}
+
+\subsubsection{Spline cubica (N knot)}
+
+$N-1$ cubici concatenati, $C^2$ agli $N-2$ knot interni:
+\[
+\theta_k(\tau) = a_{k0} + a_{k1}\tau + a_{k2}\tau^2 + a_{k3}\tau^3, \quad
+\tau = t - t_k \in [0,\, h_k]
+\]
+
+\textbf{Algoritmo:}
+\begin{enumerate}[itemsep=2pt]
+  \item Input: $q_k$ (knots), $v_1, v_N$ (velocità ai bordi).
+  \item Risolvi il sistema tridiagonale per $v_2,\ldots,v_{N-1}$.
+  \item Per ogni $k$: risolvi il sistema $2\times2$ per $a_{k2}, a_{k3}$.
+  \item Assembla la spline piecewise $\theta_k$.
+\end{enumerate}
+
+\subsubsection{LTS (Lift–Travel–Setdown)}
+
+Per operazioni di pick \& place, la traiettoria è composta da tre fasi:
+\begin{itemize}[itemsep=2pt]
+  \item $q_L$: polinomio grado 4, $t \in [t_i, t_1]$
+  \item $q_T$: polinomio grado 3, $t \in [t_1, t_2]$
+  \item $q_S$: polinomio grado 4, $t \in [t_2, t_f]$
+\end{itemize}
+
+14 condizioni totali (posizione, velocità/accelerazione nulle ai bordi, $C^2$ ai giunti $t_1, t_2$)
+$\Rightarrow$ sistema lineare con soluzione simbolica.
+
+% ===========================================================
+\section{Statica e Dualità Forze/Coppie}
+% ===========================================================
+
+\subsection{Relazione fondamentale di accoppiamento statico}
+
+Tramite il Principio dei Lavori Virtuali, la stessa matrice Jacobiana che modella il moto
+differenziale determina l'equilibrio statico tra le coppie ai giunti $\boldsymbol{\tau}$ e
+il wrench cartesiano $\mathbf{F}$ dell'end-effector:
+\begin{formulabox}
+\[
+\boldsymbol{\tau} = J^T(\mathbf{q})\,\mathbf{F}
+\]
+\end{formulabox}
+
+\subsection{Dualità cinematica e conservazione energetica}
+
+\begin{itemize}[itemsep=4pt]
+  \item I vettori di forza cartesiana nel \textbf{Null-Space dello Jacobiano Trasposto}
+        $\mathcal{N}(J^T)$ rappresentano direzioni vincolate: le forze esterne vengono trasferite
+        alle strutture meccaniche senza richiedere controcoppia attiva ai motori ($\boldsymbol{\tau} = 0$).
+  \item Le direzioni di massima destrezza di spostamento (asse maggiore dell'ellissoide di
+        velocità) corrispondono a scarsa capacità di impatto statico e richiedono enorme coppia
+        motoria.
+\end{itemize}
+
+% ===========================================================
+\appendix
+\section{Riepilogo formule principali}
+% ===========================================================
+
+\renewcommand{\arraystretch}{1.7}
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Quantità} & \textbf{Formula}\\
+\midrule
+Matrice DH              & ${}^{i-1}A_i = \Rot_z(\theta_i)\Trans_z(d_i)\Trans_x(a_i)\Rot_x(\alpha_i)$\\
+Cinematica diretta      & ${}^0T_n = \prod_{i=1}^n {}^{i-1}A_i$\\
+Jacobiano, giunto R     & $J_i = \bigl(\mathbf{z}_{i-1}\times(\mathbf{p}_E-\mathbf{p}_{i-1}),\; \mathbf{z}_{i-1}\bigr)^T$\\
+Jacobiano, giunto P     & $J_i = \bigl(\mathbf{z}_{i-1},\; \mathbf{0}\bigr)^T$\\
+Pseudo-inversa          & $J^\# = J^T(JJ^T)^{-1}$\\
+Null-Space              & $\dot{\mathbf{q}} = J^\#\mathbf{v} + (I - J^\#J)\boldsymbol{\xi}$\\
+DLS                     & $J_{\text{DLS}} = J^T(JJ^T + \lambda^2 I)^{-1}$\\
+Manipolabilità          & $w = \sqrt{\det(JJ^T)}$\\
+Statica                 & $\boldsymbol{\tau} = J^T\mathbf{F}$\\
+IK 2R — $\cos q_2$      & $\cos q_2 = (P_x^2+P_y^2-l_1^2-l_2^2)/(2l_1 l_2)$\\
+Trapezoidale $T$        & $T = (La_{\max}+v_{\max}^2)/(a_{\max}v_{\max})$\\
+Cubico rest-to-rest     & $q(\tau) = q_i + \Delta q(3\tau^2-2\tau^3)$\\
+Quintico rest-to-rest   & $q(\tau) = q_i + \Delta q(10\tau^3-15\tau^4+6\tau^5)$\\
+Curvatura               & $\kappa = \|\dot{\mathbf{p}}\times\ddot{\mathbf{p}}\|/\|\dot{\mathbf{p}}\|^3$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vfill
+\begin{center}
+  \small\textit{Dispensa generata da \texttt{Teoria.tsx} --- Robotica 1, Sapienza Università di Roma}
+\end{center}
+
+\end{document}
