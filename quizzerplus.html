@@ -1614,9 +1614,16 @@ async function callOllamaGrade(domanda, expectedAnswer, userAnswer, signal, kind
     ? `Sei un correttore di quiz scolastici specializzato in formule matematiche, fisiche o chimiche. Il confronto automatico carattere-per-carattere tra la formula dello studente e quella di riferimento NON ha trovato una corrispondenza esatta: il tuo compito è stabilire se le due formule sono comunque EQUIVALENTI nel contenuto, anche se scritte in modo diverso (ordine dei termini, forma riarrangiata algebricamente, notazione diversa, simboli diversi per la stessa grandezza, LaTeX vs notazione semplice, presenza/assenza di costanti banali). Sii rigoroso sul contenuto matematico/scientifico ma tollerante sulla notazione. Se la formula è concettualmente sbagliata o rappresenta una relazione diversa, è da considerarsi sbagliata.
 Rispondi SOLO con un oggetto JSON valido, senza nessun testo prima o dopo, con esattamente questi campi:
 {"corretto": true oppure false, "punteggio": intero da 0 a 100, "feedback": stringa con una spiegazione chiara in italiano del perché la formula è (o non è) equivalente a quella di riferimento}`
-    : `Sei un correttore di quiz scolastici. Ricevi una domanda aperta, una risposta di riferimento e la risposta scritta da uno studente. Valuta se la risposta dello studente è sostanzialmente corretta nel CONTENUTO, anche se formulata con parole diverse dalla risposta di riferimento: non penalizzare formulazioni diverse se il significato è giusto, ma penalizza errori concettuali, omissioni importanti o risposte vaghe/fuori tema.
+    : `Sei un correttore di quiz universitari, rigoroso ma VELOCE: rispondi con pochissimo testo.
+Ricevi una domanda aperta, una risposta di riferimento e la risposta scritta da uno studente.
+
+Compito (breve, senza scriverlo per intero, solo il risultato finale):
+1. Stima quanti punti chiave/concetti distinti contiene la risposta di riferimento (in genere 2-5).
+2. Conta quanti di quei punti chiave sono presenti E spiegati correttamente nella risposta dello studente (una menzione superficiale del termine giusto senza spiegazione NON conta come presente).
+3. Conta quanti sono presenti solo parzialmente (nominati ma non spiegati bene, o imprecisi).
+
 Rispondi SOLO con un oggetto JSON valido, senza nessun testo prima o dopo, con esattamente questi campi:
-{"corretto": true oppure false, "punteggio": intero da 0 a 100, "feedback": stringa con una spiegazione chiara e dettagliata in italiano di cosa è giusto e cosa è sbagliato o mancante nella risposta dello studente}`;
+{"punti_totali": intero (quanti punti chiave ha la risposta di riferimento), "punti_coperti": intero (quanti sono presenti e ben spiegati nella risposta dello studente), "punti_parziali": intero (quanti sono solo accennati/imprecisi), "feedback": stringa BREVISSIMA in italiano (massimo 2 frasi corte) su cosa manca o è impreciso, o su cosa va bene se la risposta è completa}`;
   const userPrompt = kind === 'formula'
     ? `Domanda: ${domanda}\nFormula di riferimento: ${expectedAnswer.split('|')[0].trim()}\nFormula scritta dallo studente: ${userAnswer}`
     : `Domanda: ${domanda}\nRisposta di riferimento: ${expectedAnswer}\nRisposta dello studente: ${userAnswer}`;
@@ -1634,7 +1641,9 @@ Rispondi SOLO con un oggetto JSON valido, senza nessun testo prima o dopo, con e
           { role: 'user', content: userPrompt }
         ],
         stream: false,
-        format: 'json'
+        format: 'json',
+        keep_alive: '30m',
+        options: { temperature: 0.15, top_p: 0.9, num_predict: kind === 'formula' ? 300 : 180 }
       })
     });
   } catch (e) {
@@ -1658,12 +1667,42 @@ Rispondi SOLO con un oggetto JSON valido, senza nessun testo prima o dopo, con e
   } catch (e) {
     throw new Error('Il modello non ha restituito un JSON valido. Prova un modello diverso o riprova.');
   }
-  if (typeof parsed.corretto !== 'boolean') throw new Error('Risposta AI incompleta (manca il campo "corretto").');
-  return {
-    corretto: parsed.corretto,
-    punteggio: typeof parsed.punteggio === 'number' ? Math.max(0, Math.min(100, Math.round(parsed.punteggio))) : (parsed.corretto ? 100 : 0),
-    feedback: typeof parsed.feedback === 'string' && parsed.feedback.trim() ? parsed.feedback.trim() : '(nessun feedback testuale fornito dal modello)'
-  };
+  if (kind === 'formula') {
+    if (typeof parsed.corretto !== 'boolean') throw new Error('Risposta AI incompleta (manca il campo "corretto").');
+    return {
+      corretto: parsed.corretto,
+      punteggio: typeof parsed.punteggio === 'number' ? Math.max(0, Math.min(100, Math.round(parsed.punteggio))) : (parsed.corretto ? 100 : 0),
+      feedback: typeof parsed.feedback === 'string' && parsed.feedback.trim() ? parsed.feedback.trim() : '(nessun feedback testuale fornito dal modello)'
+    };
+  }
+
+  // Domande aperte: non ci fidiamo dell'aritmetica del modello (piccolo e spesso troppo
+  // permissivo). Il modello riporta solo dei conteggi grezzi, il punteggio e il verdetto
+  // "corretto" li calcoliamo qui in modo deterministico. Così restiamo leggeri/veloci
+  // (poco testo da generare) ma coerenti da una correzione all'altra.
+  // toNum tollera anche numeri restituiti come stringa (es. "3" invece di 3), cosa che
+  // capita occasionalmente anche con format:'json' sui modelli più piccoli.
+  const toNum = v => { const n = Number(v); return Number.isFinite(n) ? n : NaN; };
+  let totali = Math.round(toNum(parsed.punti_totali));
+  let coperti = Math.round(toNum(parsed.punti_coperti));
+  let parziali = Number.isFinite(toNum(parsed.punti_parziali)) ? Math.round(toNum(parsed.punti_parziali)) : 0;
+  if (!Number.isFinite(totali) || totali < 1) throw new Error('Risposta AI incompleta (manca "punti_totali").');
+  if (!Number.isFinite(coperti)) throw new Error('Risposta AI incompleta (manca "punti_coperti").');
+  coperti = Math.max(0, Math.min(totali, coperti));
+  parziali = Math.max(0, Math.min(totali - coperti, parziali));
+
+  const punteggio = Math.max(0, Math.min(100, Math.round(((coperti + 0.5 * parziali) / totali) * 100)));
+  // "corretto" solo se: (a) nessun punto chiave è del tutto assente, e (b) almeno il 70%
+  // è coperto per intero (il resto può essere parziale). Regola volutamente severa, dato
+  // che il problema di partenza era una correzione troppo permissiva: un punto chiave
+  // completamente omesso non passa mai, indipendentemente dal punteggio numerico.
+  const mancantiCompleti = totali - coperti - parziali;
+  const corretto = mancantiCompleti === 0 && (coperti / totali) >= 0.7;
+
+  let feedback = typeof parsed.feedback === 'string' && parsed.feedback.trim() ? parsed.feedback.trim() : '(nessun feedback testuale fornito dal modello)';
+  feedback += `\n\n(${coperti}/${totali} punti chiave coperti${parziali ? `, ${parziali} parziali` : ''})`;
+
+  return { corretto, punteggio, feedback };
 }
 
 // Ritorna gli elementi di input/submit dell'UI attualmente in uso (aperta o
@@ -1683,7 +1722,7 @@ async function gradeAnswerWithAI(userAnswer, kind) {
 
   const waitMsg = kind === 'formula'
     ? `Il confronto esatto non corrisponde: verifico con l'AI ("${aiConfig.model}") se è comunque una forma equivalente…`
-    : `Correzione in corso con "${aiConfig.model}"… può richiedere qualche secondo, soprattutto su CPU.`;
+    : `Correzione in corso con "${aiConfig.model}"… output minimale per restare veloce anche su CPU.`;
   answerArea.insertAdjacentHTML('beforeend', `
     <div class="ai-grading-row" id="ai-grading-row">
       <span class="ai-spinner"></span>
@@ -1692,7 +1731,7 @@ async function gradeAnswerWithAI(userAnswer, kind) {
     </div>`);
 
   gradingAbort = new AbortController();
-  const timeoutId = setTimeout(() => gradingAbort.abort(), 60000); // timeout di sicurezza: 60s
+  const timeoutId = setTimeout(() => gradingAbort.abort(), 45000); // timeout di sicurezza: 45s (output ora molto più corto, dovrebbe bastare ampiamente su CPU)
 
   const key = currentQ.domanda;
   const d = getQData(key);
@@ -1725,7 +1764,7 @@ function cancelGrading() {
 function renderOpenResult(result, userAnswer, kind) {
   const row = document.getElementById('ai-grading-row');
   if (row) row.remove();
-  const col = result.punteggio >= 80 ? 'var(--green)' : result.punteggio >= 50 ? 'var(--yellow)' : 'var(--red)';
+  const col = result.corretto ? 'var(--green)' : (result.punteggio >= 50 ? 'var(--yellow)' : 'var(--red)');
   const primaryAnswer = currentQ.risposta.split('|')[0].trim();
   const box = document.createElement('div');
   box.className = 'ai-feedback-box ' + (result.corretto ? 'is-correct' : 'is-wrong');
