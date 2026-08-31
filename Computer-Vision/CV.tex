@@ -1,0 +1,2811 @@
+\documentclass[12pt, a4paper]{report}
+
+% -- Encoding & language ------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+% -- Math ---------------------------------------------------------------------
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{bm}
+
+% -- Layout -------------------------------------------------------------------
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.8cm]{geometry}
+\usepackage{parskip}
+\setlength{\parskip}{6pt}
+
+% -- Tables -------------------------------------------------------------------
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+
+% -- Colors & boxes -----------------------------------------------------------
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{theorems, skins, breakable}
+
+\definecolor{noteblue}{RGB}{220, 235, 252}
+\definecolor{noteblueborder}{RGB}{52, 120, 200}
+\definecolor{warnred}{RGB}{252, 228, 220}
+\definecolor{warnredborder}{RGB}{200, 72, 52}
+\definecolor{defgreen}{RGB}{220, 248, 228}
+\definecolor{defgreenborder}{RGB}{40, 160, 80}
+\definecolor{propgold}{RGB}{252, 248, 220}
+\definecolor{propgoldborder}{RGB}{180, 150, 40}
+
+\newtcolorbox{notebox}[1][Nota]{
+  breakable,
+  colback=noteblue, colframe=noteblueborder,
+  fonttitle=\bfseries\small, title={#1},
+  boxrule=0.8pt, arc=4pt,
+  left=6pt, right=6pt, top=4pt, bottom=4pt
+}
+
+\newtcolorbox{warnbox}[1][Attenzione]{
+  breakable,
+  colback=warnred, colframe=warnredborder,
+  fonttitle=\bfseries\small, title={#1},
+  boxrule=0.8pt, arc=4pt,
+  left=6pt, right=6pt, top=4pt, bottom=4pt
+}
+
+\newtcolorbox{defbox}[1][Definizione]{
+  breakable,
+  colback=defgreen, colframe=defgreenborder,
+  fonttitle=\bfseries\small, title={#1},
+  boxrule=0.8pt, arc=4pt,
+  left=6pt, right=6pt, top=4pt, bottom=4pt
+}
+
+\newtcolorbox{propbox}[1][Proprietà]{
+  breakable,
+  colback=propgold, colframe=propgoldborder,
+  fonttitle=\bfseries\small, title={#1},
+  boxrule=0.8pt, arc=4pt,
+  left=6pt, right=6pt, top=4pt, bottom=4pt
+}
+
+% -- Hyperlinks ---------------------------------------------------------------
+\usepackage[colorlinks=true, linkcolor=noteblueborder,
+            urlcolor=noteblueborder, citecolor=defgreenborder]{hyperref}
+
+% -- Math operators -----------------------------------------------------------
+\DeclareMathOperator{\trace}{trace}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+% -----------------------------------------------------------------------------
+\title{%
+  \vspace{-1cm}
+  {\LARGE\bfseries Computer Vision}\\[0.6em]
+  {\large Note complete del corso}\\[0.3em]
+  {\normalsize Capitoli 1\,--\,19}
+}
+\author{Prof.\ Irene Amerini}
+\date{Anno Accademico 2024/2025}
+% -----------------------------------------------------------------------------
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% =============================================================================
+\chapter{Introduzione alla Computer Vision}
+% =============================================================================
+
+\section{Definizione e obiettivi}
+
+La \textbf{Computer Vision} mira a convertire luce in significato, estraendo informazioni
+geometriche, semantiche e temporali da immagini e video.  A differenza
+dell'\textit{Image Processing}, che trasforma immagini in altre immagini, la Computer
+Vision cerca di inferire proprietà del mondo a partire da dati visivi.
+
+\begin{defbox}[Problema inverso mal posto]
+La Computer Vision può essere vista come un \textbf{problema inverso mal posto}: date
+una o più immagini 2D, l'obiettivo è recuperare informazioni sulla scena 3D
+sottostante.  Molte scene 3D diverse, condizioni di illuminazione e configurazioni
+di oggetti possono produrre immagini 2D simili; gli algoritmi necessitano quindi di
+assunzioni, vincoli e prior appresi per interpretare correttamente le immagini.
+\end{defbox}
+
+\section{Rappresentazione di un'immagine}
+
+Un'immagine può essere interpretata in due modi:
+
+\begin{itemize}
+  \item \textbf{Dominio discreto}: griglia di valori di intensità in $[0,\,2^{\text{bit}}]$.
+  \item \textbf{Dominio continuo}: una funzione $f:\R^2\to\R$, dove $f(x,y)$ fornisce
+        l'intensità nella posizione spaziale $(x,y)$.  Un'immagine digitale è
+        semplicemente una versione discreta, campionata e quantizzata di questa funzione
+        continua.
+\end{itemize}
+
+\section{Computer Vision, Image Processing e Computer Graphics}
+
+\begin{itemize}
+  \item \textbf{Image Processing}: trasforma immagini in altre immagini (filtraggio,
+        riduzione del rumore, rilevamento di bordi, \ldots).
+  \item \textbf{Computer Vision}: inferisce informazioni dal mondo a partire da immagini
+        (identità degli oggetti, struttura 3D, moto, posa, semantica della scena).
+  \item \textbf{Computer Graphics}: risolve il \emph{problema diretto} --- data una scena
+        3D con oggetti, materiali, illuminazione e parametri della telecamera, genera
+        un'immagine 2D.  La Computer Vision risolve il \emph{problema inverso}.
+\end{itemize}
+
+\section{Percezione visiva}
+
+La percezione visiva \emph{non} è una semplice misurazione delle intensità dei pixel.
+La stessa intensità misurata può essere percepita in modo diverso a seconda del
+contesto, delle ombre, della geometria e delle conoscenze pregresse.  Ciò spiega
+perché i sistemi di visione hanno bisogno di modelli, assunzioni e vincoli per
+interpretare correttamente le immagini.
+
+\section{Sfide principali}
+
+Variazione di punto di vista, variazione di scala, deformazione, occlusione,
+variazioni di illuminazione, cluttering di sfondo, variazione intra-classe, moto e
+ambiguità locale.
+
+\section{Breve contesto storico}
+
+Milestones importanti: stereo e fotogrammetria precoci; shape from shading;
+flusso ottico; matrice essenziale; Markov Random Fields; feature locali (SIFT);
+reti neurali convoluzionali; ImageNet e AlexNet; metodi di rilevamento di oggetti
+(YOLO, Mask R-CNN); modelli di diffusione e modelli multimodali.
+
+\section{Sfide aperte}
+
+Apprendimento non supervisionato e auto-supervisionato, apprendimento interattivo,
+robustezza, generalizzazione, bias induttivi, interpretabilità, costi computazionali
+e problemi etici/legali.
+
+% =============================================================================
+\chapter{Image Processing}
+% =============================================================================
+
+\section{Pipeline tipica di acquisizione a colori}
+
+Un'immagine digitale è il risultato di una pipeline di acquisizione ed elaborazione.
+La luce viene catturata da un sensore CCD/CMOS dotato di un \textbf{color filter
+array} (solitamente un pattern di Bayer).  Le misurazioni grezze del sensore vengono
+poi elaborate attraverso: guadagno ISO, elaborazione raw, demosaicing, bilanciamento
+del bianco, trasformazione dello spazio colore, riduzione del rumore, mappatura a
+sRGB e infine compressione (es.\ JPEG).
+
+\begin{notebox}[Importanza per la Computer Vision]
+Le immagini usate dagli algoritmi di CV spesso non sono misurazioni fisiche grezze:
+sono già state tone-mappate, corrette per il colore, derumorose e compresse.  Molti
+algoritmi assumono che le intensità siano in uno \emph{spazio lineare}.
+\end{notebox}
+
+% -----------------------------------------------------------------------------
+\section{Operatori puntuali (Point Processing)}
+% -----------------------------------------------------------------------------
+
+\begin{defbox}[Operatori puntuali]
+Gli operatori puntuali modificano il valore di ciascun pixel \textbf{indipendentemente
+dai suoi vicini}.  Il nuovo valore di un pixel in posizione $(x,y)$ dipende solo dal
+valore originale in quella posizione.
+\end{defbox}
+
+\textbf{Esempi:}
+\begin{itemize}
+  \item \textbf{Luminosità}: $g(x,y)=f(x,y)+b$.
+        Aggiungere una costante $b$ schiarisce o scurisce l'immagine.
+  \item \textbf{Contrasto}: $g(x,y)=a\cdot f(x,y)$.
+        Moltiplicare per $a>1$ aumenta il contrasto; $a<1$ lo riduce.
+  \item \textbf{Inversione}: $g(x,y)=255-f(x,y)$ per un'immagine a 8 bit.
+  \item \textbf{Flip orizzontale}: $g(x,y)=f(-x,y)$.
+\end{itemize}
+
+% -- 2.1 Gamma correction ------------------------------------------------------
+\subsection{Correzione gamma}
+
+La correzione gamma \textbf{aggiusta la luminosità} di un'immagine visualizzata su
+schermo per renderla più naturale all'occhio:
+\[
+  V_{\text{out}} = A \cdot V_{\text{in}}^{\gamma}
+\]
+dove $V_{\text{in}}$ è la tensione d'ingresso, $V_{\text{out}}$ è l'uscita
+regolata, $A$ è una costante e tipicamente $\gamma = 2.2$.
+
+\begin{notebox}[Gamma e spazio sRGB]
+La maggior parte delle immagini è memorizzata in spazio sRGB, già tone-mappato e
+\emph{non} lineare rispetto alla luminanza della scena.  Molti algoritmi di CV
+assumono uno spazio lineare.  In assenza della curva di risposta della camera, si
+usa tipicamente $\gamma=2.2$ come approssimazione (non fisicamente esatta, ma spesso
+sufficiente).
+\end{notebox}
+
+% -- 2.2 Histogram equalization -----------------------------------------------
+\subsection{Equalizzazione dell'istogramma}
+
+L'\textbf{Histogram Equalization (HE)} aggiusta il contrasto globale redistribuendo
+i valori di intensità per produrre un istogramma più piatto, rendendo i dettagli più
+visibili.
+
+\begin{enumerate}
+  \item \textbf{Calcolo dell'istogramma}: conta il numero di pixel per ogni livello
+        di intensità.
+        \[
+          p(r_k) = \frac{\#\text{pixel con intensità }r_k}{\#\text{pixel totali}}
+        \]
+
+  \item \textbf{Calcolo della CDF}: mappa ogni intensità di input a un valore in
+        $[0,1]$.
+        \[
+          \mathrm{CDF}(r_k) = \sum_{i=0}^{k} p(r_i)
+        \]
+
+  \item \textbf{Scalatura}: la CDF viene scalata all'intero range di intensità e
+        usata come lookup table.
+        \[
+          r'_k = \mathrm{round}\!\left(
+            \frac{\bigl(\mathrm{CDF}(r_k)-\mathrm{CDF}_{\min}\bigr)(L-1)}
+                 {N - \mathrm{CDF}_{\min}}
+          \right)
+        \]
+        dove $L$ è il massimo valore di pixel, $N$ il numero totale di pixel e
+        $\mathrm{CDF}_{\min}$ il minimo valore non-zero della CDF.
+\end{enumerate}
+
+\textbf{Local Histogram Equalization (AHE):} calcola una trasformazione per ciascun
+pixel basandosi sull'istogramma di un piccolo intorno locale, migliorando i dettagli
+locali a scapito della complessità computazionale.
+
+\begin{notebox}[CLAHE --- Contrast Limited AHE]
+Un limite dell'AHE è che può amplificare fortemente il rumore in regioni quasi
+uniformi.  La \textbf{CLAHE} risolve il problema agganciando i picchi dell'istogramma
+tramite un \emph{clip limit} predefinito e ridistribuendo i pixel tagliati.
+L'interpolazione bilineare tra tile vicine evita artefatti a blocchi.
+\end{notebox}
+
+% =============================================================================
+\section{Filtraggio lineare}
+% =============================================================================
+
+\begin{defbox}[Filtraggio lineare]
+Il filtraggio crea una nuova immagine in cui il valore di ciascun pixel è una
+\textbf{funzione dei suoi vicini} nell'immagine originale.  Più specificamente, il
+\emph{filtraggio lineare} calcola ciascun nuovo pixel come \textbf{combinazione
+lineare} (somma pesata) dei suoi vicini; l'insieme dei pesi è detto \textbf{kernel}
+o \textbf{filtro}.
+\end{defbox}
+
+% -- 2.3.1 Cross-correlation e convoluzione ------------------------------------
+\subsection{Cross-correlazione e convoluzione}
+
+Queste sono le due operazioni primarie di filtraggio lineare.
+
+\textbf{Cross-correlazione:} l'output $G[i,j]$ è la somma dei prodotti element-wise
+tra il kernel $H$ e il vicinato dell'immagine $F$ centrato in $(i,j)$:
+\[
+  G[i,j] = \sum_{u=-k}^{k}\sum_{v=-k}^{k} H[u,v]\,F[i+u,\,j+v]
+\]
+
+\textbf{Convoluzione:} uguale alla cross-correlazione, tranne che il kernel $H$
+viene ribaltato orizzontalmente e verticalmente prima di essere applicato:
+\[
+  G[i,j] = \sum_{u=-k}^{k}\sum_{v=-k}^{k} H[u,v]\,F[i-u,\,j-v]
+\]
+
+\begin{propbox}[Proprietà della convoluzione]
+\begin{itemize}
+  \item \textbf{Commutativa}: $a*b = b*a$
+  \item \textbf{Associativa}: $(a*b_1)*b_2 = a*(b_1*b_2)$.
+        Applicare due filtri in sequenza equivale a convolverli prima in un unico
+        filtro.
+  \item \textbf{Distributiva sull'addizione}.
+\end{itemize}
+In pratica, se il kernel è simmetrico, convoluzione e cross-correlazione sono
+identiche.
+\end{propbox}
+
+% -- 2.3.2 Padding e bordi ----------------------------------------------------
+\subsection{Padding e gestione dei bordi}
+
+Quando il kernel è centrato su un pixel vicino al bordo dell'immagine, la finestra
+del kernel può sconfinare oltre il bordo.  Strategie di padding:
+
+\begin{itemize}
+  \item \textbf{Zero}: si aggiungono zeri all'esterno.
+  \item \textbf{Costante}: si aggiunge un valore costante $c$.
+  \item \textbf{Clamp / replica}: si replica il bordo.
+  \item \textbf{Reflection / mirror}: si riflette verso l'interno.
+  \item \textbf{Symmetric}: si riflette includendo il bordo.
+\end{itemize}
+
+\textbf{Dimensione dell'output.}
+Per una convoluzione con input di dimensione $N$, kernel di dimensione $K$, padding
+$P$ e stride $S$:
+\[
+  \dim_{\text{out}} = \left\lfloor\frac{N + 2P - K}{S}\right\rfloor + 1
+\]
+Casi speciali (stride $S=1$):
+\begin{itemize}
+  \item \texttt{full}: output più grande dell'input.
+  \item \texttt{same}: output con stessa dimensione dell'input
+        ($P = \lfloor K/2\rfloor$).
+  \item \texttt{valid}: nessun padding, output più piccolo
+        ($\dim_{\text{out}} = N - K + 1$).
+\end{itemize}
+
+% -- 2.3.3 Esempi di filtri lineari -------------------------------------------
+\subsection{Esempi di filtri lineari}
+
+\paragraph{Filtro box (mean filter).}
+Sostituisce ogni pixel con la media dei valori nel suo vicinato rettangolare.  Il
+kernel è composto da tutti 1, normalizzati per il numero di elementi (es.\ diviso 9
+per un kernel $3\times3$).  Produce sfocatura (blurring).
+
+\paragraph{Filtro Gaussiano.}
+Un filtro passa-basso più sofisticato che usa un kernel con pesi estratti da una
+distribuzione Gaussiana 2D.  I pixel più vicini al centro ricevono pesi maggiori:
+\[
+  G_\sigma(x,y) = \frac{1}{2\pi\sigma^2}\,e^{-\frac{x^2+y^2}{2\sigma^2}}
+\]
+Il parametro $\sigma$ controlla la quantità di sfocatura.
+
+\begin{propbox}[Proprietà del filtro Gaussiano]
+\begin{itemize}
+  \item Convolvere un Gaussiano con un altro Gaussiano produce un nuovo Gaussiano più
+        largo.
+  \item Un kernel Gaussiano 2D è \textbf{separabile}: la convoluzione 2D può essere
+        eseguita come due convoluzioni 1D (una orizzontale, una verticale), molto più
+        efficienti computazionalmente.
+\end{itemize}
+\end{propbox}
+
+\begin{notebox}[Costo computazionale dei filtri separabili]
+Un filtro 2D è separabile quando la sua matrice kernel ha rango 1.  Per
+un'immagine $M\times N$ e un kernel $L\times L$:
+\begin{itemize}
+  \item Convoluzione 2D standard: $\mathcal{O}(L^2 MN)$
+  \item Implementazione separabile (due conv.\ 1D): $\mathcal{O}(2LMN)$
+\end{itemize}
+\end{notebox}
+
+\paragraph{Filtro di nitidezza (unsharp masking).}
+Un effetto di nitidezza si ottiene amplificando i dettagli dell'immagine.  I
+dettagli vengono estratti sottraendo la versione sfocata all'originale, poi
+riaggiunti:
+\[
+  F_{\text{sharp}} = F_{\text{orig}} + \alpha\bigl(F_{\text{orig}} - F_{\text{blur}}\bigr)
+\]
+dove $\alpha$ è la forza di nitidezza ($F_{\text{sharp}} = F_{\text{orig}}$ per
+$\alpha=0$).  Si può implementare con un unico filtro che approssima un'impulso
+scalato meno un Gaussiano.
+
+% =============================================================================
+\section{Filtraggio non lineare}
+% =============================================================================
+
+I filtri non lineari eseguono operazioni di vicinato, ma il nuovo valore del pixel
+\emph{non} è una combinazione lineare dei suoi vicini.
+
+% -- Bilateral ----------------------------------------------------------------
+\subsection{Filtro bilaterale}
+
+È un filtro di smoothing avanzato che \textbf{preserva i bordi}.  Un filtro
+Gaussiano standard media i pixel indipendentemente dal loro contenuto, causando
+sfocatura attraverso i bordi degli oggetti.  Il filtro bilaterale risolve questo
+problema pesando i pixel vicini in base sia alla loro \textbf{distanza spaziale}
+che alla loro \textbf{differenza di intensità}:
+\[
+  h[m,n] = \frac{1}{W_{mn}} \sum_{k,l}
+    \underbrace{g[k,l]}_{\text{kernel spaziale}}\;
+    \underbrace{r_{mn}[k,l]}_{\text{kernel di range}}\;
+    f[m+k,\,n+l]
+\]
+dove:
+\begin{itemize}
+  \item $g[k,l]$: kernel Gaussiano spaziale, pesa i pixel in base alla distanza
+        Euclidea dal pixel centrale $(m,n)$.
+  \item $r_{mn}[k,l]$: kernel di range (o di intensità), pesa i pixel in base alla
+        differenza di intensità dal pixel centrale $f[m,n]$.
+  \item $W_{mn} = \sum_{k,l} g[k,l]\,r_{mn}[k,l]$: fattore di normalizzazione.
+\end{itemize}
+
+Un pixel contribuisce alla media solo se è sia spazialmente vicino sia
+fotometricamente simile.  Il filtro bilaterale elimina il rumore nelle regioni piatte
+ma preserva i bordi netti.  Applicazioni: denoising di alta qualità, ritocco
+fotografico, effetto cartoon.
+
+% -- Mediana ------------------------------------------------------------------
+\subsection{Filtro mediana}
+
+Sostituisce ogni pixel con il valore \textbf{mediano} di tutti i pixel nel suo
+vicinato.
+
+\begin{propbox}[Mediana vs.\ media]
+Il filtro mediana rimuove il \textbf{rumore sale e pepe}: i valori anomali
+(\emph{outlier}) vengono ignorati dalla mediana, mentre la media diffonde il rumore
+nei pixel circostanti e sfoca i bordi.
+\end{propbox}
+
+% -- Sogliatura ---------------------------------------------------------------
+\subsection{Sogliatura (Thresholding)}
+
+Operazione non lineare semplice che converte un'immagine in scala di grigi in
+un'immagine binaria:
+\[
+  g(m,n) = \begin{cases} 255 & \text{se } f(m,n) > A \\ 0 & \text{altrimenti} \end{cases}
+\]
+
+% =============================================================================
+\section{Scalatura dell'immagine}
+% =============================================================================
+
+\subsection{Sottocampionamento e aliasing}
+
+Per ridurre le dimensioni di un'immagine, un approccio ingenuo è il
+\textbf{sottocampionamento}: eliminare righe e colonne.
+
+\begin{warnbox}[Aliasing]
+Il semplice sottocampionamento può causare \textbf{aliasing}: un effetto in cui
+dettagli fini e pattern nell'immagine originale vengono distorte in nuovi pattern
+errati nell'immagine ridotta.  Questo accade quando la \textbf{frequenza di
+campionamento è troppo bassa} per catturare le frequenze più alte nell'immagine.
+
+Per evitarlo, la frequenza di campionamento deve essere almeno il doppio della
+frequenza massima presente nell'immagine (\textbf{frequenza di Nyquist}):
+\[
+  f_s \geq 2\,f_{\max}
+\]
+\end{warnbox}
+
+\textbf{Anti-aliasing:} il modo corretto per ridurre un'immagine è applicare prima
+un \textbf{filtro passa-basso} (es.\ blur Gaussiano) per rimuovere i dettagli ad
+alta frequenza che non possono essere rappresentati alla risoluzione inferiore.  Dopo
+la sfocatura, l'immagine può essere sottocampionata in modo sicuro.
+
+\begin{notebox}[Aliasing nei sistemi pratici]
+L'aliasing appare anche nelle implementazioni pratiche del downsampling nei framework
+di deep learning.  Le operazioni di pooling nelle CNN possono ridurre
+l'\emph{equivarianza} rispetto alle traslazioni, rendendo le predizioni instabili a
+piccole traslazioni dell'immagine.  Il \emph{anti-aliased pooling} risolve il
+problema inserendo un filtro passa-basso prima del sottocampionamento.
+\end{notebox}
+
+\subsection{Upsampling e interpolazione}
+
+Per aumentare le dimensioni di un'immagine è necessario \textbf{interpolare} nuovi
+pixel:
+\begin{itemize}
+  \item \textbf{Nearest-neighbor}: replica i pixel; il più semplice ma produce
+        risultati a blocchi.
+  \item \textbf{Bilineare}: calcola ciascun nuovo pixel come media pesata dei 4
+        pixel più vicini nell'immagine originale; risultati più fluidi.
+  \item \textbf{Bicubica}: usa un vicinato di 16 pixel per un risultato ancora più
+        fluido.
+\end{itemize}
+
+\begin{notebox}[Super-risoluzione moderna]
+Tecniche avanzate usano reti neurali per imparare come generare dettagli ad alta
+risoluzione, oppure metodi multi-immagine che catturano foto leggermente shiftate e
+le combinano per ricostruire un'immagine a risoluzione maggiore.
+\end{notebox}
+
+% =============================================================================
+\section{Derivate dell'immagine e rilevamento dei bordi}
+% =============================================================================
+
+\begin{defbox}[Bordi]
+I \textbf{bordi} (\emph{edges}) sono posizioni in un'immagine con un
+\textbf{rapido cambiamento di intensità}.  Sono caratteristiche fondamentali per
+comprendere il contenuto dell'immagine.
+\end{defbox}
+
+\subsection{Origine fisica dei bordi}
+
+I bordi possono essere causati da diversi fenomeni fisici:
+\begin{itemize}
+  \item Discontinuità della normale alla superficie.
+  \item Discontinuità di profondità.
+  \item Discontinuità di colore o materiale della superficie.
+  \item Discontinuità di illuminazione (es.\ ombre).
+\end{itemize}
+
+\subsection{Il gradiente dell'immagine}
+
+Poiché un'immagine è una funzione 2D $f(x,y)$, possiamo analizzare le variazioni
+di intensità calcolando le sue derivate, approssimate tramite convoluzione con
+piccoli kernel.
+
+\begin{itemize}
+  \item La \textbf{derivata parziale} $\dfrac{\partial f}{\partial x}$ si approssima
+        convolvendo con un filtro come $[-1,\,1]$ oppure $[1,\,-1]$.
+        (Analogamente per $\dfrac{\partial f}{\partial y}$ in verticale.)
+
+  \item Il \textbf{gradiente} $\nabla f = \left[\dfrac{\partial f}{\partial x},\,
+        \dfrac{\partial f}{\partial y}\right]$ è un vettore che punta nella direzione
+        del più rapido aumento di intensità.
+
+  \item La \textbf{magnitudine del gradiente}:
+        \[
+          \norm{\nabla f} = \sqrt{\left(\frac{\partial f}{\partial x}\right)^2 +
+                                  \left(\frac{\partial f}{\partial y}\right)^2}
+        \]
+        misura la forza del bordo.
+
+  \item L'\textbf{orientazione del gradiente}:
+        \[
+          \theta = \mathrm{atan2}\!\left(\frac{\partial f}{\partial y},\,
+                                         \frac{\partial f}{\partial x}\right)
+        \]
+        fornisce la direzione del bordo.
+\end{itemize}
+
+\textbf{Gestione del rumore.}  Applicare direttamente filtri derivativi è
+altamente sensibile al rumore.  La soluzione è \textbf{prima uniformare l'immagine
+con un filtro Gaussiano}.  Grazie alla proprietà associativa della convoluzione:
+\[
+  \frac{\partial}{\partial x}(G * f)
+  = \left(\frac{\partial}{\partial x}G\right) * f
+\]
+Si ottiene il filtro \textbf{Derivative of Gaussian (DoG)}: invece di sfocare
+l'immagine e poi prenderne la derivata, si prende la derivata del kernel Gaussiano
+e si convolve con essa l'immagine in un'unica operazione efficiente.
+
+\begin{warnbox}[Nota terminologica: DoG]
+In rilevamento dei bordi, l'espressione \emph{Derivative of Gaussian} non va
+abbreviata in DoG, perché in rilevamento di feature e SIFT, DoG significa
+tipicamente \emph{Difference of Gaussians}.  Si tratta di concetti distinti.
+\end{warnbox}
+
+\subsection{Derivate del secondo ordine: il Laplaciano}
+
+La derivata del secondo ordine può anch'essa essere usata per trovare i bordi.
+Il \textbf{Laplaciano} di un'immagine è:
+\[
+  \nabla^2 f = \frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2}
+\]
+che è uno scalare.
+
+\begin{itemize}
+  \item In un segnale 1D, un bordo corrisponde a un picco nella prima derivata e a
+        un \textbf{zero-crossing} nella seconda derivata.
+  \item Combinando il Laplaciano con lo smoothing Gaussiano si crea un filtro
+        \textbf{Laplacian of Gaussian (LoG)}.  I bordi vengono localizzati trovando
+        gli zero-crossing nell'immagine filtrata.
+\end{itemize}
+
+\begin{notebox}[Zero-crossing vs.\ DoG]
+Gli zero-crossing (LoG) sono più accurati nel localizzare i bordi, ma il DoG è
+computazionalmente più efficiente.  La prima derivata in corrispondenza di un bordo
+corrisponde a un massimo, mentre la seconda derivata è zero.
+\end{notebox}
+
+\subsection{L'operatore di Sobel}
+
+L'operatore di Sobel è un'approssimazione efficiente del DoG.  È un
+\textbf{filtro separabile} composto da un kernel derivativo 1D e un kernel di
+smoothing 1D.  Il filtro Sobel orizzontale combina $[1,\,2,\,1]$ (smoothing) e
+$[1,\,0,\,-1]$ (derivativo).
+
+Altri filtri derivativi comuni: \textbf{Prewitt}, \textbf{Roberts}, \textbf{Scharr}.
+
+\begin{notebox}[Normalizzazione di Sobel]
+I mask di Sobel standard sono spesso scritti senza il fattore di normalizzazione
+$1/8$.  Questo non influisce sul rilevamento dei bordi se si usano solo risposte
+relative o soglie, ma il fattore è necessario per ottenere la scala corretta della
+magnitudine del gradiente.
+\end{notebox}
+
+\subsection{La pipeline di Canny}
+
+Il rilevatore di Canny è un algoritmo multi-stadio considerato il metodo classico
+standard per il rilevamento dei bordi.
+
+\begin{enumerate}
+  \item \textbf{Filtraggio}: si uniforma l'immagine con un filtro Gaussiano e si
+        calcolano magnitudine e orientazione del gradiente usando un filtro DoG (o
+        un'approssimazione come Sobel).
+
+  \item \textbf{Non-maximum suppression}: per ogni pixel, si verifica se la sua
+        magnitudine è un massimo locale nella direzione del suo gradiente; se no, lo
+        si sopprime impostandolo a 0.  Ciò produce bordi sottili, larghi un pixel.
+
+  \item \textbf{Linking e sogliatura isteresi}: si usano due soglie (alta e bassa).
+        \begin{itemize}
+          \item Pixel con magnitudine del gradiente sopra la soglia alta:
+                bordi \emph{forti}, conservati.
+          \item Pixel con magnitudine tra soglia bassa e alta: bordi \emph{deboli},
+                conservati solo se connessi a un pixel di bordo forte.
+          \item Pixel sotto la soglia bassa: scartati.
+        \end{itemize}
+\end{enumerate}
+
+\begin{propbox}[Criteri di ottimalità del rilevatore di Canny]
+Un rilevatore di bordi ottimale deve soddisfare tre criteri:
+\begin{enumerate}
+  \item \textbf{Buona rilevazione}: pochi falsi positivi e falsi negativi.
+  \item \textbf{Buona localizzazione}: i bordi rilevati devono essere vicini alla
+        vera posizione del bordo.
+  \item \textbf{Risposta singola}: un bordo fisico deve generare un solo bordo
+        rilevato.
+\end{enumerate}
+Il comportamento dipende principalmente da tre parametri: la scala di smoothing
+Gaussiano $\sigma$, la soglia alta e la soglia bassa.  Un $\sigma$ più grande
+sopprime i dettagli fini e rileva bordi su scala maggiore; un $\sigma$ più piccolo
+preserva bordi più fini ma è più sensibile al rumore.
+\end{propbox}
+
+% =============================================================================
+\chapter{Piramidi di immagini}
+% =============================================================================
+
+\section{Piramidi Gaussiane}
+
+\begin{defbox}[Piramide Gaussiana]
+Una \textbf{piramide Gaussiana} è una rappresentazione multi-risoluzione
+dell'immagine in cui ogni livello è creato applicando un filtro Gaussiano e
+sottocampionando il livello precedente di un fattore 2, producendo immagini
+progressivamente più piccole e sfocate, utili per la \textbf{ricerca
+coarse-to-fine}.
+\end{defbox}
+
+Man mano che si sale di livello nella piramide (risoluzioni minori), i dettagli ad
+alta frequenza vengono eliminati, mentre le componenti a bassa frequenza e le regioni
+uniformi vengono preservate.
+
+\begin{notebox}[Perché si usa il filtro Gaussiano]
+Il Gaussiano è usato perché è \textbf{auto-riproducente}: convolvere un Gaussiano
+con un altro Gaussiano produce un nuovo Gaussiano con varianza maggiore.  Questo
+rende possibile lo smoothing incrementale tra i livelli della piramide.  Una volta
+filtrata passa-basso l'immagine, sono necessari meno pixel per rappresentare il
+contenuto rimanente senza aliasing severo.
+\end{notebox}
+
+\begin{warnbox}[La sfocatura è con perdita di informazione]
+Non è possibile ricostruire l'immagine originale ad alta risoluzione a partire da
+un livello a risoluzione inferiore.
+\end{warnbox}
+
+\begin{notebox}[Dimensione di una piramide Gaussiana]
+Se ogni livello è sottocampionato di un fattore 2, sia la larghezza che l'altezza
+vengono dimezzate $\Rightarrow$ il livello successivo ha $1/4$ dei pixel del
+precedente.  Il numero totale di pixel dell'intera piramide:
+\[
+  N_{\text{tot}} = N + \frac{N}{4} + \frac{N}{16} + \cdots
+  = N\sum_{i=0}^{\infty}\left(\frac{1}{4}\right)^i
+  = N \cdot \frac{1}{1-1/4}
+  = \frac{4}{3}N
+\]
+L'intera piramide richiede solo circa il $\frac{4}{3}$ dello storage
+dell'immagine originale.
+\end{notebox}
+
+\section{Piramidi Laplaciane}
+
+\begin{defbox}[Piramide Laplaciana]
+La \textbf{piramide Laplaciana} è una \textbf{rappresentazione senza perdita} che
+memorizza i dettagli ad alta frequenza persi tra due livelli di una piramide
+Gaussiana, calcolando un'immagine \emph{residuo}.
+\end{defbox}
+
+Si definiscono due operazioni fondamentali:
+
+\begin{itemize}
+  \item $\mathrm{REDUCE}(I)$: crea il livello successivo $G_{i+1}$ della piramide
+        Gaussiana sfocando e poi sottocampionando $G_i$:
+        \[
+          G_{i+1} = \mathrm{REDUCE}(G_i)
+          = \mathrm{downsample}\!\bigl(\mathrm{blur}(G_i)\bigr)
+        \]
+
+  \item $\mathrm{EXPAND}(I)$: predice un'immagine a risoluzione maggiore $G_i$ da
+        $G_{i+1}$ a risoluzione minore, tramite upsampling e sfocatura:
+        \[
+          \mathrm{EXPAND}(G_{i+1})
+          = \mathrm{blur}\!\bigl(\mathrm{upsample}(G_{i+1})\bigr)
+        \]
+\end{itemize}
+
+Il \textbf{residuo} $L_i$ forma un livello della piramide Laplaciana:
+\[
+  L_i = G_i - \mathrm{EXPAND}(G_{i+1})
+\]
+
+Ogni residuo contiene principalmente i dettagli persi nel passaggio da un livello
+Gaussiano a quello successivo (bordi, contorni, texture fine).
+
+La rappresentazione completa della piramide Laplaciana è
+$\{L_0,L_1,\ldots,L_{n-1}\}$ più il livello Gaussiano più piccolo $G_n$.
+
+\textbf{Perché ``Laplaciana''?}  La creazione di ogni residuo (immagine meno versione
+sfocata, differenza di Gaussiani) approssima l'operatore LoG:
+\[
+  \underbrace{G_i - \mathrm{EXPAND}(G_{i+1})}_{\text{Difference of Gaussians}}
+  \approx
+  \underbrace{\nabla^2 G}_{\text{Laplacian of Gaussian}}
+\]
+
+\subsection{Sommario delle formule}
+
+\[
+\boxed{
+  G_{i+1} = \mathrm{REDUCE}(G_i) \qquad
+  L_i = G_i - \mathrm{EXPAND}(G_{i+1}) \qquad
+  G_i = L_i + \mathrm{EXPAND}(G_{i+1})
+}
+\]
+
+\subsection{Ricostruzione}
+
+L'immagine originale può essere \textbf{ricostruita perfettamente} dalla piramide
+Laplaciana invertendo il processo:
+\begin{enumerate}
+  \item Si parte dall'immagine al livello più alto, $G_n$.
+  \item Per ogni livello $i$ da $n-1$ fino a 0:
+        \[G_i = \mathrm{EXPAND}(G_{i+1}) + L_i\]
+  \item Il risultato finale $G_0$ è l'immagine originale perfettamente ricostruita.
+\end{enumerate}
+
+In assenza di errori di quantizzazione e approssimazione numerica, la piramide
+Laplaciana consente \textbf{ricostruzione perfetta}.  Per memorizzare questa
+ricostruzione si devono conservare: le immagini residuo a ogni livello; l'immagine
+più piccola al vertice della piramide Gaussiana.
+
+\section{Applicazioni delle piramidi}
+
+Le piramidi di immagini sono uno strumento fondamentale usato in: compressione di
+immagini, denoising, registrazione multi-scala (allineamento immagini da grossolano
+a fine) e rilevamento multi-scala (trovare oggetti a varie scale).
+
+\subsection{Blending di immagini}
+
+Le piramidi Laplaciane forniscono una tecnica potente per fondere due immagini in
+modo fluido, evitando la giunzione netta che risulterebbe da un semplice taglia-e-incolla.
+
+\begin{notebox}[Algoritmo di blending piramidale]
+Per fondere due immagini $A$ e $B$ usando un'immagine maschera $M$:
+\begin{enumerate}
+  \item Costruire le piramidi Laplaciane per le due immagini sorgente, $LA$ e $LB$.
+  \item Costruire una piramide Gaussiana per la maschera, $GM$.  I valori della
+        maschera (da 0 a 1) fungono da pesi di blending a ogni scala.
+  \item Per ogni livello $j$, creare un livello Laplaciano combinato $LC_j$ come
+        media pesata:
+        \[
+          LC_j(x,y)
+          = GM_j(x,y)\cdot LA_j(x,y)
+          + \bigl(1-GM_j(x,y)\bigr)\cdot LB_j(x,y)
+        \]
+  \item Collassare la piramide Laplaciana combinata $LC$ per ottenere l'immagine
+        finale.
+\end{enumerate}
+\end{notebox}
+
+\subsection{Altre rappresentazioni multi-risoluzione}
+
+Altre rappresentazioni multi-risoluzione includono le \textbf{piramidi orientabili}
+(\emph{steerable pyramids}) e le \textbf{wavelet}.
+\begin{itemize}
+  \item Le piramidi orientabili memorizzano risposte orientate multiple a ogni scala.
+  \item Le wavelet decompongono l'immagine in approssimazioni a bassa frequenza e
+        dettagli ad alta frequenza, spesso separati in componenti orizzontali,
+        verticali e diagonali.
+\end{itemize}
+
+\subsection{Rilevamento multi-scala}
+
+Nel rilevamento multi-scala, lo stesso template o rilevatore a dimensione fissa
+viene applicato a livelli diversi della piramide.  Poiché gli oggetti appaiono a
+dimensioni diverse a seconda del livello, un rilevatore che funziona a una dimensione
+fissa di template può rilevare oggetti di diverse dimensioni apparenti scansionando
+la piramide.
+
+% =============================================================================
+\chapter{Dominio delle frequenze}
+% =============================================================================
+
+\section{Dominio delle frequenze e serie di Fourier}
+
+Qualsiasi funzione univariata può essere riscritta come somma pesata di seni e coseni
+di frequenze diverse, sotto certe condizioni.
+
+\subsection{Costruire segnali da sinusoidi}
+
+Il mattone di base per l'analisi di Fourier è la sinusoide:
+\[
+  A\sin(\omega x + \phi)
+\]
+definita da tre parametri chiave:
+\begin{itemize}
+  \item \textbf{Ampiezza} ($A$): la forza o intensità dell'onda.
+  \item \textbf{Frequenza angolare} ($\omega$): determina la velocità di oscillazione.
+        Il periodo è $T = 2\pi/|\omega|$.
+  \item \textbf{Fase} ($\phi$): la posizione iniziale o offset della sinusoide.
+\end{itemize}
+
+Il \textbf{teorema di Fourier} afferma che sommando abbastanza sinusoidi con
+frequenze e ampiezze diverse, si può approssimare qualsiasi segnale periodico.
+
+Lo \textbf{spettro di frequenza} è un grafico che mostra l'ampiezza di ciascuna
+componente di frequenza presente nel segnale.  Il valore alla frequenza zero è detto
+\textbf{componente DC} e rappresenta il valore medio del segnale.
+
+\section{La trasformata di Fourier}
+
+Le serie di Fourier rappresentano funzioni periodiche.  La \textit{trasformata di
+Fourier} estende questa idea alle \textbf{funzioni non periodiche}:
+
+\begin{defbox}[Trasformata di Fourier]
+La trasformata di Fourier converte un segnale $f(x)$ dal dominio spaziale a una
+funzione $F(\omega)$ nel dominio delle frequenze.  $F(\omega)$ è a valori complessi:
+\[
+  F(\omega) = R(\omega) + i\,I(\omega)
+\]
+L'ampiezza e la fase si ricavano dalla parte reale e immaginaria:
+\[
+  A(\omega) = \sqrt{R(\omega)^2 + I(\omega)^2}, \qquad
+  \phi(\omega) = \mathrm{atan2}\!\bigl(I(\omega),\,R(\omega)\bigr)
+\]
+L'uso di $\mathrm{atan2}$ è preferibile all'arcotangente semplice perché gestisce
+correttamente il quadrante del numero complesso.  La trasformazione è invertibile.
+\end{defbox}
+
+\subsection{Definizione matematica}
+
+\textbf{Trasformata diretta} (Spaziale $\to$ Frequenza):
+\[
+  F(\omega) = \int_{-\infty}^{+\infty} f(x)\,e^{-i\omega x}\,dx
+\]
+
+\textbf{Trasformata inversa} (Frequenza $\to$ Spaziale):
+\[
+  f(x) = \frac{1}{2\pi}\int_{-\infty}^{+\infty} F(\omega)\,e^{i\omega x}\,d\omega
+\]
+
+La connessione con le sinusoidi è data dalla \textbf{formula di Eulero}:
+$e^{i\theta} = \cos\theta + i\sin\theta$.
+La trasformata misura essenzialmente quanta di una data frequenza seno e coseno è
+presente nel segnale $f(x)$.
+
+\subsection{La trasformata discreta di Fourier (DFT)}
+
+Per segnali e immagini digitali si usa la \textit{Discrete Fourier Transform (DFT)}.
+Per un segnale 1D $f(x)$ di lunghezza $N$:
+\[
+  F(k) = \sum_{x=0}^{N-1} f(x)\,e^{-j2\pi kx/N}
+\]
+Può essere espressa come moltiplicazione matriciale $\mathbf{F} = \mathbf{W}\mathbf{f}$.
+
+\begin{notebox}[Fast Fourier Transform (FFT)]
+Il calcolo diretto della DFT tramite moltiplicazione matriciale ha complessità
+$\mathcal{O}(N^2)$.  La \textbf{Fast Fourier Transform (FFT)} calcola la DFT in
+$\mathcal{O}(N\log N)$, rendendola pratica per l'elaborazione delle immagini.
+\end{notebox}
+
+\section{Analisi di Fourier in 2D}
+
+La trasformata di Fourier si estende a 2D per analizzare le immagini.  Un'immagine
+$f(x,y)$ viene trasformata nella sua rappresentazione in frequenza $F(u,v)$, dove
+$u$ e $v$ sono le frequenze orizzontale e verticale:
+\[
+  F(u,v) = \sum_{x=0}^{M-1}\sum_{y=0}^{N-1}
+    f(x,y)\,e^{-j2\pi\!\left(\frac{ux}{M}+\frac{vy}{N}\right)}
+\]
+
+Nello spettro 2D di Fourier (visualizzato con il DC al centro):
+\begin{itemize}
+  \item Le \textbf{basse frequenze} sono vicino al centro e corrispondono a strutture
+        lisce su larga scala.
+  \item Le \textbf{alte frequenze} sono lontane dal centro e corrispondono a dettagli
+        fini, bordi e texture.
+  \item L'orientazione delle linee nello spettro corrisponde all'orientazione dei
+        bordi nell'immagine (es.\ i bordi verticali creano linee orizzontali nel
+        dominio delle frequenze).
+\end{itemize}
+
+\begin{notebox}[L'importanza della fase]
+\begin{itemize}
+  \item L'\textbf{ampiezza} della DFT rappresenta quanta di una particolare frequenza
+        è presente nell'immagine $\Rightarrow$ manca di informazione spaziale.
+  \item La \textbf{fase} della DFT rappresenta la disposizione spaziale di ogni
+        componente di frequenza $\Rightarrow$ definisce la posizione di bordi, linee,
+        angoli e texture.
+  \item Se si ricostruisce un'immagine usando solo la fase, il risultato è
+        riconoscibile ma distorto, con strane variazioni di intensità.  La fase è
+        generalmente più importante dell'ampiezza per la ricostruzione visiva.
+\end{itemize}
+\end{notebox}
+
+\section{Coppie della trasformata di Fourier e proprietà}
+
+\textbf{Coppie importanti:}
+\begin{itemize}
+  \item Funzione \emph{box} nel dominio spaziale $\leftrightarrow$ funzione
+        \emph{sinc} nel dominio delle frequenze.
+  \item Gaussiano nel dominio spaziale $\leftrightarrow$ Gaussiano nel dominio delle
+        frequenze.
+  \item Per dualità: sinc nel dominio spaziale $\leftrightarrow$ box nel dominio
+        delle frequenze.
+\end{itemize}
+
+\textbf{Proprietà di scaling:} espandere un segnale nel dominio spaziale comprime
+la sua trasformata nel dominio delle frequenze, e viceversa.  Strutture lisce su
+larga scala $\leftrightarrow$ basse frequenze; dettagli piccoli e variazioni rapide
+$\leftrightarrow$ alte frequenze.
+
+\section{Filtraggio nel dominio delle frequenze}
+
+\subsection{Il teorema della convoluzione}
+
+\begin{propbox}[Teorema della convoluzione]
+La convoluzione nel dominio spaziale è equivalente alla moltiplicazione
+element-wise nel dominio delle frequenze:
+\[
+  \mathcal{F}\{g * h\} = \mathcal{F}\{g\} \cdot \mathcal{F}\{h\}
+\]
+Equivalentemente, la moltiplicazione nel dominio delle frequenze corrisponde alla
+convoluzione nel dominio spaziale.
+\end{propbox}
+
+Invece di eseguire una costosa convoluzione nel dominio spaziale, si può:
+\begin{enumerate}
+  \item Trasformare immagine e kernel nel dominio delle frequenze tramite FFT.
+  \item Moltiplicarli element-wise.
+  \item Ritrasformare il risultato nel dominio spaziale tramite FFT inversa.
+\end{enumerate}
+
+\textbf{Esempi di filtraggio:}
+\begin{itemize}
+  \item \textbf{Filtraggio passa-basso}: moltiplicare lo spettro per una maschera
+        che preserva le basse frequenze (vicino al centro) e attenua le alte
+        frequenze.  Un Gaussiano è un eccellente filtro passa-basso.
+  \item \textbf{Filtraggio passa-alto}: attenuare le basse frequenze e preservare le
+        alte (per nitidezza o rilevamento bordi).
+  \item \textbf{Filtraggio passa-banda}: preservare un anello di frequenze per
+        isolare feature a una scala specifica.
+\end{itemize}
+
+\begin{notebox}[Filtro box vs.\ filtro Gaussiano]
+Il \textbf{filtro box} è brusco nel dominio spaziale.  La sua trasformata di
+Fourier è una \textbf{funzione sinc} con sidelobes significativi.  Queste
+caratteristiche non ideali producono un taglio di frequenza imperfetto e possono
+causare \textbf{artefatti di ringing} nell'immagine sfocata risultante.
+
+Il \textbf{filtro Gaussiano} è regolare sia nel dominio spaziale che in quello
+delle frequenze, garantendo un'attenuazione pulita.  Un filtro passa-basso ideale
+(taglio netto in frequenza) produce anch'esso ringing perché la sua risposta
+impulsiva nel dominio spaziale è una sinc.
+
+In pratica, il supporto spaziale di un mask Gaussiano viene scelto pari a circa
+\textbf{tre volte la deviazione standard}, in modo da includere la maggior parte
+della campana Gaussiana.
+\end{notebox}
+
+\section{Campionamento}
+
+\begin{propbox}[Teorema di Nyquist-Shannon]
+Il teorema di Nyquist-Shannon afferma che un segnale continuo può essere
+ricostruito perfettamente dai suoi campioni discreti \textbf{senza aliasing} se e
+solo se:
+\[
+  f_s \geq 2\,f_{\max}
+\]
+dove la frequenza minima di campionamento $2f_{\max}$ è chiamata
+\textbf{frequenza di Nyquist}.
+\end{propbox}
+
+\begin{notebox}[Applicazione alle piramidi Gaussiane]
+La sfocatura Gaussiana (filtraggio passa-basso) riduce $f_{\max}$, prevenendo
+così l'aliasing quando l'immagine viene successivamente sottocampionata.
+\end{notebox}
+
+\section{Immagini ibride}
+
+Le \textbf{immagini ibride} sono create combinando le componenti a bassa frequenza
+di un'immagine con le componenti ad alta frequenza di un'altra.
+
+\begin{enumerate}
+  \item Un \textbf{filtro passa-basso} (es.\ Gaussiano) viene applicato alla prima
+        immagine, conservandone solo la struttura grossolana.
+  \item Un \textbf{filtro passa-alto} (es.\ Laplaciano) viene applicato alla seconda
+        immagine, conservandone solo i dettagli fini e i bordi.
+  \item Le due immagini risultanti vengono sommate.
+\end{enumerate}
+
+L'immagine ibrida finale viene percepita diversamente a seconda della distanza di
+visione: da lontano il sistema visivo coglie l'immagine a bassa frequenza; da vicino
+i dettagli ad alta frequenza diventano dominanti.  Questo sfrutta il comportamento
+\textbf{dipendente dalla frequenza della visione umana}.
+
+% =============================================================================
+\chapter{Feature locali}
+% =============================================================================
+
+\section{Introduzione alle feature locali}
+
+\begin{defbox}[Feature]
+Una \textbf{feature} è un'informazione sul contenuto di un'immagine.  Si distinguono
+due tipi principali:
+\begin{itemize}
+  \item \textbf{Feature globali}: descrivono un'immagine nel suo insieme per
+        rappresentare un intero oggetto.  Usate per il rilevamento di oggetti
+        (l'oggetto è presente, sì/no?).
+  \item \textbf{Feature locali}: descrivono patch o keypoint all'interno di un
+        oggetto.  Usate per il riconoscimento di oggetti, dove è necessario trovare
+        corrispondenze tra parti degli oggetti.
+\end{itemize}
+\end{defbox}
+
+\begin{propbox}[Proprietà di buone feature locali]
+Buone feature locali devono essere \textbf{numerose} per il matching e
+\textbf{distintive} per una corrispondenza non ambigua.  Crucialmente, devono essere
+\textbf{invarianti} alle trasformazioni fotometriche e geometriche.
+
+Le feature locali sono utili perché sono: \textbf{locali} (robuste a occlusione
+parziale e cluttering), \textbf{numerose}, \textbf{distintive} (permettono un
+matching non ambiguo) ed \textbf{efficienti} (adatte ad applicazioni in tempo reale).
+\end{propbox}
+
+\section{Invarianza ed equivarianza}
+
+\begin{itemize}
+  \item \textbf{Invarianza}: una trasformazione dell'immagine non cambia la proprietà
+        della feature rilevata.
+  \item \textbf{Equivarianza}: se l'immagine è trasformata geometricamente, le
+        posizioni delle feature rilevate si trasformano di conseguenza, così i punti
+        corrispondenti vengono ancora rilevati in posizioni corrispondenti.
+\end{itemize}
+
+Per i rilevatori di feature locali, si vuole tipicamente \textbf{invarianza} alle
+trasformazioni fotometriche ed \textbf{equivarianza} alle trasformazioni
+geometriche.
+
+\section{Applicazioni delle feature locali}
+
+Feature locali sono usate in: allineamento di immagini e stitching di panorami,
+ricostruzione 3D, SLAM visivo, tracking in realtà aumentata, riconoscimento di
+oggetti, image retrieval e navigazione robotica/veicolare.
+
+\section{Detection, description e matching}
+
+I metodi a feature locali sono tipicamente composti da tre fasi:
+\begin{itemize}
+  \item \textbf{Detection}: identificare punti di interesse o keypoint nell'immagine.
+  \item \textbf{Description}: estrarre un vettore descrittore dalla patch intorno a
+        ogni keypoint.
+  \item \textbf{Matching}: confrontare i descrittori tra immagini diverse per trovare
+        corrispondenze.
+\end{itemize}
+
+\section{Rilevatore di angoli di Harris}
+
+\begin{defbox}[Harris corner detector]
+Il \textit{rilevatore di angoli di Harris} identifica punti importanti traslando una
+piccola finestra intorno a essi e verificando dove si verificano forti cambiamenti
+di aspetto.
+\end{defbox}
+
+\subsection{La matematica del rilevamento di angoli}
+
+Per quantificare il cambiamento di intensità, si calcola la \textbf{Sum of Squared
+Differences (SSD)} per una finestra $W$ traslata di un piccolo offset $(u,v)$:
+\[
+  E(u,v) = \sum_{(x,y)\in W} \bigl[I(x+u,\,y+v) - I(x,y)\bigr]^2
+\]
+
+Un angolo è un punto in cui questo errore $E(u,v)$ è elevato per tutti i piccoli
+spostamenti $(u,v)$.
+
+\textbf{Approssimazione per piccoli spostamenti.}  Per piccoli spostamenti si
+approssima il cambiamento di intensità con un'espansione di Taylor al primo ordine:
+\[
+  I(x+u,\,y+v) \approx I(x,y) + I_x\,u + I_y\,v
+\]
+Sostituendo nella formula della SSD:
+\[
+  E(u,v) \approx \sum_{(x,y)\in W}\bigl[I_x\,u + I_y\,v\bigr]^2
+  \approx Au^2 + 2Buv + Cv^2
+\]
+dove $A = \sum I_x^2$, $B = \sum I_x I_y$, $C = \sum I_y^2$
+(somme sulla finestra $W$).
+
+\subsection{La matrice dei secondi momenti}
+
+La forma quadratica si esprime in notazione matriciale:
+\[
+  E(u,v) \approx
+  \begin{bmatrix}u & v\end{bmatrix}
+  \underbrace{\begin{bmatrix}A & B \\ B & C\end{bmatrix}}_{\mathbf{H}}
+  \begin{bmatrix}u \\ v\end{bmatrix}
+\]
+
+La matrice $\mathbf{H}$ è la \textbf{matrice dei secondi momenti} (o
+\emph{structure tensor}):
+\[
+  \mathbf{H} = \sum_{(x,y)\in W}
+  \begin{bmatrix}I_x^2 & I_x I_y \\ I_x I_y & I_y^2\end{bmatrix}
+\]
+
+\subsection{Interpretazione della matrice dei secondi momenti}
+
+La forma della superficie di errore quadratica $E(u,v)$ è determinata dagli
+autovalori $\lambda_1$ e $\lambda_2$ di $\mathbf{H}$:
+
+\begin{itemize}
+  \item Gli \textbf{autovettori} di $\mathbf{H}$ corrispondono alle direzioni di
+        massimo e minimo cambiamento di intensità.
+  \item Gli \textbf{autovalori} $\lambda_{\max}$ e $\lambda_{\min}$ rappresentano
+        la magnitudine di tale cambiamento in quelle direzioni.
+\end{itemize}
+
+Questo permette di classificare la regione:
+\begin{itemize}
+  \item \textbf{Flat}: entrambi $\lambda_1$ e $\lambda_2$ piccoli.  Errore basso in
+        tutte le direzioni.
+  \item \textbf{Edge}: un autovalore grande e l'altro piccolo
+        ($\lambda_1 \gg \lambda_2$).  Errore alto in una direzione ma basso lungo
+        il bordo.
+  \item \textbf{Corner}: entrambi $\lambda_1$ e $\lambda_2$ grandi e di magnitudine
+        simile.  Errore alto in tutte le direzioni.
+\end{itemize}
+
+\begin{notebox}[Criterio del minimo autovalore]
+Una misura semplice di \emph{cornerness} è $\lambda_{\min}$, il minore autovalore
+della matrice dei secondi momenti.  Un punto è considerato un buon angolo se
+$\lambda_{\min}$ supera una soglia.
+\end{notebox}
+
+\subsection{L'operatore di Harris e l'algoritmo}
+
+Calcolare gli autovalori per ogni pixel è inefficiente.  Il rilevatore di Harris usa
+una \textbf{funzione di risposta} $R$ che approssima il comportamento degli autovalori
+senza calcolarli esplicitamente:
+\[
+  R = \det(\mathbf{H}) - k\cdot\trace^2(\mathbf{H})
+  = \lambda_1\lambda_2 - k(\lambda_1+\lambda_2)^2
+\]
+
+dove $k$ è una costante empirica (tipicamente 0.04--0.06).  Il valore di $R$ indica
+la \emph{cornerness}: grande e positivo per un angolo, grande e negativo per un
+bordo, piccolo per una regione piatta.
+
+\textbf{Algoritmo del rilevatore di Harris:}
+\begin{enumerate}
+  \item Calcolare le derivate dell'immagine $I_x$ e $I_y$ (es.\ usando filtri
+        Sobel).
+  \item Per ogni pixel, calcolare la matrice dei secondi momenti $\mathbf{H}$ su una
+        finestra Gaussiana intorno ad esso.
+  \item Calcolare la risposta di Harris $R$ per ogni pixel.
+  \item Sogliare la mappa di risposta $R$ per identificare candidati angoli forti.
+  \item Eseguire la \textbf{non-maximum suppression} per trovare i punti angolo
+        finali.
+\end{enumerate}
+
+\subsection{Proprietà e limitazioni}
+
+Il rilevatore di Harris è:
+\begin{itemize}
+  \item \textbf{Equivariante} alla rotazione (l'ellisse dei secondi momenti ruota,
+        ma gli autovalori sono preservati) e alla traslazione.
+  \item \textbf{Invariante} agli shift di luminosità ($+b$) ma solo parzialmente ai
+        cambiamenti di contrasto ($\times a$), poiché la sua risposta $R$ scala,
+        influenzando la sogliatura.
+  \item \textbf{Non invariante alla scala}: un angolo può apparire piatto o come un
+        bordo quando si esegue lo zoom.
+\end{itemize}
+
+\section{Rilevamento di blob invariante alla scala}
+
+Per superare la limitazione di scala di Harris, i \textit{blob} invarianti alla
+scala vengono rilevati trovando la loro \textbf{scala caratteristica}: la scala
+$\sigma$ in uno \textbf{scale-space 3D} $(x, y, \sigma)$ in cui una funzione di
+risposta è massimizzata.
+
+Il \textbf{LoG normalizzato alla scala} è un comune rilevatore di blob:
+\[
+  \nabla^2_{\text{norm}}\,g
+  = \sigma^2\left(\frac{\partial^2 g}{\partial x^2}
+                 +\frac{\partial^2 g}{\partial y^2}\right)
+\]
+
+Massimizzare questa risposta LoG attraverso le scale fornisce la scala caratteristica.
+
+\begin{defbox}[Scale-space extrema]
+Il rilevamento invariante alla scala può essere formulato come ricerca dei massimi
+locali in uno scale-space 3D $(x, y, \sigma)$.  Un keypoint viene selezionato non
+solo se la sua risposta è massima localmente nel piano immagine, ma anche se è
+massima tra le scale vicine.  Il fattore $\sigma^2$ nella LoG normalizzata è
+necessario per rendere le risposte comparabili tra scale diverse.
+\end{defbox}
+
+\begin{notebox}[Implementazione efficiente]
+Invece di applicare filtri sempre più grandi all'immagine, è più efficiente
+costruire una piramide Gaussiana e applicare un filtro di dimensione fissa a ogni
+livello:
+\begin{enumerate}
+  \item Costruire uno scale-space calcolando la risposta LoG per un range di scale
+        $\sigma$.
+  \item Trovare i massimi locali nello spazio 3D posizione-scala $(x,y,\sigma)$.
+  \item La posizione $(x,y)$ e la scala caratteristica $\sigma$ di ogni massimo
+        definiscono una feature rilevata.
+\end{enumerate}
+\end{notebox}
+
+\begin{notebox}[Filtro LoG a dimensione fissa e scala effettiva]
+Quando si usa una piramide Gaussiana per il rilevamento di blob invariante alla
+scala con un filtro LoG a dimensione fissa e $\sigma$ interno fisso:
+\begin{itemize}
+  \item \textbf{Livello 0} (immagine originale): scala effettiva
+        $\approx \sigma_{\text{filter}}$.
+  \item \textbf{Livello 1} (sottocampionato $2\times$): ogni pixel del filtro copre
+        $2\times2$ pixel dell'immagine originale; scala effettiva
+        $\approx 2\times\sigma_{\text{filter}}$.
+  \item \textbf{Livello 2} (sottocampionato $4\times$): scala effettiva
+        $\approx 4\times\sigma_{\text{filter}}$.
+\end{itemize}
+La scala caratteristica per un blob rilevato è la scala del livello piramidale in
+cui la sua risposta LoG è massimizzata.
+\end{notebox}
+
+% =============================================================================
+\chapter{Descrittori locali}
+% =============================================================================
+
+\section{Progettare descrittori di feature}
+
+\begin{defbox}[Descrittore di feature]
+Un \textbf{descrittore di feature} è una \textbf{rappresentazione vettoriale} della
+patch che circonda un keypoint. L'obiettivo è progettare descrittori tali che
+\textbf{patch con contenuto simile abbiano descrittori simili}, abilitando un
+matching robusto. Un buon descrittore deve essere robusto alle trasformazioni
+fotometriche e geometriche: il design è un compromesso tra \textbf{distintività}
+e \textbf{invarianza}.
+\end{defbox}
+
+\subsection{Evoluzione di un descrittore}
+
+\begin{enumerate}
+  \item \textbf{Patch grezza}: intensità dei pixel; perfetta per match esatti ma
+        altamente sensibile a variazioni di luminosità e posizione.
+  \item \textbf{Gradienti dell'immagine}: invarianti agli shift di luminosità ma
+        sensibili a deformazione, rotazione e cambiamenti di contrasto.
+  \item \textbf{Istogramma colore}: invariante a rotazione/scala ma perde tutto
+        il layout spaziale, rendendolo non discriminativo.
+  \item \textbf{Istogrammi spaziali}: istogrammi per cella (come in HOG o nelle
+        regioni di SIFT). Parzialmente invarianti alla deformazione; sensibili alla
+        rotazione a meno che non si stabilisca prima un'orientazione dominante.
+  \item \textbf{Normalizzazione dell'orientazione}: raggiunge la piena invarianza
+        alla rotazione allineando la patch alla sua orientazione dominante prima
+        del calcolo del descrittore (come in SIFT).
+\end{enumerate}
+
+\subsection{Confronto di istogrammi}
+
+\begin{itemize}
+  \item \textbf{Intersezione}: $\cap(Q,V)=\sum_i \min(q_i,v_i)$. Robusta.
+  \item \textbf{Distanza Euclidea}: $d(Q,V)=\sqrt{\sum_i(q_i-v_i)^2}$.
+        Meno robusta: pesa tutti i bin ugualmente.
+  \item \textbf{Chi-quadro}: $\chi^2(Q,V)=\sum_i\frac{(q_i-v_i)^2}{q_i+v_i}$.
+        Più discriminativa: pesa i bin diversamente.
+\end{itemize}
+
+\section{Descrittore HOG (Histogram of Oriented Gradients)}
+
+\begin{defbox}[HOG]
+\textbf{HOG} è un potente descrittore di feature usato per il rilevamento di
+pedoni, che combina gradiente dell'immagine, celle spaziali e normalizzazione
+locale del contrasto.
+\end{defbox}
+
+Il descrittore viene calcolato su una patch di dimensione fissa
+(es.\ $64\times128$ pixel per il rilevamento di pedoni).
+
+\paragraph{1.\ Calcolo del gradiente.}
+Si calcolano i gradienti orizzontale e verticale per ottenere magnitudine e
+direzione per ogni pixel, usando \textbf{gradienti unsigned} con angoli da $0^{\circ}$
+a $180^{\circ}$ (direzioni opposte trattate ugualmente).
+
+\paragraph{2.\ Istogrammi per cella.}
+La patch viene divisa in piccole regioni dette \textbf{celle} (es.\ $8\times8$
+pixel). Per ogni cella si crea un istogramma delle orientazioni del gradiente
+con \textbf{9 bin} (per angoli $0^{\circ}, 20^{\circ}, \ldots, 160^{\circ}$). Ogni pixel vota con
+peso uguale alla sua magnitudine, nel bin corrispondente alla sua orientazione.
+I voti vengono interpolati bilinearmente tra bin adiacenti per evitare aliasing.
+
+\paragraph{3.\ Normalizzazione per blocco.}
+Le celle adiacenti vengono raggruppate in \textbf{blocchi} (es.\ $2\times2$ celle,
+$16\times16$ pixel). Gli istogrammi di tutte le celle nel blocco vengono
+concatenati e normalizzati:
+\[
+  v_{\mathrm{norm}} = \frac{v}{\sqrt{\|v\|_2^2+\varepsilon}}
+\]
+Questo rende il descrittore \textbf{robusto ai cambiamenti fotometrici locali}.
+
+\paragraph{4.\ Vettore di feature.}
+Tutti i vettori di blocco normalizzati vengono concatenati nel descrittore HOG
+finale. I blocchi si sovrappongono (finestra mossa di 8 pixel alla volta),
+fornendo una rappresentazione ridondante e robusta. Le celle d'angolo vengono
+codificate una volta, quelle di bordo due volte, quelle interne quattro volte.
+
+\begin{notebox}[HOG per il rilevamento di pedoni]
+Per una patch $64\times128$ con celle $8\times8$ e blocchi $2\times2$ (step 8
+pixel), si ottengono $7\times15=105$ blocchi, ciascuno con $4\times9=36$ valori.
+Il descrittore HOG finale è un \textbf{vettore a 3780 dimensioni}:
+\[
+  7\times15\times36 = 3780
+\]
+Questo vettore può essere alimentato in un classificatore lineare (es.\ SVM).
+La visualizzazione del descrittore HOG cattura chiaramente la forma della persona,
+specialmente intorno al tronco e alle gambe.
+\end{notebox}
+
+\begin{propbox}[Proprietà di HOG]
+HOG standard non ha assegnazione di orientazione dominante: è adatto a oggetti
+con posa canonica (pedoni in piedi) e \textbf{non è invariante alla rotazione}.
+\`E robusto ai cambiamenti locali di illuminazione grazie alla normalizzazione
+per blocco, ma non invariante alla scala.
+\end{propbox}
+
+% =============================================================================
+\chapter{Scale-Invariant Feature Transform (SIFT)}
+% =============================================================================
+
+Il \textit{Scale-Invariant Feature Transform} (\textbf{SIFT}) è un algoritmo di
+riferimento per \textbf{rilevare} e \textbf{descrivere} feature locali nelle
+immagini, progettato per essere robusto a variazioni di scala, rotazione e
+illuminazione. SIFT è sia un rilevatore che un descrittore; ogni keypoint è
+rappresentato come $(x,y,s,\theta,\mathbf{d})$.
+
+\section{Rilevatore SIFT}
+
+\subsection{Costruzione dello scale-space}
+
+SIFT usa una piramide \textbf{Difference of Gaussians (DoG)}, approssimazione
+efficiente del Laplaciano del Gaussiano (LoG):
+\[
+  \mathrm{DoG}(x,y,\sigma) = G(x,y,k\sigma)-G(x,y,\sigma)
+\]
+Sia DoG che LoG sono equivarianti alla rotazione.
+
+Una piramide Gaussiana viene costruita in \textbf{ottave}. Ogni ottava contiene
+immagini della stessa risoluzione, progressivamente sfocate. Per passare
+all'ottava successiva si sottocampiona di un fattore 2. Le immagini DoG si
+calcolano sottraendo livelli adiacenti all'interno di ogni ottava.
+
+\subsection{Rilevamento degli estremi nello scale-space}
+
+Un pixel è un keypoint potenziale se è un estremo locale rispetto ai suoi
+\textbf{8 vicini spaziali} nella stessa immagine DoG e ai \textbf{9 vicini}
+nelle immagini DoG sopra e sotto, per un totale di \textbf{26 vicini}.
+
+\textbf{Rimozione dei keypoint instabili:}
+\begin{itemize}
+  \item \textbf{Basso contrasto}: risposta DoG debole, sensibile al rumore.
+        Si scartano keypoint con risposta sotto una soglia.
+  \item \textbf{Su bordi}: localizzazione ambigua lungo la direzione del bordo.
+        La risposta DoG cambia fortemente in una sola direzione (trasversale al
+        bordo) $\Rightarrow$ non distinti per il matching. Su un buon keypoint
+        (blob o angolo) la risposta cambia significativamente in tutte le direzioni.
+\end{itemize}
+
+\begin{propbox}[Eliminazione dei keypoint sui bordi (Hessian Ratio Test)]
+Per scartare i punti di interesse situati lungo i bordi rettilinei (dove la localizzazione è ambigua lungo la direzione del bordo), SIFT calcola la matrice Hessiana 2D $\mathbf{H}$ della risposta DoG nel punto candidato:
+\[
+  \mathbf{H} = \begin{bmatrix} D_{xx} & D_{xy} \\ D_{xy} & D_{yy} \end{bmatrix}
+\]
+Il rapporto tra i suoi autovalori $\alpha, \beta$ (curvature principali) viene verificato calcolando la traccia e il determinante senza calcolare gli autovalori espliciti:
+\[
+  \frac{\trace(\mathbf{H})^2}{\det(\mathbf{H})} = \frac{(\alpha + \beta)^2}{\alpha \beta} = \frac{(r+1)^2}{r}
+\]
+Se $\frac{\trace(\mathbf{H})^2}{\det(\mathbf{H})} \ge \frac{(r+1)^2}{r}$ (con soglia tipica $r=10$), significa che il punto si trova su un bordo e viene eliminato.
+\end{propbox}
+
+\subsection{Assegnazione dell'orientazione}
+
+Per garantire l'invarianza alla rotazione si assegna un'\textbf{orientazione
+canonica} a ogni keypoint:
+
+\begin{enumerate}
+  \item \textbf{Gradiente del vicinato}: si calcolano magnitudine e orientazione
+        per i pixel nell'intorno del keypoint nell'immagine Gaussiana
+        corrispondente.
+  \item \textbf{Istogramma di orientazione}: istogramma a \textbf{36 bin}
+        ($360^{\circ}$, bin da $10^{\circ}$); ogni pixel vota pesato dalla magnitudine e da
+        una finestra Gaussiana centrata sul keypoint.
+  \item \textbf{Orientazione/i dominante/i}: il picco più alto definisce
+        l'orientazione primaria. Qualsiasi picco superiore all'\textbf{80\%}
+        del principale genera un nuovo keypoint con stessa posizione e scala.
+\end{enumerate}
+
+\section{Descrittore SIFT}
+
+Assegnati posizione $(x,y)$, scala $\sigma$ e orientazione $\theta$ al keypoint:
+
+\begin{enumerate}
+  \item Si prende una finestra $16\times16$ dall'immagine Gaussiana sfocata alla
+        scala caratteristica.
+  \item Si \textbf{ruotano} coordinate e gradienti secondo l'orientazione canonica
+        $\Rightarrow$ \textbf{invarianza alla rotazione}.
+  \item La finestra $16\times16$ viene divisa in una griglia $4\times4$ di celle
+        ($4\times4$ pixel ciascuna, 16 celle in totale). Per ogni cella si calcola
+        un \textbf{istogramma di orientazione a 8 bin}.
+  \item Si \textbf{concatenano} i 16 istogrammi in un vettore a
+        $\mathbf{128}$ \textbf{dimensioni} ($16\times8=128$).
+  \item Si \textbf{normalizza} a lunghezza unitaria $\Rightarrow$ robustezza ai
+        cambiamenti di illuminazione.
+\end{enumerate}
+
+\begin{propbox}[Proprietà di SIFT]
+Il descrittore SIFT è invariante a:
+\begin{itemize}
+  \item \textbf{Scala}: rilevamento in piramide di scale-space.
+  \item \textbf{Rotazione}: normalizzazione dell'orientazione.
+  \item \textbf{Illuminazione}: normalizzazione del vettore descrittore.
+\end{itemize}
+\`E anche robusto alle trasformazioni affini e al rumore, ma non completamente
+invariante a grandi cambiamenti di punto di vista.
+\end{propbox}
+
+\section{Matching di feature}
+
+\subsection{Ratio test di Lowe}
+
+Per ogni feature $f_1$ in $I_1$ si trovano i due vicini più prossimi in $I_2$:
+$f_2$ (best match) e $f'_2$ (second-best). Si calcola il ratio:
+\[
+  \mathrm{ratio} = \frac{\|f_1-f_2\|}{\|f_1-f'_2\|}
+\]
+Il match è accettato se ratio $<$ soglia (tipicamente 0.75--0.8). Un ratio piccolo
+indica un match non ambiguo: il miglior match è significativamente migliore del
+secondo migliore.
+
+\section{Valutazione del matching}
+
+Variando la soglia si ottiene la \textbf{ROC curve}:
+\[
+  \mathrm{TPR}=\frac{\#\mathrm{TP}}{\#\text{match corretti totali}}, \qquad
+  \mathrm{FPR}=\frac{\#\mathrm{FP}}{\#\text{match scorretti totali}}
+\]
+
+\begin{notebox}[Metriche informative]
+La semplice accuracy è scadente per il feature matching: i veri negativi
+(match non corrispondenti) sono astronomicamente numerosi e dominano il calcolo.
+Preferire:
+\[
+  \mathrm{Precision}=\frac{TP}{TP+FP},\quad
+  \mathrm{Recall}=\frac{TP}{TP+FN},\quad
+  F_1=2\frac{P\cdot R}{P+R}
+\]
+L'\textbf{AUC} (Area Under the ROC Curve) riassume la performance complessiva:
+1.0 = classificatore perfetto, 0.5 = random.
+\end{notebox}
+
+\section{SURF: Speeded-Up Robust Features}
+
+SURF è un'alternativa più veloce a SIFT con qualità comparabile.
+
+\textbf{Rilevamento (Hessiano):} SURF rileva blob dove $\det(\mathbf{H})$ è
+massimo, con:
+\[
+  \mathbf{H}(\mathbf{x},\sigma)=
+  \begin{bmatrix}L_{xx}&L_{xy}\\L_{xy}&L_{yy}\end{bmatrix}, \qquad
+  \det(H_{\mathrm{approx}})=D_{xx}D_{yy}-(wD_{xy})^2, \quad w=0.9
+\]
+Le derivate Gaussiane del secondo ordine vengono approssimate con \textbf{filtri
+box} calcolati tramite \textbf{immagini integrali} per massima efficienza.
+
+\textbf{Descrittore:} finestra $20s\times20s$ allineata all'orientazione dominante,
+divisa in griglia $4\times4$. Per ogni cella: $(\sum dx, \sum dy, \sum|dx|,
+\sum|dy|)$ $\Rightarrow$ \textbf{vettore a 64 dimensioni}.
+
+\section{Descrittori binari di feature}
+
+Alternative meno costose a SIFT che generano \textbf{stringhe binarie brevi},
+molto veloci da calcolare e confrontare.
+
+Per ogni coppia di pixel $(s_1,s_2)$ nella patch:
+\[
+  b=\begin{cases}1&\text{se }I(s_1)<I(s_2)\\0&\text{altrimenti}\end{cases}
+\]
+
+\begin{propbox}[Vantaggi]
+Compatti (es.\ 256 bit per ORB); veloci da calcolare (semplici confronti di
+intensità); veloci da confrontare tramite \textbf{distanza di Hamming}:
+$d_H(B_1,B_2)=\mathrm{sum}(\mathrm{xor}(B_1,B_2))$.
+\end{propbox}
+
+\textbf{ORB (Oriented FAST and Rotated BRIEF):} migliora BRIEF aggiungendo
+invarianza alla rotazione. Stima il centro di massa (CoM) e ruota di $\theta$ le
+256 coppie apprese da training (coppie non correlate ad alta varianza) prima di
+eseguire i confronti.
+
+\section{Deep local features}
+
+\textbf{SuperPoint} apprende detection e description tramite dati sintetici e
+self-supervised learning. \textbf{SuperGlue} apprende il matching con graph
+neural networks.
+
+% =============================================================================
+\chapter{Trasformazioni e allineamento}
+% =============================================================================
+
+\section{Image warping}
+
+\begin{itemize}
+  \item \textbf{Image filtering}: cambia i valori dei pixel (range)
+        $\Rightarrow g(x)=h(f(x))$.
+  \item \textbf{Image warping}: cambia le coordinate dei pixel (dominio)
+        $\Rightarrow g(x)=f(h(x))$, dove $h$ è una trasformazione di coordinate.
+\end{itemize}
+
+Ci si concentra sul \textbf{global warping}: una singola trasformazione
+$\mathbf{p}'=T(\mathbf{p})$ applicata a tutti i punti $\mathbf{p}=(x,y)$.
+
+\section{Tipi di trasformazioni 2D}
+
+\begin{center}
+\begin{tabular}{lccl}
+\toprule
+\textbf{Trasformazione}&\textbf{DOF}&\textbf{Min. corrisp.}&\textbf{Preserva}\\
+\midrule
+Traslazione    & 2 & 1 & orientazione, lunghezze, angoli, parallelismo\\
+Euclidea/rigid & 3 & --- & lunghezze, angoli, parallelismo\\
+Similarità     & 4 & --- & angoli, parallelismo, rapporti\\
+Affine         & 6 & 3 & linee, parallelismo, rapporti su parallele\\
+Proiettiva     & 8 & 4 & linee rette\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Trasformazioni lineari}
+
+\[
+  \mathbf{p}'=\mathbf{T}\mathbf{p}\implies
+  \begin{bmatrix}x'\\y'\end{bmatrix}=
+  \begin{bmatrix}a&b\\c&d\end{bmatrix}\begin{bmatrix}x\\y\end{bmatrix}
+\]
+
+Esempi:
+\begin{itemize}
+  \item Scala: $\mathbf{S}=\begin{bmatrix}s_x&0\\0&s_y\end{bmatrix}$
+  \item Rotazione: $\mathbf{R}=\begin{bmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{bmatrix}$
+  \item Shear: $\mathbf{Sh}=\begin{bmatrix}1&sh_x\\sh_y&1\end{bmatrix}$
+\end{itemize}
+
+\begin{propbox}[Proprietà]
+L'origine mappa nell'origine; le linee mappano in linee; il parallelismo è
+preservato; i rapporti di lunghezze lungo una linea sono preservati; chiuse sotto
+composizione.
+\end{propbox}
+
+\begin{warnbox}[Limitazione delle matrici $2\times2$]
+La traslazione non è lineare su coordinate 2D e non può essere rappresentata da
+una matrice $2\times2$.
+\end{warnbox}
+
+\subsection{Trasformazioni affini}
+
+Con \textbf{coordinate omogenee} $(x,y)\to(x,y,1)$ si includono le traslazioni:
+\[
+  \begin{bmatrix}x'\\y'\\1\end{bmatrix}=
+  \begin{bmatrix}a&b&c\\d&e&f\\0&0&1\end{bmatrix}
+  \begin{bmatrix}x\\y\\1\end{bmatrix}
+\]
+
+\begin{notebox}[Da coordinate omogenee a 2D]
+$(x,y,w)\to(x/w,\,y/w)$ (normalizzazione). I punti con $w=0$ sono punti
+all'infinito (utili per i punti di fuga).
+\end{notebox}
+
+La trasformazione affine mappa linee in linee, preserva il parallelismo e i
+rapporti lungo linee parallele. L'origine non mappa necessariamente nell'origine.
+
+\subsection{Trasformazioni proiettive (omografie)}
+
+Matrice $3\times3$ $\mathbf{H}$ definita a meno di un fattore di scala (8 DOF):
+\[
+  \begin{bmatrix}x'\\y'\\w'\end{bmatrix}=
+  \underbrace{\begin{bmatrix}a&b&c\\d&e&f\\g&h&1\end{bmatrix}}_{\mathbf{H}}
+  \begin{bmatrix}x\\y\\w\end{bmatrix},
+  \qquad \text{coordinate Cartesiane: }(x'/w',\,y'/w')
+\]
+
+\begin{propbox}[Proprietà]
+Le linee rette mappano in linee rette. Le linee parallele non rimangono
+necessariamente parallele (convergono a punti di fuga). I rapporti non sono
+preservati.
+\end{propbox}
+
+\begin{notebox}[Applicazione]
+Un'omografia mappa punti tra due immagini diverse dello stesso piano 3D.
+\`E la trasformazione che relaziona due viste della stessa superficie planare
+nel modello a camera pinhole.
+\end{notebox}
+
+\section{Calcolo delle trasformazioni}
+
+\subsection{Sistema lineare e minimi quadrati}
+
+Con più della minima quantità di corrispondenze si ottiene un sistema
+\textbf{sovradeterminato} $\mathbf{At}=\mathbf{b}$, risolto con i
+\textbf{minimi quadrati lineari}:
+\[
+  \mathbf{t}=(\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T\mathbf{b}=\mathbf{A}^\#\mathbf{b}
+\]
+
+\subsection{Calcolo di un'omografia}
+
+Per una corrispondenza $(x_i,y_i)\to(x'_i,y'_i)$, riorganizzando si ottiene
+$\mathbf{Ah}=\mathbf{0}$ con due righe per corrispondenza:
+\[
+  \begin{bmatrix}
+    x_i&y_i&1&0&0&0&-x'_ix_i&-x'_iy_i&-x'_i\\
+    0&0&0&x_i&y_i&1&-y'_ix_i&-y'_iy_i&-y'_i
+  \end{bmatrix}\mathbf{h}=\mathbf{0}
+\]
+
+Con 4 corrispondenze (8 equazioni) si risolve il sistema omogeneo:
+minimizzare $\|\mathbf{Ah}\|^2$ soggetto a $\|\mathbf{h}\|=1$.
+
+\begin{notebox}[Soluzione SVD]
+$\mathbf{h}$ è l'autovettore di $\mathbf{A}^T\mathbf{A}$ per il minimo
+autovalore. Si usa la SVD di $\mathbf{A}$: $\mathbf{h}$ è l'ultima colonna di
+$\mathbf{V}$.
+\end{notebox}
+
+\section{Stima robusta con RANSAC}
+
+I minimi quadrati sono sensibili agli \textbf{outlier} (match scorretti).
+\textbf{RANSAC} (RANdom SAmple Consensus) identifica il più grande insieme
+di inlier:
+
+\begin{enumerate}
+  \item \textbf{Campiona} $s$ punti (2 per lineare, 3 per affine, 4 per omografia).
+  \item \textbf{Calcola} il modello dal campione minimale.
+  \item \textbf{Conta} gli inlier entro tolleranza $\varepsilon$.
+  \item \textbf{Ripeti} per $N$ iterazioni; conserva il modello con più inlier.
+  \item \textbf{Ricalcola} il modello con tutti gli inlier tramite minimi quadrati.
+\end{enumerate}
+
+\begin{defbox}[Numero teorico di iterazioni in RANSAC]
+Il numero minimo di iterazioni $N$ necessario a RANSAC per garantire con probabilità $p$ (es.\ 99\%) di pescare almeno un sottoinsieme di $s$ punti composto esclusivamente da inlier (con un tasso stimato di outlier $e$) è:
+\[
+  N \ge \frac{\log(1 - p)}{\log\bigl(1 - (1 - e)^s\bigr)}
+\]
+\textit{Implicazione d'esame}: All'aumentare della percentuale di outlier ($e \to 1$), il denominatore tende a zero e il numero di iterazioni $N$ necessarie cresce in modo \textbf{esponenziale}.
+\end{defbox}
+
+\section{Implementazione del warping e blending}
+
+\subsection{Forward vs.\ inverse warping}
+
+\begin{itemize}
+  \item \textbf{Forward}: per ogni pixel $(x,y)$ sorgente si calcola
+        $(x',y')=T(x,y)$ e si copia il valore. \textit{Problema}: buchi e
+        sovrapposizioni nell'output.
+  \item \textbf{Inverse}: per ogni pixel $(x',y')$ destinazione si calcola
+        $(x,y)=T^{-1}(x',y')$ e si campiona il colore. \textbf{Garantisce ogni
+        pixel riempito}. Poiché $(x,y)$ non è in genere intero, serve
+        \textbf{interpolazione} (nearest neighbor, bilineare, bicubica).
+\end{itemize}
+
+\subsection{Blending}
+
+\begin{itemize}
+  \item \textbf{Feathering}: media pesata (alpha blending) con transizione
+        graduale nelle zone sovrapposte. Può produrre ghosting se l'allineamento
+        è imperfetto.
+  \item \textbf{Pyramid blending}: si veda Capitolo~3.
+  \item \textbf{Poisson blending}: metodo nel dominio del gradiente che risolve
+        un'equazione di Poisson per preservare i gradienti nella regione incollata.
+\end{itemize}
+
+\section{Punti di fuga}
+
+Un \textbf{punto di fuga} è la proiezione di una direzione 3D. Le linee 3D
+parallele con la stessa direzione convergono in esso. Per due rette $l_1,l_2$
+in coordinate omogenee: $v=l_1\times l_2$.
+
+% =============================================================================
+\chapter{Riconoscimento}
+% =============================================================================
+
+\section{Compiti di riconoscimento}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Compito}&\textbf{Output}\\
+\midrule
+Image classification  & Un'etichetta di classe per l'intera immagine\\
+Semantic segmentation & Un'etichetta semantica per ogni pixel\\
+Object detection      & Bounding box ed etichette di classe\\
+Instance segmentation & Etichetta semantica e identità di istanza per i pixel degli oggetti\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Classificazione di immagini}
+
+Si usano approcci di ML con dataset etichettati (es.\ ImageNet). Il
+\textbf{transfer learning} consente il pre-training su un dataset grande e il
+fine-tuning su uno più piccolo.
+
+\textbf{Baseline nearest neighbor}: si assegna la classe dell'immagine di training
+più vicina. Le distanze pixel-wise sono però poco informative a causa di shift,
+illuminazione o deformazioni.
+
+\subsection{Bag-of-Words (BoW)}
+
+BoW raggiunge l'\textbf{invarianza spaziale} rappresentando immagini come
+istogrammi di feature locali, ignorando la loro disposizione spaziale.
+
+\textbf{Pipeline:}
+\begin{enumerate}
+  \item Rilevare e descrivere feature (es.\ SIFT).
+  \item Raggruppare feature con k-means per formare il vocabolario visivo.
+  \item Assegnare ogni descrittore alla parola visiva più vicina.
+  \item Rappresentare ogni immagine con l'istogramma di frequenza delle parole.
+  \item Addestrare un classificatore (es.\ SVM) sugli istogrammi.
+\end{enumerate}
+
+\section{Reti Neurali Convoluzionali (CNN)}
+
+Tre tipi principali di strati:
+\begin{itemize}
+  \item \textbf{Convoluzionali}: filtri apprendibili con \textbf{weight sharing}.
+        Equivarianti alla traslazione.
+  \item \textbf{Pooling}: riducono la risoluzione spaziale e aumentano il
+        \textbf{campo ricettivo}. Solitamente senza parametri apprendibili.
+  \item \textbf{FC}: classificazione finale.
+\end{itemize}
+
+\subsection{Output e funzione di loss}
+
+Funzione \textbf{softmax}:
+\[
+  p_c=\frac{e^{s_c}}{\sum_j e^{s_j}}
+\]
+Loss \textbf{cross-entropy}:
+\[
+  L=-\log p_y
+\]
+
+\subsection{Architetture principali}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Architettura}&\textbf{Idea chiave}\\
+\midrule
+LeNet-5            & Prima CNN per cifre\\
+AlexNet            & ImageNet breakthrough, ReLU, dropout, data augmentation\\
+VGG                & Stack profondi di conv.\ $3\times3$\\
+GoogLeNet/Inception& Moduli convoluzionali multi-scala, meno parametri\\
+ResNet             & Connessioni residuali per reti molto profonde\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{ResNet} mitiga il \textbf{vanishing gradient} con connessioni residuali
+che permettono al gradiente di bypassare gli strati.
+
+\section{Segmentazione semantica}
+
+Usa l'\textbf{architettura encoder-decoder}:
+\begin{itemize}
+  \item \textit{Encoder}: downsampling progressivo per feature di alto livello.
+  \item \textit{Decoder}: upsampling progressivo per produrre la mappa di
+        segmentazione.
+  \item \textbf{Skip connections}: combinano informazioni grossolane del decoder
+        con quelle fini dell'encoder.
+\end{itemize}
+
+\textbf{Metriche}: IoU (Jaccard Index) $=\frac{|P\cap G|}{|P\cup G|}$,
+accuratezza per pixel.
+
+\textbf{Fully Convolutional Networks (FCN):} sostituiscono i layer FC con
+operazioni convoluzionali producendo heatmap spaziali. Skip connections recuperano
+il dettaglio spaziale.
+
+\textbf{SegNet:} encoder-decoder con pooling indices per guidare l'unpooling.
+
+\textbf{Convoluzione dilatata:} aumenta il campo ricettivo senza aumentare i
+parametri e senza ridurre la risoluzione spaziale. Utile per predizione densa.
+
+\textbf{U-Net:} encoder-decoder con skip connections tra livelli corrispondenti.
+Le skip connections concatenano feature a bassa e alta risoluzione, migliorando
+la localizzazione. Standard de facto per segmentazione biomedicale.
+
+\section{Rilevamento di oggetti}
+
+\textbf{mAP} (mean Average Precision): metrica principale calcolata dalle curve
+precisione-recall, con soglia IoU $\geq0.5$ per i veri positivi.
+
+\subsection{Rilevatori a due stadi}
+
+\begin{itemize}
+  \item \textbf{R-CNN (2014)}: Selective Search per $\sim$2k proposte; CNN su
+        ciascuna indipendentemente. Lento.
+  \item \textbf{Fast R-CNN (2015)}: CNN sull'intera immagine; \textbf{RoI Pooling}
+        per feature a dimensione fissa da ogni proposta.
+  \item \textbf{Faster R-CNN (2015)}: \textbf{Region Proposal Network (RPN)}
+        apprendibile; predice objectness e raffinamenti rispetto ad
+        \textbf{anchor box} predefiniti. Molto più veloce.
+\end{itemize}
+
+\subsection{Rilevatori a stadio singolo}
+
+\textbf{YOLO} e \textbf{SSD} predicono bounding box e probabilità di classe
+direttamente in un singolo passaggio. Generalmente più veloci.
+
+\subsection{Feature Pyramid Networks (FPN)}
+
+Costruiscono una \textbf{piramide di feature multi-scala} con percorso top-down
+e connessioni laterali, permettendo il rilevamento a multiple scale.
+
+\subsection{Sliding window e HOG}
+
+Approccio classico: finestra scorrevole + HOG + classificatore SVM.
+Non-maximum suppression rimuove i rilevamenti duplicati. Semplice ma lento.
+
+\section{Estensioni}
+
+\textbf{Mask R-CNN:} estende Faster R-CNN con un ramo di segmentazione per ogni
+oggetto rilevato. Sostituisce RoI Pooling con \textbf{RoIAlign} per preservare
+l'allineamento spaziale.
+
+\begin{notebox}[RoIPooling vs.\ RoIAlign: Il problema della Quantizzazione]
+In Faster R-CNN, il \textbf{RoIPooling} esegue un arrotondamento (quantizzazione) sulle coordinate decimali della regione d'interesse per adattarle alla griglia discreta dei pixel della feature map. Questo errore di disallineamento spaziale ($\approx 0.5$ pixel) è trascurabile per le Bounding Box, ma distruttivo per le maschere di segmentazione al pixel.
+
+\textbf{Mask R-CNN} sostituisce RoIPooling con \textbf{RoIAlign}: evita qualsiasi quantizzazione e calcola il valore esatto delle caratteristiche in punti a coordinate decimali utilizzando l'\textbf{interpolazione bilineare} a partire da 4 punti di campionamento, preservando un perfetto allineamento spaziale.
+\end{notebox}
+
+\textbf{Segmentazione panoptica:} unifica segmentazione semantica (``stuff'':
+cielo, strada) e di istanze (``things'': auto, persone).
+
+% =============================================================================
+\chapter{Flusso ottico}
+% =============================================================================
+
+\section{Introduzione}
+
+\begin{defbox}[Flusso ottico]
+Il \textbf{flusso ottico} è il moto apparente di oggetti, superfici e bordi in
+una scena visiva causato dal moto relativo tra osservatore e scena.
+\`E un \textbf{campo vettoriale 2D} dove ogni vettore è uno spostamento di pixel
+tra fotogrammi successivi.
+\end{defbox}
+
+Visualizzazione tipica: codifica HSV, dove la tonalità indica la direzione e la
+luminosità la magnitudine.
+
+\begin{notebox}[Campo di moto vs.\ flusso ottico]
+\begin{itemize}
+  \item \textbf{Campo di moto}: vera proiezione 2D del moto 3D sul piano immagine.
+  \item \textbf{Flusso ottico}: moto apparente dei pattern di luminosità.
+        Possono differire: sfera Lambertiana ruotante sotto illuminazione fissa
+        $\to$ campo di moto ma flusso ottico nullo; sfera speculare ferma con
+        sorgente di luce mobile $\to$ flusso ottico ma campo di moto nullo.
+\end{itemize}
+\end{notebox}
+
+\begin{notebox}[Stereo vs.\ flusso ottico]
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Stereo}&\textbf{Flusso ottico}\\
+\midrule
+Due immagini allo stesso tempo & Due immagini in tempi diversi\\
+Ricerca 1D lungo epipolare & Stima moto 2D (tutte le direzioni)\\
+Usa geometria epipolare & Nessun vincolo epipolare diretto\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{notebox}
+
+\section{Il problema dell'apertura}
+
+Osservando un bordo in movimento in una piccola patch locale, solo il moto
+perpendicolare al bordo può essere determinato (\textbf{flusso normale}); la
+componente parallela rimane ambigua. Per evitare il problema si necessita di
+patch con gradienti in direzioni diverse (angoli, texture).
+
+\section{Stima del flusso ottico}
+
+\textbf{Assunzioni:}
+\begin{itemize}
+  \item \textbf{Costanza della luminosità}: $I(x(t),y(t),t)$ costante nel tempo.
+  \item \textbf{Piccolo moto}: i punti non si spostano troppo tra fotogrammi.
+  \item \textbf{Coerenza spaziale}: i punti vicini si muovono in modo simile.
+\end{itemize}
+
+\subsection{Equazione di costanza della luminosità}
+
+Dalla costanza della luminosità e dall'espansione di Taylor al primo ordine:
+\[
+  I_x u + I_y v + I_t = 0
+\]
+dove $I_x,I_y$ sono i gradienti spaziali e $I_t$ è il gradiente temporale.
+
+\begin{warnbox}[Problema sottodeterminato]
+Un'equazione per pixel, due incognite $(u,v)$: le soluzioni giacciono su una
+retta nello spazio $(u,v)$ $\Rightarrow$ problema sottodeterminato per singoli
+pixel (apertura problem).
+\end{warnbox}
+
+\section{Lucas-Kanade}
+
+Assume il flusso \textbf{costante} in una piccola patch $N\times N$.
+Sistema sovradeterminato $\mathbf{Ax}=\mathbf{b}$:
+\[
+  \underbrace{\begin{bmatrix}I_x(\mathbf{p}_1)&I_y(\mathbf{p}_1)\\\vdots&\vdots\\I_x(\mathbf{p}_{N^2})&I_y(\mathbf{p}_{N^2})\end{bmatrix}}_{\mathbf{A}}
+  \begin{bmatrix}u\\v\end{bmatrix}=
+  \underbrace{\begin{bmatrix}-I_t(\mathbf{p}_1)\\\vdots\\-I_t(\mathbf{p}_{N^2})\end{bmatrix}}_{\mathbf{b}}
+\]
+
+Soluzione minimi quadrati: $\mathbf{x}=(\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T\mathbf{b}$.
+
+La matrice $\mathbf{A}^T\mathbf{A}$ è la \textbf{matrice dei secondi momenti}
+(come in Harris):
+\[
+  \mathbf{A}^T\mathbf{A}=\sum_{\mathbf{p}}\begin{bmatrix}I_x^2&I_xI_y\\I_xI_y&I_y^2\end{bmatrix}
+\]
+
+\begin{propbox}[Quando funziona Lucas-Kanade?]
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Regione}&\textbf{Autovalori $\lambda_1,\lambda_2$}&\textbf{Flusso}\\
+\midrule
+Piatta    & Entrambi piccoli & Non affidabile\\
+Bordo     & Uno grande, uno piccolo & Ambiguo\\
+Angolo/texture & Entrambi grandi & Affidabile\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{propbox}
+
+\subsection{Gestione dei grandi moti: coarse-to-fine}
+
+L'assunzione di piccolo moto fallisce per spostamenti grandi. Si usa la strategia
+\textbf{coarse-to-fine} con piramidi Gaussiane:
+
+\begin{enumerate}
+  \item Costruire piramidi Gaussiane per entrambi i fotogrammi.
+  \item Stimare $(u,v)^{(0)}$ al livello più grossolano (grandi moti appaiono
+        piccoli).
+  \item Iterativamente: upsample del flusso $\to$ warp del fotogramma $t+1$
+        verso $t$ (inverse warping) $\to$ calcolo del residuo $\Delta(u,v)$
+        $\to$ accumulo.
+  \item Ripetere fino alla risoluzione piena.
+\end{enumerate}
+
+\section{Horn-Schunck}
+
+Assume il flusso \textbf{regolare} sull'intera immagine. Minimizza:
+\[
+  E(u,v)=
+  \underbrace{\iint(I_xu+I_yv+I_t)^2\,dxdy}_{\text{termine dati}}+
+  \lambda\underbrace{\iint(\|\nabla u\|^2+\|\nabla v\|^2)\,dxdy}_{\text{regolarizzazione}}
+\]
+
+\begin{warnbox}[Oversmoothing]
+La penalità quadratica penalizza troppo le discontinuità di flusso ai confini
+degli oggetti, causando \textbf{oversmoothing}. Si risolve con funzioni di loss
+\textbf{robuste} (es.\ penalità Student-t) meno sensibili ai grandi errori.
+\end{warnbox}
+
+\section{Deep learning per il flusso ottico}
+
+\textbf{FlowNet:} prima rete end-to-end supervisionata per flusso ottico.
+Architettura encoder-decoder su due fotogrammi consecutivi.
+\begin{itemize}
+  \item FlowNetSimple: stack dei due frame in input a una singola rete.
+  \item FlowNetCorr: due stream con correlation layer per il matching.
+\end{itemize}
+
+\textbf{End-Point Error (EPE):}
+$\mathrm{EPE}=\sqrt{(u-\hat{u})^2+(v-\hat{v})^2}$
+
+\textbf{FlowNet2:} impila più moduli FlowNet con warping tra i moduli.
+
+\textbf{PWC-Net} (\textbf{P}yramid, \textbf{W}arping, \textbf{C}ost volume):
+piramide di feature, stima coarse-to-fine, warping delle feature del secondo frame
+verso il primo, cost volume per il matching. Combina principi classici e DL.
+
+\textbf{Flusso non supervisionato:} apprendimento senza ground-truth tramite
+loss di ricostruzione fotometrica e di smoothness.
+
+% =============================================================================
+\chapter{Calibrazione della camera}
+% =============================================================================
+
+\section{Il modello della camera}
+
+Una camera esegue una \textbf{trasformazione proiettiva} che mappa il mondo 3D
+su un piano immagine 2D. La \textbf{calibrazione} è il processo di stima dei
+parametri di questa trasformazione.
+
+\subsection{Pinhole e lente sottile}
+
+Il modello più semplice è la \textbf{camera pinhole}: una piccola apertura lascia
+passare un solo raggio per punto, producendo un'immagine invertita senza sfocatura.
+
+\begin{notebox}[Trade-off del pinhole]
+Apertura piccola $\to$ meno blur ma effetti di diffrazione e poca luce
+(lunga esposizione). Formula approssimata per il diametro ideale:
+$d\approx2\sqrt{f\lambda}$.
+\end{notebox}
+
+\textbf{Legge della lente sottile:}
+\[
+  \frac{1}{i}+\frac{1}{o}=\frac{1}{f}
+\]
+dove $o$ è la distanza oggetto, $i$ la distanza immagine, $f$ la lunghezza focale.
+Solo gli oggetti a una profondità specifica sono a fuoco.
+
+\subsection{Proiezione prospettica}
+
+Relazione tra punto 3D $\mathbf{x}_c=(x_c,y_c,z_c)$ nel frame camera e
+proiezione 2D $(x_i,y_i)$:
+\[
+  x_i=f\frac{x_c}{z_c}, \qquad y_i=f\frac{y_c}{z_c}
+\]
+
+\subsection{Dal piano immagine ai pixel}
+
+\[
+  u=f_x\frac{x_c}{z_c}+o_x, \qquad v=f_y\frac{y_c}{z_c}+o_y
+\]
+dove $f_x=m_xf$, $f_y=m_yf$ (lunghezze focali in pixel) e $(o_x,o_y)$ è il
+punto principale.
+
+\subsection{La matrice della camera}
+
+\[
+  \tilde{\mathbf{u}}=\mathbf{P}\tilde{\mathbf{x}}_w=\mathbf{K}[\mathbf{R}|\mathbf{t}]\tilde{\mathbf{x}}_w
+\]
+
+\textbf{Matrice intrinseca} $\mathbf{K}$ (parametri intrinseci $f_x,f_y,o_x,o_y$):
+\[
+  \mathbf{K}=\begin{bmatrix}f_x&0&o_x\\0&f_y&o_y\\0&0&1\end{bmatrix}
+\]
+
+\textbf{Matrice estrinseca} $[\mathbf{R}|\mathbf{t}]$ (parametri estrinseci):
+\[
+  [\mathbf{R}|\mathbf{t}]=\begin{bmatrix}r_{11}&r_{12}&r_{13}&t_x\\r_{21}&r_{22}&r_{23}&t_y\\r_{31}&r_{32}&r_{33}&t_z\end{bmatrix}
+\]
+
+\begin{notebox}[Distorsione dell'obiettivo]
+Gli obiettivi reali introducono distorsioni radiali e tangenziali:
+\[
+  \begin{pmatrix}x'\\y'\end{pmatrix}=
+  (1+\kappa_1r^2+\kappa_2r^4)\begin{pmatrix}x\\y\end{pmatrix}+
+  \begin{pmatrix}2\kappa_3xy+\kappa_4(r^2+2x^2)\\2\kappa_4xy+\kappa_3(r^2+2y^2)\end{pmatrix}
+\]
+con $r^2=x^2+y^2$. Poi: $(u,v)=(f_x x'+c_x,\,f_y y'+c_y)$.
+\end{notebox}
+
+\section{Calibrazione della camera}
+
+Si stima $\mathbf{P}$ osservando un oggetto di geometria nota (es.\ scacchiera)
+con almeno 6 coppie di punti 3D noti e corrispondenti punti immagine (11 incognite
+perché $\mathbf{P}$ è definita a meno di scala).
+
+\begin{defbox}[Espansione delle equazioni DLT per singolo punto]
+Ogni corrispondenza tra punto 3D del mondo $\mathbf{X}_i = (x_i, y_i, z_i, 1)^T$ e pixel 2D $\mathbf{u}_i = (u_i, v_i, 1)^T$ soddisfa $\mathbf{u}_i \sim \mathbf{P} \mathbf{X}_i$. Eliminando lo scalare omogeneo tramite divisione per la terza riga, si ricavano due equazioni lineari indipendenti per ciascun punto:
+\[
+  \begin{aligned}
+    u_i (p_{31} x_i + p_{32} y_i + p_{33} z_i + p_{34}) - (p_{11} x_i + p_{12} y_i + p_{13} z_i + p_{14}) &= 0 \\
+    v_i (p_{31} x_i + p_{32} y_i + p_{33} z_i + p_{34}) - (p_{21} x_i + p_{22} y_i + p_{23} z_i + p_{24}) &= 0
+  \end{aligned}
+\]
+Impilando queste due righe per $N \ge 6$ punti, si compone la matrice dei dati $\mathbf{A}_{2N \times 12}$ per il sistema lineare omogeneo $\mathbf{A}\mathbf{p} = \mathbf{0}$.
+\end{defbox}
+
+Ogni corrispondenza dà 2 equazioni. Sistema omogeneo $\mathbf{Ap}=\mathbf{0}$:
+minimizzare $\|\mathbf{Ap}\|^2$ soggetto a $\|\mathbf{p}\|=1$.
+Soluzione: autovettore di $\mathbf{A}^T\mathbf{A}$ per il minimo autovalore.
+
+\subsection{Estrazione dei parametri}
+
+Tramite \textbf{fattorizzazione RQ}:
+\[
+  \mathbf{P}=[\mathbf{M}|\mathbf{p}_4]\implies
+  \mathbf{M}=\mathbf{KR},\;\mathbf{p}_4=\mathbf{Kt}\implies
+  \mathbf{K}=\mathrm{RQ}(\mathbf{M}),\;
+  \mathbf{R}=\mathbf{K}^{-1}\mathbf{M},\;
+  \mathbf{t}=\mathbf{K}^{-1}\mathbf{p}_4
+\]
+
+\section{Punti di fuga}
+
+Un \textbf{punto di fuga} è la proiezione di una direzione 3D. Le linee 3D
+parallele convergono in esso. Per due rette $l_1,l_2$: $v=l_1\times l_2$.
+
+\section{Visione stereo}
+
+Usa \textbf{due o più camere} per inferire profondità tramite triangolazione.
+
+\subsection{Profondità dalla disparità}
+
+Per stereo rettificato (camere parallele, baseline $b$):
+\[
+  z=\frac{b\,f_x}{d}=\frac{b\,f_x}{u_l-u_r}
+\]
+Alta disparità $d$ $\to$ punto vicino; bassa $\to$ lontano.
+
+\subsection{Matching stereo}
+
+\textbf{Matching a finestra:}
+\begin{enumerate}
+  \item Patch intorno al pixel in $I_l$.
+  \item Confronto con patch lungo la stessa scanline in $I_r$.
+  \item Best match con SSD/SAD/NCC; $d=u_l-u_r$.
+\end{enumerate}
+
+\begin{notebox}[Trade-off della finestra]
+Finestra piccola: cattura dettagli fini, mappa rumorosa.
+Finestra grande: robusta al rumore, sfoca le discontinuità.
+Casi problematici: regioni senza texture, pattern ripetuti, superfici
+speculari, discontinuità di profondità.
+\end{notebox}
+
+\subsection{Stereo come minimizzazione di energia}
+
+\[
+  E(d)=\underbrace{\sum_{(x,y)}E_d(x,y,d(x,y))}_{\text{dati}}+
+       \lambda\underbrace{\sum_{(p,q)\in\mathcal{E}}E_s(d_p,d_q)}_{\text{smoothness}}
+\]
+
+Termini di smoothness: Potts ($\mathbf{1}[d_p\neq d_q]$) o L1 ($|d_p-d_q|$).
+Ottimizzazione: programmazione dinamica per scanline (ma streaking) o graph cuts
+(globale).
+
+\section{Stereo attivo e luce strutturata}
+
+Un proiettore proietta pattern di luce strutturata sulla scena, creando texture
+artificiale e semplificando le corrispondenze. Base di sensori come Kinect e
+Apple TrueDepth.
+
+% =============================================================================
+\chapter{Geometria epipolare}
+% =============================================================================
+
+\section{Introduzione}
+
+\begin{defbox}[Geometria epipolare]
+La \textbf{geometria epipolare} mette in relazione le proiezioni 2D
+$(\mathbf{x},\mathbf{x}')$ di un punto 3D $\mathbf{X}$ da due viste diverse,
+fornendo un vincolo geometrico per trovare corrispondenze e pose relative.
+\end{defbox}
+
+La geometria multi-vista relaziona tre componenti: moto della camera,
+corrispondenze tra immagini e struttura 3D.
+\begin{itemize}
+  \item \textbf{Calibrazione / pose estimation}: da corrispondenze 3D-2D note.
+  \item \textbf{Triangolazione}: da camera note e corrispondenze 2D-2D.
+  \item \textbf{Structure from Motion / SLAM}: stima sia moto che struttura.
+\end{itemize}
+
+\textbf{Back-projection:} da una singola immagine, un pixel non determina un
+punto 3D unico ma un raggio retroproiettato. Serve una seconda vista.
+
+\textbf{Definizioni:}
+\begin{itemize}
+  \item \textbf{Baseline}: segmento tra i centri $\mathbf{O},\mathbf{O}'$.
+  \item \textbf{Piano epipolare}: piano definito da $\mathbf{X},\mathbf{O},\mathbf{O}'$.
+  \item \textbf{Epipoli} $(\mathbf{e},\mathbf{e}')$: intersezione della baseline
+        con i piani immagine. $\mathbf{e}$ = proiezione di $\mathbf{O}'$,
+        $\mathbf{e}'$ = proiezione di $\mathbf{O}$.
+  \item \textbf{Linee epipolari} $(\mathbf{l},\mathbf{l}')$: intersezione del
+        piano epipolare con i piani immagine.
+\end{itemize}
+
+\textbf{Vincolo epipolare:} $\mathbf{x}'$ deve giacere su $\mathbf{l}'$
+$\Rightarrow$ riduce la ricerca di corrispondenze da 2D a 1D.
+
+\section{La matrice essenziale}
+
+\begin{defbox}[Matrice essenziale]
+$\mathbf{E}\in\R^{3\times3}$ codifica il vincolo epipolare per camere
+\textbf{calibrate} ($\mathbf{K}$ nota):
+\[
+  \boxed{\mathbf{x}'^T\mathbf{E}\mathbf{x}=0}
+\]
+Linee: $\mathbf{l}'=\mathbf{E}\mathbf{x}$, $\mathbf{l}=\mathbf{E}^T\mathbf{x}'$.
+Epipoli: $\mathbf{Ee}=\mathbf{0}$, $\mathbf{e}'^T\mathbf{E}=\mathbf{0}$.
+\end{defbox}
+
+\subsection{Derivazione}
+
+Con $\mathbf{x}=\mathbf{K}^{-1}\mathbf{p}$, $\mathbf{x}'=\mathbf{R}(\mathbf{x}-\mathbf{t})$.
+La coplanarità di $\mathbf{x}$, $\mathbf{t}$, $\mathbf{x}-\mathbf{t}$ implica:
+\[
+  (\mathbf{x}-\mathbf{t})^T(\mathbf{t}\times\mathbf{x})=0
+  \implies \mathbf{x}'^T\mathbf{R}[\mathbf{t}]_\times\mathbf{x}=0
+  \implies \mathbf{E}=\mathbf{R}[\mathbf{t}]_\times
+\]
+
+\begin{propbox}[Proprietà di $\mathbf{E}$]
+\begin{itemize}
+  \item Opera su coordinate normalizzate.
+  \item Rango 2, $\det(\mathbf{E})=0$.
+  \item 5 DOF (3 per $\mathbf{R}$, 2 per direzione di $\mathbf{t}$).
+  \item 2 valori singolari non-zero uguali.
+\end{itemize}
+\end{propbox}
+
+\begin{notebox}[E vs.\ H]
+$\mathbf{E}$ mappa un punto in una linea ($\mathbf{l}'=\mathbf{Ex}$);
+$\mathbf{H}$ mappa un punto in un punto ($\mathbf{x}'=\mathbf{Hx}$).
+\end{notebox}
+
+\section{La matrice fondamentale}
+
+\begin{defbox}[Matrice fondamentale]
+$\mathbf{F}\in\R^{3\times3}$ è la generalizzazione di $\mathbf{E}$ per camere
+\textbf{non calibrate} ($\mathbf{K}$ ignota); opera direttamente su pixel:
+\[
+  \mathbf{p}'^T\mathbf{F}\mathbf{p}=0, \qquad
+  \mathbf{F}=\mathbf{K}'^{-T}\mathbf{E}\mathbf{K}^{-1}
+\]
+\end{defbox}
+
+\begin{propbox}[Derivazione algebrica di F da E]
+Siano $\mathbf{p}, \mathbf{p}'$ le coordinate pixel e $\mathbf{x}, \mathbf{x}'$ le coordinate normalizzate della camera. La matrice intrinseca $\mathbf{K}$ lega i due domini:
+\[
+  \mathbf{p} = \mathbf{K} \mathbf{x} \implies \mathbf{x} = \mathbf{K}^{-1} \mathbf{p} \quad \text{e} \quad \mathbf{x}' = \mathbf{K}'^{-1} \mathbf{p}'
+\]
+Sostituendo nell'equazione del vincolo epipolare della matrice essenziale $\mathbf{x}'^T \mathbf{E} \mathbf{x} = 0$:
+\[
+  (\mathbf{K}'^{-1} \mathbf{p}')^T \mathbf{E} (\mathbf{K}^{-1} \mathbf{p}) = 0 \implies \mathbf{p}'^T \underbrace{(\mathbf{K}'^{-T} \mathbf{E} \mathbf{K}^{-1})}_{\mathbf{F}} \mathbf{p} = 0
+\]
+Otteniamo la definizione formale della Matrice Fondamentale:
+\[
+  \mathbf{F} = \mathbf{K}'^{-T} \mathbf{E} \mathbf{K}^{-1} = \mathbf{K}'^{-T} \mathbf{R} [\mathbf{t}]_\times \mathbf{K}^{-1}
+\]
+\end{propbox}
+
+\begin{propbox}[Proprietà di $\mathbf{F}$]
+\begin{itemize}
+  \item Opera su coordinate pixel.
+  \item Rango 2, $\det(\mathbf{F})=0$.
+  \item 7 DOF.
+  \item Fornisce una ``calibrazione debole''.
+  \item $\mathbf{l}'=\mathbf{Fp}$.
+\end{itemize}
+\end{propbox}
+
+\begin{notebox}[F vs.\ E vs.\ H]
+$\mathbf{H}$: rango 3, 8 DOF. $\mathbf{F}$: rango 2, 7 DOF.
+$\mathbf{E}$: rango 2, 5 DOF. Se $\mathbf{K},\mathbf{K}'$ note:
+$\mathbf{E}=\mathbf{K}'^T\mathbf{F}\mathbf{K}$.
+\end{notebox}
+
+\section{Stima della matrice fondamentale}
+
+\subsection{Algoritmo a 8 punti}
+
+Ogni corrispondenza dà un'equazione lineare nelle 9 incognite di $\mathbf{F}$.
+Con $\geq8$ corrispondenze: sistema $\mathbf{Af}=\mathbf{0}$
+$\Rightarrow$ soluzione SVD (autovettore di $\mathbf{A}^T\mathbf{A}$
+per il minimo autovalore).
+
+\begin{warnbox}[Instabilità numerica]
+Le colonne di $\mathbf{A}$ hanno magnitudini molto diverse
+(es.\ $p_xp'_x$ vs.\ costante 1) $\Rightarrow$ cattivo condizionamento.
+\end{warnbox}
+
+\subsection{Algoritmo a 8 punti normalizzato}
+
+\begin{enumerate}
+  \item \textbf{Normalizzare}: traslare i punti al centroide; scalare a distanza
+        media $\sqrt{2}$. Matrici: $\mathbf{T}$, $\mathbf{T}'$.
+  \item \textbf{Stimare $\hat{\mathbf{F}}$} sui punti normalizzati (algoritmo
+        a 8 punti base).
+  \item \textbf{Imporre rango 2}: SVD di $\hat{\mathbf{F}}=\mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^T$;
+        imporre a zero il minimo valore singolare; ricalcolare $\hat{\mathbf{F}}'$.
+  \item \textbf{Denormalizzare}: $\mathbf{F}=\mathbf{T}'^T\hat{\mathbf{F}}'\mathbf{T}$.
+\end{enumerate}
+
+In pratica si combina con \textbf{RANSAC} per gestire gli outlier.
+
+\section{Triangolazione}
+
+Dati $\mathbf{P},\mathbf{P}'$ e corrispondenze $(\mathbf{x},\mathbf{x}')$:
+
+\[
+  \mathbf{x}\times(\mathbf{PX})=\mathbf{0}, \qquad
+  \mathbf{x}'\times(\mathbf{P'X})=\mathbf{0}
+\]
+
+Ogni prodotto vettoriale dà 2 equazioni in $\mathbf{X}\in\R^4$.
+Sistema $4\times3$ $\mathbf{AX}=\mathbf{0}$ risolto per SVD.
+
+\begin{warnbox}[Il problema del rumore]
+I raggi retroproiettati non si intersecano perfettamente a causa del rumore.
+Il metodo SVD minimizza un errore algebrico. Il \textbf{bundle adjustment}
+minimizza l'errore di riproiezione (non lineare, più accurato).
+\end{warnbox}
+
+\section{Rettificazione stereo e DSI}
+
+La \textbf{rettificazione stereo} deforma le due immagini per allineare le linee
+epipolari orizzontalmente, riducendo il matching da 2D a 1D.
+
+La \textbf{Disparity Space Image (DSI)} memorizza i costi di matching
+$C(i,j)$ per ogni coppia di pixel corrispondenti nella stessa scanline.
+La \textbf{programmazione dinamica} trova il percorso ottimale:
+\[
+  C(i,j)=\min\begin{cases}C(i-1,j-1)+D(i,j)\quad\text{(match)}\\C(i-1,j)+c_{\mathrm{occ}}\quad\text{(occlusione da destra)}\\C(i,j-1)+c_{\mathrm{occ}}\quad\text{(occlusione da sinistra)}\end{cases}
+\]
+Trattando le scanline indipendentemente si possono generare artefatti di striatura.
+
+\section{Da $\mathbf{F}$ a moto della camera}
+
+Se $\mathbf{K},\mathbf{K}'$ sono note, si recupera $\mathbf{E}=\mathbf{K}'^T\mathbf{FK}$
+e si decompone: 4 soluzioni possibili per $(\mathbf{R},\mathbf{t})$.
+La corretta si determina verificando che i punti 3D siano davanti a entrambe le
+camere.
+
+Per 3 viste: \textbf{tensore trifocale}; per 4 viste: \textbf{tensore quadrifocale}.
+
+% =============================================================================
+\chapter{Vision Transformers e Architetture Avanzate}
+% =============================================================================
+
+\section{Dal NLP alla Visione: Motivazione}
+
+I \textbf{Transformers} sono stati introdotti originariamente per il Natural Language
+Processing (NLP) nel paper \emph{"Attention Is All You Need"} (Vaswani et al., 2017).
+La loro estensione alla visione artificiale deriva dalla capacità del meccanismo di
+\textbf{Self-Attention} di modellare le interazioni tra coppie di elementi in una
+sequenza in un'unica operazione globale, eliminando il bias di località tipico delle CNN.
+
+% -- 12.2 Self-Attention -------------------------------------------------------
+\section{Meccanismo di Self-Attention}
+
+Dato un insieme di vettori di input $X \in \R^{n \times d_{model}}$, il modello impara
+tre proiezioni lineari tramite matrici di peso $W_Q, W_K \in \R^{d_{model} \times d_k}$
+e $W_V \in \R^{d_{model} \times d_v}$:
+\[
+  Q = X W_Q \quad (\text{Queries}), \qquad
+  K = X W_K \quad (\text{Keys}), \qquad
+  V = X W_V \quad (\text{Values})
+\]
+
+\begin{defbox}[Scaled Dot-Product Attention]
+La risposta di attenzione viene calcolata moltiplicando la matrice delle Queries con
+la trasposta delle Keys, applicando un fattore di scala e la funzione softmax sui
+Values:
+\[
+  \mathrm{Attention}(Q, K, V) = \mathrm{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
+\]
+\end{defbox}
+
+\begin{notebox}[Perché il fattore di scala $\frac{1}{\sqrt{d_k}}$?]
+Per valori elevati della dimensione $d_k$, il prodotto scalare $Q K^T$ tende ad
+assumere valori numericamente grandi. Questo spinge la funzione $\mathrm{softmax}$ in
+regioni a gradiente estremamente piccolo (saturazione), provocando il fenomeno del
+\emph{vanishing gradient} durante l'addestramento. La divisione per $\sqrt{d_k}$
+stabilizza i gradienti mantenendo la varianza dei prodotti scalari vicina a $1$.
+\end{notebox}
+
+\subsection{Multi-Head Attention (MHA)}
+
+Invece di calcolare un'unica funzione di attenzione, la \textbf{Multi-Head Attention}
+esegue $h$ meccanismi di attenzione in parallelo. Ogni "testa" (head) proietta $Q, K, V$
+in sottospazi di rappresentazione differenti, consentendo al modello di focalizzarsi
+contemporaneamente su relazioni spaziali o semantiche diverse:
+\[
+  \mathrm{MultiHead}(Q, K, V) = \mathrm{Concat}(\text{head}_1, \ldots, \text{head}_h) W^O
+\]
+dove $\text{head}_i = \mathrm{Attention}(Q W_i^Q, K W_i^K, V W_i^V)$ e $W^O \in \R^{h d_v \times d_{model}}$.
+
+\subsection{Positional Encoding}
+
+La Self-Attention è \textbf{permutation-equivariant}: è del tutto indifferente
+all'ordine d'ingresso dei token. Poiché nella visione artificiale la posizione
+geometrica dei pixel è fondamentale, occorre iniettare l'informazione spaziale
+sommando agli embedding di input un vettore di \textbf{Positional Encoding} (funzioni
+sinusoidali fisse o embedding posizionali 1D/2D apprendibili).
+
+\subsection{Struttura del Transformer Encoder Block}
+
+Ogni blocco dell'encoder applica in sequenza:
+\begin{enumerate}
+  \item Multi-Head Self-Attention con connessione residuale e Layer Normalization.
+  \item Feed-Forward Network (FFN) composta da due strati lineari con non-linearità
+        (es.\ GELU o ReLU), integrata da connessione residuale e Layer Normalization.
+\end{enumerate}
+
+% -- 12.3 Vision Transformer (ViT) ---------------------------------------------
+\section{Vision Transformer (ViT)}
+
+Il \textbf{Vision Transformer} (Dosovitskiy et al., 2021) applica l'architettura del
+Transformer Encoder direttamente a sequenze di patch d'immagine.
+
+\begin{defbox}[Pipeline di ViT]
+\begin{enumerate}
+  \item \textbf{Patch Extraction}: un'immagine $H \times W \times C$ viene divisa in
+        $N = \frac{HW}{P^2}$ patch non sovrapposti di dimensione $P \times P$ (es.\ $16 \times 16$).
+  \item \textbf{Linear Embedding}: ogni patch viene appiattito in un vettore $P^2 C$ e
+        proiettato linearmente in una dimensione $d_{model}$.
+  \item \textbf{Class Token ([CLS])}: un token apprendibile $[CLS]$ viene aggiunto in
+        testa alla sequenza; la sua rappresentazione finale all'uscita dell'encoder
+        verrà usata per la classificazione globale.
+  \item \textbf{Positional Encoding}: si sommano vettori posizionali 1D apprendibili.
+  \item \textbf{Transformer Encoder}: la sequenza passa attraverso $L$ blocchi
+        residuali MHA + FFN.
+  \item \textbf{Classification Head}: un perceptron multistrato (MLP) viene applicato
+        all'output del token $[CLS]$.
+\end{enumerate}
+\end{defbox}
+
+\begin{warnbox}[CNN vs.\ ViT: Inductive Biases]
+\begin{itemize}
+  \item \textbf{CNN}: possiedono forti \emph{inductive biases} specifici per le immagini,
+        ovvero la \textbf{Località} (pixel vicini sono correlati) e l'\textbf{Equivarianza alla Traslazione}
+        (stessi filtri applicati ovunque). Imparano molto velocemente anche su piccoli dataset.
+  \item \textbf{ViT}: hanno \emph{inductive biases} visivi molto \textbf{deboli}. Non assumono
+        innatamente la geometria 2D dell'immagine.
+  \item \textbf{Conseguenza}: i ViT richiedono pre-addestramento su dataset di scala
+        massiva (es.\ ImageNet-21k o JFT-300M) per apprendere da soli le relazioni spaziali.
+        Su grande scala superano nettamente le CNN modellando interazioni globali $O(N^2)$.
+\end{itemize}
+\end{warnbox}
+
+% -- 12.4 Swin Transformer -----------------------------------------------------
+\section{Swin Transformer: Shifted-Window Attention}
+
+Il ViT classico calcola l'attenzione globale tra tutti i patch, con complessità
+quadratica $O(N^2)$ rispetto alla risoluzione. Lo \textbf{Swin Transformer} (Liu et al.,
+2021) introduce l'attenzione a finestre traslate per ottenere complessità lineare $O(N)$
+e mappe di feature gerarchiche multi-scala.
+
+\begin{propbox}[Meccanismi di Swin Transformer]
+\begin{itemize}
+  \item \textbf{Local Windows}: l'immagine viene divisa in finestre non sovrapposte
+        $M \times M$ (es.\ $7 \times 7$ patch). La Self-Attention viene calcolata
+        esclusivamente all'interno di ciascuna finestra $\Rightarrow$ Complessità $O(N)$.
+  \item \textbf{Shifted Window Attention}: tra strati consecutivi, le finestre
+        vengono traslate di $(\lfloor M/2 \rfloor, \lfloor M/2 \rfloor)$ pixel. Questo
+        consente connessioni \emph{cross-window} tra patch adiacenti appartenenti a
+        finestre diverse, mantenendo la complessità computazionale lineare.
+  \item \textbf{Hierarchical Feature Maps}: accorpa patch adiacenti nei layer profondi
+        costruendo una piramide di feature simile alle CNN, ideale per detection e segmentazione.
+\end{itemize}
+\end{propbox}
+
+% -- 12.5 DETR -----------------------------------------------------------------
+\section{DETR: End-to-End Object Detection with Transformers}
+
+\textbf{DETR} (Carion et al., 2020) riformula l'Object Detection come un problema di
+predizione diretta d'insieme (*set-prediction*), eliminando componenti euristiche
+manuali come le \emph{anchor boxes} e la \emph{Non-Maximum Suppression (NMS)}.
+
+\begin{defbox}[Architettura di DETR]
+\begin{enumerate}
+  \item \textbf{CNN Backbone}: estrae una mappa di caratteristiche dall'immagine
+        (es.\ $H/32 \times W/32 \times C$).
+  \item \textbf{Transformer Encoder}: elabora le feature spaziali appiattite insieme
+        a positional encodings.
+  \item \textbf{Transformer Decoder}: riceve $N_q$ \textbf{Object Queries} apprendibili
+        (vettori posizionali trasformati che "interrogano" la scena) ed esegue
+        Cross-Attention con l'output dell'encoder.
+  \item \textbf{Prediction Heads}: MLP lineari mappano ciascuna query in una bounding
+        box $(x, y, w, h)$ e una classe (incluso la classe "no object").
+  \item \textbf{Bipartite Matching Loss}: usa l'\textbf{algoritmo Ungherese} durante
+        l'addestramento per assegnare in modo unico ogni predizione a un oggetto
+        ground-truth.
+\end{enumerate}
+\end{defbox}
+
+% =============================================================================
+\chapter{Modelli Generativi Profondi: GANs e Diffusione}
+% =============================================================================
+
+\section{Formulazione generale}
+
+I modelli generativi profondi apprendono la distribuzione di probabilità sottostante
+$p_{\text{data}}(x)$ a partire da dati ad alta dimensione (immagini) per campionare nuove
+istanze sintetiche $x \sim p_{\theta}(x)$.
+
+% -- 13.1 GANs -----------------------------------------------------------------
+\section{Generative Adversarial Networks (GANs)}
+
+Un'architettura \textbf{GAN} (Goodfellow et al., 2014) è composta da due reti neurali
+addestrate in un gioco minimax avversario a due giocatori:
+\begin{itemize}
+  \item \textbf{Generatore ($G$)}: mappa un vettore latente stocastico $z \sim p_z$ in un
+        campione sintetico $G(z)$.
+  \item \textbf{Discriminatore ($D$)}: calcola la probabilità $D(x) \in [0, 1]$ che un
+        campione provenga dai dati reali $p_{\text{data}}$ piuttosto che da $G$.
+\end{itemize}
+
+\begin{defbox}[Funzione Obiettivo Minimax delle GAN]
+\[
+  \min_G \max_D V(D, G) = \mathbb{E}_{x \sim p_{\text{data}}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
+\]
+All'equilibrio di Nash, $G$ ricostruisce esattamente la distribuzione $p_{\text{data}}$ e $D(x) \equiv 1/2$.
+\end{defbox}
+
+\begin{warnbox}[Problematiche di Addestramento e Fallimenti]
+\begin{itemize}
+  \item \textbf{Mode Collapse}: $G$ impara a produrre solo una piccola sotto-varietà
+        di immagini reali che ingannano $D$, ignorando la diversità del dataset.
+  \item \textbf{Vanishing Gradients}: se $D$ diventa troppo forte rispetto a $G$, i
+        gradienti per $G$ crollano a zero.
+  \item \textbf{Wasserstein GAN (WGAN)}: risolve le instabilità sostituendo la
+        divergenza JS con la \emph{Distanza di Wasserstein-1} (Earth Mover's Distance) e
+        imponendo il vincolo di $1$-Lipschitzianità a $D$.
+\end{itemize}
+\end{warnbox}
+
+% -- 13.2 DDPM Diffusion Models ------------------------------------------------
+\section{Denoising Diffusion Probabilistic Models (DDPM)}
+
+I modelli di diffusione (Ho et al., 2020) definiscono un processo di generazione basato
+su due catene stocastiche di Markov.
+
+\subsection{Forward Process (Noising)}
+
+Un processo fisso (non apprendibile) che corrompe progressivamente un'immagine reale $x_0$
+aggiungendo rumore Gaussiano isotropo in $T$ passi temporali:
+\[
+  q(x_t \mid x_{t-1}) = \mathcal{N}\left(x_t; \sqrt{1 - \beta_t} x_{t-1}, \beta_t I\right)
+\]
+dove $\{\beta_t \in (0, 1)\}_{t=1}^T$ è una schedula di varianza prefissata.
+
+\begin{propbox}[Reparameterization Trick nei DDPM]
+Definendo $\alpha_t = 1 - \beta_t$ e $\bar{\alpha}_t = \prod_{i=1}^t \alpha_i$, è
+possibile campionare direttamente l'immagine rumorosa $x_t$ al generico passo $t$ a partire
+da $x_0$ in forma chiusa senza iterare tutti i passi precedenti:
+\[
+  x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon, \qquad \epsilon \sim \mathcal{N}(0, I)
+\]
+\end{propbox}
+
+\subsection{Reverse Process (Denoising)}
+
+Il processo inverso è una catena di Markov apprendibile parametrizzata da una rete
+neurale $\epsilon_\theta(x_t, t)$ (solitamente un'architettura \textbf{U-Net}):
+\[
+  p_\theta(x_{t-1} \mid x_t) = \mathcal{N}\left(x_{t-1}; \mu_\theta(x_t, t), \Sigma_\theta(x_t, t)\right)
+\]
+
+\begin{defbox}[Loss Semplificata di DDPM]
+Invece di prevedere l'immagine pulita, la rete viene addestrata a **prevedere il rumore
+$\epsilon$** aggiunto al passo $t$:
+\[
+  \mathcal{L}_{\text{simple}} = \mathbb{E}_{x_0, t, \epsilon} \left[ \left\| \epsilon - \epsilon_\theta(x_t, t) \right\|^2 \right]
+\]
+\end{defbox}
+\begin{itemize}
+  \item \textbf{Diffusione}: addestramento stabile (nessun gioco avversario), evita il
+        mode collapse e garantisce un'altissima diversità dei campioni.
+  \item \textbf{Svantaggio}: campionamento iterativo lento ($T \approx 1000$ passaggi U-Net
+        all'inferenza). Mitigato da metodi come \textbf{DDIM} ( deterministic sampling a $\sim 50$
+        passi) e modelli di consistenza.
+\end{itemize}
+\end{notebox}
+
+% =============================================================================
+\chapter{Deep Learning per Video e Dati Temporali}
+% =============================================================================
+
+\section{Il Video come Segnale Spazio-Temporale}
+
+Un video è un segnale 3D rappresentato da un tensore di dimensione $T \times H \times W \times C$,
+dove $T$ è la dimensione temporale (sequenza di frame) e $H \times W$ sono le coordinate spaziali.
+
+\section{Architetture per Video Recognition}
+
+\begin{itemize}
+  \item \textbf{Single-Frame Models}: applicano una CNN 2D indipendentemente su ogni
+        frame e aggregano le predizioni tramite pooling (ignore l'ordine temporale).
+  \item \textbf{2D CNN + RNN / LSTM}: estraggono feature da ciascun frame con una CNN
+        2D e passano la sequenza a una rete ricorsiva per modellare le dipendenze temporali.
+  \item \textbf{3D CNNs (es.\ C3D)}: estendono la convoluzione 2D aggiungendo una dimensione
+        temporale ai kernel ($T_k \times K \times K$), elaborando congiuntamente spazio e tempo.
+  \item \textbf{Two-Stream Networks}: dividono l'analisi in due rami separati:
+        \begin{enumerate}
+          \item *Spatial Stream*: elabora i frame RGB (apparenza).
+          \item *Temporal Stream*: elabora stack di campi di \textbf{Optical Flow} (movimento).
+        \end{enumerate}
+\end{itemize}
+
+% -- 14.1 TimeSformer ---------------------------------------------------------
+\section{TimeSformer: Video Vision Transformer}
+
+Estende il Vision Transformer al video trattando regioni spazio-temporali 3D come
+\emph{tubelets}. Per evitare l'esplosione della memoria dovuta all'attenzione congiunta
+spazio-tempo $O((T \times N)^2)$, introduce la \textbf{Divided Space-Time Attention}:
+
+\begin{defbox}[Divided Space-Time Attention]
+All'interno di ciascun blocco Transformer vengono applicati due meccanismi di attenzione
+in sequenza:
+\begin{enumerate}
+  \item \textbf{Temporal Attention}: ogni patch interagisce esclusivamente con i patch
+        situati nella stessa posizione spaziale attraverso tutti gli altri frame della sequenza.
+  \item \textbf{Spatial Attention}: ogni patch interagisce con tutti gli altri patch
+        all'interno dello stesso frame.
+\end{enumerate}
+Questo abbatte drasticamente i costi computazionali mantenendo la capacità di modellare
+la dinamica del movimento.
+\end{defbox}
+
+% =============================================================================
+\chapter{Vision-Language Models (VLMs)}
+% =============================================================================
+
+\section{Motivazione e Strategie di Fusione}
+
+I modelli unimodali estraggono feature spaziali ma mancano di ragionamento semantico
+linguistico. I \textbf{Vision-Language Models (VLMs)} rappresentano congiuntamente immagini
+e testo per compiti quali \emph{Visual Question Answering (VQA)}, \emph{Image Captioning}
+e \emph{Zero-Shot Recognition}.
+
+\begin{propbox}[Strategie di Fusione Multimodale]
+\begin{itemize}
+  \item \textbf{Early Fusion}: concatenazione dei token visivi e testuali al primo strato di
+        un unico Transformer condiviso.
+  \item \textbf{Intermediate Fusion}: encoder dedicati separati le cui feature intermedie
+        vengono fuse a metà rete tramite moduli di Cross-Attention (es.\ Flamingo).
+  \item \textbf{Late Fusion}: elaborazione del tutto indipendente fino agli embedding
+        finali, confrontati nello spazio latente (es.\ CLIP).
+\end{itemize}
+\end{propbox}
+
+\begin{defbox}[Modality Gap]
+Il \textbf{Modality Gap} indica la divergenza geometrica tra lo spazio delle feature visive
+e quello delle feature testuali. Un VLM impara una proiezione condivisa in cui coppie
+immagine-testo corrispondenti si trovino vicine nello spazio latente.
+\end{defbox}
+
+% -- 15.1 CLIP -----------------------------------------------------------------
+\section{CLIP: Contrastive Language-Image Pre-training}
+
+\textbf{CLIP} (Radford et al., 2021) è un VLM a Late Fusion addestrato su $400$ milioni di
+coppie immagine-testo pubblicamente disponibili sul web tramite \textbf{Apprendimento Contrastivo}.
+
+\begin{defbox}[InfoNCE Loss in CLIP]
+Dato un batch di $N$ coppie (Immagine $I_k$, Testo $T_k$), si calcola la matrice di
+similarità del coseno $N \times N$. La loss massimizza i valori lungo la diagonale
+(coppie positive) e minimizza gli elementi fuori diagonale:
+\[
+  \mathcal{L}_{I \to T} = -\sum_{k=1}^N \log \frac{\exp(I_k \cdot T_k / \tau)}{\sum_{j=1}^N \exp(I_k \cdot T_j / \tau)}, \qquad
+  \mathcal{L}_{\text{CLIP}} = \frac{1}{2}\left(\mathcal{L}_{I \to T} + \mathcal{L}_{T \to I}\right)
+\]
+dove $\tau$ è un parametro di temperatura apprendibile.
+\end{defbox}
+
+\subsection{Zero-Shot Transfer}
+
+Durante l'inferenza, non occorre alcun addestramento specifico. I nomi delle classi
+vengono trasformati in prompt testuali tramite *prompt engineering* (es.\ *"a photo of a \{class\}"*).
+L'immagine di input viene classificata assegnandole la classe del prompt testuale il cui
+embedding presenta la \textbf{massima similarità del coseno} con l'embedding dell'immagine.
+
+% =============================================================================
+\chapter{Medical Imaging e Segmentazione Avanzata}
+% =============================================================================
+
+\section{Il Medical Data Gap}
+
+A differenza dei dataset visivi naturali (ImageNet), l'imaging medico presenta forti
+limitazioni: volumetria ridotta, annotazioni estremamente costose poiché richiedono
+medici specialisti, vincoli normativi rigidi sulla privacy (GDPR/HIPAA) e un forte
+\textbf{Domain Shift} dovuto a scanner e protocolli di acquisizione differenti tra ospedali.
+
+\section{Architetture di Segmentazione Biomedica}
+
+\begin{defbox}[U-Net]
+La \textbf{U-Net} (Ronneberger et al., 2015) è un'architettura Encoder-Decoder simmetrica:
+\begin{itemize}
+  \item \textbf{Encoder} (contrazione): estrae feature semantiche ad alto livello
+        tramite convoluzioni e pooling.
+  \item \textbf{Decoder} (espansione): ripristina la risoluzione spaziale originale
+        tramite upsampling.
+  \item \textbf{Skip Connections}: concatenano le mappe di caratteristiche ad alta
+        risoluzione dell'encoder direttamente con i corrispondenti livelli del decoder,
+        preservando i dettagli spaziali dei bordi delle lesioni.
+\end{itemize}
+\end{defbox}
+
+\section{Funzioni di Loss per Dati Sbilanciati}
+
+Nel settore medico, lo sfondo occupa la maggior parte dell'immagine, mentre il tumore/lesione
+rappresenta solo una frazione minuscola di pixel.
+
+\begin{propbox}[Dice Loss e Focal Loss]
+\begin{itemize}
+  \item \textbf{Dice Loss}: ottimizza direttamente l'overlap geometrico tra la maschera
+        prevista $y$ e la ground-truth $t$, risultando insensibile allo sbilanciamento delle classi:
+        \[
+          \mathcal{L}_{\text{Dice}} = 1 - \frac{1}{C}\sum_{c=0}^{C-1} \frac{2 \sum_n t_n^c y_n^c}{\sum_n (t_n^c + y_n^c)}
+        \]
+  \item \textbf{Focal Loss}: abbassa il peso dei pixel facili (sfondo) focalizzando la
+        backpropagation sugli esempi difficili (i confini della lesione):
+        \[
+          \mathcal{L}_{\text{Focal}} = -\sum_{n=1}^N (1 - p_{t,n})^\gamma \log(p_{t,n}), \qquad (\text{tipicamente } \gamma = 2)
+        \]
+\end{itemize}
+\end{propbox}
+
+\section{Metriche di Valutazione}
+
+*   \textbf{Dice Score (DSC)}: equivalent all'F1-score $\implies \mathrm{DSC} = \frac{2|X \cap Y|}{|X| + |Y|}$.
+*   \textbf{Hausdorff Distance (HD)}: misura la deviazione peggiore superficie-superficie tra
+    i contorni previsti e quelli reali:
+    \[
+      \mathrm{HD}(X, Y) = \max \left\{ \max_{x \in X} \min_{y \in Y} \|x - y\|, \max_{y \in Y} \min_{x \in X} \|x - y\| \right\}
+    \]
+
+% =============================================================================
+\chapter{Monocular Depth Estimation (MDE)}
+% =============================================================================
+
+\section{Definizione e Natura Ill-Posed}
+
+La \textbf{Monocular Depth Estimation (MDE)} consiste nel prevedere una mappa di profondità
+densa $Z(x,y)$ a partire da un'unica immagine RGB 2D.
+
+\begin{warnbox}[Perché MDE è un problema mal posto?]
+La proiezione da 3D a 2D perde un grado di libertà (la profondità lungo il raggio ottico).
+Infiniti mondi 3D differenti possono proiettarsi nella stessa identica immagine 2D.
+Il problema è quindi matematicamente mal posto e richiede che il modello apprenda
+\emph{priors} visivi dal contesto.
+\end{warnbox}
+
+\section{Indizi Monoculari (Monocular Cues)}
+
+*   \textbf{Prospettiva lineare}: linee parallele che convergono verso il punto di fuga.
+*   \textbf{Dimensione relativa}: oggetti noti appaiono più piccoli se lontani.
+*   \textbf{Gradiente di texture}: la grana delle superfici diventa più densa a distanza.
+*   \textbf{Occlusione}: gli oggetti in primo piano nascondono quelli sullo sfondo.
+
+\section{Depth Anything v2}
+
+Modello state-of-the-art basato su una pipeline \textbf{Teacher-Student} di pseudo-labelling:
+1. Si addestra un modello *Teacher* su dati sintetici (profondità perfetta senza rumore).
+2. Il Teacher genera pseudo-labels dense su un dataset immenso di immagini reali non etichettate.
+3. Si addestra un modello *Student* su queste pseudo-labels, garantendo forte generalizzazione.
+
+% =============================================================================
+\chapter{Efficienza nel Deep Learning}
+% =============================================================================
+
+\section{Training Efficiente vs.\ Inferenza Efficiente}
+
+*   \textbf{Efficient Training}: riduce il tempo di addestramento su GPU/TPU (es.\ *mixed-precision FP16*, *gradient checkpointing*).
+*   \textbf{Efficient Inference}: minimizza latenza e memoria durante la distribuzione su
+    dispositivi mobile o embedded.
+
+\section{Tecniche di Inferenza Efficiente}
+
+\begin{defbox}[Tecniche di Compressione]
+\begin{enumerate}
+  \item \textbf{Architetture Compatte}: uso di \emph{depthwise separable convolutions} (es.\ MobileNet)
+        per separare il filtraggio spaziale dalla combinazione dei canali.
+  \item \textbf{Pruning}: rimozione dei pesi meno importanti.
+        \begin{itemize}
+          \item *Structured Pruning*: rimuove interi canali/filtri $\Rightarrow$ velocizzazione immediata su hardware standard.
+          \item *Unstructured Pruning*: azzera pesi singoli $\Rightarrow$ richiede hardware specializzato per matrici sparse.
+        \end{itemize}
+  \item \textbf{Knowledge Distillation}: addestramento di una rete piccola (*Student*) affinché
+        imiti la distribuzione delle probabilità umane o le feature intermedie di una rete grande (*Teacher*).
+  \item \textbf{Quantizzazione}: riduzione della precisione numerica dei pesi e delle attivazioni.
+        Passare da \textbf{FP32 ad INT8} riduce l'impronta di memoria di $4\times$ e abilita
+        l'aritmetica intera sui processori.
+\end{enumerate}
+\end{defbox}
+
+\section{Metriche e Trade-off}
+
+*   \textbf{MACs}: operazioni di *Multiply-Accumulate*.
+*   \textbf{FLOPs}: operazioni in virgola mobile ($\approx 2 \times \text{MACs}$).
+*   \textbf{Pareto Frontier}: la curva che rappresenta le configurazioni di modelli ottimali
+    per cui non esiste un'architettura contemporaneamente più precisa e più veloce.
+
+\end{document}
