@@ -54,6 +54,10 @@ frasi = [
     ("amo questa lezione",          1),
     ("tutto molto bello",           1),
     ("tutto molto brutto",          0),
+    ("sono contentissima oggi",     1),
+    ("sono tristissimo oggi",       0),
+    ("bellissima giornata",         1),
+    ("bruttissima giornata",        0),
 ]
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -97,7 +101,8 @@ def build_vocab(frasi, min_prefix=4):
     # suffissi comuni italiani come token separati
     suffissi = ["##o", "##a", "##i", "##e", "##oso", "##osa",
                 "##oso", "##bile", "##mente", "##ata", "##ato",
-                "##ione", "##ioso", "##iosa"]
+                "##ione", "##ioso", "##iosa", '#issima', '#issimo', 
+                '#issime', '#issimi' ]
     for s in suffissi:
         if s not in vocab:
             vocab[s] = len(vocab)
@@ -205,8 +210,12 @@ SEMANTIC_PRIOR = {
     "bene":         [ 0.7,  0.5,   0.7,   0.5],
     "male":         [-0.7,  0.5,   0.7,   0.5],
     "piace":        [ 0.6,  0.5,   0.7,   0.7],
-    "##osa":        [ 0.1,  0.0,   0.0,   0.0],  # desinenza femminile — neutro
+    "##osa":        [ 0.1,  0.0,   0.0,   0.0],  
     "##oso":        [ 0.1,  0.0,   0.0,   0.0],
+    "##issimo":     [ 0.0,  0.0,  0.0,  0.0],
+    "##issima":     [ 0.0,  0.0,  0.0,  0.0],
+    "##issimi":     [ 0.0,  0.0,  0.0,  0.0],
+    "##issime":     [ 0.0,  0.0,  0.0,  0.0],
 }
 
 
