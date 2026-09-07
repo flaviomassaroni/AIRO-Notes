@@ -1,0 +1,34 @@
+% TeX root = ../Main.tex
+
+% First argument to \section is the title that will go in the table of contents. Second argument is the title that will be printed on the page.
+\section[Question -- {\it Padding}]{}
+
+\subsection{Padding Strategies}
+
+Padding is used to allow the filter to shift on all pixels of the image, including cornest and edges.
+Many different strategies of padding exists:
+\begin{itemize}
+    \item Zero and Constant padding: The borders are filled with 0s or constants, creating artificial edges on the borders
+    \item Mirror: Reflects the inner pixel values excluding the border pixels
+    \item Symmetric: Reflects the inner pixel values including border pixels
+    \item Clamp: Replicates the most external pixel constantly
+\end{itemize}
+
+\subsection{Effect on Output Dimensions (Valid vs. Same vs. Full)}
+The size of the output image depends on the input size $N$, kernel size $K$, padding size $P$, and stride $S$:
+\[
+  \dim_{\text{out}} = \left\lfloor \frac{N + 2P - K}{S} \right\rfloor + 1
+\]
+\begin{itemize}
+    \item \textbf{Valid ($P = 0$)}: No padding is applied. The output is smaller than the input ($\dim_{\text{out}} = N - K + 1$ for $S=1$).
+    \item \textbf{Same ($P = \lfloor K/2 \rfloor$)}: Padding is chosen such that the output has the exact same spatial dimensions as the input (for $S=1$).
+    \item \textbf{Full ($P = K - 1$)}: Padding is added such that every element of the kernel visits every input pixel. The output is larger than the input ($\dim_{\text{out}} = N + K - 1$).
+\end{itemize}
+
+\subsection{Impact on Edge Detection Near Boundaries}
+Edge detection relies on computing spatial derivatives (gradients):
+\begin{itemize}
+    \item \textbf{Zero and Constant Padding ($c \neq 0$)}: Introduce a sharp, artificial step-discontinuity between real pixel intensities and the constant padding value. Derivative filters (like Sobel) mistake this jump for a strong edge, generating \textbf{false/spurious edges} along the image borders.
+    \item \textbf{Clamp / Replicate Padding}: Forces the gradient at the boundary to zero by replicating pixel values. While it avoids artificial step-edges, it incorrectly **suppresses legitimate real edges** crossing near the boundary.
+    \item \textbf{Mirror and Symmetric Padding}: Preserve smooth gradient continuity without sharp steps. They are the optimal strategies for edge detection near image boundaries as they **correctly preserve edge responses** without creating false positives or suppressing true borders.
+\end{itemize}

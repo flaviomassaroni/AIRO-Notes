@@ -1,0 +1,32 @@
+% TeX root = ../Main.tex
+
+% First argument to \section is the title that will go in the table of contents. Second argument is the title that will be printed on the page.
+\section[Question -- {\it Detecting keyframes in Video}]{}
+
+\subsection{Detecting keyframes in Video}
+The all approach can be devided in 3 main features, to detect all the different situation in a video sequence.
+\begin{itemize}
+    \item Macro (global changes)
+    \item Micro changes
+    \item Optical flow magnitude for movements 
+\end{itemize}
+
+The all algorithm is completed by using a minimum gap constraint to avoid considering a number k of successive frames, 
+to not face the redundancy problem.
+
+\subsection{Macro}
+To have a general and comprehensive understanding of the scene, the color histogram in HSV can be analized. This approach
+is not complex and allows to detect scene interrupts and macro changes in the video sequence. The two histograms are compared
+with Chi square distance.
+
+\subsection{Micro}
+It may happen that the color histogram in two consequent scenes is similar, but the objects displacement is completely different.
+This issue may be overcame by the use of an edge ratio system: a canny edge detector algorhitm is used to find all edges in a scene
+and the amount of edges in two scenes is compared finding a change ratio.
+
+\subsection{Optical Flow}
+Finally, to detect the beginning of actions, the optical flow magnitude can be used $M = \frac{1}{N}\sum \sqrt{u^2 + v^2}$. 
+LK comparing algorithm is used to compare consecutive frames and it can detect in two scenes some movements (mouth moving 
+while talking), where the scenes appear similar to the Macro analyzer.
+
+

@@ -1,0 +1,29 @@
+% TeX root = ../Main.tex
+
+% First argument to \section is the title that will go in the table of contents. Second argument is the title that will be printed on the page.
+\section[Question -- {\it DFT in image filtering}]{}
+
+\subsection{Role of DFT in Image Filtering}
+The Discrete Fourier Transform (DFT) converts an image from the spatial domain into the frequency domain, decomposing it into a weighted sum of 2D sinusoids. Its primary role in image filtering relies on the \textbf{Convolution Theorem}, which states that a spatial convolution $g * h$ is equivalent to an element-wise multiplication in the frequency domain:
+\[
+  \mathcal{F}\{g * h\} = \mathcal{F}\{g\} \cdot \mathcal{F}\{h\}
+\]
+Instead of performing costly sliding-window spatial convolutions—whose computational complexity grows quadratically with the kernel size as $\mathcal{O}(L^2 N^2)$—filtering can be efficiently executed in $\mathcal{O}(N^2 \log N)$ using the Fast Fourier Transform (FFT). 
+By the Convolution Theorem, this global approach completely eliminates the need for local window movement: we transform the entire image via FFT, transform the kernel—\textbf{zero-padded to the image dimensions to avoid circular convolution artifacts}—via FFT, perform a single global element-wise multiplication of their spectra, and apply the \textbf{Inverse FFT (IFFT)} to return to the spatial domain. This method is especially advantageous when applying very large filter kernels.
+
+\subsection{Information Provided by the DFT}
+The DFT transforms an image into a complex-valued 2D spectrum $F(u,v) = R(u,v) + iI(u,v)$, providing two fundamental types of information:
+\begin{itemize}
+    \item \textbf{Amplitude Spectrum (Magnitude)}: $|F(u,v)| = \sqrt{R^2 + I^2}$, representing \textit{how much energy} of a specific spatial frequency is present in the image. 
+    \begin{itemize}
+        \item Low frequencies (near the center, DC component) correspond to smooth, large-scale structures and background.
+        \item High frequencies (far from the center) correspond to fine details, sharp edges, and rapid intensity variations (textures).
+    \end{itemize}
+    \item \textbf{Phase Spectrum}: $\phi(u,v) = \operatorname{atan2}(I, R)$, which encodes the \textit{spatial alignment} of those frequency components, defining the exact geometric location of edges, lines, and structures in the image space. \textbf{Phase is perceptually more important than amplitude}: in phase-swapping experiments, reconstructing an image using the amplitude of Image A and the phase of Image B yields an image whose structural layout and recognizable shapes belong strictly to Image B.
+\end{itemize}
+
+\subsection{Filtering Examples: Low-Pass and High-Pass}
+\begin{itemize}
+    \item \textbf{Low-Pass Filtering}: Used for smoothing or blurring. We multiply the frequency spectrum by a mask (such as an ideal cutoff mask beyond a radius $r$ or a smooth 2D Gaussian function) that preserves low frequencies near the center and attenuates high frequencies. \textit{Example}: Removing high-frequency Gaussian sensor noise or smoothing background details.
+    \item \textbf{High-Pass Filtering}: Used for sharpening or edge detection. We multiply the frequency spectrum by a mask that attenuates low frequencies at the center and preserves high frequencies in the outer peripheral regions. \textit{Example}: Isolating abrupt intensity transitions to highlight edges and fine textures.
+\end{itemize}

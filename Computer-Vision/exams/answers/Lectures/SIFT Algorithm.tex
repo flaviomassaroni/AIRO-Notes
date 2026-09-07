@@ -1,0 +1,31 @@
+% TeX root = ../Main.tex
+
+\section[Question -- {\it SIFT Algorithm}]{}
+
+\subsection{SIFT Detection}
+The Scale-Invariant Feature Transform (SIFT) detects stable keypoints in scale-space by constructing a \textbf{Difference of Gaussians (DoG)} pyramid across octaves:
+\[
+  \mathrm{DoG}(x, y, \sigma) = G(x, y, k\sigma) - G(x, y, \sigma)
+\]
+A pixel is selected as a keypoint if it is a local extremum compared to its \textbf{26 neighbors} in the 3D scale-space (8 spatial, 9 in the scale above, 9 below). 
+Unstable points—specifically low-contrast points and edge responses (filtered via a 2D Hessian ratio test)—are discarded. 
+Finally, a \textbf{canonical orientation} is assigned based on the peak of a local gradient orientation histogram to ensure rotation invariance.
+
+\subsection{SIFT Descriptor}
+To represent the local appearance around a keypoint:
+\begin{itemize}
+    \item A $16 \times 16$ pixel window is extracted at the keypoint's characteristic scale.
+    \item The coordinate system and gradients are rotated according to the keypoint's canonical orientation (achieving rotation invariance).
+    \item The window is divided into a $4 \times 4$ grid of cells (16 cells total).
+    \item An \textbf{8-bin orientation histogram} is computed for each cell.
+    \item Concatenating all 16 histograms yields a single \textbf{128-dimensional vector} ($16 \times 8 = 128$).
+    \item The vector is normalized to unit length ($L_2$ norm) for illumination invariance.
+\end{itemize}
+
+\subsection{SIFT Properties}
+The SIFT algorithm is robust and invariant to:
+\begin{itemize}
+    \item \textbf{Scale}: Via multi-scale DoG extrema detection.
+    \item \textbf{Rotation}: Via canonical orientation alignment.
+    \item \textbf{Illuminazione}: Via $L_2$ vector normalization.
+\end{itemize}

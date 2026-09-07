@@ -1,0 +1,32 @@
+% TeX root = ../Main.tex
+
+\section[Question -- {\it Recovering 3D Structure from 2 Calibrated Images}]{}
+
+\subsection{Camera Model and Projection Matrix}
+Recovering 3D structure from images requires modeling how 3D world points are mapped to 2D pixel coordinates. This is expressed by the $3 \times 4$ projection matrix $P = K[R \mid t]$, which unifies the intrinsic and extrinsic parameters.
+
+\subsection{Intrinsic and Extrinsic Parameters}
+\begin{itemize}
+    \item \textbf{Intrinsic Matrix ($K$)}: Encodes internal optical properties, mapping 3D camera coordinates to 2D pixels using focal lengths ($f_x, f_y$) and the principal point ($o_x, o_y$):
+    \[
+      K = \begin{bmatrix} f_x & 0 & o_x \\ 0 & f_y & o_y \\ 0 & 0 & 1 \end{bmatrix}
+    \]
+    \item \textbf{Extrinsic Matrix ($[R \mid t]$)}: Describes the camera's pose relative to the world frame, consisting of a $3 \times 3$ rotation matrix $R$ and a $3 \times 1$ translation vector $t$.
+\end{itemize}
+
+\subsection{Camera Calibration}
+Camera calibration consists of computing the transformation parameters by estimating the $3 \times 4$ matrix $P$. 
+Using at least \textbf{6 point correspondences} between known 3D world points and 2D image points (since $P$ has 11 degrees of freedom), we obtain 2 linear equations per point. This forms a homogeneous system $A\mathbf{p} = 0$, solved via SVD by finding the eigenvector corresponding to the smallest eigenvalue of $A^T A$. 
+
+Once $P = [M \mid p_4]$ is estimated, intrinsic and extrinsic parameters are decoupled using \textbf{RQ factorization}:
+\[
+  M = KR \implies R = K^{-1}M, \qquad p_4 = Kt \implies t = K^{-1}p_4
+\]
+
+\subsection{Triangulation}
+Once the camera matrices ($P, P'$) and corresponding 2D points ($x, x'$) are known from two calibrated views, the 3D position of a scene point $X$ is recovered via \textbf{triangulation}. By using the cross product to eliminate the unknown scale factor:
+\[
+  x \times (PX) = 0 \quad \text{and} \quad x' \times (P'X) = 0
+\]
+This generates a homogeneous linear system $AX = 0$ ($4 \times 3$ system), which is solved using SVD (minimizing the algebraic error) to estimate the 3D coordinates of the point.
+The solution consideres also the noise challenge: it is possible that the two rays are skew, thus the solution involves the minimization of the consequent error.

@@ -1,0 +1,63 @@
+% TeX root = ../Main.tex
+
+% First argument to \section is the title that will go in the table of contents. Second argument is the title that will be printed on the page.
+\section[Question -- {\it Derivatives}]{}
+
+\subsection{Derivative in Computer Vision}
+Image derivatives are the mathematical foundation of both edge and corner detection, as they capture local intensity variations that correspond to meaningful structural features.
+A 2D image can be treated as 2D discrete function $I(x,y)$. The derivatives are approximated via finite
+differences or convolution with derivative kernels.
+
+The first order derivatives explains the rate of change of intensity in an image, representing the edges as local maximum $\nabla I (\frac{\partial I}{\partial x}),\frac{\partial I}{\partial y}$
+The second order derivative describes the rate of change of the cradient, and the edges are represented as zero crossing point (as in LoG) $\nabla^2 I (\frac{\partial^2 I}{\partial x^2}),\frac{\partial^2 I}{\partial y^2}$
+However the LoG function is high computational complex, and it is approximated by DoG for computational efficiency.
+
+\subsection{Gradient magnitude and direction}
+From the first-order derivatives $I_x$ and $I_y$, — typically computed via the Sobel operator, a separable filter combining a derivative kernel with a smoothing kernel — 
+two quantities are derived:
+\begin{itemize}
+\item Magnitude: $|\nabla I| = \sqrt{I_x ^2 + I_y ^2}$, which encodes the edge strenght (high values represents a sharp transition)
+\item Direction: $\theta = arctan(\frac{I_y}{I_x})$, which encodes the edge orientation (perpendicular to edge contours)
+\end{itemize}
+These quantities are crucial to apply NMS, since the edge direction is used to determine the orientation of the local neighborhood for non-maximum suppression, ensuring that only the most significant edge pixels are retained 
+and edge magnitude is used to threshold the edges, discarding weak edges that are likely to be noise.
+
+\subsection{Second order derivative for Intensity transitions}
+The laplacian (LoG) responds to intensity transitions with a zero corssing at the edge location, remarking edge boundary with high spatial accuracy.
+However, its main challenge is noise since it is amplified by the function, solved by a pre-smoothing by a Gaussian filter.
+Two main strategies are used to overcome the noise sensitivity:
+\begin{itemize}
+    \item Gaussian smoothing, before differentiation
+    \item Medial filtering, non linear strategy for salt and pepper noise
+\end{itemize}
+
+\subsection{Corner detection}
+Corner detection relies on image derivatives and a second-moment matrix approach (structure tensor). The second moment matrix $H$ over a window $W$ is defined as:
+\[
+  H = \sum_{(x,y) \in W} \begin{bmatrix} I_x^2 & I_x I_y \\ I_x I_y & I_y^2 \end{bmatrix}
+\]
+
+To analyze the local intensity variation, we study the eigenvalues $\lambda_1$ and $\lambda_2$ of $H$, which correspond to the magnitudes of maximum and minimum intensity change:
+\begin{itemize}
+    \item $\lambda_1 \approx \lambda_2 \approx 0$ (Flat region): The error is low in all directions; intensity is nearly constant.
+    \item $\lambda_1 \gg \lambda_2 \approx 0$ (Edge): The error is high in one direction but low along the edge.
+    \item $\lambda_1 \approx \lambda_2 \gg 0$ (Corner): The error is high in all directions, representing a point of distinct intersection.
+\end{itemize}
+
+Since calculating eigenvalues for every pixel is computationally expensive, the Harris detector introduces a response function $R$ that approximates their behavior without explicit eigenvalue decomposition:
+\[
+  R = \det(H) - k \cdot (\operatorname{trace}(H))^2 = \lambda_1 \lambda_2 - k(\lambda_1 + \lambda_2)^2
+\]
+where $k$ is an empirical constant (typically $0.04 - 0.06$). The value of $R$ indicates the "cornerness":
+\begin{itemize}
+    \item $R$ large and positive $\implies$ Corner.
+    \item $R$ large and negative $\implies$ Edge.
+    \item $|R|$ small $\implies$ Flat region.
+\end{itemize}
+
+Properties of the Harris detector:
+\begin{itemize}
+    \item \textbf{Equivariant} to translation and rotation (eigenvalues and shape are preserved under rotation).
+    \item \textbf{Invariant} to additive brightness shifts ($I' = I + b$) because derivatives eliminate constant offsets.
+    \item \textbf{Not scale-invariant}, as a physical corner may appear as an edge or a flat region when zoomed in.
+\end{itemize}

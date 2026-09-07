@@ -1,0 +1,26 @@
+% TeX root = ../Main.tex
+
+\section[Question -- {\it SURF Algorithm}]{}
+
+\subsection{SURF Detection}
+SURF (Speeded-Up Robust Features) is a faster alternative to SIFT, designed to address high computational complexity while maintaining comparable matching quality.
+
+Instead of using Difference of Gaussians (DoG), SURF is a \textbf{Hessian-based} detector that identifies blobs at locations where the determinant of the Hessian matrix $H$ is maximal:
+\[
+  H(x, \sigma) = \begin{bmatrix} L_{xx}(x, \sigma) & L_{xy}(x, \sigma) \\ L_{xy}(x, \sigma) & L_{yy}(x, \sigma) \end{bmatrix}
+\]
+where $L_{xx}$ represents the convolution of the image with the second partial derivative of a Gaussian. 
+
+To achieve high computation speed, SURF approximates these Gaussian second-order derivatives using \textbf{box filters}, which can be evaluated extremely fast in constant time using \textbf{integral images} (where each location stores the sum of all pixel intensities in the rectangle from the origin). The approximate determinant is computed as:
+\[
+  \det(H_{\text{approx}}) = D_{xx} D_{yy} - (w D_{xy})^2 \quad (w = 0.9)
+\]
+
+\subsection{SURF Descriptor}
+The SURF descriptor is designed to be compact and fast to compute:
+\begin{itemize}
+    \item \textbf{Orientation assignment}: Computes Haar wavelet responses in the $x$ and $y$ directions within a circular neighborhood around the interest point, weighted by a Gaussian, to find a dominant orientation (ensuring rotation invariance).
+    \item \textbf{Feature vector}: A square window of size $20s \times 20s$ (where $s$ is the scale) is aligned with the dominant orientation and divided into a $4 \times 4$ grid of cells (16 cells total).
+    \item For each cell, the sum of Haar wavelet responses and their absolute values are computed: $\sum dx, \sum dy, \sum |dx|, \sum |dy|$.
+    \item Concatenating these 4 values for all 16 cells creates a \textbf{64-dimensional descriptor vector} ($16 \times 4 = 64$), making it computationally lighter and more compact than SIFT's 128-D vector.
+\end{itemize}

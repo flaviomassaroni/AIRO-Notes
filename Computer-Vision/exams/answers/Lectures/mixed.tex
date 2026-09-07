@@ -1,0 +1,87 @@
+% TeX root = ../Main.tex
+
+\section{Domande miste}
+
+\subsection{Zero-Padding vs. Mirror Padding in Sobel}
+\textit{Why does zero-padding generate a false high-gradient boundary along the entire image perimeter when followed by the Sobel operator?}
+
+Zero-padding adds a uniform layer of zeros around the image. When a derivative-based filter like Sobel is applied, the sharp intensity transition between the actual image content and the artificial border of zeros creates a strong, false high-gradient response along the perimeter. Differently, mirror (or reflect) padding mirrors the boundary pixel values symmetrically, smoothing the transition and preventing artificial gradient spikes.
+
+\subsection{Limits and Validity of Homography}
+\textit{Under what two specific geometric conditions does a Homography matrix $H$ ($3 \times 3$) accurately map points between two images? What happens if the camera undergoes a pure translation in a non-planar 3D scene?}
+
+A homography matrix $H$ accurately maps points between two images if and only if at least one of two conditions is met: (1) the observed 3D scene is strictly planar, or (2) the camera motion is a pure rotation around its optical center ($t = 0$), regardless of the 3D structure. 
+If the camera undergoes a pure translation (or general motion) in a non-planar 3D scene, the \textbf{parallax effect} occurs. Points at different depths move by different amounts, making a single global homography invalid. In this scenario, one must resort to Epipolar Geometry using the Fundamental ($F$) or Essential ($E$) matrix.
+
+\subsection{Coarse-to-Fine Optical Flow and Inverse Warping}
+\textit{How do Gaussian pyramids, inverse warping, and residual flow solve the failure of Lucas-Kanade under large object motions?}
+
+Lucas-Kanade assumes small motion (e.g., $< 1$ pixel). Gaussian pyramids scale down the image resolution so that large motions (e.g., 20 pixels) at the original scale become small motions at the coarsest pyramid level. Starting from the coarsest level, the optical flow is computed, and \textbf{inverse warping} is used to align the second frame to the first without leaving gaps (avoiding forward warping holes). Then, a \textbf{residual flow} is computed for the remaining motion and propagated upward through the pyramid levels, accumulating the total optical flow.
+
+\subsection{Box Filter vs. Gaussian Filter in the Frequency Domain}
+\textit{Why does a Box filter produce ringing artifacts near sharp edges, while a Gaussian filter does not?}
+
+A Box filter is a rectangular function in the spatial domain, whose Fourier transform is a \textbf{Sinc function} in the frequency domain. The Sinc function exhibits prominent sidelobes that cause an abrupt and imperfect frequency cutoff, resulting in spatial ringing artifacts. Conversely, a Gaussian filter remains a Gaussian function in both spatial and frequency domains; it has no sidelobes and provides a smooth, clean attenuation of high frequencies without ringing.
+
+\subsection{Harris Corner Detector}
+\textit{What is the geometric intuition behind the Harris corner detector, and how are the eigenvalues of the Second Moment Matrix interpreted?}
+
+The Harris detector looks for local intensity variations by shifting a small window in all directions. It uses the Second Moment Matrix $H$ (or $M$). By analyzing its eigenvalues ($\lambda_1, \lambda_2$):
+\begin{itemize}
+    \item Both $\lambda_1, \lambda_2 \approx 0$ (Flat region): intensity is constant in all directions.
+    \item One large, one near zero ($\lambda_1 \gg \lambda_2$ or vice versa) (Edge): intensity changes along only one direction.
+    \item Both $\lambda_1, \lambda_2 \gg 0$ (Corner): intensity changes significantly in all directions.
+\end{itemize}
+
+\subsection{Stereo Vision Baseline Trade-off}
+\textit{What is the engineering trade-off in stereo vision when choosing a very small baseline versus a very large baseline?}
+
+The baseline is the distance between the optical centers of the two cameras. 
+A \textbf{narrow baseline} makes stereo matching much easier (high overlap, fewer occlusions), but depth estimation is very sensitive to noise, as small pixel disparity errors lead to huge errors in depth calculation ($Z$). 
+A \textbf{wide baseline} provides high geometric precision for depth estimation, but makes stereo matching extremely difficult due to large perspective distortions and heavy occlusions.
+
+\subsection{The Aperture Problem}
+\textit{What is the aperture problem in optical flow estimation, and along which direction is motion ambiguous?}
+
+The aperture problem occurs when observing a moving edge through a small local window (aperture), making it impossible to determine the true 2D motion vector. Only the motion component perpendicular (normal) to the edge can be measured. The motion component \textbf{parallel to the edge} is completely ambiguous and cannot be reliably estimated because the intensity profile along the edge is uniform.
+
+\subsection{SIFT: Scale and Rotation Invariance}
+\textit{How does SIFT achieve scale invariance and rotation invariance?}
+
+\textbf{Scale invariance} is achieved by detecting keypoints across multiple scales using a scale-space representation based on the Difference of Gaussians (DoG) pyramids, locating stable extrema across adjacent scales. 
+\textbf{Rotation invariance} is achieved by computing a local gradient orientation histogram in the neighborhood of each keypoint and assigning a canonical orientation corresponding to the highest peak of the histogram, so that descriptors are always aligned relative to this dominant direction.
+
+\subsection{Fundamental Matrix and its Rank}
+\textit{What is the Fundamental Matrix ($F$), and why does it have a rank of 2 ($\det(F) = 0$)?}
+
+The Fundamental Matrix $F$ ($3 \times 3$) is the algebraic representation of epipolar geometry for uncalibrated cameras, mapping a point in the first image to its corresponding epipolar line in the second image ($l' = Fx$). 
+It has a \textbf{rank of 2 ($\det(F) = 0$)} because it maps a 2D point onto a 1D line (epipolar line). Mathematically, it is defined as $F = K'^{-T} [t]_\times R K^{-1}$, where the essential matrix component $[t]_\times$ is a skew-symmetric matrix of rank 2, which forces $F$ to also be singular (rank 2).
+
+\subsection{Epipoles and Epipolar Lines}
+\textit{What are epipoles and epipolar lines, and how do they simplify stereo matching?}
+
+An \textbf{epipole} ($e, e'$) is the intersection of the baseline (the line connecting the two camera centers) with the respective image planes (equivalently, the projection of one camera center onto the other image plane). An \textbf{epipolar line} is the intersection of the epipolar plane (defined by 3D point $X$ and the two camera centers) with the image plane. 
+The epipolar constraint simplifies stereo matching from a 2D search problem to a 1D search problem: given a point $x$ in the first image, its corresponding point $x'$ in the second image must lie entirely along its corresponding epipolar line $l'$.
+
+\subsection{RANSAC vs. Least Squares}
+\textit{Why do Least Squares fail in the presence of high outlier ratios, and how does RANSAC solve this?}
+
+Standard Least Squares minimizes the sum of squared residuals, which causes even a small percentage of severe outliers (e.g., 40% false matches) to drastically pull and distort the estimated model parameters. 
+\textbf{RANSAC (Random Sample Consensus)} solves this by iteratively sampling the minimum subset of points required to estimate the model, computing the transformation, and counting how many total points agree with it (the consensus set / inliers). By keeping the model with the largest consensus set over many iterations, it completely isolates and discards the outliers.
+
+\subsection{Mean vs. Median Filter for Salt-and-Pepper Noise}
+\textit{Why does a Mean filter blur salt-and-pepper noise while a Median filter completely eliminates it?}
+
+A Mean filter is a linear filter that averages all pixel values in a neighborhood. Since salt-and-pepper noise consists of extreme, isolated impulse values (maximum or minimum brightness), averaging them smears the noise values across neighboring pixels, causing blurring. 
+A Median filter is a non-linear filter that replaces the pixel value with the statistical median of its neighborhood. Extreme noise impulses fall at the extreme ends of the sorted neighborhood values and are automatically ignored, completely removing the noise without blurring edges.
+
+\subsection{Phase Swapping Experiment in Fourier Domain}
+\textit{In a phase-swapping experiment between Image A and Image B, which image is visually recognizable in the IFFT output and why?}
+
+Image B (the one whose \textbf{Phase} was used) will be visually recognizable. 
+While the Amplitude spectrum contains the overall energy distribution and frequency magnitudes, the \textbf{Phase spectrum} contains the precise spatial structure, alignment, and edge locations of the image. The human visual system relies overwhelmingly on phase information to perceive shapes and objects.
+
+\subsection{Background Subtraction in Outdoor Environments}
+\textit{What traditional (non-Deep Learning) approach is used for background subtraction in outdoor scenes with changing illumination and moving shadows?}
+
+Simple frame differencing fails due to lighting variations and shadows. Instead, traditional computer vision uses statistical background modeling such as \textbf{Gaussian Mixture Models (GMM)}, where each pixel is modeled over time by a mixture of Gaussians to account for multi-modal backgrounds (e.g., swaying tree leaves, flickering light). Alternatively, color spaces like HSV are used, separating chromaticity from intensity ($V$) to make the system more robust to illumination shifts and shadows.

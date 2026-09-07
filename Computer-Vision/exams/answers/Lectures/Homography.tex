@@ -1,0 +1,16 @@
+% TeX root = ../Main.tex
+
+% First argument to \section is the title that will go in the table of contents. Second argument is the title that will be printed on the page.
+\section[Question -- {\it Homography limits and validity}]{}
+
+\subsection{Homography limits and validity}
+A homography matrix $H$ ($3 \times 3$) maps points between two 2D images accurately if and only if at least one of the following two geometric conditions is satisfied:
+\begin{itemize}
+    \item \textbf{Planar Scene:} The observed 3D scene points all lie on a single physical plane (e.g., a wall, a poster, the ground).
+    \item \textbf{Pure Rotation:} The camera motion consists strictly of a pure rotation around its optical center ($t = 0$), regardless of the 3D structure of the scene.
+\end{itemize}
+
+What happens if the camera performs a pure translation (or a general motion with both rotation and translation) in a non-planar 3D scene? 
+In this scenario, the \textbf{parallax effect} occurs. Points at different 3D depths project displacements in the image plane that are inversely proportional to their depth $Z$. Consequently, the geometric relationship between the two images can no longer be described by a single global homography, because the point correspondences depend on their individual spatial depths. 
+
+When parallax is present, homography estimation fails, and it is necessary to resort to \textbf{Epipolar Geometry}, estimating the \textbf{Fundamental Matrix ($F$)} or the \textbf{Essential Matrix ($E$)} to properly model the multi-view geometry.

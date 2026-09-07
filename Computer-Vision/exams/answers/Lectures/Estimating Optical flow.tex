@@ -1,0 +1,30 @@
+% TeX root = ../Main.tex
+
+% First argument to \section is the title that will go in the table of contents. Second argument is the title that will be printed on the page.
+\section[Question -- {\it Estimating optical flow}]{}
+
+\subsection{Estimating optical flow}
+To estimate optical flow, the Lk algorithm is employed. It is based on three main absumption:
+\begin{itemize}
+    \item Brightness constancy: $I(x, y, t) = I(x+u \delta t, y+v \delta t, t+\delta t)$
+    \item Small motion
+    \item Spatial coherence
+\end{itemize}
+
+Starting from the brightness constancy, by applying Taylor approximation, we can derive the optical flow constraint equation
+$I_x u + I_y v+ I_t = 0$. 
+Since this single-pixel equation is underconstrained (1 equation for 2 unknowns), Lucas-Kanade introduces the spatial coherence assumption, yielding $N^2$ equations for an $N \times N$ patch.
+$Ax = b$ is so formed as an overdetermined system solvable by Least Squares. The Solution is the eigenvector corresponding to 
+the smallest eigenvalue.
+This is possible only if $A^T A$ is invertible and well conditioned. Indeed, by the $A^T A$ eigenvalues we can understand
+the optical flow, as for the harris corner detector:
+\begin{itemize}
+    \item $\lambda_1 \approx \lambda_2 \approx 0$ (Flat region): No reliable optical flow can be estimated.
+    \item $\lambda_1 \ \lambda_2 \approx 0$ (Edge): Aperture problem; only the normal flow (perpendicular to the edge) can be estimated.
+    \item $\lambda_1 \approx \lambda_2 \gg 0$ (Corner / Texture): Optical flow can be estimated reliably in all directions.
+\end{itemize}
+
+The **aperture problem** occurs in the edge case, stating that observing a moving edge through a small local aperture 
+only allows estimating the motion component perpendicular to the edge, while the parallel (tangent) component 
+remains completely ambiguous. Lucas-Kanade mitigates this by pooling information from a spatial neighborhood (patches) 
+rather than relying on isolated pixels.

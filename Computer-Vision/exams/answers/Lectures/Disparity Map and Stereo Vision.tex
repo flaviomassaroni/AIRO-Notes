@@ -1,0 +1,46 @@
+% TeX root = ../Main.tex
+
+\section[Question -- {\it Disparity Map and Stereo Vision}]{}
+
+\subsection{Definition of Disparity}
+Disparity $d$ is the horizontal displacement (difference in pixel coordinates) of the same 3D point between a left stereo image and a right stereo image:
+\[
+  d = x_L - x_R
+\]
+For objects in front of the cameras, $x_L > x_R$, yielding a positive disparity ($d \ge 0$). It is the core geometric parameter used to infer 3D depth.
+
+\subsection{Epipolar Rectification}
+Epipolar rectification is a preprocessing geometric transformation that warps both stereo images using homographies so that their epipolar lines become horizontal and coincide with the image scanlines ($v_L = v_R$). 
+This simplifies the correspondence problem: instead of searching for matching points across a 2D image plane, the search is reduced to a 1D horizontal scan along the exact same row.
+
+\subsection{Block Matching and Similarity Metrics}
+To compute the disparity map, local window-based matching is commonly employed:
+\begin{enumerate}
+    \item For each pixel in the left image $I_L$, a small patch (window) $W$ is extracted.
+    \item The algorithm searches for the best matching patch along the same horizontal scanline in the right image $I_R$.
+    \item The optimal displacement $d$ is selected using a \textbf{Winner-Takes-All (WTA)} strategy—choosing the disparity that minimizes the matching cost. Common dissimilarity metrics include:
+    \begin{itemize}
+        \item \textbf{SAD} (Sum of Absolute Differences): 
+        \[ \text{SAD} = \sum_{(u,v)\in W} |I_L(u,v) - I_R(u+d, v)| \]
+        \item \textbf{SSD} (Sum of Squared Differences): 
+        \[ \text{SSD} = \sum_{(u,v)\in W} (I_L(u,v) - I_R(u+d, v))^2 \]
+        \item \textbf{NCC} (Normalized Cross-Correlation).
+    \end{itemize}
+\end{enumerate}
+\textbf{Window Size Trade-off}: A small window captures fine details but results in a noisy disparity map; a larger window is robust to noise but blurs depth discontinuities and fails at localizing thin objects.
+
+\subsection{Relationship Between Disparity and Depth}
+Assuming a rectified stereo rig with two parallel cameras separated by a baseline $b$ and sharing an effective focal length $f$, depth $Z$ is inversely proportional to disparity $d$:
+\[
+  Z = \frac{b \cdot f}{d}
+\]
+A high disparity indicates a close object (large horizontal shift), while a low disparity indicates a distant object (small shift).
+
+\subsection{Limitations and Failure Cases}
+Local block matching often fails in the following scenarios:
+\begin{itemize}
+    \item \textbf{Textureless regions}: Homogeneous areas (e.g., a white wall) where all patches look identical, leading to severe matching ambiguity.
+    \item \textbf{Repeated patterns}: Repetitive textures (e.g., bricks or fences) causing multiple identical minimum-cost matches.
+    \item \textbf{Specular/reflective surfaces}: Mirrors or shiny metal violate the brightness constancy assumption.
+    \item \textbf{Depth discontinuities}: Pixels near object boundaries where a local window covers parts of both the foreground and background.
+\end{itemize}

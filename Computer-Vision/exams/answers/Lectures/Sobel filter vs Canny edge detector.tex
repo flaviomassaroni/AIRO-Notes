@@ -1,0 +1,19 @@
+% TeX root = ../Main.tex
+
+% First argument to \section is the title that will go in the table of contents. Second argument is the title that will be printed on the page.
+\section[Question -- {\it Sobel filter vs Canny edge detector}]{}
+
+\subsection{Sobel filter}
+The Sobel filter is a efficient approximation of the first gaussian derivative (used to compute the gradients
+in an image). It is a separable filter composed by a 1D kernel derivation x 1D kernel smoothing. 
+
+\subsection{Canny edge detector}
+The canny edge detector is a edge detector algorithm, which involves the Sobel filter for the gradient computation, but the
+algorithm does not ends up finding the gradient but analyzes all the edges found by the use of the filter.
+Indeed, the proper algorithm is composed of these steps:
+\begin{itemize}
+    \item Gaussian smoothing, since the derivatives are not robust to gaussian noise, to smooth the image
+    \item Sobel filter for gradient computation
+    \item NMS to filter all the non maxima gradient pixels in ad edge, ensuring the edges to be 1 pixel thick
+    \item Linking and Hyisteresis thresholding, all the pixels with weak gradient are kept if connected to a pixel with a strong gradient
+\end{itemize}

@@ -1,0 +1,42 @@
+% TeX root = ../Main.tex
+
+\section[Question -- {\it Two-View Epipolar Geometry and Reconstruction}]{}
+
+\subsection{Introduction to Epipolar Geometry and Epipoles}
+Epipolar geometry describes the geometric relationship between two camera views of the same 3D scene, providing constraints that simplify feature matching.
+\begin{itemize}
+    \item \textbf{Baseline}: The line segment connecting the two camera optical centers ($O$ and $O'$).
+    \item \textbf{Epipolar Plane}: The plane defined by a 3D point $X$ and the two camera centers.
+    \item \textbf{Epipoles ($e, e'$)}: The intersection of the baseline with the image planes. $e$ is the projection of $O'$ onto the first image, and $e'$ is the projection of $O$ onto the second image. All epipolar lines converge at the epipole.
+    \item \textbf{Epipolar Constraint}: Given a point $x$ in the first view, its correspondence $x'$ in the second view must lie on the corresponding epipolar line $l'$, reducing the search space from 2D to 1D.
+\end{itemize}
+
+\subsection{Essential Matrix $E$ and Fundamental Matrix $F$}
+\begin{itemize}
+    \item \textbf{Essential Matrix ($E$)}: Encodes the epipolar constraint for \textbf{calibrated cameras} ($K$ known), operating in normalized camera coordinates ($\mathbf{x}'^T E \mathbf{x} = 0$). It is defined as $E = R[t]_\times$, has 5 degrees of freedom (DoFs), and rank 2.
+    \item \textbf{Fundamental Matrix ($F$)}: The generalization of $E$ for \textbf{uncalibrated cameras} ($K$ unknown), operating directly in pixel coordinates ($\mathbf{p}'^T F \mathbf{p} = 0$). It maps pixels to epipolar lines ($l' = Fp$) and has 7 DoFs.
+    \item \textbf{Algebraic Relationship}: $F$ and $E$ are linked through the intrinsic camera calibration matrices $K$ and $K'$:
+    \[
+      F = K'^{-T} E K^{-1} = K'^{-T} R [t]_\times K^{-1}
+    \]
+\end{itemize}
+
+\subsection{Estimation of the Fundamental Matrix}
+$F$ is estimated from corresponding point matches using the \textbf{Normalized 8-Point Algorithm}:
+\begin{enumerate}
+    \item \textbf{Normalization}: Translate and scale pixel coordinates (centroid at origin, average distance $\sqrt{2}$) to ensure numerical stability.
+    \item \textbf{Linear System}: Set up $Ah = 0$ using $\ge 8$ point matches and solve via SVD (smallest singular value of $A^T A$).
+    \item \textbf{Rank-2 Constraint}: Enforce $\det(F) = 0$ by computing the SVD of the estimated matrix and zeroing out its smallest singular value ($\Sigma' = \operatorname{diag}(\sigma_1, \sigma_2, 0)$).
+    \item \textbf{Denormalization}: Transform $F$ back to the original coordinate system, typically combined with \textbf{RANSAC} to reject outliers.
+\end{enumerate}
+The normalized algorithm is preferred since the normal algorithm is sensitive to noise and 
+to avoid the poor numerical conditioning of the A matrix, which can result in high variance in the columns' values.
+
+\subsection{Relation to Calibration Parameters and Relative Poses}
+\begin{itemize}
+    \item \textbf{Calibration Parameters}: Intrinsic parameters ($K, K'$) bridge pixel coordinates and normalized coordinates. Extrinsic parameters ($R, t$) define the relative rotation and translation between the two camera frames.
+    \item \textbf{Recovering Relative Pose ($R, t$)}: Once the Essential matrix $E$ is recovered (either directly or via $E = K'^T F K$), it can be decomposed using SVD to yield four possible solutions for the relative camera pose $(R, t)$. The correct physical solution is uniquely determined by checking that reconstructed 3D points lie in front of both cameras (cheirality constraint).
+\end{itemize}
+
+\subsection{3D Triangulation}
+Given known camera projection matrices ($P, P'$) and 2D correspondences ($x, x'$), the 3D position of a scene point $X$ is recovered via \textbf{triangulation}. By eliminating the unknown scale factors via cross product ($x \times PX = 0$ and $x' \times P'X = 0$), we form a homogeneous system $AX = 0$ ($4 \times 3$ system). Solving this via SVD minimizes the algebraic error to estimate the 3D spatial coordinates.
