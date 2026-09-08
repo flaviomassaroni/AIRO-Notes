@@ -1,6 +1,6 @@
 % TeX root = ../Main.tex
 
-\section{Domande miste}
+\section{Mixed Questions}
 
 \subsection{Zero-Padding vs. Mirror Padding in Sobel}
 \textit{Why does zero-padding generate a false high-gradient boundary along the entire image perimeter when followed by the Sobel operator?}
@@ -85,3 +85,144 @@ While the Amplitude spectrum contains the overall energy distribution and freque
 \textit{What traditional (non-Deep Learning) approach is used for background subtraction in outdoor scenes with changing illumination and moving shadows?}
 
 Simple frame differencing fails due to lighting variations and shadows. Instead, traditional computer vision uses statistical background modeling such as \textbf{Gaussian Mixture Models (GMM)}, where each pixel is modeled over time by a mixture of Gaussians to account for multi-modal backgrounds (e.g., swaying tree leaves, flickering light). Alternatively, color spaces like HSV are used, separating chromaticity from intensity ($V$) to make the system more robust to illumination shifts and shadows.
+
+\section[Question -- {\it Tracking Failures and Hybrid Architecture}]{}
+
+\subsection{Tracking Failures: Template Matching vs. Optical Flow}
+\textit{Consider two pedestrian tracking systems in a video: System A uses template matching (SSD against a fixed patch from $t=0$), and System B uses optical flow (iteratively propagating position). Both work for 10 seconds, but fail after 30 seconds. Explain the failure mechanisms and design a non-Deep Learning hybrid system.}
+
+\textbf{1. System A Failure Mechanism (Template Matching):}
+System A does not fail due to keypoint deformation (since template matching operates on raw pixel patches via SSD/NCC rather than discrete feature keypoints). Instead, it fails due to \textbf{template staleness}. Because the reference template is statically fixed to frame $t=0$ and never updated, it cannot represent a non-rigidly deforming, evolving object. Over 30 seconds, the pedestrian's pose (limb articulation during walking), scale (approaching/receding), illumination (shadows, direct sunlight), and viewpoint change completely. The static patch no longer resembles the target, causing SSD to find an incorrect local minimum. This failure is structurally inevitable for any non-rigid or scaling object.
+
+\textbf{2. System B Failure Mechanism (Optical Flow):}
+System B fails due to \textbf{temporal error accumulation (drift)} combined with structural vulnerabilities. Lucas-Kanade assumes \textit{small motion} between consecutive frames, introducing a small estimation error $\epsilon$ per frame. This error accumulates linearly over time ($T \cdot \epsilon$), resulting in a significant spatial offset after 900 frames (30 seconds at 30 fps). Furthermore, System B fails inevitably during \textbf{occlusions} (partial or total): because optical flow cannot estimate motion on invisible pixels, the propagation breaks down immediately and cannot recover independently.
+
+\textbf{3. Non-Deep Learning Hybrid System Design:}
+To overcome these limitations without Deep Learning, we can design a robust coarse-to-fine hybrid tracker combining both approaches with safety mechanisms:
+\begin{enumerate}
+    \item \textbf{Motion Propagation via Optical Flow (LK):} Use optical flow on pixels within the bounding box to estimate local motion and predict the target's rough position in frame $t+1$. This handles continuous motion efficiently.
+    \item \textbf{Local Refinement via Template Matching (NCC):} Perform a localized search (using Normalized Cross-Correlation) around the predicted position to correct sub-pixel drift and small accumulation errors.
+    \item \textbf{Adaptive Template Update:} To prevent template staleness (System A's flaw), if the NCC confidence score remains high but shows minor appearance shifts, the reference template is **adaptively updated** with the current patch at a controlled, conservative rate.
+    \item \textbf{Confidence Thresholding \& Loss of Target Declaration:} If the NCC confidence score drops below a strict threshold (due to severe occlusions or tracking failure), the system suspends template updates and declares a \textbf{loss of target} rather than blindly propagating corrupted tracking windows.
+\end{enumerate}
+
+% TeX root = ../Main.tex
+
+\section[Question -- {\it Industrial Conveyor Belt Anomaly Detection}]{}
+
+\subsection{Industrial Conveyor Belt Anomaly Detection}
+\textit{Design an automated industrial anomaly detection system for a moving conveyor belt using traditional computer vision. Evaluate a colleague's naïve proposal of using direct pixel-by-pixel background subtraction against a static empty-belt reference image.}
+
+\textbf{a) Valid Conditions for the Naïve Approach:}
+This direct subtraction approach works correctly and is acceptable only if strict conditions are met: 
+(1) The conveyor belt must be stationary (or perfectly synchronized) during image capture; 
+(2) The object must stop at the exact same identical position every time; and 
+(3) The anomaly or object must exhibit a high-contrast difference in color/intensity relative to the belt. Under these rigid constraints, simple thresholding is sufficient because spatial coordinates remain perfectly aligned.
+
+\textbf{b) Three Fundamental Failure Modes in Dynamic Conditions:}
+When the belt moves continuously in a real industrial setting, the naïve approach fails due to:
+\begin{enumerate}
+    \item \textbf{Non-deterministic Motion Blur:} If the belt moves continuously, the textured pattern of the rubber blurs. Since belt speed varies slightly between cycles, the blur pattern changes, causing systematic false positives during subtraction.
+    \item \textbf{Mechanical Vibrations:} Industrial motors induce micro-vibrations in the camera mounting, causing subtle frame-to-frame misalignments (spatial jitter) between the current frame and the static reference.
+    \item \textbf{Object Misalignment (Ghosting Artifacts):} Even identical objects slip or shift slightly by 2--3 pixels. Subtraction creates a severe double-edge "ghosting" artifact around the object boundaries, leading to false anomaly detections.
+    \item \textit{(Bonus)} \textbf{Accumulation of Dirt and Wear:} Over time, dust, grease, and scratches accumulate on the belt. A static reference image captured at $t=0$ becomes obsolete, generating widespread false positives.
+\end{enumerate}
+
+\textbf{c) Robust Traditional Computer Vision Improvements:}
+To maintain computational simplicity while fixing these flaws without Deep Learning:
+\begin{enumerate}
+    \item \textbf{For Motion Blur:} Use an **encoder trigger** synchronized with the belt motor (or a strobe flash) to freeze motion at the exact same inspection window, eliminating motion blur at the root.
+    \item \textbf{For Mechanical Vibrations:} Apply a fast **rigid image registration** (translation and rotation via frequency-domain cross-correlation) to stabilize and realign the frame with the reference before subtraction.
+    \item \textbf{For Object Slittage/Positioning:} Use localized feature alignment or an optimized template matching/homography to warp the inspected object into standard alignment, preventing boundary ghosting.
+    \item \textbf{For Belt Wear/Dirt:} Implement a **periodic reference update** algorithm (running background update during empty belt intervals) to dynamically adapt the reference image.
+\end{enumerate}
+
+\section[Question -- {\it Panoramic Stitching Failures and Parallax}]{}
+
+\subsection{Panoramic Stitching Failures: Corridor vs. Open Piazza}
+\textit{A panoramic stitching pipeline (SIFT + Ratio Test + RANSAC + Global Homography) works perfectly in a closed corridor, but fails with ghosting and misalignment in an open piazza with buildings at different depths, despite abundant matches and correct RANSAC convergence. Explain the geometric causes and how to solve it.}
+
+\textbf{a) Geometric Difference (Corridor vs. Piazza):}
+In a closed corridor, all scene points lie approximately at the same depth and on coplanar surfaces. A homography mathematically models this exactly, as it is valid for planar scenes or pure camera rotation. In an open piazza, buildings and structures exist at radically different depths. When the camera rotates, foreground objects undergo a larger apparent displacement than distant background objects. This differential motion is \textbf{parallax}, which violates the fundamental assumptions of a single global homography.
+
+\textbf{b) Why RANSAC Converges but the Result is Wrong:}
+RANSAC successfully finds the homography that maximizes the number of inliers, but it is optimizing over a \textbf{misspecified model}. Since no single global homography can simultaneously map points at varying depths, RANSAC converges to a least-squares compromise—typically aligning distant background points while failing on foreground elements. It is analogous to fitting a straight line to curved data: the algorithm optimizes correctly, but the underlying geometric model is insufficient for a multi-depth scene.
+
+\textbf{c) Solution (Geometric Correction + Blending):}
+To solve this properly without relying on naive blending (like feathering, which only masks geometric errors):
+\begin{enumerate}
+    \item \textbf{Correct Geometric Model (Cylindrical Projection):} Instead of warping flat image planes via homography, project images onto a cylindrical or spherical surface. Under cylindrical coordinates, pure camera rotation reduces to a simple horizontal translation, inherently eliminating background parallax.
+    \item \textbf{Multi-Band Blending:} For any residual parallax in foreground objects, apply a Laplacian pyramid blending technique. This decomposes images into frequency bands, smoothing low frequencies (illumination/color) over wide zones while blending high frequencies (edges/details) locally, ensuring sharp transitions without ghosting.
+\end{enumerate}
+
+\section[Question -- {\it Document Rectification: Passports vs. Receipts}]{}
+
+\subsection{Document Rectification: Passports vs. Receipts}
+\textit{A document rectification pipeline (SIFT + RANSAC + Homography) works well on passports and IDs, but systematically fails on supermarket receipts, despite them being flat rectangles. Explain why SIFT fails, propose a traditional alternative for corner detection, and explain how to estimate and apply the homography.}
+
+\textbf{a) Why SIFT Fails on Supermarket Receipts:}
+Supermarket receipts lack distinctive, unique local texture. They consist of repetitive rows of text, identical characters, and large white spaces, which create severe descriptor ambiguity for SIFT. Furthermore, thermal paper lacks the rich graphical features, holograms, complex background patterns, and sharp internal gradients found in passports or IDs. Consequently, SIFT fails to find reliable, unambiguous matches across views.
+
+\textbf{b) Traditional Alternative for Corner Detection (No SIFT):}
+Instead of feature matching, we use a classic image processing pipeline:
+\begin{enumerate}
+    \item \textbf{Binarization:} Apply Otsu's thresholding to separate the receipt from the background table.
+    \item \textbf{Edge Detection \& Contour Extraction:} Use Canny edge detection followed by contour tracing to find closed boundaries.
+    \item \textbf{Polygon Approximation:} Apply the Douglas-Peucker algorithm to simplify the largest closed contour into a quadrilateral polygon guaranteed to have exactly 4 vertices. The geometric intersections of these four lines yield the 4 precise corner coordinates.
+\end{enumerate}
+
+\textbf{c) Estimating and Applying the Homography:}
+\begin{enumerate}
+    \item \textbf{Target Coordinates:} Determine the target dimensions ($\text{width}$ and $\text{height}$) by computing the maximum Euclidean distances between the detected corners. Define the destination points as a clean, frontal rectangle: $(0,0)$, $(\text{width}, 0)$, $(\text{width}, \text{height})$, and $(0, \text{height})$.
+    \item \textbf{Homography Estimation:} An 8-DOF homography matrix $H$ requires 4 point correspondences (yielding 8 linear equations). Construct the system $Ah = 0$ and solve it using Singular Value Decomposition (SVD), taking the right-singular vector corresponding to the smallest singular value.
+    \item \textbf{Rectification via Inverse Warping:} Apply the inverse of the estimated homography to map destination pixel coordinates back into the source image, using bilinear interpolation. This ensures every pixel in the rectified output is filled, preventing interpolation gaps.
+\end{enumerate}
+
+\section[Question -- {\it Document Rectification: Passports vs. Receipts}]{}
+
+\subsection{Document Rectification: Passports vs. Receipts}
+\textit{A document rectification pipeline (SIFT + RANSAC + Homography) works well on passports and IDs, but systematically fails on supermarket receipts, despite them being flat rectangles. Explain why SIFT fails, propose a traditional alternative for corner detection, and explain how to estimate and apply the homography.}
+
+\textbf{a) Why SIFT Fails on Supermarket Receipts:}
+Supermarket receipts lack distinctive, unique local texture. They consist of repetitive rows of text, uniform thermal printing, and large white spaces, which create severe descriptor ambiguity for SIFT. Unlike passports or IDs—which contain rich graphical elements, color photographs, holograms, and sharp multi-directional gradients—receipts offer no robust local keypoints that can be matched reliably across varying viewpoints.
+
+\textbf{b) Traditional Alternative for Corner Detection (No SIFT):}
+Instead of feature matching, we use a robust bottom-up image processing pipeline:
+\begin{enumerate}
+    \item \textbf{Binarization \& Edge Detection:} Apply Otsu's thresholding (noting that under uncontrolled conditions with similar background tones, contrast enhancement or adaptive thresholds may be required) followed by Canny edge detection to highlight structural boundaries.
+    \item \textbf{Contour Extraction \& Morphology:} Extract connected components using contour finding algorithms ($\texttt{findContours}$). Apply morphological closing operations (dilation followed by erosion) to bridge any small gaps or broken edges in the receipt boundary.
+    \item \textbf{Largest Contour Selection \& Polygon Approximation:} Select the largest closed contour by area (corresponding to the document). Apply the Douglas-Peucker polygon approximation algorithm to reduce the contour vertices down to a quadrilateral with exactly 4 vertices, representing the receipt's corners.
+\end{enumerate}
+
+\textbf{c) Estimating and Applying the Homography:}
+\begin{enumerate}
+    \item \textbf{Target Rectangle Estimation:} Compute the real-world proportions by taking the maximum Euclidean distances between opposite corners (e.g., width as $\max(d_{top}, d_{bottom})$ and height as $\max(d_{left}, d_{right})$). Define the destination coordinates as a clean frontal rectangle from $(0,0)$ to $(\text{width}, \text{height})$.
+    \item \textbf{Homography Estimation via SVD:} With 4 point correspondences, construct the direct linear transformation system $Ah = 0$ (yielding 8 equations for 8 DOFs). Solve it using Singular Value Decomposition (SVD), where the estimated homography vector corresponds to the right-singular vector associated with the smallest singular value.
+    \item \textbf{Rectification via Inverse Warping:} Apply \textbf{inverse warping} (mapping destination coordinates back to the source via $H^{-1}$) combined with bilinear interpolation. Inverse warping is strictly required because forward mapping leaves unmapped destination pixels (holes/gaps), whereas inverse mapping guarantees that every pixel in the rectified output frame is evaluated and filled.
+\end{enumerate}
+
+\section[Question -- {\it Stereo Vision Failure Scenarios}]{}
+
+\subsection{Stereo Vision Failure Scenarios: A, B, and C}
+\textit{A calibrated and rectified stereo vision system works in a lab, but degrades in three specific scenarios: A (white uniform walls), B (outdoor scene with a window), and C (two objects at different depths with a sharp boundary). Explain the failure mechanism, the traditional solution, and the violated block matching assumption for each.}
+
+\textbf{Scenario A: Uniform White Walls (Aperture / Textureless Region)}
+\begin{itemize}
+    \item \textbf{Failure Mechanism:} The smooth white wall lacks distinctive high-frequency texture or intensity gradients. Consequently, local pixel windows look identical, producing a flat, ambiguous matching cost curve (SSD) with no distinct global minimum, resulting in large unassigned grey areas.
+    \item \textbf{Violated Assumption:} \textit{Texture Sufficiency} (the assumption that every local patch contains sufficient intensity variation to be uniquely matched).
+    \item \textbf{Traditional Solution:} Project an artificial structured light pattern (e.g., an infrared dot pattern or laser texture) onto textureless surfaces to force high-frequency features.
+\end{itemize}
+
+\textbf{Scenario B: Window with Reflections (Specular/Non-Lambertian Surface)}
+\begin{itemize}
+    \item \textbf{Failure Mechanism:} Glass acts as a semi-reflective mirror. Because the left and right cameras view the window from different angles, they capture completely different reflections (e.g., indoor room vs. outdoor sky), violating photometric consistency.
+    \item \textbf{Violated Assumption:} \textit{Brightness Constancy / Photometric Consistency} (the assumption that a physical point reflects the same light intensity into both cameras).
+    \item \textbf{Traditional Solution:} Use cross-polarization (placing orthogonal polarizing filters on the cameras and light sources) to eliminate specular reflections, or apply disparity confidence masks to filter out regions with high left-right photometric inconsistency.
+\end{itemize}
+
+\textbf{Scenario C: Sharp Boundary Between Near and Far Objects (Fattening Effect)}
+\begin{itemize}
+    \item \textbf{Failure Mechanism:} When the block matching window straddles a sharp depth discontinuity, it simultaneously captures pixels belonging to two different depth planes. No single patch in the right image can match this mixed combination, causing a smeared cost function, erroneous disparity values, and the \textbf{fattening effect} (foreground boundaries "bleeding" onto the background).
+    \item \textbf{Violated Assumption:} \textit{Fronto-Parallel Surface Assumption} (the assumption that all pixels within the matching window lie on a single continuous flat surface at constant depth).
+    \item \textbf{Traditional Solution:} Employ adaptive support weights (adaptive windows that shrink or adjust near edges) or Global/Semi-Global Matching (SGM) with regularization terms that penalize abrupt, un-supported disparity jumps.
+\end{itemize}
