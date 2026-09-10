@@ -10,7 +10,7 @@ Zero-padding adds a uniform layer of zeros around the image. When a derivative-b
 \subsection{Limits and Validity of Homography}
 \textit{Under what two specific geometric conditions does a Homography matrix $H$ ($3 \times 3$) accurately map points between two images? What happens if the camera undergoes a pure translation in a non-planar 3D scene?}
 
-A homography matrix $H$ accurately maps points between two images if and only if at least one of two conditions is met: (1) the observed 3D scene is strictly planar, or (2) the camera motion is a pure rotation around its optical center ($t = 0$), regardless of the 3D structure. 
+A homography matrix $H$ accurately maps points between two images if and only if at least one of two conditions is met: (1) the observed 3D scene is strictly planar, or (2) the camera motion is a pure rotation around its optical center ($t = 0$), regardless of the 3D structure.
 If the camera undergoes a pure translation (or general motion) in a non-planar 3D scene, the \textbf{parallax effect} occurs. Points at different depths move by different amounts, making a single global homography invalid. In this scenario, one must resort to Epipolar Geometry using the Fundamental ($F$) or Essential ($E$) matrix.
 
 \subsection{Coarse-to-Fine Optical Flow and Inverse Warping}
@@ -36,8 +36,8 @@ The Harris detector looks for local intensity variations by shifting a small win
 \subsection{Stereo Vision Baseline Trade-off}
 \textit{What is the engineering trade-off in stereo vision when choosing a very small baseline versus a very large baseline?}
 
-The baseline is the distance between the optical centers of the two cameras. 
-A \textbf{narrow baseline} makes stereo matching much easier (high overlap, fewer occlusions), but depth estimation is very sensitive to noise, as small pixel disparity errors lead to huge errors in depth calculation ($Z$). 
+The baseline is the distance between the optical centers of the two cameras.
+A \textbf{narrow baseline} makes stereo matching much easier (high overlap, fewer occlusions), but depth estimation is very sensitive to noise, as small pixel disparity errors lead to huge errors in depth calculation ($Z$).
 A \textbf{wide baseline} provides high geometric precision for depth estimation, but makes stereo matching extremely difficult due to large perspective distortions and heavy occlusions.
 
 \subsection{The Aperture Problem}
@@ -48,37 +48,37 @@ The aperture problem occurs when observing a moving edge through a small local w
 \subsection{SIFT: Scale and Rotation Invariance}
 \textit{How does SIFT achieve scale invariance and rotation invariance?}
 
-\textbf{Scale invariance} is achieved by detecting keypoints across multiple scales using a scale-space representation based on the Difference of Gaussians (DoG) pyramids, locating stable extrema across adjacent scales. 
+\textbf{Scale invariance} is achieved by detecting keypoints across multiple scales using a scale-space representation based on the Difference of Gaussians (DoG) pyramids, locating stable extrema across adjacent scales.
 \textbf{Rotation invariance} is achieved by computing a local gradient orientation histogram in the neighborhood of each keypoint and assigning a canonical orientation corresponding to the highest peak of the histogram, so that descriptors are always aligned relative to this dominant direction.
 
 \subsection{Fundamental Matrix and its Rank}
 \textit{What is the Fundamental Matrix ($F$), and why does it have a rank of 2 ($\det(F) = 0$)?}
 
-The Fundamental Matrix $F$ ($3 \times 3$) is the algebraic representation of epipolar geometry for uncalibrated cameras, mapping a point in the first image to its corresponding epipolar line in the second image ($l' = Fx$). 
+The Fundamental Matrix $F$ ($3 \times 3$) is the algebraic representation of epipolar geometry for uncalibrated cameras, mapping a point in the first image to its corresponding epipolar line in the second image ($l' = Fx$).
 It has a \textbf{rank of 2 ($\det(F) = 0$)} because it maps a 2D point onto a 1D line (epipolar line). Mathematically, it is defined as $F = K'^{-T} [t]_\times R K^{-1}$, where the essential matrix component $[t]_\times$ is a skew-symmetric matrix of rank 2, which forces $F$ to also be singular (rank 2).
 
 \subsection{Epipoles and Epipolar Lines}
 \textit{What are epipoles and epipolar lines, and how do they simplify stereo matching?}
 
-An \textbf{epipole} ($e, e'$) is the intersection of the baseline (the line connecting the two camera centers) with the respective image planes (equivalently, the projection of one camera center onto the other image plane). An \textbf{epipolar line} is the intersection of the epipolar plane (defined by 3D point $X$ and the two camera centers) with the image plane. 
+An \textbf{epipole} ($e, e'$) is the intersection of the baseline (the line connecting the two camera centers) with the respective image planes (equivalently, the projection of one camera center onto the other image plane). An \textbf{epipolar line} is the intersection of the epipolar plane (defined by 3D point $X$ and the two camera centers) with the image plane.
 The epipolar constraint simplifies stereo matching from a 2D search problem to a 1D search problem: given a point $x$ in the first image, its corresponding point $x'$ in the second image must lie entirely along its corresponding epipolar line $l'$.
 
 \subsection{RANSAC vs. Least Squares}
 \textit{Why do Least Squares fail in the presence of high outlier ratios, and how does RANSAC solve this?}
 
-Standard Least Squares minimizes the sum of squared residuals, which causes even a small percentage of severe outliers (e.g., 40% false matches) to drastically pull and distort the estimated model parameters. 
+Standard Least Squares minimizes the sum of squared residuals, which causes even a small percentage of severe outliers (e.g., 40\% false matches) to drastically pull and distort the estimated model parameters.
 \textbf{RANSAC (Random Sample Consensus)} solves this by iteratively sampling the minimum subset of points required to estimate the model, computing the transformation, and counting how many total points agree with it (the consensus set / inliers). By keeping the model with the largest consensus set over many iterations, it completely isolates and discards the outliers.
 
 \subsection{Mean vs. Median Filter for Salt-and-Pepper Noise}
 \textit{Why does a Mean filter blur salt-and-pepper noise while a Median filter completely eliminates it?}
 
-A Mean filter is a linear filter that averages all pixel values in a neighborhood. Since salt-and-pepper noise consists of extreme, isolated impulse values (maximum or minimum brightness), averaging them smears the noise values across neighboring pixels, causing blurring. 
+A Mean filter is a linear filter that averages all pixel values in a neighborhood. Since salt-and-pepper noise consists of extreme, isolated impulse values (maximum or minimum brightness), averaging them smears the noise values across neighboring pixels, causing blurring.
 A Median filter is a non-linear filter that replaces the pixel value with the statistical median of its neighborhood. Extreme noise impulses fall at the extreme ends of the sorted neighborhood values and are automatically ignored, completely removing the noise without blurring edges.
 
 \subsection{Phase Swapping Experiment in Fourier Domain}
 \textit{In a phase-swapping experiment between Image A and Image B, which image is visually recognizable in the IFFT output and why?}
 
-Image B (the one whose \textbf{Phase} was used) will be visually recognizable. 
+Image B (the one whose \textbf{Phase} was used) will be visually recognizable.
 While the Amplitude spectrum contains the overall energy distribution and frequency magnitudes, the \textbf{Phase spectrum} contains the precise spatial structure, alignment, and edge locations of the image. The human visual system relies overwhelmingly on phase information to perceive shapes and objects.
 
 \subsection{Background Subtraction in Outdoor Environments}
@@ -86,7 +86,7 @@ While the Amplitude spectrum contains the overall energy distribution and freque
 
 Simple frame differencing fails due to lighting variations and shadows. Instead, traditional computer vision uses statistical background modeling such as \textbf{Gaussian Mixture Models (GMM)}, where each pixel is modeled over time by a mixture of Gaussians to account for multi-modal backgrounds (e.g., swaying tree leaves, flickering light). Alternatively, color spaces like HSV are used, separating chromaticity from intensity ($V$) to make the system more robust to illumination shifts and shadows.
 
-\section[Question -- {\it Tracking Failures and Hybrid Architecture}]{}
+\subsection[Question -- {\it Tracking Failures and Hybrid Architecture}]{}
 
 \subsection{Tracking Failures: Template Matching vs. Optical Flow}
 \textit{Consider two pedestrian tracking systems in a video: System A uses template matching (SSD against a fixed patch from $t=0$), and System B uses optical flow (iteratively propagating position). Both work for 10 seconds, but fail after 30 seconds. Explain the failure mechanisms and design a non-Deep Learning hybrid system.}
@@ -102,21 +102,19 @@ To overcome these limitations without Deep Learning, we can design a robust coar
 \begin{enumerate}
     \item \textbf{Motion Propagation via Optical Flow (LK):} Use optical flow on pixels within the bounding box to estimate local motion and predict the target's rough position in frame $t+1$. This handles continuous motion efficiently.
     \item \textbf{Local Refinement via Template Matching (NCC):} Perform a localized search (using Normalized Cross-Correlation) around the predicted position to correct sub-pixel drift and small accumulation errors.
-    \item \textbf{Adaptive Template Update:} To prevent template staleness (System A's flaw), if the NCC confidence score remains high but shows minor appearance shifts, the reference template is **adaptively updated** with the current patch at a controlled, conservative rate.
+    \item \textbf{Adaptive Template Update:} To prevent template staleness (System A's flaw), if the NCC confidence score remains high but shows minor appearance shifts, the reference template is \textbf{adaptively updated} with the current patch at a controlled, conservative rate.
     \item \textbf{Confidence Thresholding \& Loss of Target Declaration:} If the NCC confidence score drops below a strict threshold (due to severe occlusions or tracking failure), the system suspends template updates and declares a \textbf{loss of target} rather than blindly propagating corrupted tracking windows.
 \end{enumerate}
 
-% TeX root = ../Main.tex
-
-\section[Question -- {\it Industrial Conveyor Belt Anomaly Detection}]{}
+\subsection[Question -- {\it Industrial Conveyor Belt Anomaly Detection}]{}
 
 \subsection{Industrial Conveyor Belt Anomaly Detection}
 \textit{Design an automated industrial anomaly detection system for a moving conveyor belt using traditional computer vision. Evaluate a colleague's naïve proposal of using direct pixel-by-pixel background subtraction against a static empty-belt reference image.}
 
 \textbf{a) Valid Conditions for the Naïve Approach:}
-This direct subtraction approach works correctly and is acceptable only if strict conditions are met: 
-(1) The conveyor belt must be stationary (or perfectly synchronized) during image capture; 
-(2) The object must stop at the exact same identical position every time; and 
+This direct subtraction approach works correctly and is acceptable only if strict conditions are met:
+(1) The conveyor belt must be stationary (or perfectly synchronized) during image capture;
+(2) The object must stop at the exact same identical position every time; and
 (3) The anomaly or object must exhibit a high-contrast difference in color/intensity relative to the belt. Under these rigid constraints, simple thresholding is sufficient because spatial coordinates remain perfectly aligned.
 
 \textbf{b) Three Fundamental Failure Modes in Dynamic Conditions:}
@@ -124,20 +122,20 @@ When the belt moves continuously in a real industrial setting, the naïve approa
 \begin{enumerate}
     \item \textbf{Non-deterministic Motion Blur:} If the belt moves continuously, the textured pattern of the rubber blurs. Since belt speed varies slightly between cycles, the blur pattern changes, causing systematic false positives during subtraction.
     \item \textbf{Mechanical Vibrations:} Industrial motors induce micro-vibrations in the camera mounting, causing subtle frame-to-frame misalignments (spatial jitter) between the current frame and the static reference.
-    \item \textbf{Object Misalignment (Ghosting Artifacts):} Even identical objects slip or shift slightly by 2--3 pixels. Subtraction creates a severe double-edge "ghosting" artifact around the object boundaries, leading to false anomaly detections.
+    \item \textbf{Object Misalignment (Ghosting Artifacts):} Even identical objects slip or shift slightly by 2--3 pixels. Subtraction creates a severe double-edge ``ghosting'' artifact around the object boundaries, leading to false anomaly detections.
     \item \textit{(Bonus)} \textbf{Accumulation of Dirt and Wear:} Over time, dust, grease, and scratches accumulate on the belt. A static reference image captured at $t=0$ becomes obsolete, generating widespread false positives.
 \end{enumerate}
 
 \textbf{c) Robust Traditional Computer Vision Improvements:}
 To maintain computational simplicity while fixing these flaws without Deep Learning:
 \begin{enumerate}
-    \item \textbf{For Motion Blur:} Use an **encoder trigger** synchronized with the belt motor (or a strobe flash) to freeze motion at the exact same inspection window, eliminating motion blur at the root.
-    \item \textbf{For Mechanical Vibrations:} Apply a fast **rigid image registration** (translation and rotation via frequency-domain cross-correlation) to stabilize and realign the frame with the reference before subtraction.
-    \item \textbf{For Object Slittage/Positioning:} Use localized feature alignment or an optimized template matching/homography to warp the inspected object into standard alignment, preventing boundary ghosting.
-    \item \textbf{For Belt Wear/Dirt:} Implement a **periodic reference update** algorithm (running background update during empty belt intervals) to dynamically adapt the reference image.
+    \item \textbf{For Motion Blur:} Use an \textbf{encoder trigger} synchronized with the belt motor (or a strobe flash) to freeze motion at the exact same inspection window, eliminating motion blur at the root.
+    \item \textbf{For Mechanical Vibrations:} Apply a fast \textbf{rigid image registration} (translation and rotation via frequency-domain cross-correlation) to stabilize and realign the frame with the reference before subtraction.
+    \item \textbf{For Object Slippage/Positioning:} Use localized feature alignment or an optimized template matching/homography to warp the inspected object into standard alignment, preventing boundary ghosting.
+    \item \textbf{For Belt Wear/Dirt:} Implement a \textbf{periodic reference update} algorithm (running background update during empty belt intervals) to dynamically adapt the reference image.
 \end{enumerate}
 
-\section[Question -- {\it Panoramic Stitching Failures and Parallax}]{}
+\subsection[Question -- {\it Panoramic Stitching Failures and Parallax}]{}
 
 \subsection{Panoramic Stitching Failures: Corridor vs. Open Piazza}
 \textit{A panoramic stitching pipeline (SIFT + Ratio Test + RANSAC + Global Homography) works perfectly in a closed corridor, but fails with ghosting and misalignment in an open piazza with buildings at different depths, despite abundant matches and correct RANSAC convergence. Explain the geometric causes and how to solve it.}
@@ -146,7 +144,7 @@ To maintain computational simplicity while fixing these flaws without Deep Learn
 In a closed corridor, all scene points lie approximately at the same depth and on coplanar surfaces. A homography mathematically models this exactly, as it is valid for planar scenes or pure camera rotation. In an open piazza, buildings and structures exist at radically different depths. When the camera rotates, foreground objects undergo a larger apparent displacement than distant background objects. This differential motion is \textbf{parallax}, which violates the fundamental assumptions of a single global homography.
 
 \textbf{b) Why RANSAC Converges but the Result is Wrong:}
-RANSAC successfully finds the homography that maximizes the number of inliers, but it is optimizing over a \textbf{misspecified model}. Since no single global homography can simultaneously map points at varying depths, RANSAC converges to a least-squares compromise—typically aligning distant background points while failing on foreground elements. It is analogous to fitting a straight line to curved data: the algorithm optimizes correctly, but the underlying geometric model is insufficient for a multi-depth scene.
+RANSAC successfully finds the homography that maximizes the number of inliers, but it is optimizing over a \textbf{misspecified model}. Since no single global homography can simultaneously map points at varying depths, RANSAC converges to a least-squares compromise---typically aligning distant background points while failing on foreground elements. It is analogous to fitting a straight line to curved data: the algorithm optimizes correctly, but the underlying geometric model is insufficient for a multi-depth scene.
 
 \textbf{c) Solution (Geometric Correction + Blending):}
 To solve this properly without relying on naive blending (like feathering, which only masks geometric errors):
@@ -155,7 +153,7 @@ To solve this properly without relying on naive blending (like feathering, which
     \item \textbf{Multi-Band Blending:} For any residual parallax in foreground objects, apply a Laplacian pyramid blending technique. This decomposes images into frequency bands, smoothing low frequencies (illumination/color) over wide zones while blending high frequencies (edges/details) locally, ensuring sharp transitions without ghosting.
 \end{enumerate}
 
-\section[Question -- {\it Document Rectification: Passports vs. Receipts}]{}
+\subsection[Question -- {\it Document Rectification: Passports vs. Receipts}]{}
 
 \subsection{Document Rectification: Passports vs. Receipts}
 \textit{A document rectification pipeline (SIFT + RANSAC + Homography) works well on passports and IDs, but systematically fails on supermarket receipts, despite them being flat rectangles. Explain why SIFT fails, propose a traditional alternative for corner detection, and explain how to estimate and apply the homography.}
@@ -178,13 +176,13 @@ Instead of feature matching, we use a classic image processing pipeline:
     \item \textbf{Rectification via Inverse Warping:} Apply the inverse of the estimated homography to map destination pixel coordinates back into the source image, using bilinear interpolation. This ensures every pixel in the rectified output is filled, preventing interpolation gaps.
 \end{enumerate}
 
-\section[Question -- {\it Document Rectification: Passports vs. Receipts}]{}
+\subsection[Question -- {\it Document Rectification: Passports vs. Receipts (Extended)}]{}
 
 \subsection{Document Rectification: Passports vs. Receipts}
 \textit{A document rectification pipeline (SIFT + RANSAC + Homography) works well on passports and IDs, but systematically fails on supermarket receipts, despite them being flat rectangles. Explain why SIFT fails, propose a traditional alternative for corner detection, and explain how to estimate and apply the homography.}
 
 \textbf{a) Why SIFT Fails on Supermarket Receipts:}
-Supermarket receipts lack distinctive, unique local texture. They consist of repetitive rows of text, uniform thermal printing, and large white spaces, which create severe descriptor ambiguity for SIFT. Unlike passports or IDs—which contain rich graphical elements, color photographs, holograms, and sharp multi-directional gradients—receipts offer no robust local keypoints that can be matched reliably across varying viewpoints.
+Supermarket receipts lack distinctive, unique local texture. They consist of repetitive rows of text, uniform thermal printing, and large white spaces, which create severe descriptor ambiguity for SIFT. Unlike passports or IDs---which contain rich graphical elements, color photographs, holograms, and sharp multi-directional gradients---receipts offer no robust local keypoints that can be matched reliably across varying viewpoints.
 
 \textbf{b) Traditional Alternative for Corner Detection (No SIFT):}
 Instead of feature matching, we use a robust bottom-up image processing pipeline:
@@ -201,7 +199,7 @@ Instead of feature matching, we use a robust bottom-up image processing pipeline
     \item \textbf{Rectification via Inverse Warping:} Apply \textbf{inverse warping} (mapping destination coordinates back to the source via $H^{-1}$) combined with bilinear interpolation. Inverse warping is strictly required because forward mapping leaves unmapped destination pixels (holes/gaps), whereas inverse mapping guarantees that every pixel in the rectified output frame is evaluated and filled.
 \end{enumerate}
 
-\section[Question -- {\it Stereo Vision Failure Scenarios}]{}
+\subsection[Question -- {\it Stereo Vision Failure Scenarios}]{}
 
 \subsection{Stereo Vision Failure Scenarios: A, B, and C}
 \textit{A calibrated and rectified stereo vision system works in a lab, but degrades in three specific scenarios: A (white uniform walls), B (outdoor scene with a window), and C (two objects at different depths with a sharp boundary). Explain the failure mechanism, the traditional solution, and the violated block matching assumption for each.}
@@ -222,7 +220,64 @@ Instead of feature matching, we use a robust bottom-up image processing pipeline
 
 \textbf{Scenario C: Sharp Boundary Between Near and Far Objects (Fattening Effect)}
 \begin{itemize}
-    \item \textbf{Failure Mechanism:} When the block matching window straddles a sharp depth discontinuity, it simultaneously captures pixels belonging to two different depth planes. No single patch in the right image can match this mixed combination, causing a smeared cost function, erroneous disparity values, and the \textbf{fattening effect} (foreground boundaries "bleeding" onto the background).
+    \item \textbf{Failure Mechanism:} When the block matching window straddles a sharp depth discontinuity, it simultaneously captures pixels belonging to two different depth planes. No single patch in the right image can match this mixed combination, causing a smeared cost function, erroneous disparity values, and the \textbf{fattening effect} (foreground boundaries ``bleeding'' onto the background).
     \item \textbf{Violated Assumption:} \textit{Fronto-Parallel Surface Assumption} (the assumption that all pixels within the matching window lie on a single continuous flat surface at constant depth).
     \item \textbf{Traditional Solution:} Employ adaptive support weights (adaptive windows that shrink or adjust near edges) or Global/Semi-Global Matching (SGM) with regularization terms that penalize abrupt, un-supported disparity jumps.
 \end{itemize}
+
+\subsection[Question -- {\it RANSAC Inliers and Low Percentage Diagnosis}]{}
+
+\subsection{Diagnosing Low Inlier Percentage in RANSAC}
+\textit{A SIFT + RANSAC homography pipeline yields an inlier ratio of 29\% (87 out of 300 matches). A colleague suggests increasing RANSAC iterations $N$ to fix it. Why is the colleague wrong, what are the photometric and geometric causes, and how would you diagnose and solve them?}
+
+\textbf{Vincoli della domanda:}
+A pipeline with SIFT, RANSAC, and Homography successfully converges despite a low inlier ratio, indicating a structural issue in the data rather than an algorithmic failure of RANSAC.
+
+\textbf{a) Why the Colleague is Wrong:}
+The colleague is wrong because $N$ (number of iterations) only guarantees the statistical probability $p$ of randomly sampling at least one outlier-free set of minimum points ($s=4$). If the inlier ratio is low due to structural data issues (bad matches or model misspecification), running RANSAC longer will not magically turn outliers into inliers; it will just test the same flawed pool of matches more times.
+
+\textbf{b) Photometric and Geometric Causes:}
+\begin{itemize}
+    \item \textbf{Photometric Cause:} Reflections, specularities (non-Lambertian surfaces like glass windows on urban buildings), or severe illumination changes between views that cause SIFT descriptors to fail or fail Lowe's ratio test, resulting in a high rate of incorrect initial matches.
+    \item \textbf{Geometric Cause:} A violation of the homography assumptions due to strong 3D \textbf{parallax} (buildings at vastly different depths in an urban scene). A single global homography cannot model multi-depth structures.
+\end{itemize}
+
+\textbf{c) Diagnosis and Solutions:}
+\begin{itemize}
+    \item \textbf{Diagnostic Method:} Visualize the spatial distribution of RANSAC inliers on the image. If inliers are densely clustered only on a single flat surface (e.g., one building facade) while the rest of the scene is rejected, the issue is \textbf{geometric (parallax)}. If inliers are sparsely scattered or absent on reflective/shadowed areas, the issue is \textbf{photometric}.
+    \item \textbf{Solutions:}
+    \begin{itemize}
+        \item For \textit{Geometric issues}, abandon the global homography model and use multi-view geometry (Epipolar geometry / Fundamental Matrix) or piecewise planar stitching.
+        \item For \textit{Photometric issues}, apply preprocessing like CLAHE (Contrast Limited Adaptive Histogram Equalization) or use robust feature descriptors less sensitive to specularities.
+    \end{itemize}
+\end{itemize}
+
+\subsection[Question -- {\it Calibrated vs. Uncalibrated Stereo Systems and Zhang's Calibration}]{}
+
+\subsection{Calibrated vs. Uncalibrated Stereo Systems and Zhang's Calibration}
+\textit{Two identical stereo hardware setups exist: System A has calibrated cameras ($K, R, t$ known), and System B is uncalibrated. A colleague claims that because they share identical hardware and see the same scene, their 3D reconstruction will be similar. Why is the colleague wrong, what can and cannot System B do, and how does Zhang's method estimate $K$?}
+
+\textbf{Vincoli della domanda:}
+The colleague confuses identical hardware with identical geometric information; the core issue is not what the cameras see, but what can be mathematically computed without $K$.
+
+\textbf{a) Why the Colleague is Wrong — The Role of $K$:}
+The camera projection matrix $P = K[R \mid t]$ maps a 3D world point $X_w$ to a 2D image point $x$ in pixels: $\lambda x = K[R \mid t] X_w$. 
+The intrinsic matrix $K$ encodes optical properties (focal lengths $f_x, f_y$, principal point $c_x, c_y$). It acts as the mathematical bridge converting metric 3D coordinates into pixel coordinates. 
+The colleague is wrong because identical hardware does not imply identical $K$ (manufacturing tolerances vary focal lengths and optical centers). Without $K$, true metric 3D reconstruction is fundamentally impossible, regardless of identical hardware.
+
+\textbf{b) What System B Can and Cannot Do:}
+System B without $K$ is not completely blind, but faces strict mathematical boundaries:
+\begin{itemize}
+    \item \textbf{Still possible without $K$:} Extract SIFT/SURF keypoints and descriptors, perform feature matching, estimate the Fundamental matrix $F$ via the normalized 8-point algorithm, and perform epipolar rectification.
+    \item \textbf{Structurally blocked without $K$:} Cannot convert $F$ to the Essential matrix $E$ (since $E = K'^T F K$), cannot recover metric rotation $R$ and translation $t$, cannot triangulate in metric 3D coordinates (yielding only a \textit{projective reconstruction} up to an unknown projective transformation), and cannot measure real-world distances.
+\end{itemize}
+
+\textbf{c) Zhang's Method for Estimating $K$:}
+Zhang's method estimates $K$ from a planar calibration target (checkerboard) without requiring 3D world points:
+\begin{enumerate}
+    \item \textbf{Capture Multiple Views:} Photograph the planar checkerboard ($Z=0$ in its local frame) from $N \ge 3$ different poses.
+    \item \textbf{Estimate Homographies:} For each view, estimate the homography $H_i = K[r_1 \ r_2 \ t]$ linking board points to image points using DLT.
+    \item \textbf{Extract Constraints on $K$:} Each homography provides 2 constraints on $K$ via the orthonormality of rotation columns ($r_1^T r_2 = 0$ and $\|r_1\| = \|r_2\|$), expressed through the Image of the Absolute Conic (IAC) $\omega = K^{-T}K^{-1}$.
+    \item \textbf{Solve for $K$:} With $N \ge 3$ views, we get $\ge 6$ constraints, sufficient to solve for $K$ (5 DoF) linearly via SVD, recovering $K$ through Cholesky decomposition of $\omega^{-1}$.
+    \item \textbf{Refinement:} Minimize total reprojection error via Bundle Adjustment.
+\end{enumerate}

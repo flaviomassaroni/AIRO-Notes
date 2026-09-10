@@ -1,0 +1,292 @@
+Ecco la raccolta completa di tutte le domande d'esame ufficiali e delle domande
+di ragionamento/scenari affrontate durante tutto il nostro percorso di studio.
+
+Puoi copiare questo testo e salvarlo in un file nominato
+domande_computer_vision_complete.md.
+
+📚 Archivio Completo Domande di Computer Vision
+
+🏛️ PARTE 1: Tracce d'Esame Ufficiali (2023 – 2026)
+
+📄 Febbraio 2023 — Exam B (Vision and Perception)
+
+1.  [Convolution] Given an image Im (4 \times 4) and a filter f_1 (3 \times 3),
+    show the intermediate passages and the resulting image g after applying the
+    convolution operator between Im and f_1. Use the coordinates (3,3), (1,1),
+    (2,4) with zero padding.
+2.  [Harris Corner Detector]
+      - a) List the main steps of the Harris corner detector.
+      - b) Is the Harris corner detector robust with respect to uniform
+        intensity changes in the image (intensity shifts and scaling)? Justify
+        your answer. Is the Harris corner detector robust with respect to
+        rotation? Justify your answer.
+3.  [Optical Flow] Describe the optical flow algorithm (Lucas-Kanade). What is
+    the aperture problem? What is the direction in the image along which optical
+    flow cannot be reliably estimated?
+4.  [Camera Calibration] Describe the camera calibration algorithm, reporting
+    what is the input data, which quantities can be estimated with it and how it
+    works (starting and ending equations will be sufficient).
+5.  [Epipolar Geometry] Explain what are the epipoles e and e' in a two-view
+    geometry, reporting also their characteristics, their main features, and the
+    most important epipoles-related equations.
+6.  [Deep Learning] What is an hierarchical set of features in a Deep Learning
+    model? Do we need to take any special action to build it when employing a
+    deep convolutional neural network?
+
+📄 Giugno 2024 — Exam A
+
+1.  [Fourier & Filtering] Discuss the role of DFT (Discrete Fourier Transform)
+    in image filtering and what information does it provide about an image.
+    Provide an example of how DFT can be used to perform high-pass and low-pass
+    filtering in the frequency domain.
+2.  [SIFT & SURF]
+      - a) Explain the Scale-Invariant Feature Transform (SIFT) algorithm.
+        Outline the steps involved in detecting and describing features using
+        SIFT. How does it achieve scale and rotation invariance?
+      - b) Compare SIFT with the Speeded-Up Robust Features (SURF) algorithm.
+        Discuss the differences in their approach and computational efficiency.
+3.  [Fundamental Matrix & Epipoles]
+      - a) Explain the concept of fundamental matrix F. How is it computed, and
+        what information does it convey about the relationship between two
+        images?
+      - b) What is the geometric meaning of the epipoles in the two images? How
+        are they related to the fundamental matrix (algebraically)?
+4.  [Stereo Vision] Describe the process of computing a disparity map in stereo
+    vision. How does the disparity map relate to depth information?
+
+📄 Settembre 2025 — Exam A
+
+1.  [Video Segmentation] Reasoning question: Consider two alternative approaches
+    for segmenting a video into visually similar segments:
+      - Approach A: Use pixel intensity histograms as features and Euclidean
+        distance as a similarity measure, followed by k-means clustering.
+      - Approach B: Use deep CNN-based frame embeddings as features and cosine
+        similarity as a distance measure, followed by a clustering method.
+        Compare the two approaches in terms of robustness, computational
+        efficiency and scalability. Discuss in which scenarios Approach A might
+        outperform Approach B, and vice versa. How the choice of features could
+        affect the quality of segmentation?
+2.  [Padding & Edge Detection] Explain the concept of padding in the context of
+    convolutional image filtering. How does the choice of padding method
+    influence edge detection results, especially near the image boundaries?
+3.  [Optical Flow & Aperture] Describe a method for estimating optical flow in
+    image sequences. What is the aperture problem, and how does it affect motion
+    estimation? In which direction within the image is optical flow ambiguous
+    due to this problem?
+4.  [Epipolar Geometry]
+      - a) What is the relationship between the fundamental matrix F and the
+        essential matrix E? Explain how one can be derived from the other.
+      - b) Describe how the fundamental matrix F can be estimated from
+        corresponding points in two images. What method(s) are commonly used for
+        this computation?
+
+📄 Aprile 2026 — Exam A
+
+1.  [Sobel vs Canny] Describe the Sobel filter for edge detection. How does it
+    differ from the Canny edge detector?
+2.  [Feature Matching & RANSAC] Explain feature matching and how the RANSAC
+    (Random Sample Consensus) algorithm can be used in conjunction with feature
+    matching to improve the accuracy of homography estimation between two
+    images.
+3.  [Fundamental Matrix & Epipoles]
+      - a) Explain the concept of fundamental matrix. How is it computed, and
+        what information does it convey about the relationship between two
+        images?
+      - b) What is the geometric meaning of the epipoles in the two images? How
+        are they related to the fundamental matrix (algebraically)?
+4.  [Keyframe Detection Pipeline] Propose a method to detect keyframes in a
+    video sequence using traditional (non-deep learning) techniques. Explain the
+    features you would extract, how you would measure frame importance or
+    uniqueness, and the criteria for selecting keyframes. Justify each step in
+    your approach. (Keyframe examples: scene changes, new objects, explosion,
+    expression change, speaker switch).
+
+📄 Giugno 2026 — Exam A
+
+1.  [Image Derivatives] Discuss the role of image derivatives in edge and corner
+    detection. Explain:
+      - a) The meaning of first-order and second-order image derivatives.
+      - b) How gradient magnitude and gradient direction are used for edge
+        detection.
+      - c) How second-order derivatives can be used to identify intensity
+        transitions (zero-crossing).
+      - d) Why are derivative-based methods sensitive to noise and how to
+        mitigate that.
+2.  [3D Reconstruction & Repeated Patterns] You are given a set of images of the
+    same building taken from different viewpoints, some images contain repeated
+    structures such as windows, columns, or similar textures. You need to build
+    a robust image matching pipeline for 3D reconstruction. Describe:
+      - a) Which local features and descriptors you would use and why.
+      - b) How you would match descriptors between image pairs.
+      - c) How you would remove incorrect matches caused by repeated patterns.
+3.  [Homography] Explain the concept of homography and its use in image
+    alignment. Discuss:
+      - a) What a homography matrix represents geometrically.
+      - b) Under which assumptions a homography can correctly map points between
+        two images.
+      - c) How corresponding feature points can be used to estimate a
+        homography.
+4.  [Structure from Motion / Triangulation] Describe the process of
+    recovering 3D structure from two calibrated images. Include:
+      - a) The role of camera calibration and intrinsic/extrinsic parameters.
+      - b) How triangulation is used to estimate the 3D position of scene
+        points.
+
+📄 Giugno 2026 — Exam B
+
+1.  [Scale-Space Representation] Explain the role of scale-space representation
+    in computer vision. Discuss:
+      - a) Why analyzing an image at multiple scales can be useful.
+      - b) How Gaussian filtering is used to construct a scale-space
+        representation.
+      - c) The difference between smoothing at a single scale and building a
+        Gaussian pyramid.
+      - d) One application where multi-scale analysis is important.
+2.  [Harris Detector] Describe the Harris corner detector. Explain:
+      - a) The intuition behind detecting corners using local intensity
+        variations.
+      - b) The role of the second-moment matrix.
+      - c) How the corner response function is computed and interpreted.
+      - d) Whether the detector is robust to rotation, intensity changes, and
+        scale changes. Justify your answer.
+3.  [Epipolar Geometry] Explain the concept of epipolar geometry between two
+    images. Discuss:
+      - a) The meaning of epipolar lines and epipoles.
+      - b) How the fundamental matrix relates corresponding points in two
+        images.
+      - c) Why the fundamental matrix has rank 2.
+      - d) How epipolar geometry can reduce the search space in stereo matching.
+4.  [Outdoor Surveillance System Design] A surveillance camera is used to
+    monitor a fixed outdoor area. During the day, illumination changes strongly
+    because of shadows, clouds, and sunlight. Design a traditional computer
+    vision method to detect moving objects while reducing false detections
+    caused by lighting variations:
+      - a) Which preprocessing steps you would apply.
+      - b) How you would model the background and detect foreground regions.
+      - c) How you would distinguish real object motion from illumination
+        changes or shadows.
+
+🧠 PARTE 2: Domande di Ragionamento, Scenari e Trade-Off
+
+🔍 Modulo 1: Image Processing, Filtri e Piramidi
+
+1.  [Salt-and-Pepper vs. Gaussian Noise] Perché il filtro Media (Mean) crea una
+    sfocatura degli artefatti in presenza di rumore salt-and-pepper, mentre il
+    filtro Mediana lo elimina completamente?
+2.  [Zero-Padding vs. Mirror Padding] Perché lo Zero-Padding genera un falso
+    contorno ad alto gradiente lungo tutto il perimetro dell'immagine quando
+    viene seguito dall'operatore di Sobel?
+3.  [Filtri Separabili] Come fa la separabilità di un filtro 2D (rango 1) a
+    ridurre il costo computazionale da O(L^2 MN) a O(2LMN)?
+4.  [Rilevamento Difetti Industriali] Se devi rilevare contemporaneamente
+    micro-crepe sottilissime (alta frequenza) e grandi bolle d'aria (bassa
+    frequenza) in bottiglie di vetro trasparenti sotto rumore del sensore,
+    perché un Canny a scala singola con \sigma grande fallisce?
+5.  [Piramide Gaussiana vs Laplaciana] Perché la piramide Gaussiana è definita
+    lossy mentre la piramide Laplaciana è definita lossless? Qual è il ruolo dei
+    residui L_i?
+
+🌊 Modulo 2: Dominio delle Frequenze (Fourier)
+
+6.  [Notch Filter vs. Spatial Gaussian Blur] Un satellite acquisisce un'immagine
+    con un'interferenza elettronica periodica a righe diagonali a 45^\circ. Dove
+    si manifestano i picchi di energia nello spettro 2D F(u,v)? Come li rimuovi
+    con un Notch Filter senza sfocare la superficie terrestre?
+7.  [Phase Swapping Experiment] Se prendi l'Ampiezza dell'immagine A e la Fase
+    dell'immagine B e fai l'antitrasformata IFFT, quale delle due immagini sarà
+    visivamente riconoscibile nell'output e perché?
+8.  [Box Filter vs. Gaussian Filter in Frequenza] Perché il Box Filter produce
+    artefatti di ringing (ondulazioni) vicino ai bordi, mentre il filtro
+    Gaussiano no? (Pensa alla trasformata Sinc).
+9.  [Rotazione nello Spettro] Se ruoti un'immagine reale di 30^\circ, cosa
+    succede al suo Spettro di Ampiezza di Fourier 2D?
+
+🎯 Modulo 3: Feature Locali, Harris, SIFT, SURF e ORB
+
+10. [Ruolo del fattore k in Harris] Nella funzione di risposta di Harris
+    R = \det(H) - k \cdot (\operatorname{trace}(H))^2, a cosa serve il termine
+    k? Cosa succederebbe ai bordi se k=0?
+11. [I due filtri di Harris] Quali sono i due filtri applicati in sequenza per
+    costruire la Second Moment Matrix H di Harris? (Sobel per le derivate +
+    Gaussiana per la media pesata locale).
+12. [Fattore \sigma^2 nel LoG Normalizzato] Perché senza moltiplicare il
+    Laplaciano di Gaussiana per \sigma^2
+    (\nabla^2_{norm}g = \sigma^2 \nabla^2 g), i blob a scala grande avrebbero
+    risposte numeriche vicine a zero?
+13. [SIFT Hessian Edge Rejection] Perché la Difference of Gaussians (DoG)
+    risponde fortemente lungo i bordi rettilinei e come fa SIFT ad eliminarli
+    usando la matrice Hessiana 2D?
+14. [Robot Aspirapolvere Economico] Un robot con CPU limitata (senza GPU) deve
+    fare navigazione visiva su un pavimento in parquet con doghe ripetitive.
+    Perché si sceglie ORB anziché SIFT? Come si evitano i falsi match sul
+    parquet? Perché HOG fallirebbe?
+
+📐 Modulo 4: Trasformazioni, Omografie, Warping e RANSAC
+
+15. [Limiti dell'Omografia] Sotto quali due condizioni specifiche una matrice di
+    Omografia H (3x3) mappa perfettamente i punti tra due immagini? Cosa succede
+    se la camera trasla in una scena 3D non piatta?
+16. [RANSAC vs. Least Squares] Perché i Least Squares falliscono miseramente in
+    presenza di un 40% di match errati (outliers)? Perché il numero di
+    iterazioni N di RANSAC cresce in modo esponenziale all'aumentare del tasso
+    di outlier e?
+17. [Forward vs. Inverse Warping] Qual è la differenza concettuale tra Forward e
+    Inverse Warping? Quale problema di output risolve l'Inverse Warping e perché
+    richiede l'interpolazione (bilineare/bicubica)?
+
+🎥 Modulo 5 & 6: Deep Learning, Motion e Optical Flow
+
+18. [BoW vs. CNNs per la Geometria] Perché il modello Bag-of-Words (BoW) è
+    completamente cieco alla disposizione spaziale delle feature (spatial layout
+    loss) mentre le CNN mantengono la struttura spaziale?
+19. [RoIPooling vs. RoIAlign in Mask R-CNN] Cos'è la quantizzazione in
+    RoIPooling e perché crea disallineamenti trascurabili per le Bounding Box ma
+    catastrofici per la segmentazione delle maschere di istanza?
+20. [Coarse-to-Fine Optical Flow] Se un oggetto si muove di 20 pixel tra due
+    frame, l'assunzione di Small Motion di Lucas-Kanade fallisce. Come risolvono
+    questo problema le piramidi Gaussiane insieme all'Inverse Warping e al
+    Residual Flow?
+21. [Horn-Schunck Oversmoothing] Perché la penalità quadratica
+    \lambda (\|\nabla u\|^2 + \|\nabla v\|^2) in Horn-Schunck provoca
+    oversmoothing sui bordi degli oggetti in movimento? Come lo risolvono le
+    Robust Loss Functions?
+22. [TimeSformer per Analisi Video] Come funziona la Divided Space-Time
+    Attention in TimeSformer (Temporal Attention + Spatial Attention) e perché
+    abbatte la complessità rispetto alla Joint Space-Time Attention?
+
+📐 Modulo 7 & 8: Calibrazione, Stereo Vision e Geometria 3D
+
+23. [Trade-off della Baseline in Stereo Vision] Cosa succede all'incertezza di
+    triangolazione e alla facilità di stereo matching se usiamo una baseline b
+    molto piccola rispetto a una baseline b molto grande?
+24. [Sfera Lambertiana vs. Speculare] Fai un esempio in cui il Motion Field 3D è
+    maggiore di zero ma l'Optical Flow 2D è zero, e viceversa.
+25. [Epipolo all'Infinito] Dove si trovano gli epipoli e come appaiono le linee
+    epipolari se due telecamere sono perfettamente parallele o se una telecamera
+    compie una traslazione pura parallela al piano immagine?
+26. [Errore Algebrico vs. Riproiezione] Nella triangolazione 3D lineare tramite
+    SVD (A\mathbf{X}=0), quale errore viene minimizzato? Perché per la
+    precisione geometrica finale si preferiscono metodi non-lineari come il
+    Bundle Adjustment?
+
+🤖 Modulo 9: Visione Moderna (Transformers, VLMs, Diffusion & Efficienza)
+
+27. [Inductive Bias: CNN vs. ViT] Cosa si intende per bias induttivo di Località
+    ed Equivarianza alla Traslazione nelle CNN? Perché i Vision Transformers
+    (ViT) ne sono privi e richiedono pre-addestramento su dataset enormi (es.
+    JFT-300M)?
+28. [Swin Transformer Shifted Windows] Come fa Swin Transformer ad abbattere la
+    complessità della Self-Attention da O(N^2) a O(N) lineare? A cosa serve lo
+    shift delle finestre tra strati consecutivi?
+29. [CLIP & Zero-Shot Transfer] Come viene addestrato CLIP tramite la InfoNCE
+    Loss e come esegue la classificazione Zero-Shot all'inferenza usando i
+    prompt testuali?
+30. [DDPM Diffusion Models] Spiega la differenza tra il Forward Process (noising
+    fisso via reparameterization trick) e il Reverse Process (denoising con
+    U-Net) nei modelli di diffusione.
+31. [Medical Data Gap & Dice Loss] Perché la Cross-Entropy standard fallisce
+    nella segmentazione di piccole lesioni mediche rispetto alla Dice Loss e
+    alla Focal Loss?
+32. [Pruning e Quantizzazione] Qual è la differenza tra Structured Pruning e
+    Unstructured Pruning? Perché la quantizzazione da FP32 ad INT8 riduce l'uso
+    di memoria di 4 volte?

@@ -63,6 +63,9 @@
 % Reduce spacing between sections in table of contents
 \setlength{\cftbeforesecskip}{.9ex}
 
+\setlength{\headheight}{14.5pt}
+\addtolength{\topmargin}{-2.5pt}
+
 % Remove indentation for sections
 \cftsetindents{section}{0em}{0em}
 
@@ -195,7 +198,7 @@
 \fancyhead[R]{\small\textit{\nouppercase{\rightmark}}}
 
 % Left header text: Short course title, hyperlinked to table of contents
-\fancyhead[L]{\hyperref[sec:contents]{\small Short title of document}}
+\fancyhead[L]{\hyperref[sec:contents]{\small CV-guidelines}}
 
 % --- Document starts here ---
 
@@ -203,12 +206,12 @@
 
 % --- Main title and subtitle ---
 
-\title{Title here \\[1em]
+\title{Computer Vision Guidelines \\
 \normalsize Subtitle here}
 
 % --- Author and date of last update ---
 
-\author{\normalsize Your name here}
+\author{\normalsize Flavio Massaroni}
 \date{\normalsize\vspace{-1ex} Last updated: \today}
 
 % --- Add title and table of contents ---
@@ -230,7 +233,6 @@
 \input{Lectures/Disparity Map and Stereo Vision.tex}
 \input{Lectures/VideoSegmentation TradeOffs.tex}
 \input{Lectures/Homography.tex}
-
 
 \input{Lectures/mixed.tex}
 
