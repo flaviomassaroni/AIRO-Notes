@@ -23,7 +23,7 @@
 # Cartella di output di compilazione
 build/
 
-# PDF finale generato (con eccezione per eventuali immagini in formato PDF)
+# PDF finale generato
 *.pdf
 !images/*.pdf
 !images/**/*.pdf
@@ -34,3 +34,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Python
+__pycache__/
+*.pyc
+.python-version

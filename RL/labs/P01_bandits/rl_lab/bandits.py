@@ -31,9 +31,7 @@ def hoeffding_radius(n: int, delta: float) -> float:
     """
     if n == 0:
         return float("inf")
-    # TODO: return ...
-    raise NotImplementedError
-
+    return math.sqrt(math.log(2/delta)/(2*n))
 
 # --------------------------------------------------------------------------- #
 # Q2. Action selection rules (deterministic given the statistics)
@@ -41,8 +39,7 @@ def hoeffding_radius(n: int, delta: float) -> float:
 def select_greedy(means: np.ndarray, counts: np.ndarray) -> int:
     """Pull the arm with the highest empirical mean. Ties: lowest index.
     Arms never pulled count as mean 0 here (they are handled by the caller)."""
-    # TODO: return ...
-    raise NotImplementedError
+    return int(np.argmax(means))
 
 
 def select_etc(means: np.ndarray, counts: np.ndarray, t: int,
@@ -64,9 +61,10 @@ def select_etc(means: np.ndarray, counts: np.ndarray, t: int,
 
     `t` is 1-based, as everywhere in this lab.
     """
-    # TODO: ...
-    raise NotImplementedError
-
+    K = len(means)
+    if t <= explore_rounds * K:
+        return (t-1) % K
+    return int(np.argmax(means))
 
 def select_ucb(means: np.ndarray, counts: np.ndarray, t: int, delta: float) -> int:
     r"""Upper confidence bound rule:
@@ -79,9 +77,9 @@ def select_ucb(means: np.ndarray, counts: np.ndarray, t: int, delta: float) -> i
     linear regret, and Q3 of the report asks you to break it.
     Ties: lowest index.
     """
-    # TODO: ...
-    raise NotImplementedError
-
+    delta_t = delta / max(t, 1) ** 3
+    idx = [means[a] + hoeffding_radius(int(counts[a]), delta_t) for a in range(len(means))]
+    return int(np.argmax(idx))
 
 def select_epsilon_greedy(means: np.ndarray, counts: np.ndarray,
                           epsilon: float, rng: np.random.Generator) -> int:
@@ -89,16 +87,17 @@ def select_epsilon_greedy(means: np.ndarray, counts: np.ndarray,
     Draw the uniform *first* with `rng.random()`, then the arm with
     `rng.integers(len(means))`, so that results are reproducible across
     implementations."""
-    # TODO: ...
-    raise NotImplementedError
+    u = rng.random()
+    if u < epsilon:
+        return rng.integers(len(means))
+    return select_greedy(means, counts)
 
 
 def select_thompson_bernoulli(successes: np.ndarray, failures: np.ndarray,
                               rng: np.random.Generator) -> int:
     r"""Thompson sampling with a Beta(1,1) prior: draw
     $\tilde\mu(a) \sim \mathrm{Beta}(1+S_a,\, 1+F_a)$ and pull the argmax."""
-    # TODO: ...
-    raise NotImplementedError
+    return np.argmax(rng.beta(1+successes, 1+failures))
 
 
 # --------------------------------------------------------------------------- #
@@ -114,8 +113,8 @@ def pseudo_regret(mu: np.ndarray, pulls: np.ndarray) -> float:
     Note this uses the *true* means, not the observed rewards: it is the
     quantity the theory bounds, and it is not observable by the agent.
     """
-    # TODO: return ...
-    raise NotImplementedError
+    T = len(pulls)
+    return T * mu.max() - mu[pulls].sum()
 
 
 # --------------------------------------------------------------------------- #
