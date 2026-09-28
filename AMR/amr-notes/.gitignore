@@ -1,4 +1,39 @@
+# File temporanei e di ausilio di LaTeX (validi per tutte le sottocartelle)
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Cartella di output di compilazione
 build/
+
+# PDF finale generato (con eccezione per eventuali immagini in formato PDF)
+*.pdf
+!images/*.pdf
+!images/**/*.pdf
+
+# File di ambiente / editor / SO
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swpbuild/
 *.aux
 *.log
 *.out
