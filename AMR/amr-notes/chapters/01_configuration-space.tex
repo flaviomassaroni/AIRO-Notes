@@ -1,0 +1,228 @@
+\chapter{Configuration Space}
+\label{ch:configuration-space}
+
+The configuration space is the unifying abstraction of robot motion:
+once it is in place, planning, control, and localization all become
+statements about the same underlying object. This chapter introduces
+the concept, its structure, and its role in motion planning.
+
+\section{Motivation: Why Configuration Space?}
+\label{sec:why-cspace}
+
+The central problem of mobile robotics is the following: given a robot
+in an environment with obstacles, move it from an initial configuration
+to a final one without collisions. Stated directly in the workspace,
+this problem is hard: the robot has an extent, the obstacles have
+arbitrary shapes, and checking whether a given placement is collision-free
+requires geometric reasoning.
+
+The \emph{configuration space} (C-space), introduced by Lozano-Pérez in
+the early 1980s, makes the problem tractable. The idea is to replace
+the motion of an extended body among obstacles with the motion of a
+\emph{point} in an abstract space, where obstacles have been ``inflated''
+to account for the robot's shape. This reduction turns a complex
+geometric problem into a path-search problem in a topological space,
+for which a large body of algorithms exists
+\cite{choset2005principles, siciliano2025foundations}.
+
+\section{Configuration and Degrees of Freedom}
+\label{sec:configuration-dof}
+
+\begin{definition}[Configuration]
+A \emph{configuration} \( q \) is a complete specification of the
+position of every point of the robot. It is represented as a vector
+\( q = [q_1, \dots, q_n]^\top \), where \( n \) is the number of
+\emph{degrees of freedom} (DOF) of the robot.
+\end{definition}
+
+The degrees of freedom are the minimum number of independent parameters
+needed to determine the position of the robot in space. They are a
+property of the robot's kinematics, not of the environment.
+
+\section{The Configuration Space}
+\label{sec:cspace-definition}
+
+\begin{definition}[Configuration Space]
+The \emph{configuration space} \( C \) is the set of all possible
+configurations of the robot. Formally, \( C \subseteq \mathbb{R}^n \),
+although in many cases it carries a richer structure: for instance,
+\( C = \mathbb{R}^2 \times \mathcal{S}^1 \) for a planar robot with
+orientation, where \( \mathcal{S}^1 \) denotes the unit circle.
+\end{definition}
+
+The dimension of \( C \) equals the number of DOF of the robot, which
+in general is \emph{not} the dimension of the workspace. This is a
+common source of confusion at first.
+
+\section{Workspace vs Configuration Space}
+\label{sec:workspace-vs-cspace}
+
+It is essential to distinguish two spaces:
+
+\begin{itemize}
+    \item The \textbf{workspace} \( \mathcal{W} \) is the physical space
+          in which the robot moves (e.g.\ \( \mathbb{R}^2 \) or
+          \( \mathbb{R}^3 \)), expressed in world coordinates.
+    \item The \textbf{configuration space} \( C \) is the abstract space
+          of all configurations the robot can assume. Its dimension
+          equals the robot's DOF.
+\end{itemize}
+
+A planar robot that can both translate and rotate has a 3-dimensional
+C-space, even though it lives in a 2-dimensional workspace. A free
+rigid body in \( \mathbb{R}^3 \) has a 6-dimensional C-space, while
+its workspace is 3-dimensional.
+
+\section{Examples}
+\label{sec:cspace-examples}
+
+\subsection{Point Robot}
+\label{subsec:point-robot}
+
+If the robot is a point translating in \( \mathbb{R}^2 \), then
+\( q = (x, y) \) and \( C = \mathbb{R}^2 \). The C-space coincides
+with the workspace, and the C-obstacles are the original obstacles.
+
+\subsection{Disk Robot}
+\label{subsec:disk-robot}
+
+A disk-shaped robot of radius \( r \) translating in \( \mathbb{R}^2 \)
+has \( q = (x, y) \), where \( (x, y) \) is the center of the disk.
+Again \( C = \mathbb{R}^2 \), but each obstacle is \emph{inflated} by
+the robot's radius: a point obstacle becomes a disk of radius \( r \),
+and a polygonal obstacle is expanded by the \emph{Minkowski sum} with
+the robot's disk. After this inflation, the disk robot can be treated
+as a point in \( C \).
+
+\subsection{Robot with Orientation: \( \mathbb{R}^2 \times \mathcal{S}^1 \)}
+\label{subsec:cspace-orientation}
+
+If the robot is a disk that can also rotate, then
+\( q = (x, y, \theta) \) and \( C = \mathbb{R}^2 \times \mathcal{S}^1 \),
+where \( \mathcal{S}^1 \) is the unit circle (the angle \( \theta \) is
+periodic). This space has a non-trivial topology: it is \emph{not}
+\( \mathbb{R}^3 \), because \( \theta \) and \( \theta + 2\pi \) denote
+the same configuration. The intuitive picture is a \emph{cylinder}:
+one linear dimension \( (x, y) \) and one circular dimension
+\( (\theta) \).
+
+\subsection{Planar 2-Link Manipulator: \( \mathcal{T}^2 \)}
+\label{subsec:cspace-2link}
+
+For a planar manipulator with two revolute joints,
+\( q = (\theta_1, \theta_2) \) and
+\( C = \mathcal{S}^1 \times \mathcal{S}^1 = \mathcal{T}^2 \), the
+\emph{2-dimensional torus}. Each joint is a circle, and the product
+of two circles is a torus. This is a classic example of how the
+topology of \( C \) can differ radically from that of
+\( \mathbb{R}^n \).
+
+\subsection{Rigid Body in 3D: \( SE(3) \)}
+\label{subsec:cspace-se3}
+
+A free rigid body in \( \mathbb{R}^3 \) has 6 DOF: three translational
+and three rotational. Its C-space is
+\( C = \mathbb{R}^3 \times SO(3) = SE(3) \), the \emph{special
+Euclidean group} of dimension 3. The rotational part \( SO(3) \) is
+not \( \mathbb{R}^3 \): it is a compact 3-dimensional manifold.
+
+\section{C-Obstacles and Free Space}
+\label{sec:c-obstacles}
+
+Once \( C \) is defined, obstacles from the workspace must be mapped
+into it.
+
+\begin{definition}[C-Obstacle]
+Given an obstacle \( O_i \subset \mathcal{W} \), the
+\emph{C-obstacle} \( CO_i \) is the set of configurations in which
+the robot collides with \( O_i \):
+\[
+CO_i = \{ q \in C : B(q) \cap O_i \neq \emptyset \},
+\]
+where \( B(q) \) is the volume occupied by the robot at configuration
+\( q \).
+\end{definition}
+
+The union of all C-obstacles is the \emph{C-obstacle region}:
+\[
+CO = \bigcup_i CO_i.
+\]
+
+\begin{definition}[Free Configuration Space]
+The \emph{free configuration space} is the complement of \( CO \) in
+\( C \):
+\[
+C_{\text{free}} = C \setminus CO
+= \{ q \in C : B(q) \cap \textstyle\bigcup_i O_i = \emptyset \}.
+\]
+\end{definition}
+
+Planning a safe motion is equivalent to finding a path in
+\( C_{\text{free}} \) connecting the start configuration \( q_s \) to
+the goal configuration \( q_g \).
+
+\paragraph{The point-robot trick.}
+If the robot is modeled as a point, the workspace obstacles must be
+inflated by the Minkowski sum with the robot's geometry. After this
+transformation, planning for the extended robot reduces to planning
+for a point in \( C_{\text{free}} \). This is the canonical formulation
+of the motion planning problem.
+
+\paragraph{Path vs.\ trajectory.}
+A \emph{path} is a purely geometric sequence of configurations, with
+no timing information. A \emph{trajectory} is a path endowed with a
+time law \( q(t) \). In this chapter, and in motion planning in
+general, the object of interest is the path. Timing becomes relevant
+only when the dynamics and the control layer are brought into play.
+
+\section{Relevance to Motion Planning}
+\label{sec:cspace-motion-planning}
+
+The configuration space reformulates the motion planning problem in
+a clean and general way:
+
+\begin{quote}
+Given \( C \), a start configuration \( q_s \in C_{\text{free}} \),
+and a goal configuration \( q_g \in C_{\text{free}} \), find a
+continuous path \( \tau : [0, 1] \to C_{\text{free}} \) such that
+\( \tau(0) = q_s \) and \( \tau(1) = q_g \).
+\end{quote}
+
+All the algorithms studied later in the course --- roadmaps, cell
+decompositions, probabilistic planners, potential fields --- are
+methods for solving this problem in \( C_{\text{free}} \). The
+differences between them lie in how they represent \( C_{\text{free}} \)
+and how they search it.
+
+A subtle point: the \emph{topology} of \( C \) matters. Searching for
+a path in \( \mathbb{R}^n \) is different from searching in
+\( \mathcal{S}^1 \), \( \mathcal{T}^n \), or \( SE(3) \). Planners
+must respect the topology of the space in which they operate.
+
+\section{Takeaways}
+\label{sec:cspace-takeaways}
+
+\begin{enumerate}
+    \item A \textbf{configuration} \( q \) is a complete specification
+          of the robot's position.
+    \item The \textbf{configuration space} \( C \) is the set of all
+          configurations; its dimension equals the robot's DOF.
+    \item The \textbf{workspace} is where the robot lives; the
+          \textbf{C-space} is where planning happens.
+    \item \textbf{C-obstacles} are the image of workspace obstacles
+          in \( C \); \textbf{\( C_{\text{free}} \)} is the set of
+          collision-free configurations.
+    \item Motion planning reduces to finding a path in
+          \( C_{\text{free}} \) from \( q_s \) to \( q_g \).
+    \item The \textbf{topology} of \( C \) matters: \( \mathbb{R}^n \),
+          \( \mathcal{S}^1 \), \( \mathcal{T}^n \), \( SE(3) \) are all
+          different spaces, and planners must respect their structure.
+\end{enumerate}
+
+\section{References}
+\label{sec:cspace-references}
+
+The material in this chapter follows
+\cite{siciliano2025foundations} for the foundational definitions and
+\cite{choset2005principles} for the algorithmic treatment of
+C-obstacles and free space.

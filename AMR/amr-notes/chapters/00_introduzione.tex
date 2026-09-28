@@ -1,3 +1,235 @@
-\chapter{Introduzione}
-\label{ch:introduzione}
-% Contenuto del capitolo
+\chapter{Introduction: Applications, Problems, Architectures}
+\label{ch:introduction}
+
+This introductory chapter frames the course. It does not introduce
+technical tools yet; its purpose is to define \emph{what} mobile robotics
+is about, \emph{why} it is hard, and \emph{how} we will approach it.
+
+\section{Why Mobile Robots}
+\label{sec:why-mobile-robots}
+
+Industrial fixed-base manipulators are fast and accurate, but they operate
+in a \emph{limited, structured, known, static} workspace. To be useful
+outside the factory, robots must move in \emph{large, unstructured,
+uncertain, dynamic} environments. This shift is what motivates the field
+of autonomous and mobile robotics.
+
+The course focuses on \emph{methods}, not on specific hardware or
+software: the goal is to master the basic planning and control techniques
+that enable mobility and autonomy on \emph{any} mobile platform ---
+wheeled, legged, flying, or underwater.
+
+\section{Applications}
+\label{sec:applications}
+
+Mobile robots are already deployed in a wide spectrum of domains, which
+can be roughly divided into:
+
+\begin{itemize}
+    \item \textbf{Structured environments (service robots)}: cleaning,
+          catering, customer assistance, surveillance, entertainment.
+    \item \textbf{Unstructured environments (field robots)}: planetary
+          exploration, underwater monitoring, rescue, demining,
+          agriculture, construction, military transportation.
+\end{itemize}
+
+The market for autonomous mobile robots is growing rapidly, with
+goods-to-person picking robots, self-driving forklifts, autonomous
+inventory robots, and unmanned aerial vehicles among the main segments.
+
+\section{The Key Problems of Mobile Robotics}
+\label{sec:key-problems}
+
+Following Durrant-Whyte (1991), the field can be organized around three
+fundamental questions:
+
+\begin{enumerate}
+    \item \textbf{Where am I?} --- \emph{localization}
+    \item \textbf{How am I supposed to get to the goal?} ---
+          \emph{path / trajectory / motion planning}
+    \item \textbf{How do I actually move?} --- \emph{motion control}
+\end{enumerate}
+
+The entire course is a declination of these three problems.
+
+\paragraph{Why wheeled mobile robots are harder than they look.}
+A useful comparison is between fixed-base manipulators and single-body
+wheeled mobile robots (WMRs):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+ & \textbf{Fixed-base manipulator} & \textbf{WMR} \\
+\midrule
+1. Localization              & easy (joint encoders)   & difficult \\
+2a. Path/trajectory planning & easy (all paths feasible) & difficult (not all paths feasible) \\
+2b. Motion planning          & difficult (many DOF)    & more difficult (nonholonomic + DOF) \\
+3. Motion control            & difficult (inertial couplings) & more difficult (nonlinear, no smooth stabilizer) \\
+\bottomrule
+\end{tabular}
+\caption{Comparison between fixed-base manipulators and wheeled mobile
+robots. The apparent simplicity of WMRs hides fundamental difficulties.}
+\label{tab:manipulator-vs-wmr}
+\end{table}
+
+The real challenge, however, lies in \emph{multi-body} mobile robots:
+mobile manipulators, tractor-trailer systems, and humanoids. These
+combine the planning and control difficulties of manipulators with the
+nonholonomic constraints and nonlinear dynamics of WMRs.
+
+\section{Autonomy}
+\label{sec:autonomy}
+
+\begin{definition}[Autonomy]
+A robot is \emph{autonomous} when it can solve the three key problems
+(localization, planning, control) in \emph{unstructured} environments,
+under \emph{uncertain} and possibly \emph{dynamic} operating conditions.
+\end{definition}
+
+Progress in autonomy is easy to overestimate. The DARPA Grand Challenge
+(2005) demonstrated autonomous driving in the desert, and the DARPA
+Robotics Challenge (2015) demonstrated legged locomotion and
+manipulation in semi-structured scenarios. Yet real autonomy ---
+especially when manipulation is involved --- is still far from being
+solved.
+
+\section{Perception}
+\label{sec:perception}
+
+Autonomy rests on \emph{perception}, i.e.\ sensing plus interpretation.
+Two categories are distinguished:
+
+\begin{itemize}
+    \item \textbf{Proprioceptive}: perception of the robot itself
+          (position, orientation, velocity). Sensors: encoders, IMUs, GPS.
+    \item \textbf{Exteroceptive}: perception of the environment
+          (obstacles, other robots, people). Sensors: rangefinders,
+          cameras, tactile sensors.
+\end{itemize}
+
+Perception is essential in unstructured environments, where the state of
+the robot and of the world cannot be assumed to be known.
+
+\section{Robot Architectures}
+\label{sec:architectures}
+
+Three paradigmatic ways of organizing perception, planning, and control
+on a robot:
+
+\subsection{Deliberative Architecture}
+\label{subsec:deliberative}
+
+\emph{``Think, then act.''} The robot builds a model of the world,
+plans on it, and then executes. The classical pipeline is:
+
+\begin{center}
+\texttt{mission objectives} $\to$ \texttt{planning} $\to$
+\texttt{path/trajectory} $\to$ \texttt{control}
+\end{center}
+
+with \texttt{perception} feeding \texttt{localization (SLAM)} and
+\texttt{planning}, and \texttt{control} sending actuator commands to the
+physical robot. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{images/deliberative-architecture.png}
+  \caption{Deliberative architecture.}
+  \label{fig:deliberative-architecture}
+\end{figure}
+
+This is the reference architecture of the course.
+
+\subsection{Reactive Architecture}
+\label{subsec:reactive}
+
+\emph{``Don't think, (re)act.''} No explicit model: direct mapping from
+sensor readings to actuator commands. Fast, but unable to handle
+non-trivial goals.
+
+\subsection{Hybrid Architectures}
+\label{subsec:hybrid}
+
+\emph{``Think and act concurrently.''} A set of elementary behaviors
+(e.g.\ \emph{avoid obstacles}, \emph{follow wall}, \emph{detect goal})
+is coordinated by a fusion block (e.g.\ vector summation). Deliberative
+and reactive layers coexist, each handling what it does best.
+A deliberative layer handles long-horizon reasoning (mission planning, global localization), while a
+reactive layer handles short-horizon reflexes (obstacle avoidance,
+emergency stops). The two run in parallel and exchange information
+through a shared representation of the world.
+
+\subsection{Behavior-Based Architecture}
+\label{subsec:behavior-based}
+
+\emph{``Think the way you act.''} Rather than decomposing the problem
+into functional modules (perception, planning, control), a
+behavior-based architecture decomposes it into \emph{behaviors}:
+elementary sensor-to-actuator mappings, each responsible for a specific
+task. 
+Each behavior reacts to the current sensor readings and produces a
+\emph{proposal} for the actuators. A \textbf{coordination/fusion} block
+combines these proposals into the final actuator command --- for
+example, by vector summation, priority arbitration, or subsumption.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/behavior-based-architecture.png}
+    \caption{Behavior-based architecture: elementary behaviors are
+    coordinated by a fusion block (e.g.\ vector summation) before
+    reaching the actuators. Adapted from
+    \cite{choset2005principles}.}
+    \label{fig:behavior-based}
+\end{figure}
+
+
+\section{Course Approach}
+\label{sec:course-approach}
+
+The course adopts a \emph{model-based} approach, for the following
+reasons:
+
+\begin{itemize}
+    \item Robots cannot escape physics.
+    \item Models encode structured prior knowledge about the robot and
+          the world --- knowledge that does not need to be learned again.
+    \item Machine learning can capture effects that are unknown a priori,
+          difficult to model, or accessible only through data.
+    \item Roboticists must be able to reason rigorously about autonomous
+          physical systems, critically evaluate learned solutions, and
+          combine the two.
+\end{itemize}
+
+\begin{quote}
+\emph{Use models for what we know, data for what we don't know, and
+feedback for what is still missing.}
+\end{quote}
+
+\section{Takeaways}
+\label{sec:takeaways}
+
+If this introduction is reduced to five points:
+
+\begin{enumerate}
+    \item The field is organized around \textbf{three key problems}:
+          localization, planning, control. The whole course is a
+          declination of them.
+    \item \textbf{Wheeled mobile robots are harder than manipulators},
+          despite appearances: nonholonomic constraints and nonlinear
+          dynamics break the intuition coming from fixed-base robotics.
+    \item \textbf{Autonomy} means solving the three problems in
+          unstructured, uncertain, possibly dynamic environments.
+    \item The approach is \textbf{model-based}, with machine learning as
+          a complement --- not a substitute.
+    \item The \textbf{deliberative architecture} is the reference;
+          reactive and hybrid architectures are alternatives that trade
+          optimality for reactivity.
+\end{enumerate}
+
+\section{References}
+\label{sec:intro-references}
+
+The main reference for the whole course is
+\cite{siciliano2025foundations}. Selected topics are covered in
+\cite{choset2005principles} and \cite{siciliano2016handbook}.
