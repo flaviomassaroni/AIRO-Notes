@@ -1,4 +1,4 @@
-# P01 report — <your name>, <student ID>
+# P01 report — <Flavio Massaroni>, <1990975>
 
 Keep it to one page, about five lines per answer, written in the body of your
 email. Three figures: `regret.png`, the one for Q2, and the one after your Part C
@@ -14,6 +14,9 @@ algorithm, referring to what the algorithm does — not to what the theorem says
 
 Greedy is the interesting one: its curve is a straight line in the left panel and
 its spread across seeds is enormous. Explain both facts with the same argument.
+
+
+Greedy extracts an arm and keeps it all the time. The 
 
 ## Q2. The bound is 17x loose. Is that a problem?
 

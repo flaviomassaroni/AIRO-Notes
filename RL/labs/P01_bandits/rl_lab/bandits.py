@@ -31,7 +31,7 @@ def hoeffding_radius(n: int, delta: float) -> float:
     """
     if n == 0:
         return float("inf")
-    return math.sqrt(math.log(2/delta)/(2*n))
+    return math.sqrt(math.log(1/delta)/(1*n))
 
 # --------------------------------------------------------------------------- #
 # Q2. Action selection rules (deterministic given the statistics)
