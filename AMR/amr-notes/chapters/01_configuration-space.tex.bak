@@ -104,16 +104,16 @@ which in general differs from \( \dim(W) \).
 When such a structure of $C$ is represented (\( C = \mathbb{R}^i \times \mathcal{S}^j \)),
 we are talking about the \emph{Special Euclidean Group}.
 \begin{nb}[Special Euclidean Group SE(n)]
-The Special Euclidean group $SE(n)$ describes the orientation-preserving isometries of the Euclidean space $\mathbb{R}^n$, where $n \in \mathbb{N}$ is an integer. It represents rigid transformations (combinations of rotations and translations) that preserve both distances between points and the orientation of the space.
+The Special Euclidean group $\mathbf{SE}(n)$ describes the orientation-preserving isometries of the Euclidean space $\mathbb{R}^n$, where $n \in \mathbb{N}$ is an integer. It represents rigid transformations (combinations of rotations and translations) that preserve both distances between points and the orientation of the space.
 
 This group can be represented using homogeneous transformation matrices as:
 \[
-SE(n) = \left\{ X = \begin{pmatrix} R & p \\ 0_{1 \times n} & 1 \end{pmatrix} \in \mathbb{R}^{(n+1) \times (n+1)} \;\middle|\; R^\top R = I_n, \; \det(R) = 1, \; p \in \mathbb{R}^n \right\}
+\mathbf{SE}(n) = \left\{ X = \begin{pmatrix} R & p \\ 0_{1 \times n} & 1 \end{pmatrix} \in \mathbb{R}^{(n+1) \times (n+1)} \;\middle|\; R^\top R = I_n, \; \det(R) = 1, \; p \in \mathbb{R}^n \right\}
 \]
 
 The matrix components are defined as follows:
 \begin{itemize}
-    \item \textbf{Rotation matrix ($R$):} An element of the Special Orthogonal group $SO(n)$, characterized by $R^\top R = I_n$ and $\det(R) = 1$, which handles changes in orientation without deformation or reflection.
+    \item \textbf{Rotation matrix ($R$):} An element of the Special Orthogonal group $\mathbf{SO}(n)$, characterized by $R^\top R = I_n$ and $\det(R) = 1$, which handles changes in orientation without deformation or reflection.
     \item \textbf{Translation vector ($p$):} A vector $p \in \mathbb{R}^n$ representing the rigid displacement in space.
     \item \textbf{Bottom row ($0_{1 \times n}$ and $1$):} A padding row that establishes homogeneous coordinates, allowing the composition of multiple rigid transformations through simple matrix multiplication.
 \end{itemize}
@@ -201,6 +201,14 @@ and three rotational. Its C-space is
 Euclidean group} of dimension 3. The rotational part \( SO(3) \) is
 not \( \mathbb{R}^3 \): it is a compact 3-dimensional manifold.
 
+
+% =====================================================================
+% Section: Topology of Configuration Space
+% Preamble requirements:
+%   \usepackage{tikz,amsmath,amssymb,cleveref}
+%   \usetikzlibrary{arrows.meta,calc,patterns,decorations.pathreplacing}
+%   plus your own `nb` environment
+% =====================================================================
 \section{Topology of Configuration Space}
 \label{sec:cspace-topology}
 
@@ -213,7 +221,7 @@ manipulator, which we use to answer three questions in order: what is
 \( C \) for this robot, why does the naive picture of it as a
 plane fail, and what is the right space to work in.
 
-\subsection{The 2R Planar Manipulator}
+\subsection{The 2R Planar Manipulator: \( C = SO(2)\times SO(2) \)}
 \label{subsec:cspace-2R-topology}
 
 Consider a planar manipulator with two revolute joints. Its
