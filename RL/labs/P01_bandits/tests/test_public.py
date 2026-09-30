@@ -69,6 +69,18 @@ def test_q2_ucb_can_prefer_a_worse_mean_if_it_is_uncertain_enough():
     assert b.select_ucb(means, counts, t=505, delta=0.1) == 1
 
 
+def test_q2_the_lectures_ucb_uses_sqrt_log_kt_over_delta_over_n():
+    """Given code, checked here so it cannot drift from the lecture: the bonus
+    of `select_ucb_known_horizon` is sqrt(ln(KT/delta) / N). K = 2, T = 1000,
+    delta = 0.1: arm 1 has 100 pulls against 400, so its extra bonus is
+    0.05 * sqrt(ln(20000)) = 0.15735. It wins against a lead of 0.1570 and loses
+    against 0.1577: without K, with 2KT, or with 2N one of the two fails."""
+    counts = np.array([400, 100])
+    lead = [np.array([0.5 + x, 0.5]) for x in (0.1570, 0.1577)]
+    assert b.select_ucb_known_horizon(lead[0], counts, horizon=1000, delta=0.1) == 1
+    assert b.select_ucb_known_horizon(lead[1], counts, horizon=1000, delta=0.1) == 0
+
+
 def test_q2_ucb_becomes_greedy_when_everything_is_well_estimated():
     means = np.array([0.55, 0.40])
     counts = np.array([50_000, 50_000])
@@ -155,6 +167,28 @@ def test_q2_etc_with_one_explore_round_still_pulls_every_arm():
     counts = np.zeros(K)
     seen = {b.select_etc(np.zeros(K), counts, t, 1) for t in range(1, K + 1)}
     assert seen == set(range(K))
+
+
+def test_q2_etc_commits_for_good_in_the_loop():
+    """After the switch run_bandit pulls one arm only, whatever the rewards say:
+    the commit uses the means of the exploration, not the running ones. With the
+    running means the committed arm's estimate drifts, and on these arms ETC
+    changes its mind after the switch in 128 of the seeds 0-199."""
+    mu = np.array([0.50, 0.55, 0.45])
+    m = 20
+    for seed in range(20):
+        pulls = b.run_bandit(mu, 600, "etc", seed=seed, explore_rounds=m)
+        assert len(set(pulls[m * 3:].tolist())) == 1
+
+
+def test_q2_greedy_tries_each_arm_once_then_commits():
+    """Greedy, as in the lecture: one pull per arm, then the arm with the best
+    observed reward, for the rest of the run."""
+    mu = np.array([0.50, 0.55, 0.45, 0.40])
+    for seed in range(20):
+        pulls = b.run_bandit(mu, 300, "greedy", seed=seed)
+        assert pulls[:4].tolist() == [0, 1, 2, 3]
+        assert len(set(pulls[4:].tolist())) == 1
 
 
 def test_q2_etc_matches_the_loop_used_by_run_bandit():

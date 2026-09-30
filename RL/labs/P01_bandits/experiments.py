@@ -9,12 +9,25 @@ Runtime: about 40 seconds on a laptop CPU for the default settings. No GPU, no
 environment library: a Bernoulli bandit is 15 lines of numpy, which is exactly
 why this is the first lab.
 
-What you should see, and what the lecture proved:
-  * greedy (no exploration)  -> regret grows LINEARLY in T
-  * explore-then-commit      -> grows like T^(2/3)
-  * UCB, Thompson            -> grow like sqrt(T) (log T in the gap-dependent bound)
-The dashed lines are the theoretical shapes, matched at T/2 so that you compare
-the *growth rate*, not the constants.
+What you should see, and how it relates to what the lecture proved:
+  * greedy (one pull per arm, then commit) -> a straight line: slope 1 in the
+    log-log panel, the linear regret of the theorem, visible inside one run.
+  * explore-then-commit -> slope 1 while exploring, then flat in the median (the
+    runs that committed to the best arm pay nothing more). Its T^(2/3) is how
+    the FINAL regret grows when T grows and m is re-tuned to T: one run of fixed
+    length cannot show it. Report question 2 is about that experiment.
+  * UCB, Thompson -> curves that keep bending down. sqrt(T) is the worst case
+    over all instances; on this instance, at this T, the slope is still on its
+    way down to the log T of the gap-dependent bound.
+  * "UCB" is yours, the anytime version (delta_t = delta / t^3, no T needed);
+    "UCB, T known (lecture)" is the lecture's, given in select_ucb_known_horizon.
+    Same rate, different constants: compare the two final numbers.
+The dotted lines in the right panel are slope guides (1, 2/3, 1/2) to read the
+curves against; the dashed line in the left panel is the UCB bound.
+
+The figure draws the median over seeds; the printout gives the mean as well.
+When the two are far apart, a few seeds went very differently from the others:
+that is worth a sentence in the report.
 """
 from __future__ import annotations
 
@@ -31,7 +44,8 @@ MU = np.array([0.50, 0.55, 0.45, 0.40, 0.30])   # gaps: 0.05 is the hard one
 HORIZON = 4000
 SEEDS = 30
 ALGOS = [("greedy", "greedy (no exploration)"), ("etc", "explore-then-commit"),
-         ("eps", "eps-greedy (0.1)"), ("ucb", "UCB"), ("thompson", "Thompson")]
+         ("eps", "eps-greedy (0.1)"), ("ucb", "UCB"),
+         ("ucb_T", "UCB, T known (lecture)"), ("thompson", "Thompson")]
 
 
 def regret_curve(algorithm: str, seed: int, horizon: int, **kw) -> np.ndarray:
@@ -114,9 +128,11 @@ def main() -> int:
 
     print(f"\n{len(ALGOS)} algorithms x {args.seeds} seeds x T={args.horizon}")
     curves = sweep(args.horizon, args.seeds)
-    print("\n  final regret (mean +- std over seeds):")
+    print("\n  final regret (mean +- std over seeds; the median is the curve in the figure):")
     for label, runs in curves.items():
-        print(f"    {label:26} {runs[:, -1].mean():7.1f} +- {runs[:, -1].std():5.1f}")
+        fin = runs[:, -1]
+        print(f"    {label:26} {fin.mean():7.1f} +- {fin.std():5.1f}"
+              f"   median {np.median(fin):7.1f}")
     gaps = np.array([MU.max() - m for m in MU if m < MU.max()])
     bound = 8 * np.log(args.horizon) * (1 / gaps).sum()
     ucb_emp = curves["UCB"][:, -1].mean()

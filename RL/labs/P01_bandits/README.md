@@ -13,7 +13,7 @@ Thompson sampling as pure selection rules, and read the three regret rates
 ## Part A — at home, before class
 
 Eight `# TODO`s in `rl_lab/bandits.py`, checked by
-twenty-four tests.
+twenty-seven tests.
 
 ```bash
 pip install -r requirements.txt
@@ -25,9 +25,8 @@ See [HOWTO](HOWTO.md) if this is your first lab.
 You implement the Hoeffding confidence radius, the five selection rules, and the
 pseudo-regret.
 
-Start with `test_q1_radius_halves_when_samples_quadruple`: it fails if the
-constant inside the square root is wrong, which is the mistake that survives
-everything else.
+Start with `test_q1_matches_closed_form`: it fails if a constant inside the
+square root is wrong, which is the mistake that survives every other test.
 
 **Come to class even if you are stuck.** The first fifteen minutes are about the
 three most common failures, and where you got stuck is useful.
@@ -38,7 +37,15 @@ three most common failures, and where you got stuck is useful.
 python experiments.py            # ~40 s, writes regret.png
 ```
 
-Five algorithms, 40 seeds, $T = 4000$, with the theory on the same axes.
+Five algorithms, 30 seeds, $T = 4000$, with the theory on the same axes.
+
+There are two UCB curves. "UCB" is yours, `select_ucb`: the **anytime**
+version, with $\delta_t = \delta/t^3$, which does not need to know $T$.
+"UCB, T known (lecture)" is the rule from the lecture, given in
+`select_ucb_known_horizon`: it knows $T$ in advance and gives each of the $KT$
+intervals (K arms, up to T pulls each) the failure probability $\delta/(KT)$,
+so its bonus is $\sqrt{\ln(KT/\delta)/N(a)}$. The docstrings explain where each
+comes from. The two curves almost overlap: same rate, different constants.
 
 The right panel is log-log, so a growth rate is a **slope**. Greedy sits on
 slope 1; the others do not.
