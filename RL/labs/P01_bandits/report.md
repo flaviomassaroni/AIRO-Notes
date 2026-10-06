@@ -24,6 +24,8 @@ Greedy: slope 1. It tries each arm once, commits to the best of those K single s
 
 UCB: slope ≈ 1/2 in theory (√T up to a log). At each step it pulls the arm with the highest mean plus a confidence bonus that is large for rarely pulled arms and shrinks as 1/√N, so a bad arm is pulled only until its upper bound falls below the best arm's, after which it is dropped. Unlike ε-greedy, wasted pulls stop by themselves; at T = 4000 the curve is still steeper than the asymptotic slope because it is still exploring.
 
+
+
 ## Q2. The bound is 17x loose. Is that a problem?
 
 `experiments.py` prints the empirical UCB regret and the gap-dependent bound
