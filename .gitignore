@@ -23,11 +23,6 @@
 # Cartella di output di compilazione
 build/
 
-# PDF finale generato
-*.pdf
-!images/*.pdf
-!images/**/*.pdf
-
 # File di ambiente / editor / SO
 .DS_Store
 Thumbs.db
