@@ -1,0 +1,35 @@
+\documentclass[11pt,a4paper,openany]{book}
+
+\input{preamble/packages}
+\input{preamble/colors}
+\input{preamble/theoremstyles}
+\input{preamble/commands}
+
+\addbibresource{bibliography/references.bib}
+
+\title{Autonomous and Mobile Robotics\\Appunti delle lezioni}
+\author{Tuo Nome}
+\date{Anno Accademico 2025/2026}
+
+\makeindex
+
+\begin{document}
+
+\frontmatter
+\input{frontmatter/titlepage}
+\input{frontmatter/prefazione}
+\tableofcontents
+\listoffigures
+\listoftables
+
+\mainmatter
+\include{chapters/00_introduction.tex}
+
+\backmatter
+\printbibliography
+
+\iffalse
+\printindex
+\fi
+
+\end{document}

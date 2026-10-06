@@ -1,0 +1,79 @@
+\chapter{Introduction: Exploration and Exploitation}
+\label{ch:introduction}
+
+\begin{definition}[Reinforcement Learning]
+Reinforcement learning is the process of learning what to do in order to maximize a numerical reward signal.
+\end{definition}
+
+The learner must discover which actions yield the greatest reward by trying them. A key issue is that immediate reward alone is not sufficient: subsequent rewards may occur and may drastically affect the regret if they are not taken into account. Hence, an action may affect not only the immediate reward, which characterizes reinforcement learning as a trial-and-error process.
+
+\section{Exploitation versus Exploration}
+The central trade-off in reinforcement learning is exploration versus exploitation. Exploration aims to expand the agent's knowledge so that better action selections can be made in the future. Exploitation uses the current knowledge to choose the action that maximizes reward and minimizes regret.
+
+One of the main problems in reinforcement learning is deciding when to continue exploring, that is, collecting more information about the environment, and when to exploit, that is, using the available information to move closer to the goal. Exploration must be carried out carefully and systematically. The \textbf{multi-armed bandit} (MAB) problem is a simplified problem that captures the exploration paradigm.
+
+\subsection{Multi-Armed Bandit}
+A \(K\)-armed stochastic bandit problem\footnote{\(K\) is the number of arms (actions) available.} is defined by a collection of \(K\) probability distributions \(\nu_1, \dots, \nu_K\)\footnote{\(\nu_a\) is the probability distribution of rewards for arm \(a\).} supported on the interval \([0,1]\), with unknown expected values
+\[
+\mu(a) = \mathbb{E}_{r \sim \nu_a}[r]
+\]
+for each action \(a\)\footnote{\(a\) denotes an action, that is, an arm that can be selected.} in the set of actions \(\mathcal{A} = \{1, \dots, K\}\)\footnote{\(\mathcal{A}\) is the set of available actions.}. Here, \(\mu(a)\)\footnote{\(\mu(a)\) is the expected value (mean) of the reward for arm \(a\).} denotes the expected reward, and \(\mathbb{E}\)\footnote{\(\mathbb{E}\) denotes the expected value, that is, the theoretical mean.} is the expectation operator. The reward \(r\)\footnote{\(r\) is the reward obtained.} is drawn from the corresponding distribution.
+
+The interaction between the agent and the environment occurs sequentially over a known time horizon of \(T\) rounds\footnote{\(T\) is the total number of rounds (time horizon).}:
+\begin{enumerate}
+    \item At each round \(t = 0, 1, \dots, T-1\)\footnote{\(t\) denotes the current round.}, the agent selects an arm \(A_t \in \{1, \dots, K\}\)\footnote{\(A_t\) is the arm chosen by the agent at round \(t\).} based on the information observed up to the previous round.
+    \item The environment independently draws a reward \(r_t \sim \nu_{A_t}\)\footnote{\(r_t\) is the reward obtained at round \(t\).}, with expected value \(\mathbb{E}[r_t \mid A_t] = \mu(A_t)\), and reveals only \(r_t\) to the agent.
+\end{enumerate}
+We define an optimal arm as \(a^* \in \arg\max_{a \in \mathcal{A}} \mu(a)\)\footnote{\(a^*\) is an optimal arm, that is, the one with the highest mean.}, with maximum expected value \(\mu^* = \mu(a^*)\)\footnote{\(\mu^*\) is the expected value of the optimal arm.}. For each arm \(a\), the suboptimality gap \(\Delta(a)\)\footnote{\(\Delta(a)\) is the difference between the optimal mean reward and the mean reward of arm \(a\).} is
+\begin{equation}
+    \Delta(a) = \mu^* - \mu(a).
+\end{equation}
+
+\paragraph{Notation.} The expected reward of an arm is written as a function \(\mu(a)\) rather than with a subscript \(\mu_a\) or \(\mu_k\). Both notations are equivalent, since the set of arms is \(\mathcal{A} = \{1,\dots,K\}\). The functional form \(\mu(a)\) is preferred for several reasons. First, at round \(t\) the agent selects a random arm \(A_t\), and writing the expected reward as \(\mu(A_t)\) is more natural than \(\mu_{A_t}\). Second, the same functional notation is used later for empirical estimates \(\hat{\mu}_t(a)\) and for counts \(N_t(a)\). Third, in contextual bandits the expected reward becomes a function of both context \(z\) and action \(a\), i.e.\ \(r(z,a)\), and in reinforcement learning it becomes \(r(s,a)\) or \(Q(s,a)\). Using \(\mu(a)\) from the beginning prepares for these generalisations. Finally, if the action space were continuous, a subscript \(k\) would not be possible, whereas \(\mu(a)\) remains valid.
+
+\subsection{Cumulative Regret and Decomposition}
+The agent's objective is to minimize the cumulative regret \(\mathrm{Reg}(T)\)\footnote{\(\mathrm{Reg}(T)\) is the cumulative regret, that is, the total loss compared to the optimal arm.} over \(T\) rounds, which measures the performance loss caused by not always selecting the optimal arm:
+\begin{equation}
+    \mathrm{Reg}(T) = T \mu^* - \sum_{t=0}^{T-1} \mu(A_t).
+\end{equation}
+By the regret decomposition lemma, the total loss can be expressed in terms of the number of pulls
+\[
+N_T(a) = \sum_{t=0}^{T-1} \mathbf{1}[A_t = a]
+\]
+of each arm \(a\). Here, \(N_T(a)\)\footnote{\(N_T(a)\) is the number of times arm \(a\) has been selected up to round \(T\).} counts how many times arm \(a\) was selected, and \(\mathbf{1}[\cdot]\)\footnote{\(\mathbf{1}[\cdot]\) equals 1 if the condition is true, and 0 otherwise.} is the indicator function. Therefore,
+\begin{equation}
+    \mathrm{Reg}(T) = \sum_{a=1}^K \Delta(a) N_T(a).
+\end{equation}
+
+\paragraph{Interpretation of the decomposition.} The gap \(\Delta(a) = \mu^* - \mu(a)\) is not a random reward; it is a fixed quantity determined by the true, unknown expected values \(\mu(a)\). Therefore, every single time arm \(a\) is pulled, the expected loss is exactly \(\Delta(a)\). If arm \(a\) is pulled \(N_T(a)\) times, the total expected loss caused by that arm is the sum of \(N_T(a)\) identical terms, i.e.\ \(\Delta(a) \cdot N_T(a)\). Summing over all arms gives the total regret. The formula can be written explicitly as
+\[
+\mathrm{Reg}(T) = \underbrace{\Delta(1) N_T(1)}_{\text{loss from arm 1}} + \underbrace{\Delta(2) N_T(2)}_{\text{loss from arm 2}} + \dots + \underbrace{\Delta(K) N_T(K)}_{\text{loss from arm } K}.
+\]
+Thus each arm has its own gap and its own count; the decomposition does not assume that all arms have the same regret. It simply groups the time-wise sum \(\sum_{t=0}^{T-1} \Delta(A_t)\) by arm.
+
+\paragraph{Numerical example.} Consider \(K=3\) arms and \(T=10\) rounds. Let the true means be \(\mu(1)=0.8\) (optimal), \(\mu(2)=0.5\), and \(\mu(3)=0.1\). Then \(\mu^*=0.8\), and the gaps are
+\[
+\Delta(1) = 0.8-0.8 = 0,\qquad
+\Delta(2) = 0.8-0.5 = 0.3,\qquad
+\Delta(3) = 0.8-0.1 = 0.7.
+\]
+Suppose the algorithm selects arm 1 five times, arm 2 three times, and arm 3 two times. Then
+\[
+\mathrm{Reg}(10) = 0\cdot 5 + 0.3\cdot 3 + 0.7\cdot 2 = 0 + 0.9 + 1.4 = 2.3.
+\]
+This illustrates that arms with larger gaps contribute more to the total regret per pull.
+
+\subsection{Algorithms and the Exploration--Exploitation Balance}
+\begin{itemize}
+    \item \textbf{Greedy rule:} Select each arm once and then commit to the arm with the highest empirical mean. This strategy suffers linear regret \(\Omega(T)\).
+    \item \textbf{Explore-then-commit (ETC):} Explore each arm uniformly for \(m\) rounds\footnote{\(m\) is the number of exploration rounds per arm in the ETC strategy.} and subsequently use only the empirically best arm. With an optimal choice of \(m^*\), it guarantees regret of order
+    \[
+        \mathcal{O}\!\left(T^{2/3} K^{1/3} \ln^{1/3}(2K/\delta)\right),
+    \]
+    where \(\delta\)\footnote{\(\delta\) is a confidence parameter (error probability).} is a confidence parameter.
+    \item \textbf{Upper confidence bound (UCB):} Apply the principle of optimism in the face of uncertainty by adding a confidence interval \(b_t(a)\)\footnote{\(b_t(a)\) is the width of the confidence interval added to the empirical mean.} to the empirical mean \(\hat{\mu}_t(a)\)\footnote{\(\hat{\mu}_t(a)\) is the empirical mean of arm \(a\) observed up to round \(t\).}. It guarantees near-optimal regret
+    \[
+        \tilde{\mathcal{O}}\!\left(\sqrt{KT}\right),
+    \]
+    where \(\tilde{\mathcal{O}}\)\footnote{\(\tilde{\mathcal{O}}\) denotes an asymptotic bound that ignores logarithmic factors.} hides logarithmic factors.
+\end{itemize}

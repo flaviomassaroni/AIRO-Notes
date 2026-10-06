@@ -1,0 +1,31 @@
+% Convenzioni:
+% - vettori: \vect{x}  (bold)
+% - matrici: \mat{R}   (bold)
+% - frame:   {}^A T_B
+% - angoli:  \theta (heading), \varphi, \psi
+% - derivate temporali: \dot{x}, \ddot{x}
+
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\SO}{\mathrm{SO}}
+\newcommand{\SE}{\mathrm{SE}}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\inner}[2]{\left\langle #1, #2 \right\rangle}
+\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\Lie}[2]{[#1,#2]}
+\newcommand{\config}{\mathcal{C}}
+\newcommand{\task}{\mathcal{T}}
+
+\newtcolorbox{nb}[1][]{
+  colback=yellow!10,
+  colframe=orange!80!black,
+  title=#1,
+  fonttitle=\bfseries,
+  sharp corners,
+  boxrule=0.5pt,
+  left=2mm, right=2mm, top=1mm, bottom=1mm,
+}
