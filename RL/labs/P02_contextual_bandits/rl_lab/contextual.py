@@ -105,9 +105,14 @@ def contextual_regret(ctr: np.ndarray, states: np.ndarray,
     them still pays linear regret, and that is the whole reason the context
     belongs in the state.
     """
-    best = np.max(ctr[states], axis=1)
+    best = np.max(ctr[states], axis=1) # Selects the best action among all the available in the states
+    
+    # Best becomes an array of T elements, where for each time, the probability of the best action stored. 
+    # Chosen selects per each t, the value of the pair (state, action) chosen.
     chosen = ctr[states, actions]
     return float(np.sum(best - chosen))
+
+    #Reg(T) = sum_{t=1} ^T gap_t, where gap_t = best_t - chosen_t
 
 # --------------------------------------------------------------------------- #
 # The interaction loop (given: you do not need to modify it)
