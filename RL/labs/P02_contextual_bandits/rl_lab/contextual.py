@@ -87,7 +87,9 @@ def select_posterior_greedy(alphas: np.ndarray, betas: np.ndarray,
     it. Ties: lowest index.
     """
     means = posterior_mean(alphas[state], betas[state])
-    return int(np.argmax(means))
+    variances = posterior_variance(alphas[state], betas[state])
+    scores = means + np.sqrt(variances)
+    return int(np.argmax(scores))
 
 # --------------------------------------------------------------------------- #
 # Q3: regret, per context

@@ -37,6 +37,8 @@ CTR = np.array([
     [0.08, 0.30, 0.05],   # management engineer
     [0.05, 0.10, 0.10],   # high school kid
 ])
+
+
 CONTEXTS = ["AI engineer", "management engineer", "high-school kid"]
 COURSES = ["RL course", "optimisation course", "trading course"]
 HORIZON = 3000
