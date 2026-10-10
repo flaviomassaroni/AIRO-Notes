@@ -36,7 +36,7 @@
 \section*{Setup}
 COLMAP version: pycolmap 4.2.1. Settings: default automatic reconstruction, SIFT features, exhaustive matching.
 
-\section{Part 1 -- How few images are enough?}
+\section{Part 1}
 
 \subsection*{What I photographed and how}
 
@@ -89,7 +89,7 @@ As predicted, the 20-image set produced a complete model, even if not highly det
 Before the final 20-image set, two preliminary attempts were made. A 19-image set registered only 4 images and produced 230 3D points. An earlier set produced 1553 points. Both were worse than the final 20-image set (20 registered images, 3400 points, 0.73 px). This confirms that the distribution and quality of the views matter more than the sheer number of images.
 
 % ------------------------------------------------------------
-\section{Part 2 -- Break it on purpose}
+\section{Part 2}
 
 \subsection*{What I photographed and how}
 For the second experiment, I took 10 pictures of an indoor environment, similar to a kitchen. No translation was performed: the camera was kept as still as possible, performing only rotations.
@@ -104,7 +104,7 @@ COLMAP extracted SIFT features and connected all 10 images, indicating successfu
 The failure comes from the geometry of the motion: the camera rotated in place without translating, so there is no parallax and depth cannot be observed. All rays share the same optical center, and the images are related by a homography, not by epipolar geometry with a baseline. Blur and exposure are not the causes.
 
 % ------------------------------------------------------------
-\section{Part 3 -- Repair it}
+\section{Part 3}
 
 \subsection*{What I did}
 Three images with lateral translation were added to provide the missing baseline, reaching a total of 13 images. No settings were changed.
