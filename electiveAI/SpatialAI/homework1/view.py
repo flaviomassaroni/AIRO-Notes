@@ -25,4 +25,5 @@ cam.paint_uniform_color([1, 0, 0])
 
 print(f"{len(rec.images)} immagini registrate, "
       f"{len(rec.points3D)} punti 3D totali, {len(pts)} con track >= 3")
+print(sorted(im.name for im in rec.images.values()))
 o3d.visualization.draw_geometries([pcd, cam])

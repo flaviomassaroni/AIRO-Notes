@@ -1,0 +1,103 @@
+I20261010 20:03:25.430091 129981967484480 feature_extraction.cc:498] === Feature extraction ===
+I20261010 20:03:25.430450 129981933913664 sift.cc:764] Creating SIFT CPU feature extractor
+I20261010 20:03:25.430476 129981942306368 sift.cc:764] Creating SIFT CPU feature extractor
+I20261010 20:03:40.103285 129981925520960 feature_extraction.cc:270] Processed file [1/5]
+I20261010 20:03:40.103375 129981925520960 feature_extraction.cc:273]   Name:            04.jpg
+I20261010 20:03:40.103387 129981925520960 feature_extraction.cc:282]   Dimensions:      3072 x 4080
+I20261010 20:03:40.103410 129981925520960 feature_extraction.cc:285]   Camera:          #1 - SIMPLE_RADIAL
+I20261010 20:03:40.103420 129981925520960 feature_extraction.cc:289]   Focal Length:    4896.00px
+I20261010 20:03:40.103436 129981925520960 feature_extraction.cc:294]   Features:        10159 (SIFT)
+I20261010 20:03:40.103512 129981925520960 feature_extraction.cc:308]   GPS:             LAT=42.000, LON=12.624, ALT=178.600
+I20261010 20:03:40.103527 129981925520960 feature_extraction.cc:315]   Gravity:         X=0.000, Y=1.000, Z=0.000
+I20261010 20:03:40.579704 129981925520960 feature_extraction.cc:270] Processed file [2/5]
+I20261010 20:03:40.579792 129981925520960 feature_extraction.cc:273]   Name:            00.jpg
+I20261010 20:03:40.579803 129981925520960 feature_extraction.cc:282]   Dimensions:      3072 x 4080
+I20261010 20:03:40.579811 129981925520960 feature_extraction.cc:285]   Camera:          #1 - SIMPLE_RADIAL
+I20261010 20:03:40.579831 129981925520960 feature_extraction.cc:289]   Focal Length:    4896.00px
+I20261010 20:03:40.579847 129981925520960 feature_extraction.cc:294]   Features:        15009 (SIFT)
+I20261010 20:03:40.579928 129981925520960 feature_extraction.cc:315]   Gravity:         X=0.000, Y=1.000, Z=0.000
+I20261010 20:03:51.513732 129981925520960 feature_extraction.cc:270] Processed file [3/5]
+I20261010 20:03:51.513842 129981925520960 feature_extraction.cc:273]   Name:            08.jpg
+I20261010 20:03:51.513856 129981925520960 feature_extraction.cc:282]   Dimensions:      3072 x 4080
+I20261010 20:03:51.513864 129981925520960 feature_extraction.cc:285]   Camera:          #1 - SIMPLE_RADIAL
+I20261010 20:03:51.513873 129981925520960 feature_extraction.cc:289]   Focal Length:    4896.00px
+I20261010 20:03:51.513891 129981925520960 feature_extraction.cc:294]   Features:        16676 (SIFT)
+I20261010 20:03:51.514048 129981925520960 feature_extraction.cc:308]   GPS:             LAT=42.000, LON=12.624, ALT=174.500
+I20261010 20:03:51.514063 129981925520960 feature_extraction.cc:315]   Gravity:         X=0.000, Y=1.000, Z=0.000
+I20261010 20:03:53.053422 129981925520960 feature_extraction.cc:270] Processed file [4/5]
+I20261010 20:03:53.053493 129981925520960 feature_extraction.cc:273]   Name:            12.jpg
+I20261010 20:03:53.053504 129981925520960 feature_extraction.cc:282]   Dimensions:      3072 x 4080
+I20261010 20:03:53.053514 129981925520960 feature_extraction.cc:285]   Camera:          #1 - SIMPLE_RADIAL
+I20261010 20:03:53.053525 129981925520960 feature_extraction.cc:289]   Focal Length:    4896.00px
+I20261010 20:03:53.053544 129981925520960 feature_extraction.cc:294]   Features:        11834 (SIFT)
+I20261010 20:03:53.053647 129981925520960 feature_extraction.cc:308]   GPS:             LAT=42.000, LON=12.624, ALT=174.500
+I20261010 20:03:53.053663 129981925520960 feature_extraction.cc:315]   Gravity:         X=0.000, Y=1.000, Z=0.000
+I20261010 20:04:01.768059 129981925520960 feature_extraction.cc:270] Processed file [5/5]
+I20261010 20:04:01.768137 129981925520960 feature_extraction.cc:273]   Name:            16.jpg
+I20261010 20:04:01.768159 129981925520960 feature_extraction.cc:282]   Dimensions:      3072 x 4080
+I20261010 20:04:01.768165 129981925520960 feature_extraction.cc:285]   Camera:          #1 - SIMPLE_RADIAL
+I20261010 20:04:01.768172 129981925520960 feature_extraction.cc:289]   Focal Length:    4896.00px
+I20261010 20:04:01.768198 129981925520960 feature_extraction.cc:294]   Features:        12139 (SIFT)
+I20261010 20:04:01.768261 129981925520960 feature_extraction.cc:308]   GPS:             LAT=42.000, LON=12.624, ALT=173.900
+I20261010 20:04:01.768283 129981925520960 feature_extraction.cc:315]   Gravity:         X=0.000, Y=1.000, Z=0.000
+I20261010 20:04:01.862454 129981967484480 timer.cc:90] Elapsed time: 0.607 [minutes]
+I20261010 20:04:01.877728 129981967484480 feature_matching.cc:196] === Feature matching & geometric verification ===
+I20261010 20:04:01.878040 129981925520960 sift.cc:1685] Creating SIFT CPU feature matcher
+I20261010 20:04:01.878046 129981942306368 sift.cc:1685] Creating SIFT CPU feature matcher
+I20261010 20:04:01.878117 129981933913664 sift.cc:1685] Creating SIFT CPU feature matcher
+I20261010 20:04:01.878146 129981959091776 sift.cc:1685] Creating SIFT CPU feature matcher
+I20261010 20:04:01.878226 129981917128256 sift.cc:1685] Creating SIFT CPU feature matcher
+I20261010 20:04:01.878394 129981950699072 sift.cc:1685] Creating SIFT CPU feature matcher
+I20261010 20:04:01.878401 129981908735552 sift.cc:1685] Creating SIFT CPU feature matcher
+I20261010 20:04:01.878435 129981900342848 sift.cc:1685] Creating SIFT CPU feature matcher
+I20261010 20:04:01.878689 129981967484480 pairing.cc:181] Generating exhaustive image pairs...
+I20261010 20:04:01.878704 129981967484480 pairing.cc:214] Processing block [1/1, 1/1]
+I20261010 20:04:05.228155 129981967484480 feature_matching.cc:218] in 3.349s
+I20261010 20:04:05.228247 129981967484480 timer.cc:90] Elapsed time: 0.056 [minutes]
+I20261010 20:04:05.241585 129982855281536 incremental_pipeline.cc:353] Loading database
+I20261010 20:04:05.241662 129982855281536 database_cache.cc:82] Loading rigs...
+I20261010 20:04:05.241695 129982855281536 database_cache.cc:92]  1 in 0.000s
+I20261010 20:04:05.241709 129982855281536 database_cache.cc:100] Loading cameras...
+I20261010 20:04:05.241725 129982855281536 database_cache.cc:118]  1 in 0.000s
+I20261010 20:04:05.241733 129982855281536 database_cache.cc:126] Loading frames...
+I20261010 20:04:05.241766 129982855281536 database_cache.cc:136]  5 in 0.000s
+I20261010 20:04:05.241793 129982855281536 database_cache.cc:144] Loading matches...
+I20261010 20:04:05.241839 129982855281536 database_cache.cc:163]  3 in 0.000s
+I20261010 20:04:05.241849 129982855281536 database_cache.cc:171] Loading images...
+I20261010 20:04:05.246423 129982855281536 database_cache.cc:268]  5 in 0.005s (connected 5, loaded 5)
+I20261010 20:04:05.246483 129982855281536 database_cache.cc:282] Loading pose priors...
+I20261010 20:04:05.246524 129982855281536 database_cache.cc:290]  5 in 0.000s
+I20261010 20:04:05.246534 129982855281536 database_cache.cc:298] Building correspondence graph...
+I20261010 20:04:05.247873 129982855281536 database_cache.cc:327]  in 0.001s (ignored 0)
+I20261010 20:04:05.247908 129982855281536 timer.cc:90] Elapsed time: 0.000 [minutes]
+I20261010 20:04:05.248997 129982855281536 incremental_pipeline.cc:465] Finding good initial image pair
+I20261010 20:04:05.250025 129982855281536 incremental_pipeline.cc:472] => No good initial image pair found.
+I20261010 20:04:05.250065 129982855281536 incremental_pipeline.cc:800] Discarding reconstruction due to no initial pair
+I20261010 20:04:05.250107 129982855281536 incremental_pipeline.cc:429] => Relaxing the initialization constraints.
+I20261010 20:04:05.250700 129982855281536 incremental_pipeline.cc:465] Finding good initial image pair
+I20261010 20:04:05.255931 129982855281536 incremental_pipeline.cc:472] => No good initial image pair found.
+I20261010 20:04:05.255964 129982855281536 incremental_pipeline.cc:800] Discarding reconstruction due to no initial pair
+I20261010 20:04:05.256023 129982855281536 incremental_pipeline.cc:442] => Relaxing the initialization constraints.
+I20261010 20:04:05.256423 129982855281536 incremental_pipeline.cc:465] Finding good initial image pair
+I20261010 20:04:05.261163 129982855281536 incremental_pipeline.cc:492] Registering initial image pair #4 and #2
+I20261010 20:04:05.262514 129982855281536 incremental_pipeline.cc:791] Discarding reconstruction due to bad initial pair
+I20261010 20:04:05.263334 129982855281536 incremental_pipeline.cc:465] Finding good initial image pair
+I20261010 20:04:05.264208 129982855281536 incremental_pipeline.cc:472] => No good initial image pair found.
+I20261010 20:04:05.264232 129982855281536 incremental_pipeline.cc:800] Discarding reconstruction due to no initial pair
+I20261010 20:04:05.264255 129982855281536 incremental_pipeline.cc:429] => Relaxing the initialization constraints.
+I20261010 20:04:05.264638 129982855281536 incremental_pipeline.cc:465] Finding good initial image pair
+I20261010 20:04:05.269951 129982855281536 incremental_pipeline.cc:492] Registering initial image pair #4 and #2
+I20261010 20:04:05.271397 129982855281536 incremental_pipeline.cc:791] Discarding reconstruction due to bad initial pair
+I20261010 20:04:05.272320 129982855281536 incremental_pipeline.cc:465] Finding good initial image pair
+I20261010 20:04:05.273171 129982855281536 incremental_pipeline.cc:472] => No good initial image pair found.
+I20261010 20:04:05.273195 129982855281536 incremental_pipeline.cc:800] Discarding reconstruction due to no initial pair
+I20261010 20:04:05.273225 129982855281536 incremental_pipeline.cc:442] => Relaxing the initialization constraints.
+I20261010 20:04:05.273598 129982855281536 incremental_pipeline.cc:465] Finding good initial image pair
+I20261010 20:04:05.278829 129982855281536 incremental_pipeline.cc:492] Registering initial image pair #4 and #2
+I20261010 20:04:05.280192 129982855281536 incremental_pipeline.cc:791] Discarding reconstruction due to bad initial pair
+I20261010 20:04:05.280937 129982855281536 incremental_pipeline.cc:465] Finding good initial image pair
+I20261010 20:04:05.281660 129982855281536 incremental_pipeline.cc:472] => No good initial image pair found.
+I20261010 20:04:05.281676 129982855281536 incremental_pipeline.cc:800] Discarding reconstruction due to no initial pair
+I20261010 20:04:05.281701 129982855281536 timer.cc:90] Elapsed time: 0.001 [minutes]
+E20261010 20:04:05.281726 129982855281536 sfm.cc:310] Failed to create any sparse model
+NESSUN MODELLO

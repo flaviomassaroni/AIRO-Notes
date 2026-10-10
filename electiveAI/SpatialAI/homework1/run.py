@@ -10,8 +10,11 @@ db = out / "db.db"
 if db.exists():
     db.unlink()                         # riparti sempre da un database pulito
 
+ext = pycolmap.FeatureExtractionOptions()
+ext.num_threads = 2
 pycolmap.extract_features(database_path=db, image_path=img_dir,
-                          camera_mode=pycolmap.CameraMode.SINGLE)
+                          camera_mode=pycolmap.CameraMode.SINGLE,
+                          extraction_options=ext)
 pycolmap.match_exhaustive(database_path=db)
 maps = pycolmap.incremental_mapping(database_path=db, image_path=img_dir,
                                     output_path=out)

@@ -1,0 +1,142 @@
+**Nome:** [Tuo Nome]  
+**Cognome:** [Tuo Cognome]  
+**Matricola:** [Tua Matricola]  
+**COLMAP version:** [inserisci versione, es. 3.8] – impostazioni di default, feature extractor SIFT, matching esaustivo.
+
+Ecco un resoconto dettagliato per la **Parte 1 – How few images are enough?**, pronto da adattare nel tuo report. Include oggetto, metodo, predizione, risultati per 20-10-5-3 immagini, spiegazione e confronto con la predizione.
+
+---
+
+**Nome:** [Tuo Nome]  
+**Cognome:** [Tuo Cognome]  
+**Matricola:** [Tua Matricola]  
+**COLMAP version:** [es. 3.8] – impostazioni di default, feature extractor SIFT, matching esaustivo.
+
+---
+
+## Parte 1 – How few images are enough?
+
+**Cosa ho fotografato e come**  
+Ho scelto una scarpa da ginnastica come oggetto texturato. L’ho appoggiata su una superficie con texture (giornale) e ho scattato 20 foto girando attorno all’oggetto con la camera, senza ruotare la scarpa. Lo sfondo era ricco di dettagli e cambiava prospetticamente mentre giravo, fornendo molti keypoint aggiuntivi. Le foto sono nitide e ben esposte.  
+Da questo set ho poi creato tre sottoinsiemi: 10 immagini (una ogni due), 5 immagini (una ogni quattro) e 3 immagini, mantenendo una distribuzione il più possibile uniforme attorno all’oggetto.
+
+**Predizione**  
+Prima di eseguire COLMAP mi aspettavo che:
+- con 20 immagini la ricostruzione funzionasse, grazie all’ampia sovrapposizione e alla baseline sufficiente;
+- con 10 immagini la ricostruzione degradasse, registrando meno immagini e producendo una nuvola di punti più rada;
+- con 5 e 3 immagini il fallimento fosse probabile, per mancanza di sovrapposizione e baseline sufficienti a inizializzare la struttura.
+
+**Risultati**
+
+**20 immagini**  
+- Immagini registrate: 20  
+- Punti 3D totali: 3337  
+- Punti con track ≥ 3: 2376  
+- Errore medio di reproiezione: non riportato esplicitamente, ma il modello è risultato coerente e completo.  
+Il modello ricostruisce la scarpa e parte dello sfondo. La nuvola di punti è densa e la geometria ha senso.
+
+**10 immagini**  
+- Immagini registrate: 3 (nello specifico `00.jpg`, `02.jpg`, `14.jpg`)  
+- Punti 3D totali: 67  
+- Punti con track ≥ 3: 36  
+- Errore medio di reproiezione: 0.831518  
+Il modello è estremamente parziale: solo 3 viste su 10 sono state registrate e la nuvola di punti è minuscola. Non rappresenta l’oggetto in modo utile.
+
+**5 immagini**  
+- Immagini registrate: 0  
+- Punti 3D: 0  
+- COLMAP riporta: `No good initial image pair found` e `NESSUN MODELLO`.  
+Il matching trova ancora corrispondenze (`connected 5, loaded 5`), ma non esiste una coppia con geometria affidabile per inizializzare.
+
+**3 immagini**  
+- Immagini registrate: 0  
+- Punti 3D: 0  
+- COLMAP riporta: `No good initial image pair found` e `NESSUN MODELLO`.  
+Anche qui il matching trova alcune corrispondenze (`connected 2, loaded 2`), ma la baseline o la sovrapposizione non bastano per l’inizializzazione.
+
+**Spiegazione**  
+La struttura-from-motion richiede un numero sufficiente di viste con baseline adeguata e sovrapposizione. Con 20 immagini la copertura è ampia, la baseline è ben distribuita e COLMAP riesce a triangolare un numero elevato di punti.  
+Quando si sotto-campiona, la distanza tra le viste aumenta e la sovrapposizione diminuisce. Con 10 immagini solo poche coppie hanno ancora una geometria sfruttabile, e il modello si riduce a 3 immagini e 67 punti. Con 5 e 3 immagini la baseline diventa troppo ampia o la sovrapposizione troppo bassa: il matching può ancora trovare qualche corrispondenza, ma non ci sono coppie con parallasse sufficiente per una stima affidabile. Il fallimento è quindi dovuto alla perdita di copertura e di parallasse, non a problemi di nitidezza o esposizione.
+
+**Confronto con la predizione**  
+La predizione è stata confermata: la ricostruzione funziona con 20 immagini, degrada con 10 e fallisce con 5 e 3. Il caso delle 10 immagini è particolarmente istruttivo perché mostra che anche con un numero apparentemente sufficiente di foto, la selezione delle viste può portare a una geometria povera: le immagini registrate (`00`, `02`, `14`) non coprono uniformemente l’oggetto, e il modello risultante è inutilizzabile.
+
+**Osservazione aggiuntiva**  
+Con 20 immagini parte dei punti 3D appartiene allo sfondo e non alla scarpa. È utile guardare nel modello sparse quanti punti cadono sull’oggetto e quanti attorno. Nel report si può notare che la ricostruzione è sì riuscita, ma che una parte della nuvola è dovuta alla texture dello sfondo.
+
+---
+
+Questo resoconto copre in modo preciso e dettagliato la Parte 1, con predizione e verifica dei risultati. Puoi integrarlo nel PDF con screenshot e qualche foto di input, come richiesto dalla consegna.
+## Parte 2 – Break it on purpose
+
+**Cosa ho fotografato e come**  
+Ho scattato 10 foto (00.jpg–09.jpg) con il telefono, in una stanza con texture (scaffali, quadri, oggetti). La camera è rimasta ferma nello stesso punto e ho ruotato solo il telefono di circa 15–20° tra una foto e la successiva, mantenendo una sovrapposizione del 60–70%. Le foto sono nitide e ben esposte, con esposizione e messa a fuoco bloccate. Non c’è stato spostamento laterale: la camera ruota senza traslare.
+
+**Predizione**  
+Prima di lanciare COLMAP ho previsto che:
+- l’estrazione delle feature e il matching sarebbero funzionati, grazie alla texture della scena e alla buona sovrapposizione;
+- il fallimento sarebbe avvenuto all’inizializzazione, perché con camera che ruota senza spostarsi non c’è parallasse e non si può triangolare;
+- COLMAP avrebbe segnalato `bad initial pair` o `No good initial image pair found`, senza produrre alcun modello sparse.
+
+**Risultato effettivo**  
+COLMAP ha estratto 9.869–14.502 feature SIFT per immagine e ha collegato tutte le 10 immagini (`connected 10, loaded 10`). Quindi il matching ha funzionato. Tuttavia, durante l’inizializzazione, ogni coppia provata (`#1 e #2`, `#10 e #9`, `#6 e #7`, …) è stata scartata con:
+```
+Discarding reconstruction due to bad initial pair
+=> No good initial image pair found.
+```
+Alla fine:
+```
+Failed to create any sparse model
+NESSUN MODELLO
+```
+Nessun modello è stato creato.
+
+**Spiegazione**  
+Con camera che ruota senza traslare, tutti i raggi partono dallo stesso centro ottico. La parallasse è nulla e la profondità non è osservabile. Due viste sono legate da un’omografia, non da geometria epipolare con baseline. COLMAP non può triangolare i primi punti 3D e quindi non riesce a inizializzare la ricostruzione. Il fallimento non dipende da blur o buio, ma dalla geometria del moto.
+
+**Confronto con la predizione**  
+La predizione è stata confermata in ogni punto: matching riuscito, fallimento all’inizializzazione, nessun modello. La Parte 2 è da considerarsi riuscita.
+
+---
+
+## Parte 3 – Repair it
+
+**Cosa ho fatto**  
+Ho ripreso le stesse 10 foto della Parte 2 e ho aggiunto 3 immagini con uno spostamento laterale vero (11.jpg, 14.jpg, 15.jpg), per un totale di 13 immagini. L’obiettivo era fornire la baseline mancante senza cambiare alcuna impostazione di COLMAP.
+
+**Predizione**  
+Ho previsto che:
+- l’aggiunta di foto con traslazione laterale avrebbe dato una baseline, permettendo l’inizializzazione;
+- il modello sarebbe stato però parziale, perché la maggior parte delle immagini resta degenerata (rotazione pura) e non può essere integrata;
+- COLMAP avrebbe registrato solo poche immagini, quelle che si agganciano alla baseline, e il modello non sarebbe una ricostruzione completa della scena.
+
+**Risultato effettivo**  
+COLMAP ha processato 13 immagini (`connected 13, loaded 13`). Ha trovato una coppia iniziale `#7 e #12` (cioè `06.jpg` e `14.jpg`) e ha registrato anche `#4` (`03.jpg`). Altri tentativi con 4 frame sono stati scartati per `insufficient size`. Il modello finale contiene:
+```
+num_reg_frames = 3
+num_images = 3
+num_points3D = 448
+mean_reprojection_error = 0.853851
+```
+Le immagini registrate sono: `03.jpg`, `06.jpg`, `14.jpg` (confermato da `view.py`). Solo una delle tre foto aggiunte (`14.jpg`) è entrata nel modello; le altre due (`11.jpg`, `15.jpg`) non sono state registrate.
+
+**Spiegazione**  
+La baseline fornita da `14.jpg` ha permesso di inizializzare una ricostruzione insieme a `06.jpg`, e poi `03.jpg` è stata aggiunta. Tuttavia, le restanti 10 immagini, scattate ruotando la camera sul posto, non hanno parallasse sufficiente per essere integrate. Il modello è geometricamente consistente per le 3 viste registrate (errore di reproiezione basso, 0.85 px), ma non è una ricostruzione completa della scena. Manca la maggior parte delle immagini e dei punti 3D.
+
+**Discussione sulla correttezza**  
+Il modello esiste, ma non è corretto come ricostruzione dell’intero set. La consegna sottolinea che “un modello che esiste non è necessariamente un modello giusto”: qui il modello è parziale e non rappresenta la scena nella sua interezza. La riparazione ha avuto successo solo in parte: ha dimostrato che una baseline minima è sufficiente per inizializzare, ma non risolve la degenerazione delle immagini con rotazione pura.
+
+**Confronto con la predizione**  
+La predizione è stata confermata: il modello esiste ma è parziale, con solo 3 immagini registrate su 13. La Parte 3 mostra chiaramente i limiti della riparazione e l’importanza della parallasse per una ricostruzione completa.
+
+---
+
+## Conclusioni generali
+
+- **Parte 2:** la rotazione pura della camera rende la geometria degenere; COLMAP fallisce all’inizializzazione perché non può triangolare. Predizione confermata.
+- **Parte 3:** aggiungere poche immagini con baseline permette di inizializzare, ma il modello resta parziale se la maggior parte delle viste è ancora degenerata. Predizione confermata.
+- **Insegnamento:** la struttura-from-motion richiede parallasse; senza baseline, il matching può funzionare ma la ricostruzione 3D non è possibile. Anche un modello che esiste può essere incompleto o non rappresentativo della scena.
+
+---
+
+Questo resoconto copre in modo preciso e dettagliato ciò che è stato fatto, con predizioni e verifica dei risultati. Puoi adattarlo nel tuo PDF, aggiungendo screenshot e qualche foto di input come richiesto.
