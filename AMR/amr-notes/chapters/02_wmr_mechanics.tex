@@ -1,0 +1,977 @@
+\chapter{Wheeled Mobile Robots: Mechanics}
+\label{ch:wmr-mechanics}
+
+This chapter introduces the mechanical structure of wheeled mobile
+robots. It will focus on what kinds of wheels exist, how they
+can be assembled into kinematic structures, and what constraints are imposed on the motion of the robot
+in various situations.
+
+\section{Sources of Locomotion}
+\label{sec:locomotion}
+
+The main sources of movement for a mobile robot are:
+\begin{itemize}
+    \item \textbf{Wheels}: wheeled robots usually consist of a single
+          rigid body, with the wheels in contact with the ground.
+    \item \textbf{Feet}: legged robots, consisting of several rigid
+          bodies articulated through joints.
+\end{itemize}
+
+In this course we focus on wheeled mobile robots (WMRs), which are the
+simplest and most widely deployed class of mobile robots.
+
+\section{Static Balance}
+\label{sec:static-balance}
+
+The wheels are in contact with the ground, and each wheel defines a
+point of contact. The \textbf{support polygon} is the convex hull of
+all the contact points.
+
+\begin{definition}[Static Balance]
+A wheeled robot is in \textbf{static balance} if the projection on the
+ground of its center of mass falls inside the support polygon.
+\end{definition}
+
+A robot must be balanced in order not to fall. The convex hull of two
+points is a line segment, hence a robot with only two wheels cannot be
+easily balanced in a static fashion: it needs at least a third contact
+point (typically a caster wheel). In the same way, a vehicle with a
+single wheel (the unicycle) has a support polygon that degenerates to a
+point, and a bicycle has a support polygon that degenerates to a line
+segment: neither is statically balanced.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/balance.pdf}
+    \caption{Support polygon and static balance.}
+    \label{fig:support-polygon}
+\end{figure}
+
+\section{Types of Wheels}
+\label{sec:types-of-wheels}
+
+There are three main types of wheels:
+
+\begin{itemize}
+    \item \textbf{Fixed wheels}: they have a fixed orientation with
+          respect to the robot body. They can roll but cannot steer
+          about their vertical axis. They are usually actuated; if
+          passive, they are used for balance and offer a contact point.
+    \item \textbf{Steerable wheels}: they can steer and are used for
+          orientation, hence they are typically active (e.g.\ the front
+          wheels of a car).
+    \item \textbf{Caster wheels}: they have a variable orientation but
+          are typically not actuated. Their axis of orientation is not
+          aligned with the wheel axis, so they align automatically with
+          the direction of motion. They are kinematically
+          ``invisible'' but offer a contact point for balance.
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.65\linewidth]{images/wheels.png}
+    \caption{Fixed, steerable, and caster wheels.}
+    \label{fig:wheel-types}
+\end{figure}
+
+\section{Kinematic Structures}
+\label{sec:kinematic-structures}
+
+\subsection{Differential Drive}
+\label{subsec:differential-drive}
+
+The simplest wheeled robot is the \textbf{differential drive}: two
+aligned fixed wheels, independently actuated, plus one caster wheel for
+balance. The two actuated wheels are driven independently, which
+allows the robot to rotate in place by making them turn in opposite
+directions.
+
+\subsection{Synchro-Drive}
+\label{subsec:synchro-drive}
+
+A \textbf{synchro-drive} robot has three steerable wheels and two
+actuators: one controls simultaneously the orientation of all the
+wheels, and the other rolls them together. The base over the wheels
+never changes orientation. This configuration is preferable when the
+body to be moved is particularly heavy.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/structures.eps}
+    \caption{Differential drive (left) and synchro-drive (right).}
+    \label{fig:structures}
+\end{figure}
+
+\subsection{Tricycle and Car-Like}
+\label{subsec:tricycle-car}
+
+The \textbf{tricycle} has two fixed wheels at the back and one actuated
+steerable wheel at the front. The \textbf{car-like} robot is similar,
+but with two steerable wheels at the front.
+
+Both are subject to \emph{nonholonomic} constraints: the pure rolling
+condition on each wheel forbids sideways motion, but does not prevent
+the robot from reaching any configuration in the plane.
+
+\section{The Differential}
+\label{sec:differential}
+
+Consider a car-like robot taking a curve. In the same time interval,
+the outer wheel travels a longer distance than the inner wheel, so its
+rotation speed must be higher. If the two front wheels were rigidly
+connected to a single motor, they would be forced to spin at the same
+speed, causing tire slip and mechanical strain.
+
+To avoid this, a device called \textbf{differential} is used.
+
+\begin{definition}[Differential]
+A mechanical differential is a gear assembly (typically bevel
+or planetary gears) connected to a single drive motor. It splits the
+power to the two wheels on the same axle while allowing them to rotate
+at different speeds. When the robot turns, the outer wheel travels a
+longer arc than the inner one; the differential lets each wheel spin
+at its natural speed, preventing tire slip, scrubbing, and mechanical
+strain on the drivetrain.
+\end{definition}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/differential.eps}
+    \caption{Path of a car-like robot turning: the outer wheel travels
+    a longer distance than the inner one.}
+    \label{fig:differential}
+\end{figure}
+
+\section{Constraints}
+\label{sec:constraints}
+
+The presence of wheels in contact with the ground introduces
+\emph{constraints} on the motion of the robot. Two classes matter for
+this course: geometric constraints, which act on the configuration, and
+kinematic constraints, which act on the velocities.
+
+\subsection{Geometric Constraints}
+\label{subsec:geometric-constraints}
+
+We focus on equality constraints that are time-invariant. A geometric
+constraint has the form
+\begin{equation}
+    h(q) = 0,
+\end{equation}
+and depends only on the configuration. In general we have \( k < n \)
+independent constraints,
+\begin{align}
+    h_1(q) &= 0, \\
+           &\vdots \\
+    h_k(q) &= 0.
+\end{align}
+If the configuration space is an \( n \)-manifold, \( k \) independent
+geometric constraints reduce the accessible configurations to an
+\( (n - k) \)-manifold embedded in \( C \), called a
+\textbf{sub-manifold}.
+
+For example, if \( C = \mathbb{R}^2 \) (a 2-manifold), one constraint
+restricts the configurations to a curve in the plane. If
+\( C = \mathbb{R}^3 \), one constraint restricts them to a surface.
+
+\begin{nb}[Solving for a Coordinate]
+Instead of using the full vector \( q \), one can solve
+\( h(q) = 0 \) for one coordinate, e.g.\
+\( q_i = \tilde{h}(q_1, \dots, q_{i-1}, q_{i+1}, \dots, q_n) \). But
+this choice is not always good: for the constraint
+\( q_1^2 + q_2^2 = 1 \), solving for \( q_2 \) gives
+\( q_2 = \pm\sqrt{1 - q_1^2} \), which is not single-valued. For a
+circle, it is better to use the angle \( \alpha \in \mathcal{S}^1 \)
+as the single coordinate, with \( q_1 = \cos\alpha \) and
+\( q_2 = \sin\alpha \).
+\end{nb}
+
+\subsection{Kinematic Constraints}
+\label{subsec:kinematic-constraints}
+
+A kinematic constraint is local: it prevents the configuration from
+moving in certain directions, but does not necessarily restrict the
+accessible configurations. A general kinematic constraint has the form
+\begin{equation}
+    a(q, \dot{q}) = 0,
+\end{equation}
+and depends on the state and its velocity. All the relevant kinematic
+constraints in robotics are in \textbf{Pfaffian form}:
+\begin{equation}
+\label{eq:pfaffian}
+    a^\top(q) \dot{q} = 0,
+\end{equation}
+with \( a(q) \) an \( n \)-dimensional vector depending on the
+configuration. The Pfaffian form expresses an orthogonality condition:
+at each configuration, the velocity must be orthogonal to \( a(q) \).
+
+Multiple kinematic constraints can be arranged in matrix form:
+\begin{equation}
+\begin{pmatrix}
+    a_1^\top(q) \\
+    a_2^\top(q) \\
+    \vdots \\
+    a_k^\top(q)
+\end{pmatrix}
+\dot{q} = 0
+\implies
+A(q) \dot{q} = 0
+\iff
+\dot{q} \in \mathcal{N}(A(q)),
+\end{equation}
+where \( A(q) \) is a \( k \times n \) matrix. The admissible
+velocities are the elements of the null space of \( A(q) \), a linear
+subspace of \( \mathbb{R}^n \).
+
+\begin{nb}[Geometric Implies Kinematic]
+Any geometric constraint \( h(q) = 0 \) implies a kinematic
+constraint. Differentiating with respect to time:
+\[
+\dot{h}(q) = \frac{\partial h}{\partial q} \dot{q}
+           = (\nabla_q h)^\top \dot{q} = 0.
+\]
+This is exactly a Pfaffian constraint with
+\( a(q) = \nabla_q h \). The gradient is orthogonal to the
+sub-manifold defined by the geometric constraint, so the kinematic
+constraint prevents the robot from leaving the sub-manifold.
+\end{nb}
+
+The converse is not generally true: a kinematic constraint
+\( a^\top(q) \dot{q} = 0 \) implies a geometric constraint only if
+the constraint is \emph{integrable}, i.e.\ only if there exist a
+function \( h(q) \) and a nonvanishing function \( \lambda(q) \) such
+that
+\begin{equation}
+\label{eq:integrability}
+    \nabla_q h = \lambda(q)\, a(q).
+\end{equation}
+(The factor \( \lambda \) is needed because multiplying a constraint by
+a nonzero function does not change the set of admissible velocities;
+in the simplest case \( \lambda = 1 \).)
+
+\subsection{Holonomic vs Nonholonomic Constraints}
+\label{subsec:holonomic-nonholonomic}
+
+\begin{definition}[Holonomic Constraint]
+\label{def:holonomic}
+An integrable kinematic constraint is called \textbf{holonomic}. It
+defines a geometric constraint, and therefore reduces the dimension of
+the accessible configuration space.
+\end{definition}
+
+\begin{definition}[Nonholonomic Constraint]
+\label{def:nonholonomic}
+A kinematic constraint that is not integrable is called
+\textbf{nonholonomic}. It restricts the set of admissible velocities at
+each configuration, without being equivalent to a geometric constraint.
+Depending on the degree of integrability, the accessible configuration
+space is either the whole \( C \) (\emph{completely nonholonomic}
+constraints) or a sub-manifold of dimension strictly larger than the
+number of independent admissible velocity directions (\emph{partially
+integrable} constraints, see \cref{subsec:controllability}).
+\end{definition}
+
+\paragraph{Example: integrable constraint.}
+Consider the kinematic constraint for a 2-dimensional robot:
+\[
+q_1 \dot{q}_1 + q_2 \dot{q}_2 = 0.
+\]
+This is integrable: the resulting geometric constraint is
+\( q_1^2 + q_2^2 = c \), with \( c > 0 \). So it is holonomic.
+
+\paragraph{Example: nonholonomic constraint.}
+The simplest nonholonomic system is the \textbf{rolling disk}. Its
+configuration is \( q = (x, y, \theta)^\top \), with \( \theta \) the
+orientation with respect to the horizontal axis. In pure rolling (no
+slippage), the disk can only move in the direction it points to, not
+laterally. The constraint is
+\begin{equation}
+\label{eq:rolling}
+    \sin\theta \, \dot{x} - \cos\theta \, \dot{y} = 0,
+\end{equation}
+or in vector form
+\[
+\begin{pmatrix} \sin\theta & -\cos\theta & 0 \end{pmatrix}
+\begin{pmatrix} \dot{x} \\ \dot{y} \\ \dot{\theta} \end{pmatrix} = 0.
+\]
+The vector \( n^\top = (\sin\theta, -\cos\theta) \) is normal to the
+direction of motion. Any velocity with a component along \( n \) is
+not allowed. The line through the contact point with direction \( n \)
+is called the \textbf{zero-motion line}: the velocity of the contact
+point has zero component along it.
+
+This constraint does not restrict the reachable configurations: every
+configuration can still be reached. To see this, construct an explicit
+trajectory (a \textbf{universal maneuver}) between any two
+configurations \( q_s \) and \( q_g \):
+\begin{enumerate}
+    \item Rotate in place from \( \theta_s \) to the angle
+          \( \theta^* \) such that the vector
+          \( (x_g - x_s, y_g - y_s) \) is aligned with the sagittal
+          axis.
+    \item Move along that direction until \( (x_g, y_g) \) is reached.
+    \item Rotate in place from \( \theta^* \) to \( \theta_g \).
+\end{enumerate}
+Each step respects the rolling constraint. So the rolling disk is
+nonholonomic but controllable.
+
+\begin{nb}[Holonomic vs Nonholonomic: The Takeaway]
+\begin{itemize}
+    \item \textbf{Holonomic} (integrable): the accessible
+          configuration space is reduced to a sub-manifold. The robot
+          is confined to it, hence the system is \emph{not}
+          controllable.
+    \item \textbf{Completely nonholonomic}: the accessible
+          configuration space is the whole \( C \). The robot can
+          reach any configuration, but only along admissible paths:
+          the system is controllable.
+    \item \textbf{Partially integrable} (still nonholonomic): the
+          accessible configuration space is a sub-manifold, but larger
+          than the one a holonomic constraint would give. The system
+          is not controllable.
+\end{itemize}
+Controllability of the kinematic model is therefore equivalent to the
+constraints being completely nonholonomic. The precise test is given in
+\cref{subsec:controllability}.
+\end{nb}
+
+\section{Kinematic Models}
+\label{sec:kinematic-models}
+
+The kinematic constraints are written in Pfaffian form
+\( A(q) \dot{q} = 0 \), with \( A(q) \) a \( k \times n \) matrix.
+Admissible velocities belong to the null space of \( A(q) \). We want
+to find a basis for this null space:
+\[
+\mathcal{N}(A(q)) = \text{span}\{ g_1(q), g_2(q), \dots, g_m(q) \},
+\]
+where \( m := n - k \). Each \( g_i(q) \) is a vector field on \( C \)
+with values in \( \mathbb{R}^n \), and every admissible velocity is a
+linear combination of the basis vectors:
+\begin{equation}
+    \dot{q} = \sum_{i=1}^{m} u_i \, g_i(q).
+\end{equation}
+In compact form, introducing the \( m \)-dimensional vector
+\( u = (u_1, \dots, u_m)^\top \):
+\begin{equation}
+\label{eq:kinematic-model}
+    \dot{q} = \underbrace{
+    \begin{pmatrix}
+        | & | & & | \\
+        g_1(q) & g_2(q) & \dots & g_m(q) \\
+        | & | & & |
+    \end{pmatrix}}_{G(q)}
+    \underbrace{
+    \begin{pmatrix}
+        u_1 \\ \vdots \\ u_m
+    \end{pmatrix}}_{u}.
+\end{equation}
+This is the \textbf{kinematic model} of the robot, with \( u \) a
+velocity-level quantity.
+
+\paragraph{Driftless property.}
+The kinematic model \cref{eq:kinematic-model} satisfies
+\[
+u = 0 \implies \dot{q} = 0.
+\]
+A system with this property is called \textbf{driftless}: it has no
+free evolution. When the inputs are zero, the state does not move.
+
+\paragraph{Pseudovelocities.}
+The vector \( u \) does not coincide with the actual control inputs of
+the robot (which are forces and torques), nor with the generalized
+velocities \( \dot{q} \). It is a velocity-level quantity filtered
+through the kinematic constraints, and it is called
+\textbf{pseudo-velocity}. The kinematic model describes the motion as
+resulting from the pseudo-velocities \( u \) filtered through the
+constraints \( A(q) \).
+
+\paragraph{Non-uniqueness of the model.}
+The choice of the basis \( g_1, \dots, g_m \) is not unique, and
+different choices lead to equivalent models with different physical
+interpretations of \( u \). In practice, we choose the basis so that
+the components of \( u \) have a natural meaning (e.g.\ linear and
+angular velocity for a unicycle).
+
+\subsection{Controllability and the Accessibility Rank Condition}
+\label{subsec:controllability}
+
+Whether the constraints are holonomic or nonholonomic can be decided by
+studying the controllability of the kinematic model
+\cref{eq:kinematic-model}. Two cases are possible:
+\begin{itemize}
+    \item the system is \textbf{controllable}: for any two
+          configurations \( q_i, q_f \in C \) there exists an input
+          \( u(t) \) that steers the system from \( q_i \) to
+          \( q_f \) while satisfying the constraints. The constraints
+          do not affect the accessibility of \( C \): they are
+          (completely) nonholonomic;
+    \item the system is \textbf{not controllable}: the constraints
+          reduce the set of accessible configurations, so they are at
+          least partially integrable.
+\end{itemize}
+
+To test controllability we need the Lie bracket of two vector fields,
+\begin{equation}
+\label{eq:lie-bracket}
+    [g_i, g_j](q) = \frac{\partial g_j}{\partial q}\, g_i(q)
+                  - \frac{\partial g_i}{\partial q}\, g_j(q),
+\end{equation}
+which is a new vector field, in general not a linear combination of
+\( g_i \) and \( g_j \). Let \( \Delta = \text{span}\{g_1, \dots, g_m\} \)
+be the distribution generated by the input vector fields. A
+distribution is \textbf{involutive} if it is closed under Lie bracket.
+The \textbf{accessibility distribution} \( \Delta_{\mathcal{A}} \) is
+the involutive closure of \( \Delta \), i.e.\ the smallest involutive
+distribution containing it. It is built iteratively,
+\[
+\Delta_1 = \Delta, \qquad
+\Delta_{i+1} = \Delta_i + \text{span}\{ [g, h] \;:\; g \in \Delta_1,\ h \in \Delta_i \},
+\]
+until the dimension stops growing (\( \Delta_{\mathcal{A}} = \Delta_{i}
+\) when \( \Delta_{i+1} = \Delta_i \)).
+
+The controllability test is the \textbf{accessibility rank condition}:
+\begin{equation}
+\label{eq:arc}
+    \dim \Delta_{\mathcal{A}}(q) = n.
+\end{equation}
+Let \( \nu = \dim \Delta_{\mathcal{A}} \) and \( m = \dim \Delta \).
+Three cases:
+\begin{itemize}
+    \item \( \nu = n \): \cref{eq:arc} holds, the system is
+          controllable, the constraints are \emph{completely
+          nonholonomic};
+    \item \( m < \nu < n \): the system is not controllable, but the
+          loss of accessibility is not maximal; the constraints are
+          \emph{partially integrable} (the mechanical system is still
+          nonholonomic);
+    \item \( \nu = m \): the system is not controllable and the loss of
+          accessibility is maximal; the constraints are \emph{completely
+          integrable}, hence holonomic. This happens exactly when
+          \( \Delta_{\mathcal{A}} = \Delta \), i.e.\ when \( \Delta \)
+          is already involutive.
+\end{itemize}
+
+The \textbf{degree of nonholonomy} \( \kappa \) of a controllable
+system is the smallest integer such that \( \dim \Delta_\kappa = n \),
+i.e.\ the minimum number of vector fields appearing in the nested
+brackets needed to generate \( \mathbb{R}^n \). It quantifies \emph{how}
+nonholonomic the constraints are.
+
+\begin{nb}[Systems with a Single Input Vector Field]
+If the number of Pfaffian constraints is \( k = n - 1 \), then
+\( m = 1 \): the kinematic model has a single vector field, and
+\( \Delta \) is always involutive (the bracket of a field with itself
+is zero). Hence a set of \( n-1 \) Pfaffian constraints is always
+completely integrable. For example, a scalar Pfaffian constraint is
+always holonomic for a mechanical system with two generalized
+coordinates.
+\end{nb}
+
+\subsection{The Unicycle Model}
+\label{subsec:unicycle-model}
+
+Consider the rolling disk from
+\cref{subsec:holonomic-nonholonomic}. Its constraint is
+\cref{eq:rolling}:
+\[
+\underbrace{
+\begin{pmatrix} \sin\theta & -\cos\theta & 0 \end{pmatrix}
+}_{A(q)}
+\begin{pmatrix} \dot{x} \\ \dot{y} \\ \dot{\theta} \end{pmatrix} = 0.
+\]
+The dimension of \( \mathcal{N}(A) \) is \( m = n - k = 3 - 1 = 2 \).
+A basis is
+\[
+g_1(q) = \begin{pmatrix} \cos\theta \\ \sin\theta \\ 0 \end{pmatrix},
+\qquad
+g_2(q) = \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}.
+\]
+The kinematic model is
+\begin{equation}
+    \dot{q} = G(q) u =
+    \begin{pmatrix}
+        \cos\theta & 0 \\
+        \sin\theta & 0 \\
+        0 & 1
+    \end{pmatrix}
+    \begin{pmatrix} u_1 \\ u_2 \end{pmatrix}
+    \implies
+    \begin{cases}
+        \dot{x} = u_1 \cos\theta, \\
+        \dot{y} = u_1 \sin\theta, \\
+        \dot{\theta} = u_2.
+    \end{cases}
+\end{equation}
+The pseudo-velocity \( u_1 \) is the scalar velocity along the sagittal
+axis:
+\[
+u_1 = \pm\sqrt{\dot{x}^2 + \dot{y}^2},
+\]
+while \( u_2 = \dot{\theta} \). Rename them:
+\[
+v = u_1, \qquad \omega = u_2.
+\]
+The linear velocity \( v \) is related to the rolling velocity
+\( \omega_{\text{roll}} \) and the wheel radius by
+\( v = \omega_{\text{roll}} \cdot r \). The model becomes
+\begin{equation}
+\label{eq:unicycle}
+    \dot{q} = \begin{pmatrix} \cos\theta \\ \sin\theta \\ 0 \end{pmatrix} v
+            + \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix} \omega.
+\end{equation}
+
+\paragraph{Controllability.}
+Compute the Lie bracket of the two input vector fields with
+\cref{eq:lie-bracket}:
+\[
+[g_1, g_2](q) = \frac{\partial g_2}{\partial q} g_1
+              - \frac{\partial g_1}{\partial q} g_2
+              = - \begin{pmatrix}
+                    0 & 0 & -\sin\theta \\
+                    0 & 0 & \cos\theta \\
+                    0 & 0 & 0
+                  \end{pmatrix}
+                  \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}
+              = \begin{pmatrix} \sin\theta \\ -\cos\theta \\ 0 \end{pmatrix},
+\]
+since \( g_2 \) is constant. This is the unit vector orthogonal to the
+sagittal axis, called the \textbf{slide vector field}: a velocity that
+is immediately unrealizable, but that specifies a direction achievable
+through a sequence of motions (a \emph{wriggle}, see
+\cref{sec:lie-bracket-interpretation}). It is not a linear combination
+of \( g_1 \) and \( g_2 \). Hence
+the construction of the accessibility distribution ends immediately
+with \( \Delta_{\mathcal{A}} = \Delta_2 \) and
+\[
+\dim \Delta_{\mathcal{A}} = \operatorname{rank}
+\begin{pmatrix} g_1 & g_2 & [g_1, g_2] \end{pmatrix} = 3 = n.
+\]
+The unicycle is controllable with degree of nonholonomy
+\( \kappa = 2 \), and constraint \cref{eq:rolling} is completely
+nonholonomic, as already shown constructively with the universal
+maneuver.
+
+\begin{nb}[Robots Kinematically Equivalent to the Unicycle]
+A unicycle in the strict sense is not statically balanced. Two
+statically balanced structures are \emph{kinematically} equivalent to
+it (their mechanics is different):
+\begin{itemize}
+    \item \textbf{Differential drive}: with wheel radii \( r \),
+          angular velocities \( \omega_R, \omega_L \), and distance
+          \( d \) between the contact points,
+          \[
+          v = r \frac{\omega_R + \omega_L}{2},
+          \qquad
+          \omega = (\omega_R - \omega_L) \frac{r}{d}.
+          \]
+          There is a one-to-one correspondence between \( (v, \omega) \)
+          and \( (\omega_R, \omega_L) \). Here \( (x, y) \) is the
+          midpoint between the contact points of the two fixed wheels
+          and \( \theta \) is the orientation of the body.
+    \item \textbf{Synchro-drive}: the two motors directly control
+          \( v \) and \( \omega \), common to the three steerable
+          wheels, where \( (x, y) \) can be any point of the robot
+          (e.g.\ the geometric center of the three contact points).
+          Unlike the differential drive, the orientation of the body
+          never changes, unless a third actuator is added.
+\end{itemize}
+\end{nb}
+
+\subsection{The Bicycle Model}
+\label{subsec:bicycle-model}
+
+The bicycle has one fixed rear wheel and one steerable front wheel.
+Its configuration is \( q = (x, y, \theta, \phi)^\top \), with
+\( (x, y) \) the position of the rear wheel contact point, \( \theta \)
+the orientation of the body, and \( \phi \) the steering angle. The
+configuration space is
+\( C = \mathbb{R}^2 \times SO(2) \times SO(2) \), so \( n = 4 \).
+
+Let \( l \) be the distance between the contact points of the two
+wheels. The position of the front wheel is
+\begin{align}
+    x_f &= x + l \cos\theta, \\
+    y_f &= y + l \sin\theta.
+\end{align}
+The two pure rolling constraints (rear and front wheel) are
+\begin{align}
+    \sin\theta \, \dot{x} - \cos\theta \, \dot{y} &= 0, \\
+    \sin(\theta + \phi) \, \dot{x}_f
+    - \cos(\theta + \phi) \, \dot{y}_f &= 0.
+\end{align}
+Each wheel has its own zero-motion line. The two zero-motion lines meet
+at the \textbf{instantaneous center of rotation} (ICR), whose position
+changes with the configuration; every point of the vehicle moves
+instantaneously along an arc of circle centered at the ICR.
+
+Substituting \( \dot{x}_f, \dot{y}_f \), the second constraint becomes
+\[
+\sin(\theta + \phi) \, \dot{x}
+- \cos(\theta + \phi) \, \dot{y}
+- l \cos\phi \, \dot{\theta} = 0.
+\]
+In matrix form:
+\[
+\underbrace{
+\begin{pmatrix}
+    \sin\theta & -\cos\theta & 0 & 0 \\
+    \sin(\theta + \phi) & -\cos(\theta + \phi) & -l\cos\phi & 0
+\end{pmatrix}}_{A(q)}
+\begin{pmatrix} \dot{x} \\ \dot{y} \\ \dot{\theta} \\ \dot{\phi} \end{pmatrix} = 0.
+\]
+The matrix has constant rank \( k = 2 \), so the null space has
+dimension \( m = 4 - 2 = 2 \). There are two choices of basis with a
+physical meaning, depending on which wheel is driven.
+
+\paragraph{Rear-wheel drive.}
+Look for a first vector of the form
+\( g_1 = (\cos\theta, \sin\theta, \alpha, 0)^\top \) (motion of the rear
+wheel along its sagittal axis). Imposing the second constraint gives
+\( \sin\phi - l\alpha\cos\phi = 0 \), i.e.\
+\( \alpha = \frac{1}{l}\tan\phi \). With \( g_2 \) the pure steering
+velocity, a basis is
+\[
+g_1^R(q) =
+\begin{pmatrix}
+    \cos\theta \\ \sin\theta \\ \frac{1}{l}\tan\phi \\ 0
+\end{pmatrix},
+\qquad
+g_2^R(q) =
+\begin{pmatrix}
+    0 \\ 0 \\ 0 \\ 1
+\end{pmatrix},
+\]
+and the kinematic model is
+\begin{equation}
+\label{eq:bicycle-rear}
+    \dot{q} =
+    \begin{pmatrix}
+        \cos\theta \\ \sin\theta \\ \frac{1}{l}\tan\phi \\ 0
+    \end{pmatrix} v
+    + \begin{pmatrix} 0 \\ 0 \\ 0 \\ 1 \end{pmatrix} \omega.
+\end{equation}
+Here \( v = \pm\sqrt{\dot{x}^2 + \dot{y}^2} \) is the velocity of the
+rear wheel contact point, and \( \omega = \dot{\phi} \) is the steering
+velocity.
+
+\paragraph{Singularity.}
+The model \cref{eq:bicycle-rear} is singular at \( \phi = \pm\pi/2 \),
+where \( \tan\phi \) is undefined and \( g_1^R \) is not defined: the
+model assumes pure rolling, and at \( \phi = \pm\pi/2 \) any non-zero
+\( v \) would make the front wheel slide. In practice, the singularity
+is avoided by limiting the steering angle.
+
+\paragraph{Controllability (rear-wheel drive).}
+The first two brackets are
+\[
+g_3^R = [g_1^R, g_2^R] =
+\begin{pmatrix} 0 \\ 0 \\ -\frac{1}{l\cos^2\phi} \\ 0 \end{pmatrix},
+\qquad
+g_4^R = [g_1^R, g_3^R] =
+\begin{pmatrix}
+    -\frac{\sin\theta}{l\cos^2\phi} \\
+    \frac{\cos\theta}{l\cos^2\phi} \\ 0 \\ 0
+\end{pmatrix}.
+\]
+They are obtained as follows. Since \( g_2^R = e_4 \) is constant,
+\( g_3^R = -\partial g_1^R / \partial \phi \). The field \( g_3^R \)
+depends only on \( \phi \), and the \( \phi \)-component of
+\( g_1^R \) is zero, so \( (\partial g_3^R/\partial q)\, g_1^R = 0 \);
+moreover \( g_3^R \) has only the \( \theta \)-component, therefore
+\( g_4^R = -(\partial g_1^R/\partial\theta)\, g_3^R \). The field
+\( g_3^R \) changes only the heading (a rotation in place of the
+vehicle), while \( g_4^R \) is parallel to the slide vector field of
+the unicycle (a lateral displacement of the rear wheel).
+
+Since \( g_1^R, g_2^R, g_3^R, g_4^R \) are linearly independent, with
+\[
+\det \begin{pmatrix} g_1^R & g_2^R & g_3^R & g_4^R \end{pmatrix}
+= \frac{1}{l^2\cos^4\phi} \neq 0 \qquad (\phi \neq \pm\pi/2),
+\]
+we have \( \Delta_{\mathcal{A}}^R = \Delta_3^R \) and
+\( \dim \Delta_{\mathcal{A}}^R = 4 = n \). The rear-wheel-drive bicycle
+is controllable with degree of nonholonomy \( \kappa = 3 \), and the
+rolling constraints are completely nonholonomic. The rank is lost
+exactly at the singularity of the model.
+
+\paragraph{Front-wheel drive.}
+If the robot is driven by the front wheel, replace \( g_1^R \) with
+\( g_1^F = g_1^R \cos\phi \):
+\begin{equation}
+\label{eq:bicycle-front}
+\dot{q} =
+\underbrace{
+\begin{pmatrix}
+    \cos\theta \cos\phi \\ \sin\theta \cos\phi \\ \frac{1}{l}\sin\phi \\ 0
+\end{pmatrix}}_{g_1^F} v
++ \underbrace{\begin{pmatrix} 0 \\ 0 \\ 0 \\ 1 \end{pmatrix}}_{g_2^F} \omega.
+\end{equation}
+Now \( v = \pm\sqrt{\dot{x}_f^2 + \dot{y}_f^2} \) is the velocity of the
+front wheel contact point, and the model is \emph{not} singular at
+\( \phi = \pm\pi/2 \): in that situation a front-wheel-drive bicycle
+simply pivots around the rear wheel. The brackets are
+\[
+g_3^F = [g_1^F, g_2^F] =
+\begin{pmatrix}
+    \cos\theta \sin\phi \\ \sin\theta \sin\phi \\ -\frac{\cos\phi}{l} \\ 0
+\end{pmatrix},
+\qquad
+g_4^F = [g_1^F, g_3^F] =
+\begin{pmatrix}
+    -\frac{\sin\theta}{l} \\ \frac{\cos\theta}{l} \\ 0 \\ 0
+\end{pmatrix}.
+\]
+Also \( g_1^F, g_2^F, g_3^F, g_4^F \) are linearly independent, so the
+front-wheel-drive bicycle is controllable with \( \kappa = 3 \).
+
+\begin{nb}[Instantaneous Center of Rotation and Ackermann Steering]
+The two zero-motion lines (the directions in which each wheel cannot
+move) intersect at the \textbf{instantaneous center of rotation
+(ICR)}, the point around which the robot is rotating at a given
+instant. For a tricycle, the ICR is unique. For a car-like robot with
+two steerable front wheels, the two front zero-motion lines may
+intersect the rear zero-motion line at different points, so a single
+ICR does not exist. The \textbf{Ackermann steering} mechanism solves
+this by automatically orienting the front wheels so that their
+zero-motion lines intersect at a single ICR.
+\end{nb}
+
+\begin{nb}[Kinematically Equivalent to the Bicycle]
+The bicycle is not statically balanced (its support polygon is a line
+segment). The \textbf{tricycle} is modeled as a bicycle by placing
+\( (x, y) \) at the midpoint between the two rear wheels, with \( \theta \)
+the orientation of the vehicle and \( \phi \) the steering angle. The
+\textbf{car-like} robot is modeled as a bicycle once Ackermann steering
+is in place. In both cases the kinematic model is
+\cref{eq:bicycle-rear} or \cref{eq:bicycle-front}, depending on whether
+the drive is on the rear or on the front wheels.
+\end{nb}
+
+\section{Chained Form}
+\label{sec:chained-form}
+
+Many kinematic models of mobile robots can be recast in the same
+canonical form. This is useful because it allows the use of systematic
+procedures for planning and control. We limit the analysis to systems
+with two inputs, such as the unicycle and the bicycle.
+
+\begin{definition}[Chained Form]
+A \( (2, n) \) \textbf{chained form} is the driftless system
+\begin{equation}
+\label{eq:chained}
+\begin{aligned}
+    \dot{z}_1 &= w_1, \\
+    \dot{z}_2 &= w_2, \\
+    \dot{z}_3 &= z_2 w_1, \\
+              &\;\;\vdots \\
+    \dot{z}_n &= z_{n-1} w_1,
+\end{aligned}
+\end{equation}
+with \( z = (z_1, \dots, z_n) \) the \( n \)-dimensional state and
+\( w = (w_1, w_2) \) the 2-dimensional input.
+\end{definition}
+
+\begin{proposition}
+\label{prop:chained-controllable}
+The \( (2,n) \) chained form is controllable, with degree of
+nonholonomy \( \kappa = n - 1 \).
+\end{proposition}
+
+\begin{proof}
+The input fields are \( g_1 = (1, 0, z_2, \dots, z_{n-1})^\top \) and
+\( g_2 = e_2 \). In the Jacobian of \( g_1 \), the entry on row
+\( i \ge 3 \) depends on \( z_{i-1} \), so the column of \( z_j \)
+(\( 2 \le j \le n-1 \)) is \( e_{j+1} \). Since \( g_2 \) is constant,
+\[
+[g_1, e_j] = -\frac{\partial g_1}{\partial z}\, e_j = -e_{j+1},
+\qquad 2 \le j \le n-1.
+\]
+Starting from \( g_2 = e_2 \), the iterated brackets are
+\[
+\text{ad}_{g_1}^k g_2 = (-1)^k e_{k+2}, \qquad k = 0, \dots, n-2 .
+\]
+Together with \( g_1 \), which has first component 1, they span
+\( \mathbb{R}^n \). Each bracket adds exactly one dimension, so the
+rank \( n \) is reached with brackets of length \( n - 1 \) and not
+before: \( \kappa = n - 1 \).
+\end{proof}
+
+If \( w \) is constant, the chained form is a \emph{linear} system (for
+\( w_1 \) constant, each equation \( \dot z_i = z_{i-1} w_1 \) is linear
+in \( z \)), so in digital control, where inputs are piecewise
+constant, the system is piecewise linear.
+
+A generic \( n \)-dimensional two-input driftless system
+\begin{equation}
+\label{eq:two-input}
+    \dot{q} = G(q) u = g_1(q) u_1 + g_2(q) u_2
+\end{equation}
+can be transformed into the chained form \cref{eq:chained} via a
+coordinate transformation and an input transformation,
+\[
+z = \psi(q), \qquad u = \Gamma(q)\, w,
+\]
+under necessary and sufficient conditions (not treated here). In
+particular, systems of the form \cref{eq:two-input} with \( n \le 4 \)
+can always be put in chained form. This applies to the unicycle and the
+bicycle, but the technique does not extend automatically to larger
+systems.
+
+\subsection{The Unicycle in Chained Form}
+\label{subsec:unicycle-chained}
+
+Consider the unicycle model \cref{eq:unicycle}. Use the coordinate
+transformation
+\begin{equation}
+\label{eq:chained-coord-transform}
+z_1 = \theta, \qquad
+z_2 = x\cos\theta + y\sin\theta, \qquad
+z_3 = x\sin\theta - y\cos\theta,
+\end{equation}
+and the input transformation
+\[
+v = z_3 w_1 + w_2, \qquad \omega = w_1.
+\]
+The model becomes the \( (2,3) \) chained form
+\begin{align}
+    \dot{z}_1 &= w_1, \\
+    \dot{z}_2 &= w_2, \\
+    \dot{z}_3 &= z_2 w_1.
+\end{align}
+
+\paragraph{Verification.}
+First, \( \dot z_1 = \dot\theta = \omega = w_1 \). Then
+\begin{align}
+    \dot{z}_2
+    &= \dot{x} \cos\theta + \dot{y} \sin\theta
+       - x \sin\theta\, \dot{\theta} + y \cos\theta\, \dot{\theta} \\
+    &= v - \underbrace{\dot{\theta}}_{\omega}
+       \underbrace{(x \sin\theta - y \cos\theta)}_{z_3}
+     = v - \omega z_3 = w_2 ,
+\end{align}
+and
+\begin{align}
+    \dot{z}_3
+    &= \dot{x} \sin\theta - \dot{y} \cos\theta
+       + x \cos\theta\, \dot{\theta} + y \sin\theta\, \dot{\theta} \\
+    &= \underbrace{(\dot{x} \sin\theta - \dot{y} \cos\theta)}_{0
+       \text{ by the constraint}}
+       + \dot{\theta} (x \cos\theta + y \sin\theta)
+     = \omega\, z_2 = z_2 w_1 .
+\end{align}
+
+Note that \( z_1 \) is simply the orientation \( \theta \), while
+\( z_2 \) and \( z_3 \) are the position of the unicycle in a frame
+whose first axis is the sagittal axis of the vehicle,
+\( (\cos\theta, \sin\theta) \), and whose second axis is the
+right-hand normal \( (\sin\theta, -\cos\theta) \)
+(\cref{fig:z2-z3}).
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/z2z3.eps}
+    \caption{Interpretation of \( z_2 \) and \( z_3 \): coordinates of
+    the unicycle in the frame aligned with the sagittal axis (first
+    axis) and its right-hand normal (second axis).}
+    \label{fig:z2-z3}
+\end{figure}
+
+\subsection{The Bicycle in Chained Form}
+\label{subsec:bicycle-chained}
+
+The rear-wheel-drive bicycle model \cref{eq:bicycle-rear} can also be
+transformed into chained form. Use the coordinate transformation
+\[
+z_1 = x, \quad
+z_2 = \frac{1}{l}\sec^3\theta \tan\phi, \quad
+z_3 = \tan\theta, \quad
+z_4 = y,
+\]
+and the input transformation
+\[
+v = \frac{w_1}{\cos\theta}, \qquad
+\omega = -\frac{3}{l}\, w_1 \sec\theta \tan\theta \sin^2\phi
+        + l\, w_2 \cos^3\theta \cos^2\phi.
+\]
+The resulting system is the \( (2,4) \) chained form
+\begin{align}
+    \dot{z}_1 &= w_1, \\
+    \dot{z}_2 &= w_2, \\
+    \dot{z}_3 &= z_2 w_1, \\
+    \dot{z}_4 &= z_3 w_1.
+\end{align}
+The input transformation is undefined at \( \cos\theta = 0 \), i.e.\
+at \( \theta = \pi/2 + k\pi \): the equivalence between the two
+models is subject to \( \theta \neq \pi/2 + k\pi \).
+
+\paragraph{Verification.}
+With \( \dot\theta = v\tan\phi/l = w_1\tan\phi/(l\cos\theta) \) and
+\( \dot\phi = \omega \), the equations that do not involve \( \omega \)
+are checked directly:
+\begin{align}
+    \dot z_1 &= v\cos\theta = w_1, \\
+    \dot z_3 &= \sec^2\theta\, \dot\theta
+              = \frac{1}{l}\sec^3\theta\tan\phi\, w_1 = z_2 w_1, \\
+    \dot z_4 &= v\sin\theta = w_1\tan\theta = z_3 w_1 .
+\end{align}
+The input \( \omega \) enters only through \( \dot z_2 \):
+\[
+\dot z_2
+= \frac{3}{l^2}\sec^4\theta\tan\theta\tan^2\phi\; w_1
+  + \frac{1}{l}\sec^3\theta\sec^2\phi\;\omega .
+\]
+Imposing \( \dot z_2 = w_2 \) and solving for \( \omega \), with
+\( \cos^3\theta\sec^4\theta = \sec\theta \) and
+\( \cos^2\phi\tan^2\phi = \sin^2\phi \), gives the input
+transformation above.
+
+\begin{nb}[Trailed Vehicles]
+An interesting property of \textbf{trailed vehicles} emerges when
+considering a car-like robot: if the trailer is hitched exactly at the
+midpoint between the two rear wheels, the kinematic model can still be
+converted into chained form. This property holds recursively: if the
+trailer itself has two rear wheels and an additional trailer is
+hitched at their midpoint, the overall kinematic model can still be
+expressed in chained form.
+\end{nb}
+
+\section{Takeaways}
+\label{sec:wmr-mechanics-takeaways}
+
+\begin{enumerate}
+    \item A wheeled robot is in \textbf{static balance} if the
+          projection of its center of mass falls inside the
+          \textbf{support polygon}, the convex hull of its contact
+          points. Unicycle and bicycle are not balanced; differential
+          drive, synchro-drive, tricycle and car-like robots are.
+    \item Three types of wheels exist: \textbf{fixed}, \textbf{steerable},
+          and \textbf{caster}. They differ in whether they can steer,
+          whether they are actuated, and whether they are kinematically
+          ``invisible''.
+    \item The main kinematic structures are the \textbf{differential
+          drive}, the \textbf{synchro-drive}, the \textbf{tricycle}, and
+          the \textbf{car-like} robot.
+    \item The \textbf{mechanical differential} allows two wheels on the
+          same axle to rotate at different speeds, avoiding slip during
+          turns.
+    \item Geometric constraints \( h(q) = 0 \) reduce the configuration
+          space to a sub-manifold; kinematic constraints in Pfaffian
+          form \( A(q)\dot q = 0 \) restrict the admissible velocities
+          to \( \mathcal{N}(A(q)) \). Integrable kinematic constraints
+          are holonomic, the others are nonholonomic.
+    \item The kinematic model \( \dot q = G(q) u \) is driftless, and
+          \( u \) are pseudo-velocities. The constraints are completely
+          nonholonomic if and only if the accessibility rank condition
+          \( \dim \Delta_{\mathcal{A}} = n \) holds, i.e.\ if the model
+          is controllable.
+    \item The unicycle (\( \kappa = 2 \)) and the bicycle
+          (\( \kappa = 3 \), singular at \( \phi = \pm\pi/2 \) only in
+          the rear-wheel-drive case) are controllable; differential
+          drive and synchro-drive are kinematically equivalent to the
+          unicycle, tricycle and car-like to the bicycle.
+    \item Both can be put in \textbf{chained form}, always controllable
+          with \( \kappa = n - 1 \), which allows systematic planning
+          and control.
+\end{enumerate}

@@ -16,17 +16,12 @@ this problem is hard: the robot has an extent, the obstacles have
 arbitrary shapes, and checking whether a given placement is collision-free
 requires geometric reasoning.
 
-The \emph{configuration space} (C-space) makes the problem tractable. 
+The \emph{configuration space} (C-space) makes the problem tractable.
 The idea is to replace the motion of an extended body among obstacles with the motion of a
 \emph{point} in an abstract space, where obstacles have been ``inflated''
-to account for the robot's shape. 
-A robot is a continuous body, i.e.\ an infinite set of points.
-Describing it point by point is impossible. The key idea is to
-represent it with a \emph{finite} set of parameters: the
-configuration.
-The solution is to define a suitable space (the C-space) in which
-\emph{the robot is represented as a point}, and the obstacles are
-represented as regions of that space that the point cannot enter.
+to account for the robot's shape: the robot is represented as a point,
+and the obstacles are represented as regions of that space that the
+point cannot enter.
 This reduction turns a complex geometric problem into a path-search problem in a topological space,
 for which a large body of algorithms exists
 \cite{choset2005principles, siciliano2025foundations}.
@@ -34,12 +29,13 @@ for which a large body of algorithms exists
 \section{Modeling a Robot}
 \label{sec:modeling-robot}
 
-A robot is a continuous body: an infinite set of points. Describing it
-point by point is impossible. The key idea is to find a \emph{finite}
-set of parameters that completely determines the position of every
-point of the robot. We model a robot as a collection of \( n_b \) rigid
+A robot is a continuous body, i.e.\ an infinite set of points.
+Describing it point by point is impossible. The key idea is to
+represent it with a \emph{finite} set of parameters that completely
+determines the position of every point of the robot: the
+configuration. We model a robot as a collection of \( n_b \) rigid
 bodies moving in a workspace \( W \). The workspace is the set of
-physical points in which the robot can move. 
+physical points in which the robot can move.
 
 \subsection{Configuration and Degrees of Freedom}
 \label{sec:configuration-dof}
@@ -51,60 +47,67 @@ position of every point of the robot. It is represented as a vector
 \emph{degrees of freedom} (DOF) of the robot.
 \end{definition}
 
-The configuration vector $q = (q_1, \dots, q_n)$, where each $q_i$ is a
-generalized coordinate (either Cartesian or angular). The Cartesian
-coordinates identify the position of points of the robot (e.g.\ the
-center of mass of a rigid body), and take values in $\mathbb{R}$. The
-angular coordinates identify the orientation of the rigid bodies, and
-take values in $SO(2)$ or $SO(3)$.
+Each \( q_i \) is a generalized coordinate, either Cartesian or
+angular. The Cartesian coordinates identify the position of points of
+the robot (e.g.\ the center of mass of a rigid body), and take values
+in \( \mathbb{R} \). The angular coordinates identify the orientation
+of the rigid bodies, and take values in \( \mathcal{S}^1 \cong SO(2) \)
+(planar rotations) or in \( SO(3) \) (spatial rotations).
 
 Thus, a \emph{configuration} is a minimal set of parameters that identifies the posture of the robot
 in \( W \): if the parameters are known, the position of every point of
 the robot is known.
 
 \begin{nb}[Special Orthogonal Group SO(n)]
-The Special orthogonal group SO(n) refers to the group of rotations in three-dimensional 
-space that preserve the orientation and the Euclidean structure. 
-It is characterized by orthogonal matrices with determinant equal to one, 
+The Special Orthogonal group \( SO(n) \) is the group of rotations in
+\( \mathbb{R}^n \) that preserve orientation and the Euclidean structure.
+It is characterized by orthogonal matrices with determinant equal to one,
 representing transformations that maintain distances and angles.
 
-All the matrices R in SO(n) satisfy the following properties:
+All the matrices \( R \in SO(n) \) satisfy the following properties:
 \begin{itemize}
-    \item $R^\top R = I$, where $R^\top$ is the transpose of $R$ and
-          $I$ is the identity matrix;
-    \item $\det(R) = 1$, ensuring that the transformation preserves
+    \item \( R^\top R = I \), where \( R^\top \) is the transpose of \( R \) and
+          \( I \) is the identity matrix;
+    \item \( \det(R) = 1 \), ensuring that the transformation preserves
           orientation;
     \item The set of all such matrices forms a group under matrix
           multiplication.
 \end{itemize}
 \end{nb}
 
-
 \section{The Configuration Space and the Workspace}
 \label{sec:cspace-definition}
 
 \begin{definition}[Configuration Space]
 The \emph{configuration space} \( C \) is the set of all possible
-configurations of the robot. Formally, \( C \subseteq \mathbb{R}^n \),
-although in many cases it carries a richer structure: for instance,
+configurations of the robot. It is an \( n \)-dimensional
+\emph{manifold}, i.e.\ a space that locally looks like
+\( \mathbb{R}^n \), but that in general is \emph{not} \( \mathbb{R}^n \)
+globally. Typically it is a product of Euclidean factors and circular
+(rotational) factors: for instance,
 \( C = \mathbb{R}^2 \times \mathcal{S}^1 \) for a planar robot with
 orientation, where \( \mathcal{S}^1 \) denotes the unit circle.
 \end{definition}
 
-For a collection of \( n_b \) rigid bodies moving in the plane,
-\( \dim(C) = 3 n_b \) (two translations and one rotation per body).
-In three dimensions, \( \dim(C) = 6 n_b \) (three translations and
-three rotations). For a manipulator with \( n \) joints,
-\( \dim(C) = n \). In all cases,
+For a collection of \( n_b \) \emph{free} rigid bodies moving in the
+plane, \( \dim(C) = 3 n_b \) (two translations and one rotation per
+body). In three dimensions, \( \dim(C) = 6 n_b \) (three translations
+and three rotations). Joints and other constraints between the bodies
+reduce these numbers: for a manipulator with \( n \) one-DOF joints,
+In all cases,
 \[
 \dim(C) = \text{DOF of the robot},
 \]
-which in general differs from \( \dim(W) \).
+the minimum number of independent parameters required to uniquely
+specify its state.
 
-When such a structure of $C$ is represented (\( C = \mathbb{R}^i \times \mathcal{S}^j \)),
-we are talking about the \emph{Special Euclidean Group}.
+When the configuration space of a free rigid body is considered, it has
+the structure of the \emph{Special Euclidean Group}: \( SE(2) \cong
+\mathbb{R}^2 \times \mathcal{S}^1 \) for a body in the plane, and
+\( SE(3) = \mathbb{R}^3 \times SO(3) \) for a body in space.
+
 \begin{nb}[Special Euclidean Group SE(n)]
-The Special Euclidean group $SE(n)$ describes the orientation-preserving isometries of the Euclidean space $\mathbb{R}^n$, where $n \in \mathbb{N}$ is an integer. It represents rigid transformations (combinations of rotations and translations) that preserve both distances between points and the orientation of the space.
+The Special Euclidean group \( SE(n) \) describes the orientation-preserving isometries of the Euclidean space \( \mathbb{R}^n \), where \( n \in \mathbb{N} \) is an integer. It represents rigid transformations (combinations of rotations and translations) that preserve both distances between points and the orientation of the space.
 
 This group can be represented using homogeneous transformation matrices as:
 \[
@@ -113,22 +116,14 @@ SE(n) = \left\{ X = \begin{pmatrix} R & p \\ 0_{1 \times n} & 1 \end{pmatrix} \i
 
 The matrix components are defined as follows:
 \begin{itemize}
-    \item \textbf{Rotation matrix ($R$):} An element of the Special Orthogonal group $SO(n)$, characterized by $R^\top R = I_n$ and $\det(R) = 1$, which handles changes in orientation without deformation or reflection.
-    \item \textbf{Translation vector ($p$):} A vector $p \in \mathbb{R}^n$ representing the rigid displacement in space.
-    \item \textbf{Bottom row ($0_{1 \times n}$ and $1$):} A padding row that establishes homogeneous coordinates, allowing the composition of multiple rigid transformations through simple matrix multiplication.
+    \item \textbf{Rotation matrix (\( R \)):} An element of the Special Orthogonal group \( SO(n) \), characterized by \( R^\top R = I_n \) and \( \det(R) = 1 \), which handles changes in orientation without deformation or reflection.
+    \item \textbf{Translation vector (\( p \)):} A vector \( p \in \mathbb{R}^n \) representing the rigid displacement in space.
+    \item \textbf{Bottom row (\( 0_{1 \times n} \) and \( 1 \)):} A padding row that establishes homogeneous coordinates, allowing the composition of multiple rigid transformations through simple matrix multiplication.
 \end{itemize}
-      
-\end{nb}
 
-By definition, the dimension of the configuration space $C$ always equals the robot's degrees of freedom 
-($\dim(C) = \text{DOF}$), representing the minimum number of independent 
-parameters required to uniquely specify its state. 
-\emph{C-space} is the topological variety of all the 
-possible configurations the robot can assume.
-In general, this does not coincide with the dimension of 
-the workspace $W$ ($\dim(W) \neq \dim(C)$), which depends on the physical task space 
-(e.g., position in $\mathbb{R}^3$ or full pose in $SE(3)$)
-rather than the robot's kinematic structure.
+As a manifold, \( SE(n) \cong \mathbb{R}^n \times SO(n) \), with
+dimension \( n(n+1)/2 \): 3 for \( SE(2) \), 6 for \( SE(3) \).
+\end{nb}
 
 \subsection{Workspace vs Configuration Space}
 \label{sec:workspace-vs-cspace}
@@ -136,13 +131,16 @@ rather than the robot's kinematic structure.
 To recap:
 
 \begin{itemize}
-    \item The \textbf{workspace} (${W}$) is the physical space
+    \item The \textbf{workspace} \( W \) is the physical space
           in which the robot moves (e.g.\ \( \mathbb{R}^2 \) or
           \( \mathbb{R}^3 \)), expressed in world coordinates.
     \item The \textbf{configuration space} \( C \) is the abstract space
-          of all configurations the robot can assume.
+          of all configurations the robot can assume: the manifold of
+          all its possible postures.
 \end{itemize}
 
+In general \( \dim(C) \neq \dim(W) \): the dimension of \( C \) depends
+on the kinematic structure of the robot, not on the space it lives in.
 A planar robot that can both translate and rotate has a 3-dimensional
 C-space, even though it lives in a 2-dimensional workspace. A free
 rigid body in \( \mathbb{R}^3 \) has a 6-dimensional C-space, while
@@ -172,14 +170,17 @@ as a point in \( C \).
 \subsection{Robot with Orientation: \( \mathbb{R}^2 \times \mathcal{S}^1 \)}
 \label{subsec:cspace-orientation}
 
-If the robot is a disk that can also rotate, then
+If the robot is a rigid body that can both translate and rotate in the
+plane (e.g.\ a polygon, for which orientation matters), then
 \( q = (x, y, \theta) \) and \( C = \mathbb{R}^2 \times \mathcal{S}^1 \),
 where \( \mathcal{S}^1 \) is the unit circle (the angle \( \theta \) is
 periodic). This space has a non-trivial topology: it is \emph{not}
 \( \mathbb{R}^3 \), because \( \theta \) and \( \theta + 2\pi \) denote
-the same configuration. The intuitive picture is a \emph{cylinder}:
-one linear dimension \( (x, y) \) and one circular dimension
-\( (\theta) \).
+the same configuration. As a manifold it is \( SE(2) \). The intuitive
+picture is a \emph{thick cylinder}: two linear dimensions \( (x, y) \)
+and one circular dimension \( (\theta) \), i.e.\ a circle of
+orientations attached to every point of the plane (the 2D analogue is
+the cylinder \( \mathbb{R} \times \mathcal{S}^1 \)).
 
 \subsection{Planar 2-Link Manipulator: \( \mathcal{T}^2 \)}
 \label{subsec:cspace-2link}
@@ -198,7 +199,7 @@ topology of \( C \) can differ radically from that of
 A free rigid body in \( \mathbb{R}^3 \) has 6 DOF: three translational
 and three rotational. Its C-space is
 \( C = \mathbb{R}^3 \times SO(3) = SE(3) \), the \emph{special
-Euclidean group} of dimension 3. The rotational part \( SO(3) \) is
+Euclidean group} of dimension 6. The rotational part \( SO(3) \) is
 not \( \mathbb{R}^3 \): it is a compact 3-dimensional manifold.
 
 \section{Topology of Configuration Space}
@@ -217,7 +218,7 @@ plane fail, and what is the right space to work in.
 \label{subsec:cspace-2R-topology}
 
 Consider a planar manipulator with two revolute joints. Its
-configuration is \( q = (q_1, q_2)^T \), where \( q_1 \) is the angle of
+configuration is \( q = (q_1, q_2)^\top \), where \( q_1 \) is the angle of
 the first link with respect to the base frame and \( q_2 \) the angle of
 the second link with respect to the first (\cref{fig:cspace-arm-equivalence},
 left). Each joint angle is a planar rotation, i.e.\ an element of
@@ -585,43 +586,117 @@ the sphere, every loop can. This distinction is what makes the topology of
 \( C \) matter for planning.
 \end{nb}
 
-\section{Constraints}
-\label{sec:constraints}
+\section{Distance in the Configuration Space}
+\label{sec:cspace-distance}
 
-Not every configuration in \( C \) is reachable, and not every motion
-between two configurations is admissible: robots are subject to
-\emph{constraints}. Two classes matter for this course.
+Planning, control, and localization all require a notion of
+\emph{distance} between configurations: how far apart are two postures
+of the robot? In a Euclidean configuration space the answer is the
+Euclidean norm. On a general manifold the answer is more subtle, and
+choosing the right metric has practical consequences.
 
-\begin{definition}[Holonomic Constraint]
-A constraint is \emph{holonomic} if it can be written as an algebraic
-relation among the configuration variables only:
-\[
-g(q) = 0.
-\]
-Holonomic constraints reduce the dimension of the accessible
-configuration space: the robot is confined to a submanifold of \( C \).
+\begin{definition}[Distance]
+\label{def:distance}
+Given a configuration space \( C \), a \emph{distance} is a function
+\( d : C \times C \to \mathbb{R} \) such that, for every
+\( q_a, q_b, q_c \in C \):
+\begin{align}
+    &d(q_a, q_b) \ge 0, \\
+    &d(q_a, q_b) = 0 \iff q_a = q_b, \\
+    &d(q_a, q_b) = d(q_b, q_a), \\
+    &d(q_a, q_b) \le d(q_a, q_c) + d(q_c, q_b).
+\end{align}
 \end{definition}
 
-\begin{definition}[Nonholonomic Constraint]
-A constraint is \emph{nonholonomic} if it involves the velocities and
-cannot be integrated into an algebraic relation among the configuration
-variables:
-\[
-a(q, \dot q) = 0,
-\qquad \text{not equivalent to } g(q) = 0.
-\]
-Nonholonomic constraints do \emph{not} reduce the dimension of \( C \),
-but they restrict the set of admissible velocities at each
-configuration. The robot can still reach any configuration, but not
-along arbitrary paths.
+\subsection{Geodesic Distance}
+\label{subsec:geodesic}
+
+In \( \mathbb{R}^n \), the distance between two vectors
+\( \mathbf{u}, \mathbf{v} \) is \( \|\mathbf{u} - \mathbf{v}\| \). On a
+general manifold, the distance between two points is the length of the
+\emph{shortest path} connecting them.
+
+\begin{definition}[Geodesic]
+For a general manifold, the shortest path between two points is called
+the \textbf{geodesic}, and the distance between the points is the
+length of their geodesic.
 \end{definition}
 
-The typical example of a nonholonomic system is a car-like robot or a
-differential-drive robot: the no-sideways-slip condition on the wheels
-is a nonholonomic constraint. This is the fundamental reason why
-planning and control for wheeled mobile robots are harder than for
-fixed-base manipulators: the configuration space looks Euclidean, but
-the reachable motions are constrained.
+For example, on a sphere (a 2-manifold), the geodesic between two
+points lies on the \emph{great circle} passing through them. In
+general, computing the geodesic on an arbitrary manifold is hard, and
+for a robot configuration space it is rarely the right tool.
+
+\subsection{The Displacement Metric}
+\label{subsec:displacement-metric}
+
+In robotics we want to measure the distance between two
+\emph{postures}, i.e.\ between two regions of the workspace occupied by
+the robot. This can be done directly in the workspace, without
+computing geodesics on \( C \). Two functions are useful:
+\begin{itemize}
+    \item \( B(q) \): the region of the workspace occupied by the robot
+          at configuration \( q \), i.e.\ a set of points in
+          \( \mathbb{R}^3 \).
+    \item \( \mathbf{p}(q) \): the position of a specific point of the
+          robot (e.g.\ its center of mass) at configuration \( q \).
+\end{itemize}
+
+A natural metric is the \emph{maximum displacement} of any point of
+the robot between the two configurations:
+\begin{equation}
+\label{eq:displacement-metric}
+d(q_a, q_b) = \max_{\mathbf{p} \in \text{robot}}
+    \|\mathbf{p}(q_a) - \mathbf{p}(q_b)\|.
+\end{equation}
+This is called the \textbf{displacement metric}. It relies on the
+assumption that if the region occupied by the robot is similar in two
+postures, then the distance between the corresponding configurations is
+small:
+\[
+d(q_a, q_b) \simeq 0 \implies B(q_a) \simeq B(q_b).
+\]
+
+Computing \cref{eq:displacement-metric} exactly requires checking
+every point of the robot, which is an uncountably infinite set. If the
+links are polyhedral, the problem becomes finite: the maximum
+displacement is attained at a vertex, so it is enough to check the
+vertices of the bodies. For general shapes, a more practical approach is
+to use a finite set of \textbf{control points}.
+
+\subsection{Control Points}
+\label{subsec:control-points}
+
+Let
+\[
+P = \{ \mathbf{p}_1, \mathbf{p}_2, \dots, \mathbf{p}_c \}
+\]
+be a set of \( c \) points of the robot, each depending on the
+configuration \( q \). The distance between two postures is defined as
+\begin{equation}
+\label{eq:control-points-metric}
+d(q_a, q_b) = \max_{1 \le i \le c}
+    \|\mathbf{p}_i(q_a) - \mathbf{p}_i(q_b)\|.
+\end{equation}
+Not every set of points is a valid choice. For instance, the base of a
+manipulator does not move with the configuration, so it carries no
+information. A set \( P \) is a set of \textbf{proper control points}
+if the function \( d \) defined in \cref{eq:control-points-metric}
+satisfies all the properties of a distance in
+\cref{def:distance}.
+
+\begin{nb}[Local Approximation]
+Since a smooth manifold is locally homeomorphic to \( \mathbb{R}^n \),
+for sufficiently close configurations the geodesic distance on the
+manifold can be approximated by the Euclidean distance in the local
+chart.
+\end{nb}
+
+\begin{nb}[Prismatic Joints]
+The configuration space of a robot with \emph{only} prismatic joints
+is Euclidean, because each joint contributes a linear coordinate.
+The distance in \( C \) is then the ordinary Euclidean distance.
+\end{nb}
 
 \section{C-Obstacles and Free Space}
 \label{sec:c-obstacles}
@@ -659,11 +734,18 @@ Planning a safe motion is equivalent to finding a path in
 the goal configuration \( q_g \).
 
 \paragraph{The point-robot trick.}
-If the robot is modeled as a point, the workspace obstacles must be
-inflated by the Minkowski sum with the robot's geometry. After this
-transformation, planning for the extended robot reduces to planning
-for a point in \( C_{\text{free}} \). This is the canonical formulation
-of the motion planning problem.
+To plan for a robot of finite size as if it were a point, the workspace
+obstacles are inflated by the \emph{Minkowski sum} with the robot's
+geometry: for a robot \( A \) that only translates, with its reference
+point at the origin, \( CO_i = O_i \oplus (-A) \), i.e.\ the obstacle
+is grown by the robot reflected through the reference point (for a
+symmetric robot such as a disk, simply by the robot itself). After this
+transformation, planning for the extended robot reduces to planning for
+a point in \( C_{\text{free}} \). When the robot can also rotate, the
+inflation depends on the orientation: one inflated obstacle is obtained
+for each \( \theta \), and the C-obstacle lives in the higher-dimensional
+space \( \mathbb{R}^2 \times \mathcal{S}^1 \). This is the canonical
+formulation of the motion planning problem.
 
 \paragraph{Path vs.\ trajectory.}
 A \emph{path} is a purely geometric sequence of configurations, with
@@ -696,3 +778,7 @@ a path in \( \mathbb{R}^n \) is different from searching in
 \( \mathcal{S}^1 \), \( \mathcal{T}^n \), or \( SE(3) \). Planners
 must respect the topology of the space in which they operate.
 
+The kinematic constraints that actually limit the motion of a wheeled
+mobile robot are the subject of \cref{ch:wmr-mechanics}, where they
+are derived from the pure rolling condition and used to build the
+kinematic models.

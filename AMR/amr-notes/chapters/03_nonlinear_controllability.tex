@@ -1,0 +1,463 @@
+\chapter{Nonlinear Controllability in Depth}
+\label{ch:nonlinear-controllability}
+
+\section{Scope of This Chapter}
+\label{sec:controllability-scope}
+
+\cref{ch:wmr-mechanics} introduced the controllability test as an
+operational recipe: build the accessibility distribution with the Lie
+bracket \cref{eq:lie-bracket}, check the rank condition \cref{eq:arc},
+and read the degree of nonholonomy \( \kappa \)
+(\cref{subsec:controllability}). The kinematic models, their
+controllability, and the chained-form transformations, with the
+related computations, are in that chapter.
+
+This chapter does \emph{not} repeat those definitions and results. It
+answers the question that the recipe leaves open: \emph{why does it
+work?} It collects
+
+\begin{itemize}
+    \item the formal statement of the controllability criterion and an
+          outline of its proof (\cref{sec:controllability-problem});
+    \item the properties of the Lie bracket and the derivation of its
+          geometric meaning (\cref{sec:lie-brackets,%
+          sec:lie-bracket-interpretation});
+    \item the link between involutivity, integrability and holonomy
+          (\cref{sec:distributions});
+    \item exercises with solutions, including the bracket
+          computations for the vehicles of \cref{ch:wmr-mechanics}
+          (\cref{sec:controllability-exercises}).
+\end{itemize}
+
+Throughout, the state is denoted by \( x \in \mathbb{R}^n \) when
+talking about a generic system, and by \( q \) for the vehicles. The
+system is the driftless one of \cref{eq:kinematic-model},
+\begin{equation}
+\label{eq:driftless-system}
+    \dot{x} = \sum_{i=1}^{m} g_i(x)\, u_i .
+\end{equation}
+
+\section{Controllability of Driftless Systems}
+\label{sec:controllability-problem}
+
+\begin{definition}[Controllability of a Nonlinear System]
+\label{def:controllability-nonlinear}
+The system \cref{eq:driftless-system} is \textbf{controllable} if, for
+any pair of states \( (x_i, x_f) \), with \( x(0) = x_i \), there
+exists a profile \( \tilde{u}(t) \) for the inputs on
+\( t \in [0, T] \) such that the system reaches \( x(T) = x_f \).
+\end{definition}
+
+For linear systems the test is a rank condition on the controllability
+matrix. For nonlinear systems the test is again a rank condition, but
+on a matrix built from Lie brackets, and the rank condition is, in
+general, only a statement about \emph{accessibility}, i.e.\ about the
+reachable set having non-empty interior. Driftless systems are special:
+the two notions coincide. This is the content of the following theorem
+(stated here, and used in \cref{ch:wmr-mechanics}, as the
+accessibility rank condition).
+
+\begin{theorem}[Accessibility Criterion (Chow--Rashevskii)]
+\label{thm:accessibility}
+Consider the driftless system \cref{eq:driftless-system} on a
+connected domain, and let \( \Delta_{\mathcal{A}} \) be its
+accessibility distribution (\cref{subsec:controllability}).
+\begin{enumerate}
+    \item If \( \dim \Delta_{\mathcal{A}}(x) = n \) at every \( x \),
+          the system is controllable.
+    \item Conversely, if the system is analytic and
+          \( \dim \Delta_{\mathcal{A}} = \nu < n \), it is not
+          controllable: from any initial state the reachable set is
+          contained in a \( \nu \)-dimensional sub-manifold.
+\end{enumerate}
+\end{theorem}
+
+\begin{nb}[Drift]
+If the system has a drift term, \( \dot{x} = f(x) + \sum_i g_i(x)u_i \),
+the rank condition on \( \Delta_{\mathcal{A}} \) only guarantees
+accessibility: one cannot reverse the motion along \( f \), so the
+reachable set need not be a neighbourhood. The wheeled-robot kinematic
+models in this course are driftless, so the criterion above is a
+necessary and sufficient test.
+\end{nb}
+
+\paragraph{Outline of the proof.}
+The proof of part 1 has three steps.
+\begin{enumerate}
+    \item \emph{Brackets are reachable directions.} By
+          \cref{sec:lie-bracket-interpretation}, a cyclic input
+          sequence of duration \( 4\varepsilon \) produces a
+          displacement \( \varepsilon^2 [g_i, g_j] + O(\varepsilon^3) \).
+          Iterating the construction gives the same for nested
+          brackets, with displacement of order \( \varepsilon^{k} \) for
+          a bracket of length \( k \).
+    \item \emph{Full rank gives an open set.} If the vector fields and
+          their brackets span \( \mathbb{R}^n \) at \( x_0 \), suitable
+          combinations of such sequences move the state in \( n \)
+          independent directions, so the reachable set from \( x_0 \)
+          contains an open neighbourhood of \( x_0 \).
+    \item \emph{Globalization.} The system is driftless, so every
+          motion can be reversed with the opposite inputs: ``being
+          reachable from'' is an equivalence relation. Its classes are
+          open by step 2, hence they also are closed (the complement is
+          a union of open classes). On a connected domain there is
+          only one class: the whole domain.
+\end{enumerate}
+Part 2 follows from the Frobenius theorem applied to the (involutive)
+distribution \( \Delta_{\mathcal{A}} \), see \cref{sec:distributions}.
+
+\paragraph{Holonomic vs.\ nonholonomic, revisited.}
+Combining \cref{thm:accessibility} with the classification of
+\cref{subsec:controllability}: the kinematic model of a robot is
+controllable if and only if its kinematic constraints are
+\emph{completely} nonholonomic (\( \nu = n \)). Partially integrable
+constraints are still nonholonomic, but the system is not controllable.
+
+\section{Lie Brackets in Depth}
+\label{sec:lie-brackets}
+
+The definition of the Lie bracket is \cref{eq:lie-bracket}. Using
+the Jacobians \( J_i(x) = \partial g_i / \partial x \), it reads
+\( [g_1, g_2] = J_2 g_1 - J_1 g_2 \).
+
+\paragraph{Algebraic properties.}
+For vector fields \( f, g, h \) and constants \( a, b \):
+\begin{align}
+    [f, g] &= -[g, f] && \text{(antisymmetry; in particular } [f,f]=0\text{)}, \\
+    [af + bg, h] &= a[f, h] + b[g, h] && \text{(bilinearity)}, \\
+    [f,[g,h]] + [g,[h,f]] + [h,[f,g]] &= 0 && \text{(Jacobi identity)}.
+\end{align}
+Antisymmetry is immediate from the definition and is the reason why, in
+the accessibility distribution, each pair \( g_i, g_j \) is counted only
+once. Bilinearity follows from the linearity of the Jacobian. The Jacobi
+identity is verified by expanding the six terms: the second-derivative
+terms cancel in pairs by the symmetry of the Hessian. Its practical
+consequence is that, to span all brackets of a given length, it is
+enough to consider \emph{left-nested} brackets
+\( [g_{i_1}, [g_{i_2}, [\dots, g_{i_k}]]] \).
+
+\paragraph{Example in \( \mathbb{R}^3 \).}
+Let
+\[
+g_1 = \begin{pmatrix} \cos x_3 \\ \sin x_3 \\ 0 \end{pmatrix},
+\qquad
+g_2 = \begin{pmatrix} 0 \\ 0 \\ x_1 \end{pmatrix}.
+\]
+The Jacobians are
+\[
+J_1 =
+\begin{pmatrix}
+    0 & 0 & -\sin x_3 \\
+    0 & 0 & \cos x_3 \\
+    0 & 0 & 0
+\end{pmatrix},
+\qquad
+J_2 =
+\begin{pmatrix}
+    0 & 0 & 0 \\
+    0 & 0 & 0 \\
+    1 & 0 & 0
+\end{pmatrix},
+\]
+hence
+\[
+[g_1, g_2](x) = J_2 g_1 - J_1 g_2 =
+\begin{pmatrix} 0 \\ 0 \\ \cos x_3 \end{pmatrix}
+- \begin{pmatrix} -x_1\sin x_3 \\ x_1\cos x_3 \\ 0 \end{pmatrix}
+=
+\begin{pmatrix}
+    x_1 \sin x_3 \\
+    -x_1 \cos x_3 \\
+    \cos x_3
+\end{pmatrix}.
+\]
+The determinant of \( (g_1, g_2, [g_1,g_2]) \) is \( x_1^2 \), so
+\( [g_1, g_2] \) is linearly independent from \( g_1, g_2 \) only for
+\( x_1 \neq 0 \): on the plane \( x_1 = 0 \) the rank condition fails
+at the first bracket, and one would have to compute higher-order
+brackets.
+
+\section{Interpretation of the Lie Bracket}
+\label{sec:lie-bracket-interpretation}
+
+Consider the 2-input system \( \dot{x} = g_1(x) u_1 + g_2(x) u_2 \)
+and apply the following input profile on \( t \in [0, 4\varepsilon] \):
+\begin{align}
+    (u_1, u_2) &= (1, 0) & t &\in [0, \varepsilon], \\
+    (u_1, u_2) &= (0, 1) & t &\in [\varepsilon, 2\varepsilon], \\
+    (u_1, u_2) &= (-1, 0) & t &\in [2\varepsilon, 3\varepsilon], \\
+    (u_1, u_2) &= (0, -1) & t &\in [3\varepsilon, 4\varepsilon].
+\end{align}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/lie_inputs.eps}
+    \caption{Input profile for the interpretation of the Lie bracket.}
+    \label{fig:lie-inputs}
+\end{figure}
+
+\begin{proposition}[Wriggle]
+\label{prop:wriggle}
+After this input sequence,
+\begin{equation}
+\label{eq:wriggle}
+    x(4\varepsilon) = x(0) + \varepsilon^2 [g_1, g_2](x(0)) + O(\varepsilon^3).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The flow of a vector field \( g \) for a time \( t \) is, to second
+order,
+\[
+\phi^{g}_t(x) = x + t\, g(x) + \tfrac{t^2}{2} J_g(x)\, g(x) + O(t^3),
+\]
+and the flow for \( -g \) is obtained with \( t \to -t \). Write
+\( g_i, J_i \) for the fields and Jacobians evaluated at \( x(0) \),
+and follow the four phases.
+\begin{align*}
+x_1 &= x + \varepsilon g_1 + \tfrac{\varepsilon^2}{2} J_1 g_1, \\
+x_2 &= x_1 + \varepsilon g_2(x_1) + \tfrac{\varepsilon^2}{2} J_2 g_2
+     = x + \varepsilon (g_1 + g_2)
+       + \varepsilon^2 \big( \tfrac12 J_1 g_1 + J_2 g_1 + \tfrac12 J_2 g_2 \big),
+\end{align*}
+using \( g_2(x_1) = g_2 + \varepsilon J_2 g_1 + O(\varepsilon^2) \).
+In the third phase,
+\( g_1(x_2) = g_1 + \varepsilon J_1 (g_1 + g_2) + O(\varepsilon^2) \), so
+\begin{align*}
+x_3 &= x_2 - \varepsilon g_1(x_2) + \tfrac{\varepsilon^2}{2} J_1 g_1 \\
+    &= x + \varepsilon g_2
+       + \varepsilon^2 \big( J_2 g_1 - J_1 g_2 + \tfrac12 J_2 g_2 \big),
+\end{align*}
+where the \( J_1 g_1 \) terms cancel (\( \tfrac12 - 1 + \tfrac12 = 0 \)).
+Finally, with \( g_2(x_3) = g_2 + \varepsilon J_2 g_2 + O(\varepsilon^2) \),
+\[
+x_4 = x_3 - \varepsilon g_2(x_3) + \tfrac{\varepsilon^2}{2} J_2 g_2
+    = x + \varepsilon^2 (J_2 g_1 - J_1 g_2) + O(\varepsilon^3)
+    = x + \varepsilon^2 [g_1, g_2] + O(\varepsilon^3). \qedhere
+\]
+\end{proof}
+
+The displacement is in the direction of the Lie bracket, with an error
+\( O(\varepsilon^3) \) that becomes negligible as
+\( \varepsilon \to 0 \). A suitable cyclic sequence of inputs (a
+\emph{wriggle}) therefore produces a net motion along a direction that
+is not directly spanned by the inputs. Note the scaling:
+the displacement is of order \( \varepsilon^2 \) for a maneuver of
+duration \( 4\varepsilon \), so motion along a bracket is
+``slower'' than motion along the input fields, and brackets of length
+\( k \) are slower still (order \( \varepsilon^k \)).
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\linewidth]{images/lie_bracket_direction.eps}
+    \caption{The Lie bracket gives the direction of the net displacement
+    produced by the cyclic input sequence.}
+    \label{fig:lie-bracket-direction}
+\end{figure}
+
+\begin{nb}[A Numerical Check of the Wriggle]
+For the unicycle at \( \theta = 0 \), apply the sequence
+\( (v, \omega) = (1, 0), (0, 1), (-1, 0), (0, -1) \), each for a time
+\( \varepsilon \). The vehicle moves forward by \( \varepsilon \),
+turns left by \( \varepsilon \), moves backward by \( \varepsilon \)
+along the new heading, and turns back. The final position is
+\( (\varepsilon - \varepsilon\cos\varepsilon,\
+-\varepsilon\sin\varepsilon) \approx (0, -\varepsilon^2) \) with
+\( \theta = 0 \), i.e.\ \( \varepsilon^2 [g_1, g_2] \) with
+\( [g_1, g_2] = (\sin\theta, -\cos\theta, 0)^\top \) the slide vector
+field of \cref{ch:wmr-mechanics}, in agreement with \cref{eq:wriggle}:
+a lateral displacement obtained with no lateral velocity.
+\end{nb}
+
+\begin{nb}[Lie Bracket as a Wriggle]
+The Lie bracket describes a motion that cannot be produced by any
+single input, but can be produced by a sufficiently fast cyclic
+sequence of inputs. For a car-like robot, this is exactly how you
+parallel-park: no single input moves the car sideways, but a cyclic
+sequence of forward/backward and steering commands does.
+\end{nb}
+
+\section{Distributions and Integrability}
+\label{sec:distributions}
+
+\begin{definition}[Distribution]
+\label{def:distribution}
+Let \( C \) be a smooth manifold. A \textbf{distribution} \( \Delta \)
+is a map that assigns to each point \( x \in C \) a subspace of the
+tangent space \( T_x C \):
+\[
+\Delta : x \mapsto \Delta(x) \subset T_x C.
+\]
+It has \textbf{dimension} \( k \), written \( \dim \Delta = k \), if
+\( \dim \Delta(x) = k \) for every \( x \in C \).
+\end{definition}
+
+For the system \cref{eq:driftless-system} the input distribution is
+\( \Delta = \text{span}\{ g_1, \dots, g_m \} \), and it is a
+distribution in the sense above whenever the \( g_i \) are
+independent at every point.
+
+\begin{definition}[Involutive Distribution]
+\label{def:involutive}
+A distribution \( \Delta \) is \textbf{involutive} if it is closed
+under Lie bracket: for any vector fields \( g, h \) with values in
+\( \Delta \), also \( [g, h] \) takes values in \( \Delta \).
+\end{definition}
+
+The accessibility distribution \( \Delta_{\mathcal{A}} \) is, by
+construction, the smallest involutive distribution containing
+\( \Delta \): its \emph{involutive closure}.
+
+\begin{theorem}[Frobenius]
+\label{thm:frobenius}
+A distribution of constant dimension \( k \) is
+\textbf{integrable}, i.e.\ through every point there passes a
+\( k \)-dimensional sub-manifold tangent to it, if and only if it is
+involutive.
+\end{theorem}
+
+Frobenius' theorem is the bridge to \cref{sec:constraints}. Let
+\( \Delta = \mathcal{N}(A(q)) \) be the distribution of the admissible
+velocities of the Pfaffian constraints \( A(q)\dot q = 0 \). Then:
+\begin{itemize}
+    \item \( \Delta \) involutive \( \iff \) \( \Delta_{\mathcal{A}} =
+          \Delta \) \( \iff \) \( \nu = m \): the constraints are
+          completely integrable, hence holonomic, and the motion is
+          confined to the integral sub-manifolds of \( \Delta \);
+    \item \( \Delta \) not involutive: the constraints are
+          nonholonomic. The sub-manifold tangent to
+          \( \Delta_{\mathcal{A}} \) (when \( \nu < n \)) is the set
+          of accessible configurations.
+\end{itemize}
+The case \( k = n - 1 \) of \cref{subsec:controllability} is immediate:
+a distribution generated by a single vector field is always involutive,
+since \( [g, g] = 0 \).
+
+\begin{proposition}
+\label{prop:chain-stabilizes}
+Let \( \Delta_1 = \Delta \) and
+\( \Delta_{i+1} = \Delta_i + \text{span}\{[g,h] : g \in \Delta_1,\
+h \in \Delta_i\} \), at points where the dimensions are constant. Then
+the chain stabilizes after at most \( n - m \) steps, and
+\( \Delta_{\mathcal{A}} = \Delta_{n-m+1} \). In particular, brackets of
+length greater than \( n - m + 1 \) are never needed, and
+\( \kappa \le n - m + 1 \).
+\end{proposition}
+
+\begin{proof}
+The chain is increasing, \( \Delta_i \subseteq \Delta_{i+1} \). If
+\( \Delta_{i+1} = \Delta_i \), then also \( \Delta_{i+2} = \Delta_{i+1} \),
+because the new brackets involve only elements of
+\( \Delta_{i+1} = \Delta_i \), which are already in \( \Delta_{i+1} \).
+So the chain is either strictly increasing or constant from some point
+on. Its dimension starts at \( m \) and cannot exceed \( n \): a strict
+increase of at least one dimension per step can happen at most
+\( n - m \) times. (Analyticity is not needed for this argument; it is
+needed for the converse in \cref{thm:accessibility}.)
+\end{proof}
+
+For \( m = 2 \) the bound is \( n - 1 \): the unicycle (\( n = 3 \),
+\( \kappa = 2 \)), the bicycle (\( n = 4 \), \( \kappa = 3 \)) and the
+chained form (\( \kappa = n - 1 \), see
+\cref{prop:chained-controllable}) all attain it.
+
+\section{Exercises}
+\label{sec:controllability-exercises}
+
+\begin{enumerate}
+    \item \textbf{Heisenberg system.} Let
+          \( g_1 = (1, 0, -x_2/2)^\top \) and
+          \( g_2 = (0, 1, x_1/2)^\top \) on \( \mathbb{R}^3 \). Compute
+          \( [g_1, g_2] \), and decide whether
+          \( \dot x = g_1 u_1 + g_2 u_2 \) is controllable. What is
+          \( \kappa \)?
+    \item \textbf{Unicycle.} Compute \( [g_1, g_2] \) for
+          \cref{eq:unicycle} from the Jacobians, and the determinant of
+          \( (g_1, g_2, [g_1, g_2]) \).
+    \item \textbf{Rear-wheel-drive bicycle.} For \cref{eq:bicycle-rear},
+          compute \( g_3 = [g_1, g_2] \), \( g_4 = [g_1, g_3] \), and
+          the determinant of \( (g_1, g_2, g_3, g_4) \). For which
+          \( \phi \) does the rank drop?
+    \item \textbf{Front-wheel-drive bicycle.} Repeat the computation for
+          \cref{eq:bicycle-front}. Does the rank drop at
+          \( \phi = \pm\pi/2 \)?
+    \item \textbf{Chained form.} For the \( (2,4) \) chained form
+          compute \( [g_1, g_2] \) and \( [g_1,[g_1,g_2]] \), and verify
+          that the rank is 4 and \( \kappa = 3 \).
+    \item \textbf{Partial integrability.} Consider on \( \mathbb{R}^4 \)
+          the fields \( g_1 = (1, 0, -x_2/2, 0)^\top \),
+          \( g_2 = (0, 1, x_1/2, 0)^\top \). Compute \( \nu \) and
+          \( m \), classify the constraints with the cases of
+          \cref{subsec:controllability}, and say whether the system is
+          controllable.
+    \item \textbf{Algebra of the bracket.} Prove that
+          \( [f, g] = -[g, f] \) and \( [f, f] = 0 \), and that for
+          \( f(x) = Ax \), \( g(x) = Bx \) (linear fields) one has
+          \( [f, g](x) = (BA - AB)x \).
+    \item \textbf{Numerical wriggle.} Simulate the unicycle with the
+          sequence of the numerical check in
+          \cref{sec:lie-bracket-interpretation}, for
+          \( \varepsilon = 0.1, 0.05, 0.025 \). Verify that the final
+          lateral displacement scales as \( \varepsilon^2 \).
+\end{enumerate}
+
+\paragraph{Solutions (sketch).}
+\begin{enumerate}
+    \item \( [g_1, g_2] = (0,0,1)^\top \). The matrix
+          \( (g_1, g_2, [g_1,g_2]) \) has determinant 1 everywhere, so
+          the system is controllable with \( \kappa = 2 \). (This is
+          the standard model of a nonholonomic integrator.)
+    \item Only \( \partial g_1/\partial q \) is non-zero, with the
+          column of \( \theta \) equal to \( (-\sin\theta, \cos\theta,
+          0)^\top \). Hence \( [g_1, g_2] = -(\partial g_1/\partial q)
+          g_2 = (\sin\theta, -\cos\theta, 0)^\top \), and the
+          determinant is \( 1 \) for every \( \theta \).
+    \item \( g_3 = -\partial g_1/\partial\phi = (0, 0,
+          -1/(l\cos^2\phi), 0)^\top \) and
+          \( g_4 = (-\sin\theta, \cos\theta, 0, 0)^\top /
+          (l\cos^2\phi) \). The determinant is
+          \( 1/(l^2\cos^4\phi) \): the rank drops only at
+          \( \phi = \pm\pi/2 \), the singularity of the model.
+    \item \( g_3^F = (\cos\theta\sin\phi,\ \sin\theta\sin\phi,\
+          -\cos\phi/l,\ 0)^\top \) and
+          \( g_4^F = (-\sin\theta,\ \cos\theta,\ 0,\ 0)^\top / l \). In
+          the frame aligned with the heading the determinant has
+          modulus \( 1/l^2 \), independent of \( \phi \): the rank
+          never drops, and \( \kappa = 3 \).
+    \item \( g_1 = (1, 0, z_2, z_3)^\top \), \( g_2 = e_2 \),
+          \( [g_1, g_2] = -e_3 \), \( [g_1, [g_1, g_2]] = e_4 \). The
+          four fields \( g_1, g_2, -e_3, e_4 \) are independent.
+    \item \( [g_1, g_2] = (0,0,1,0)^\top = e_3 \), and the next
+          brackets vanish: \( \nu = 3 \), \( m = 2 \), \( n = 4 \),
+          so \( m < \nu < n \): the constraints are partially
+          integrable. The system is not controllable: \( x_4 \) is
+          constant (the constraint \( \dot x_4 = 0 \) is integrable).
+    \item Antisymmetry is immediate from \( J_g f - J_f g \). For the
+          linear fields, \( J_f = A \), \( J_g = B \), so
+          \( [f,g] = BAx - ABx \).
+    \item The lateral displacement is \( -\varepsilon\sin\varepsilon
+          \approx -\varepsilon^2 \): halving \( \varepsilon \) divides
+          it by about 4.
+\end{enumerate}
+
+\section{Takeaways}
+\label{sec:controllability-takeaways}
+
+\begin{enumerate}
+    \item For driftless systems the accessibility rank condition is
+          necessary and sufficient for controllability
+          (Chow--Rashevskii); with drift it only guarantees
+          accessibility.
+    \item The Lie bracket is bilinear, antisymmetric, and satisfies the
+          Jacobi identity. A cyclic input sequence of duration
+          \( 4\varepsilon \) produces a displacement
+          \( \varepsilon^2 [g_1, g_2] + O(\varepsilon^3) \) (a
+          \textbf{wriggle}).
+    \item Frobenius: a constant-dimension distribution is integrable if
+          and only if it is involutive. Holonomic constraints
+          correspond to \( \Delta_{\mathcal{A}} = \Delta \).
+    \item The chain of brackets stabilizes after at most \( n - m \)
+          steps, so \( \kappa \le n - m + 1 \): the unicycle, the
+          bicycle and the chained form (\cref{ch:wmr-mechanics}) all
+          attain the bound for \( m = 2 \).
+\end{enumerate}
