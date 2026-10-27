@@ -1,0 +1,14 @@
+/images/
+/images_2/
+/datasets/*/images/
+/datasets/*/images_2/
+/outputs/**/nerfstudio_models/
+/outputs/**/events.out.tfevents.*
+*.mp4
+/database.db
+/tmp_txt/
+/doc/main.aux
+/doc/main.log
+/doc/main.fls
+/doc/main.fdb_latexmk
+/doc/main.synctex.gz
