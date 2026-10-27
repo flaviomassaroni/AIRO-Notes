@@ -22,7 +22,10 @@
 The scene is a kitchen table with a moka pot, two steel cups, a glass, bananas and a plastic
 water bottle (glossy, metallic and transparent objects), next to a tiled white wall and a dark
 door. We took 41 phone photos (3072$\times$4080) around the table at several heights and
-distances and kept the original files. \textbf{[TODO: exposure / white balance sentence]}
+distances and kept the original files.
+Exposure time was constant (1/20\,s) and ISO was 214 in 40 of the 41 photos (490 in one);
+white balance was automatic, so color shifts between photos are possible and add
+photometric error that the radiance field cannot explain geometrically.
 Camera poses come from a single COLMAP run (pycolmap, SIFT, exhaustive matching, one
 \texttt{SIMPLE\_PINHOLE} camera) on all 41 images: all were registered (21,788 3D points).
 Five test images, spread over the capture and never used for training, were fixed once for all
@@ -42,7 +45,7 @@ then averaged over the set, with pixel values in $[0,1]$ and on the downscaled i
 \section{Baseline}
 Mean PSNR is 33.29\,dB on the 36 training views and 24.34\,dB on the 5 test views
 (Table~\ref{tab:psnr}), a gap of about 9\,dB, i.e.\ roughly eight times the MSE. The gap is
-expected: the Gaussians are optimised to reproduce exactly the training photos, while a test
+expected: the Gaussians are optimized to reproduce exactly the training photos, while a test
 view is rendered from a pose the field never fitted and also inherits imperfect geometry and
 view-dependent appearance. The best test view (090620\_1, 27.6\,dB) was shot in the same
 second as a training photo and is probably inflated; the other four average 23.5\,dB. The two
@@ -85,14 +88,16 @@ Test view & 36 views & 27 views & 18 views \\
 \end{table}
 
 \section{How many views are enough?}
-We retrained on nested subsets of 27 (3/4) and 18 (1/2) of the training images, with the same
-test set, steps and settings. Test PSNR is 20.85, 23.68 and 24.34\,dB for 18, 27 and 36 views:
+We retrained on subsets of 27 (3/4) and 18 (1/2) of the training images, with the same
+test set, steps and settings. The 27-view subset drops every fourth training image and the
+18-view subset keeps every other one, so the sets are nested. Test PSNR is 20.85, 23.68 and
+24.34\,dB for 18, 27 and 36 views:
 the gain shrinks from +2.83 to +0.66\,dB, while training PSNR rises as views are removed
 (36.37, 34.90, 33.29\,dB), so the train--test gap grows from 9.0 to 15.5\,dB. View 090620\_1
 drops to 19.7\,dB with 18 views because its near-duplicate leaves the training set only in that
 run; excluding it, the means are 21.14, 22.84 and 23.53\,dB, with the same trend
 (Tables~\ref{tab:psnr}--\ref{tab:perview}). Figure~\ref{fig:views} shows two test views for the
-three models: with fewer views the central objects remain recognisable, whereas errors
+three models: with fewer views the central objects remain recognizable, whereas errors
 concentrate on the wall, the door and the image borders, with streaks and floating Gaussians.
 These regions are seen from fewer directions, so the number of views needed is not uniform
 over the scene.
@@ -109,12 +114,12 @@ over the scene.
 Figure~\ref{fig:between} (left) is the frame halfway between two training cameras (090627 and
 090620, poses verified), rendered from the viewer at 1920$\times$1080 with a 75$^\circ$ field of
 view. Table and objects are sharp, but streaks and dark needles appear near the borders, where
-few training rays constrain the Gaussians (the wide landscape frame likely also covers areas
-that the portrait training photos did not). Figure~\ref{fig:between} (right) is rendered from far
-above the table, outside the captured region: the table remains recognisable, but the
-surrounding room dissolves into radial streaks, stretched Gaussians and colour blobs. A
+few training rays likely constrain the Gaussians (the wide landscape frame also covers areas
+that the portrait training photos probably did not). Figure~\ref{fig:between} (right) is rendered from far
+above the table, outside the captured region: the table remains recognizable, but the
+surrounding room dissolves into radial streaks, stretched Gaussians and color blobs. A
 splatting model has no generative prior: away from the training poses it shows whatever the
-optimisation left unconstrained. Quality is therefore reliable only near the captured poses.
+optimization left unconstrained. Quality is therefore reliable only near the captured poses.
 
 \begin{figure}[H]
 \centering
@@ -132,13 +137,14 @@ optimisation left unconstrained. Quality is therefore reliable only near the cap
 
 \section{Geometric distribution of the radiance field}
 Figure~\ref{fig:artifact} shows a viewpoint looking at the corner of the room, as RGB and depth
-from the same pose (turbo colormap, normalised per frame, blue = near). Near the table the
+from the same pose (turbo colormap, normalized per frame, blue = near). Near the table the
 render is plausible, but the tiled wall is fragmented into blobs, spikes radiate from the top
 of the door, and in the depth map the door does not end on a surface: depth increases
-continuously upward. These regions are low-textured (uniform white tiles, a dark door) and most
-likely appear in the training photos only near the frame borders. The optimisation minimises
-photometric error on the training views only, and where texture is missing many depth
-assignments reproduce the same pixels; nothing penalises Gaussians that stretch or drift along
+continuously upward. This viewpoint lies close to several training cameras, so the errors are
+not an extrapolation artifact. These regions are low-textured (uniform white tiles, a dark door)
+and most likely appear in the training photos only near the frame borders. The optimization
+minimizes photometric error on the training views only, and where texture is missing many depth
+assignments reproduce the same pixels; nothing penalizes Gaussians that stretch or drift along
 viewing rays until a new camera reveals it. The reconstruction is photometrically plausible
 from the training poses but geometrically wrong.
 
