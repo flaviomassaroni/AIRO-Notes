@@ -79,13 +79,20 @@ def policy_iteration(P: np.ndarray, R: np.ndarray, gamma: float,
     optimality equation, so $V^\pi = V^{*}$.
     """
 
-    S = P.shape[0]    
+    S = P.shape[0]
     pi = np.zeros(S, dtype=int) if pi0 is None else np.array(pi0, dtype=int)
+    idx = np.arange(S)
+    V = np.zeros(S)
     rows = []
     for _ in range(max_iters):
-        rows.append(policy_evaluation_exact(P, R, pi, gamma))
-        new = policy_improvement(P, R, pi, gamma)
-        if np.array_equal(new, pi):
+        # 3 sweeps di B^pi, warm start dal V precedente
+        for _ in range(3):
+            V = R[idx, pi] + gamma * P[idx, pi] @ V
+        rows.append(V.copy())
+        # miglioramento greedy rispetto al V troncato (advantage() rivaluterebbe in modo esatto)
+        Q = q_from_v(P, R, V, gamma)
+        new = np.where(Q[idx, pi] >= Q.max(axis=1) - 1e-10, pi, Q.argmax(axis=1))
+        if np.array_equal(new, pi) and len(rows) > 1 and np.max(np.abs(rows[-1] - rows[-2])) < 1e-9:
             break
         pi = new
     return pi, np.array(rows)
