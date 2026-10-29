@@ -30,7 +30,7 @@ for which a large body of algorithms exists
 \label{sec:modeling-robot}
 
 A robot is a continuous body, i.e.\ an infinite set of points.
-Describing it point by point is impossible. The key idea is to
+Describing a robot point by point is impossible. The key idea is to
 represent it with a \emph{finite} set of parameters that completely
 determines the position of every point of the robot: the
 configuration. We model a robot as a collection of \( n_b \) rigid
@@ -94,20 +94,20 @@ plane, \( \dim(C) = 3 n_b \) (two translations and one rotation per
 body). In three dimensions, \( \dim(C) = 6 n_b \) (three translations
 and three rotations). Joints and other constraints between the bodies
 reduce these numbers: for a manipulator with \( n \) one-DOF joints,
-In all cases,
-\[
-\dim(C) = \text{DOF of the robot},
-\]
+In all cases, \( \dim(C) = \text{DOF of the robot} \),
 the minimum number of independent parameters required to uniquely
 specify its state.
 
 When the configuration space of a free rigid body is considered, it has
 the structure of the \emph{Special Euclidean Group}: \( SE(2) \cong
 \mathbb{R}^2 \times \mathcal{S}^1 \) for a body in the plane, and
-\( SE(3) = \mathbb{R}^3 \times SO(3) \) for a body in space.
+\( SE(3) \cong \mathbb{R}^3 \times SO(3) \) for a body in space.
 
 \begin{nb}[Special Euclidean Group SE(n)]
-The Special Euclidean group \( SE(n) \) describes the orientation-preserving isometries of the Euclidean space \( \mathbb{R}^n \), where \( n \in \mathbb{N} \) is an integer. It represents rigid transformations (combinations of rotations and translations) that preserve both distances between points and the orientation of the space.
+The Special Euclidean group \( SE(n) \) describes the orientation-preserving isometries of the 
+Euclidean space \( \mathbb{R}^n \), where \( n \in \mathbb{N} \) is an integer. 
+It represents rigid transformations (combinations of rotations and translations) that preserve both 
+distances between points and the orientation of the space.
 
 This group can be represented using homogeneous transformation matrices as:
 \[
@@ -129,7 +129,6 @@ dimension \( n(n+1)/2 \): 3 for \( SE(2) \), 6 for \( SE(3) \).
 \label{sec:workspace-vs-cspace}
 
 To recap:
-
 \begin{itemize}
     \item The \textbf{workspace} \( W \) is the physical space
           in which the robot moves (e.g.\ \( \mathbb{R}^2 \) or
@@ -138,7 +137,6 @@ To recap:
           of all configurations the robot can assume: the manifold of
           all its possible postures.
 \end{itemize}
-
 In general \( \dim(C) \neq \dim(W) \): the dimension of \( C \) depends
 on the kinematic structure of the robot, not on the space it lives in.
 A planar robot that can both translate and rotate has a 3-dimensional
@@ -146,6 +144,61 @@ C-space, even though it lives in a 2-dimensional workspace. A free
 rigid body in \( \mathbb{R}^3 \) has a 6-dimensional C-space, while
 its workspace is 3-dimensional.
 
+\begin{nb}[What a C-Obstacle Actually Is]
+Given a configuration \( q \), the map \( B \) uniquely determines the
+volume \( B(q) \) occupied by the robot in the workspace \( W \). One
+does not know ``just a point'': one knows the whole body, because
+\( q \) is a complete specification of the position of every point of
+the robot. The ``point'' is the representation of the robot in the
+configuration space \( C \), not in the workspace \( W \).
+
+The C-obstacles
+\[
+CO_i = \{ q \in C : B(q) \cap O_i \neq \emptyset \}
+\]
+encode the information about the shape of the robot. The geometry of
+\( CO_i \) is \emph{derived} from the geometry of the robot and of the
+obstacle \( O_i \), but it coincides with neither of them. The union
+\( CO = \bigcup_i CO_i \) is the C-obstacle region, and
+\( C_{\text{free}} = C \setminus CO \) is what determines which paths
+exist.
+
+\medskip
+\noindent\textbf{Minkowski sum.}
+Given two sets \( A, B \subseteq \mathbb{R}^n \), their
+\emph{Minkowski sum} is
+\[
+A \oplus B = \{ a + b : a \in A,\ b \in B \}.
+\]
+Geometrically, it is the set obtained by taking every point of
+\( A \), every point of \( B \), summing their coordinates, and
+collecting all the results: \( A \) is ``inflated'' by the shape of
+\( B \) (the operation is commutative, so one may equally think of
+\( B \) as being inflated by \( A \)). For example, the sum of two
+disks of radii \( r \) and \( R \) is a disk of radius \( r + R \);
+the sum of a segment and a disk is a capsule (a rectangle with two
+semicircular caps).
+
+\medskip
+For a robot that only translates, with reference point at the origin,
+\( CO_i = O_i \oplus (-A) \), the Minkowski sum of the obstacle with
+the reflected robot: the collision condition
+\( (q + A) \cap O_i \neq \emptyset \) is equivalent to
+\( q \in O_i \oplus (-A) \), because \( q = o - a \) for some
+\( o \in O_i \), \( a \in A \). In this way the extent of the robot is
+transferred from the robot itself to the inflated obstacle, and the
+robot can be treated as a point. For a robot that can also rotate,
+\( CO_i \) lives in \( \mathbb{R}^2 \times \mathcal{S}^1 \) and has
+different sections for each \( \theta \): it is a three-dimensional
+object, not a two-dimensional region in the \( (x, y) \) plane.
+
+The practical difficulty is computing \( B(q) \) and the collisions
+for arbitrary shapes, and handling uncertainty on \( q \), not a lack
+of information: if \( q \) is known, the collision is deterministic; if
+\( q \) is uncertain, a probability distribution \( p(q) \) is needed,
+provided by localization, and the planner can use it to assess the
+risk of collision.
+\end{nb}
 \section{Examples}
 \label{sec:cspace-examples}
 
