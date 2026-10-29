@@ -4,10 +4,12 @@
 Once the kinematic model of a wheeled mobile robot is known, the
 planning problem becomes: find a path \( q(s) \) in the configuration
 space that respects the kinematic constraints, and then a timing law
-\( s(t) \) that makes it executable by the robot. This chapter
-introduces the geometric model, the notion of differential flatness,
-and a practical algorithm for path planning based on polynomial
-interpolation of the flat outputs.
+\( s(t) \) that makes it executable by the robot. 
+This chapter introduces the geometric model, the notion of
+differential flatness, two algorithms for path planning (one based on
+polynomial interpolation of the flat outputs, one based on
+parametrized inputs on the chained form), and the timing law that
+turns a path into an executable trajectory.
 
 \section{Path vs Trajectory}
 \label{sec:path-vs-trajectory}
@@ -211,7 +213,8 @@ hence
 \end{align}
 
 \paragraph{Flat outputs for chained-form systems.}
-Consider a 2-input, 3-state chained-form system:
+Recall the chained form from \cref{sec:chained-form}. For a 2-input,
+3-state chained-form system:
 \begin{align}
     z_1' &= \tilde{w}_1, \\
     z_2' &= \tilde{w}_2, \\
@@ -306,7 +309,11 @@ shapes the trajectory by affecting the length of the first and last
 \section{Path Planning for a Chained-Form System}
 \label{sec:path-planning-chained}
 
-Apply the same algorithm to a 2-input, 3-state chained-form system.
+Apply the same algorithm to the chained form \cref{eq:chained}. We
+illustrate it for the \( (2,3) \) case, which covers the unicycle
+(\cref{subsec:unicycle-chained}); the \( (2,4) \) case of the
+bicycle (\cref{subsec:bicycle-chained}) follows identically.
+
 The flat outputs are \( z_1, z_3 \), hence interpolate
 \( (z_{1i}, z_{3i}) \) to \( (z_{1f}, z_{3f}) \). Interpolate \( z_1 \)
 linearly and \( z_3 \) with a cubic polynomial:
@@ -340,6 +347,135 @@ z_{1f} = z_{1i} + 2\pi,
 or to add an intermediate configuration
 \( q_m = (x_m, y_m, \theta_m) \) with \( \theta_m \neq \theta_i \).
 
+\section{Path Planning via Parametrized Inputs}
+\label{sec:path-planning-parametrized}
+
+A different approach, not based on flatness, writes the geometric
+inputs in parametrized form and imposes that the robot goes from
+\( q_i \) to \( q_f \). Assume that the robot model is in chained
+form, \cref{eq:chained}:
+\[
+\begin{cases}
+    z_1' = \tilde{w}_1, \\
+    z_2' = \tilde{w}_2, \\
+    z_3' = z_2 \tilde{w}_1, \\
+    \vdots \\
+    z_n' = z_{n-1} \tilde{w}_1,
+\end{cases}
+\]
+which is linear in \( z \) when \( \tilde{w}_1 \) is constant. Let
+\( z_i, z_f \) be the initial and final configurations in chained-form
+coordinates, and define
+\[
+\Delta = z_{1f} - z_{1i}.
+\]
+Choose the following profiles for the geometric inputs:
+\[
+\begin{cases}
+    \tilde{w}_1 = \operatorname{sign}(\Delta), \\[1ex]
+    \displaystyle \tilde{w}_2 = \sum_{j=0}^{n-2} c_j s^j,
+\end{cases}
+\qquad s \in [0, |\Delta|].
+\]
+With this choice, \( z_2' = \tilde{w}_2 \) can be integrated
+analytically to get the profiles of \( z_2, z_3, \dots, z_n \) as
+functions of \( s \), and the conditions \( z_j(|\Delta|) = z_{jf} \)
+for each \( j \) give a linear system
+\[
+D(\Delta) \begin{pmatrix} c_0 \\ \vdots \\ c_{n-2} \end{pmatrix}
+= d(z_i, z_f, \Delta).
+\]
+If \( D(\Delta) \) is invertible, the coefficients are found. For a
+2-input, 3-state system,
+\[
+D = \begin{pmatrix}
+    |\Delta| & \tfrac{\Delta^2}{2} \\[1ex]
+    \operatorname{sign}(\Delta)\, \tfrac{\Delta^2}{2} & \tfrac{\Delta^3}{6}
+\end{pmatrix},
+\qquad
+d = \begin{pmatrix}
+    z_{2f} - z_{2i} \\
+    z_{3f} - z_{3i} - z_{2i} \Delta
+\end{pmatrix}.
+\]
+
+\section{Choice of the Timing Law}
+\label{sec:timing-law}
+
+After the geometric path \( q(s) \) has been computed, the timing law
+\( s(t) \) must be chosen so that the trajectory is executable by the
+robot. Since the path is geometric, \( s(t) \) is required to be
+monotonic increasing,
+\[
+\dot{s} > 0,
+\]
+because traversing the path backwards has no meaning (a different
+direction has to be chosen at the geometric level).
+
+\subsection{Linear Timing Law}
+\label{subsec:linear-timing-law}
+
+The simplest choice is linear interpolation from \( s_i \) to
+\( s_f \):
+\[
+s(t) = s_i + (s_f - s_i) \frac{t}{T}, \qquad t \in [0, T].
+\]
+The velocity is constant, \( \dot{s} = (s_f - s_i)/T \), and the
+trajectory is the path traversed at constant speed.
+
+\subsection{Trapezoidal Timing Law}
+\label{subsec:trapezoidal-timing-law}
+
+A more realistic choice starts and ends with zero velocity, using a
+\emph{bang-coast-bang} acceleration profile:
+\[
+\ddot{s}(t) =
+\begin{cases}
+    a_{\max} & t \in [t_i, t_i + t_m], \\
+    0 & t \in (t_i + t_m, t_f - t_m], \\
+    -a_{\max} & t \in (t_f - t_m, t_f],
+\end{cases}
+\]
+with \( a_{\max} > 0 \) and \( t_m \) chosen so that the total
+displacement is \( s_f - s_i \). The velocity profile is
+trapezoidal; if \( t_m = 0 \) (short displacement) it degenerates to a
+triangle and the peak velocity \( a_{\max} t_m \) is not reached.
+
+\subsection{Velocity and Acceleration Bounds}
+\label{subsec:velocity-bounds}
+
+The pseudo-velocities are related to \( \dot{s} \) by
+\[
+u(t) = \tilde{u}(s(t)) \, \dot{s}(t).
+\]
+For the unicycle, with bounds
+\[
+|v| \le v_{\max}, \qquad |\omega| \le \omega_{\max},
+\]
+and a path with geometric inputs \( \tilde{v}(s), \tilde{\omega}(s) \),
+a linear timing law with slope \( 1/k \),
+\[
+s(t) = s_i + \frac{t}{k}, \qquad t \in [0, k(s_f - s_i)],
+\]
+gives
+\[
+v(t) = \frac{\tilde{v}(s(t))}{k}, \qquad
+\omega(t) = \frac{\tilde{\omega}(s(t))}{k}.
+\]
+The bounds are satisfied if
+\[
+k = \max\left\{
+    \frac{\tilde{v}_{\text{peak}}}{v_{\max}}, \;
+    \frac{\tilde{\omega}_{\text{peak}}}{\omega_{\max}}
+\right\},
+\]
+where
+\[
+\tilde{v}_{\text{peak}} = \max_{s \in [s_i, s_f]} |\tilde{v}(s)|,
+\qquad
+\tilde{\omega}_{\text{peak}} = \max_{s \in [s_i, s_f]} |\tilde{\omega}(s)|.
+\]
+
 \section{Takeaways}
 \label{sec:planning-takeaways}
 
@@ -362,4 +498,14 @@ or to add an intermediate configuration
           the last state variables; the reconstruction requires a
           careful handling of the singularity when the initial and
           final first coordinates coincide.
+    \item \textbf{Trajectory planning} adds the timing law \( s(t) \) to
+      the geometric path. Linear and trapezoidal (bang-coast-bang)
+      profiles are the standard choices.
+    \item For the unicycle, the velocity bounds \( |v| \le v_{\max} \) and
+      \( |\omega| \le \omega_{\max} \) translate into a scaling factor
+      \( k \) on the timing law, computed from the peak of the geometric
+      inputs.
+    \item An alternative to flatness for path planning is to parametrize
+      the geometric inputs on the chained-form system and solve the
+      resulting linear system for the coefficients.
 \end{enumerate}

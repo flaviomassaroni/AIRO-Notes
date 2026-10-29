@@ -58,16 +58,26 @@ wheeled mobile robots (WMRs):
 
 \begin{table}[h]
 \centering
-\begin{tabular}{lcc}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\linewidth}{@{} l X X @{}}
 \toprule
  & \textbf{Fixed-base manipulator} & \textbf{WMR} \\
 \midrule
-1. Localization              & easy (joint encoders)   & difficult \\
-2a. Path/trajectory planning & easy (all paths feasible) & difficult (not all paths feasible) \\
-2b. Motion planning          & difficult (many DOF)    & more difficult (nonholonomic + DOF) \\
-3. Motion control            & difficult (inertial couplings) & more difficult (nonlinear, no smooth stabilizer) \\
+1. Localization
+    & easy (joint encoders)
+    & difficult \\
+2a. Path/trajectory planning
+    & easy (all paths feasible)
+    & difficult (not all paths feasible) \\
+2b. Motion planning
+    & difficult (many DOF)
+    & more difficult (nonholonomic + DOF) \\
+3. Motion control
+    & difficult (inertial couplings)
+    & more difficult (nonlinear, no smooth stabilizer) \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Comparison between fixed-base manipulators and wheeled mobile
 robots. The apparent simplicity of WMRs hides fundamental difficulties.}
 \label{tab:manipulator-vs-wmr}

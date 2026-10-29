@@ -1,3 +1,538 @@
 \chapter{Motion Control}
-\label{ch:Motion Control}
-% Contenuto del capitolo
+\label{ch:motion-control}
+
+Following a desired trajectory, or reaching a desired configuration,
+cannot be done by simply applying the inputs computed from the flat
+outputs: disturbances and modeling errors would accumulate without
+bound. A feedback action is needed. In previous robotics courses, the
+dynamic model of manipulators was controlled through joint torques.
+For wheeled mobile robots we can work at the kinematic level, because
+the dynamic model is simpler, can be canceled via feedback, and the
+wheels are equipped with low-level velocity loops that are reliable.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/motion_control_scheme.png}
+    \caption{Actual control scheme.}
+    \label{fig:control-scheme-actual}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/motion_control_scheme2.png}
+    \caption{Simplified control scheme used for design.}
+    \label{fig:control-scheme-design}
+\end{figure}
+
+Two control tasks are considered in this course:
+\begin{itemize}
+    \item \textbf{Trajectory tracking}: the robot must converge to a
+          desired Cartesian trajectory \( (x_d(t), y_d(t)) \). Treated
+          in this chapter.
+    \item \textbf{Posture regulation}: the robot must converge to a
+          desired fixed configuration \( q_d \). Treated in
+          \cref{ch:regulation}.
+\end{itemize}
+Trajectory tracking is more relevant in practice, because moving along
+planned trajectories reduces the risk of collisions. Posture
+regulation, on the other hand, does not require any planning.
+
+\section{Trajectory Tracking for the Unicycle}
+\label{sec:trajectory-tracking}
+
+Let \( (x_d(t), y_d(t)) \) be an admissible desired trajectory for the
+unicycle. Admissibility means that there exist inputs \( v_d, \omega_d \)
+such that
+\begin{equation}
+\label{eq:desired-unicycle}
+    \begin{cases}
+        \dot{x}_d = v_d \cos\theta_d, \\
+        \dot{y}_d = v_d \sin\theta_d, \\
+        \dot{\theta}_d = \omega_d.
+    \end{cases}
+\end{equation}
+Thanks to the flatness property (\cref{sec:differential-flatness}),
+from the desired trajectory \( (x_d(t), y_d(t)) \) we can reconstruct
+the full desired state and the required inputs:
+\begin{align}
+    \theta_d(t) &= \operatorname{atan2}(\dot{y}_d(t), \dot{x}_d(t)) + k\pi,
+                   \quad k \in \{0, 1\}, \\
+    v_d(t) &= \pm\sqrt{\dot{x}_d^2(t) + \dot{y}_d^2(t)}, \\
+    \omega_d(t) &= \frac{\ddot{y}_d(t) \dot{x}_d(t)
+                        - \ddot{x}_d(t) \dot{y}_d(t)}
+                       {\dot{x}_d^2(t) + \dot{y}_d^2(t)}.
+\end{align}
+An admissible trajectory requires \( (\dot{x}_d(t), \dot{y}_d(t)) \) to
+be continuous over time. The desired state trajectory \( q_d(t) \)
+computed from the flat outputs is used to define the state error, and
+the resulting block diagram is in \cref{fig:control-scheme-flatness}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/motion_control_scheme3.png}
+    \caption{Feedforward from flatness, feedback from state error.}
+    \label{fig:control-scheme-flatness}
+\end{figure}
+
+\subsection{Error Dynamics}
+\label{subsec:error-dynamics}
+
+The objective is to drive the state error to zero. The error is
+expressed in a frame rotated by \( \theta \), with the \( x \)-axis
+parallel to the sagittal axis of the robot:
+\begin{equation}
+\label{eq:error-rotated}
+    e = \begin{pmatrix} e_1 \\ e_2 \\ e_3 \end{pmatrix}
+    =
+    \begin{pmatrix}
+        \cos\theta & \sin\theta & 0 \\
+        -\sin\theta & \cos\theta & 0 \\
+        0 & 0 & 1
+    \end{pmatrix}
+    \begin{pmatrix}
+        x_d - x \\ y_d - y \\ \theta_d - \theta
+    \end{pmatrix}.
+\end{equation}
+The pair \( (e_1, e_2) \) is the Cartesian error
+\( e_p = (x_d - x,\, y_d - y)^\top \) expressed in the rotated frame,
+as in \cref{fig:error-rotated}. Differentiating \( e \) and using the
+unicycle kinematic model together with the desired one, we obtain the
+\textbf{error dynamics}:
+\begin{align}
+\label{eq:error-dynamics}
+    \dot{e}_1 &= v_d \cos e_3 - v + e_2 \omega, \\
+    \dot{e}_2 &= v_d \sin e_3 - e_1 \omega, \\
+    \dot{e}_3 &= \omega_d - \omega.
+\end{align}
+The error dynamics is \textbf{nonlinear} and \textbf{time-varying},
+since it depends on the reference inputs \( v_d(t), \omega_d(t) \).
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.45\linewidth]{images/error.eps}
+    \caption{Cartesian error expressed in the frame rotated by
+    \( \theta \).}
+    \label{fig:error-rotated}
+\end{figure}
+
+\subsection{Approximate Linearization}
+\label{subsec:approximate-linearization}
+
+Before applying it to the unicycle, recall the idea of stabilization
+via approximate linearization: to stabilize a nonlinear system at an
+equilibrium, we stabilize its approximate linearization around it.
+Consider a generic nonlinear system
+\[
+\dot{x} = \eta(x, u) = f(x) + G(x) u,
+\qquad x \in \mathbb{R}^n,\ u \in \mathbb{R}^m,
+\]
+and assume, without loss of generality, that the origin is the desired
+\textbf{unforced equilibrium}, i.e.\ \( \eta(0, 0) = 0 \), or
+equivalently \( f(0) = 0 \). The first-order Taylor expansion of
+\( \eta \) around \( x = 0, u = 0 \) is
+\[
+\eta(x, u) \approx \underbrace{\eta(0, 0)}_{=\,0}
+    + \left. \frac{\partial \eta}{\partial x} \right|_{0}
+      x
+    + \left. \frac{\partial \eta}{\partial u} \right|_{0}
+      u,
+\]
+so the \textbf{approximate linearization} of the system at the origin is
+\[
+\dot{x} = A x + B u,
+\]
+where \( A \) and \( B \) are the two Jacobians evaluated at the
+origin. With the linear feedback \( u = K x \),
+\[
+\dot{x} = (A + BK) x.
+\]
+If \( K \) is chosen so that \( A + BK \) is \textbf{Hurwitz}
+(certainly possible if \( (A, B) \) is controllable), the approximate
+linearization is asymptotically stable.
+
+\begin{theorem}[Lyapunov Indirect Method]
+\label{thm:lyapunov-indirect}
+If the approximate linearization of a nonlinear system at an
+equilibrium is asymptotically stable, then the equilibrium is
+\textbf{locally} asymptotically stable for the nonlinear system.
+\end{theorem}
+
+\paragraph{Application to the unicycle.}
+In the form \cref{eq:error-dynamics}, the origin is \textbf{not} an
+unforced equilibrium: for \( e = 0 \), the terms \( v_d - v \) and
+\( \omega_d - \omega \) must vanish to have \( \dot{e} = 0 \). This is
+fixed by the (invertible) input transformation
+\begin{align}
+    w_1 &= v_d \cos e_3 - v, \\
+    w_2 &= \omega_d - \omega.
+\end{align}
+Substituting \( \omega = \omega_d - w_2 \), the error dynamics
+\( \dot{e} = \eta(e, w) \) takes the form
+\begin{equation}
+    \dot{e} = \underbrace{
+    \begin{pmatrix}
+        \omega_d e_2 \\
+        -\omega_d e_1 + v_d \sin e_3 \\
+        0
+    \end{pmatrix}}_{f(e)}
+    +
+    \underbrace{
+    \begin{pmatrix}
+        1 & -e_2 \\
+        0 & e_1 \\
+        0 & 1
+    \end{pmatrix}}_{G(e)}
+    \begin{pmatrix} w_1 \\ w_2 \end{pmatrix},
+\end{equation}
+which is at rest for \( e = 0, w = 0 \), i.e.\
+\( \eta(0, 0) = 0 \). Both the drift and the input term are
+nonlinear, and the drift is in general time-varying. The Jacobians are
+\[
+\frac{\partial \eta}{\partial e} =
+\begin{pmatrix}
+    0 & \omega_d - w_2 & 0 \\
+    -\omega_d + w_2 & 0 & v_d \cos e_3 \\
+    0 & 0 & 0
+\end{pmatrix},
+\qquad
+\frac{\partial \eta}{\partial w} =
+\begin{pmatrix}
+    1 & -e_2 \\
+    0 & e_1 \\
+    0 & 1
+\end{pmatrix},
+\]
+and evaluating at \( e = 0, w = 0 \):
+\begin{equation}
+\label{eq:A-tracking}
+    A(t) =
+    \begin{pmatrix}
+        0 & \omega_d & 0 \\
+        -\omega_d & 0 & v_d \\
+        0 & 0 & 0
+    \end{pmatrix},
+    \qquad
+    B =
+    \begin{pmatrix}
+        1 & 0 \\
+        0 & 0 \\
+        0 & 1
+    \end{pmatrix}.
+\end{equation}
+The pair \( (A(t), B) \) is controllable iff the matrix
+\[
+\begin{pmatrix} B & A B \end{pmatrix}
+\]
+has full rank. In this case,
+\[
+\operatorname{rank}
+\begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 0 & -\omega_d & v_d \\
+    0 & 1 & 0 & 0
+\end{pmatrix}
+= 3,
+\]
+which holds if \( \omega_d \neq 0 \) or \( v_d \neq 0 \). The system
+loses controllability when the unicycle stops.
+
+Note that \( A \) is actually \( A(t) \), because the reference inputs
+\( v_d, \omega_d \) depend on time: the linear approximation is still
+a \textbf{time-varying} system. Define the linear feedback
+\[
+w = \begin{pmatrix} w_1 \\ w_2 \end{pmatrix}
+  = \underbrace{
+    \begin{pmatrix}
+        -k_1 & 0 & 0 \\
+        0 & -k_2 & -k_3
+    \end{pmatrix}}_{K}
+    \begin{pmatrix} e_1 \\ e_2 \\ e_3 \end{pmatrix}
+  = K e.
+\]
+The closed-loop error dynamics is
+\[
+\dot{e} = (A(t) + BK) e = A_{cl}(t) e =
+\begin{pmatrix}
+    -k_1 & \omega_d & 0 \\
+    -\omega_d & 0 & v_d \\
+    0 & -k_2 & -k_3
+\end{pmatrix} e,
+\]
+still time-varying. Setting
+\[
+k_1 = k_3 = 2 \zeta a, \qquad
+k_2 = \frac{a^2 - \omega_d^2}{v_d},
+\]
+with \( a > 0 \) and \( \zeta \in (0, 1) \), the characteristic
+polynomial of \( A_{cl}(t) \) becomes time-invariant and Hurwitz:
+\[
+p(\lambda) = (\lambda + 2 \zeta a)
+             (\lambda^2 + 2 \zeta a \lambda + a^2).
+\]
+It has one real negative eigenvalue and two complex eigenvalues with
+damping \( \zeta \) and natural frequency \( a \).
+
+\begin{nb}[Caveats of Approximate Linearization]
+Having the eigenvalues of \( A_{cl}(t) \) fixed at every instant does
+\emph{not} guarantee asymptotic stability of a time-varying system,
+unless \( v_d \) and \( \omega_d \) are constant (rectilinear and
+circular trajectories). Even in that case, asymptotic stability is
+only \emph{local}, because it comes from \cref{thm:lyapunov-indirect}.
+Moreover, \( k_2 \to \infty \) as \( v_d \to 0 \): the controller can
+only be used with \textbf{persistent} Cartesian trajectories (stops
+are not allowed).
+\end{nb}
+
+The \textbf{actual} velocity inputs are recovered from the input
+transformation:
+\begin{align}
+    v &= v_d \cos e_3 - w_1 = v_d \cos e_3 + k_1 e_1, \\
+    \omega &= \omega_d - w_2 = \omega_d + k_2 e_2 + k_3 e_3.
+\end{align}
+As \( e \to 0 \), \( (v, \omega) \to (v_d, \omega_d) \): the control
+reduces to the pure feedforward term. The controller is \textbf{static}
+and based on the state error. It needs \( v_d, \omega_d \) (computed
+via flatness) and \( \theta \), both for the error rotation and for
+the input transformation.
+
+\textbf{Global stability} can be guaranteed by a nonlinear version of
+the feedback:
+\begin{align}
+    w_1 &= -k_1(v_d, \omega_d) e_1, \\
+    w_2 &= -k_2 v_d \frac{\sin e_3}{e_3} e_2
+           - k_3(v_d, \omega_d) e_3,
+\end{align}
+with \( k_2 > 0 \) constant and \( k_1, k_3 \) bounded, positive, with
+bounded derivatives. The actual inputs are recovered from the same
+input transformation.
+
+\subsection{Output Error Feedback: Static}
+\label{subsec:output-error-static}
+
+A different approach builds the feedback from the \textbf{output
+(Cartesian) error} only, without computing a desired state trajectory
+\( q_d(t) \), using the velocity \( \dot{y}_d \) along the reference
+trajectory as the \textbf{feedforward term}. Here
+\( y = (x, y)^\top \) is the Cartesian position of the unicycle and
+\( y_d \) the desired one. The controller is designed by
+\textbf{exact input-output linearization}.
+
+\paragraph{Exact input-output linearization.}
+Consider a driftless nonlinear system with the same number of inputs
+and outputs:
+\begin{align}
+    \dot{x} &= G(x) u, \qquad x \in \mathbb{R}^n,\ u \in \mathbb{R}^m,
+    \\
+    y &= h(x), \qquad y \in \mathbb{R}^m.
+\end{align}
+Differentiating the output,
+\[
+\dot{y} = \frac{\partial h}{\partial x} \dot{x}
+        = \underbrace{\frac{\partial h}{\partial x} G(x)}_{T(x)} u
+        = T(x) u,
+\]
+where \( T \) is an \( m \times m \) matrix called the
+\textbf{decoupling matrix}. If \( T \) is invertible, the
+\textbf{linearizing feedback}
+\[
+u = T^{-1}(x) w
+\]
+yields \( \dot{y} = w \): an \textbf{exactly linear} map from the new
+inputs \( w \) to the derivative of the outputs. Given a reference
+output \( y_d(t) \), the output error \( e = y_d - y \) evolves as
+\[
+\dot{e} = \dot{y}_d - \dot{y} = \dot{y}_d - w.
+\]
+With the choice \( w = \dot{y}_d + K e \) (feedforward plus
+proportional feedback),
+\[
+\dot{e} = -K e,
+\]
+which is \textbf{globally exponentially stable} if the eigenvalues of
+\( K \) lie in the right half-plane. The final control law is
+\[
+u = T^{-1}(x) \big( \dot{y}_d + K e \big).
+\]
+
+\paragraph{Singular decoupling matrix.}
+For the unicycle with output \( y = (x, y)^\top \), the decoupling
+matrix is singular:
+\[
+\begin{pmatrix} \dot{x} \\ \dot{y} \end{pmatrix}
+=
+\begin{pmatrix}
+    \cos\theta & 0 \\
+    \sin\theta & 0
+\end{pmatrix}
+\begin{pmatrix} v \\ \omega \end{pmatrix}.
+\]
+Hence exact input-output linearization is \textbf{not possible} for
+the output \( (x, y) \).
+
+\paragraph{Displaced output.}
+The solution is to move the controlled output from the wheel contact
+point to a point \( B \) along the sagittal axis, at distance \( b \):
+\[
+\begin{pmatrix} x_B \\ y_B \end{pmatrix}
+=
+\begin{pmatrix}
+    x + b \cos\theta \\
+    y + b \sin\theta
+\end{pmatrix}.
+\]
+Differentiating,
+\[
+\begin{pmatrix} \dot{x}_B \\ \dot{y}_B \end{pmatrix}
+=
+\underbrace{
+\begin{pmatrix}
+    \cos\theta & -b \sin\theta \\
+    \sin\theta & b \cos\theta
+\end{pmatrix}}_{T(\theta),\ \det T = b}
+\begin{pmatrix} v \\ \omega \end{pmatrix}.
+\]
+If \( b \neq 0 \), set
+\[
+\begin{pmatrix} v \\ \omega \end{pmatrix}
+= T^{-1}(\theta)
+  \begin{pmatrix} w_1 \\ w_2 \end{pmatrix}
+=
+\begin{pmatrix}
+    \cos\theta & \sin\theta \\
+    -\dfrac{\sin\theta}{b} & \dfrac{\cos\theta}{b}
+\end{pmatrix}
+\begin{pmatrix} w_1 \\ w_2 \end{pmatrix},
+\]
+obtaining the input-output linearized system
+\begin{align}
+    \dot{x}_B &= w_1, \\
+    \dot{y}_B &= w_2, \\
+    \dot{\theta} &= \frac{w_2 \cos\theta - w_1 \sin\theta}{b}.
+\end{align}
+\textbf{Global exponential convergence} of \( x_B, y_B \) to the
+desired trajectory is achieved with
+\begin{align}
+    w_1 &= \dot{x}_d + k_x (x_d - x_B), \\
+    w_2 &= \dot{y}_d + k_y (y_d - y_B),
+\end{align}
+with \( k_x, k_y > 0 \). The orientation \( \theta \) is \textbf{not}
+controlled by this scheme: there is a \textbf{zero dynamics}, the last
+equation above. Still, \( \theta \) must evolve as dictated by
+flatness.
+
+An advantage of this approach is that the desired trajectory for
+\( B \) can be \textbf{arbitrary}: square corners may be included. The
+controller is \textbf{static}, based on the output error, it needs
+\( \dot{y}_d \), and it needs \( x, y, \theta \) for the output
+reconstruction and \( \theta \) for the input transformation.
+
+\subsection{Output Error Feedback: Dynamic}
+\label{subsec:output-error-dynamic}
+
+Rather than displacing the output to \( B \), one can keep the (flat)
+output \( y = (x, y)^\top \) and achieve exact linearization with a
+\textbf{dynamic compensator}. Perform a \textbf{dynamic extension} on
+the driving velocity channel: treat \( v \) as a state and its
+acceleration \( a \) as a new input,
+\[
+\dot{v} = a.
+\]
+Now differentiate the output further:
+\begin{align}
+    \ddot{x} &= a \cos\theta - v \sin\theta\,\omega, \\
+    \ddot{y} &= a \sin\theta + v \cos\theta\,\omega.
+\end{align}
+The new decoupling matrix is
+\[
+\begin{pmatrix} \ddot{x} \\ \ddot{y} \end{pmatrix}
+=
+\underbrace{
+\begin{pmatrix}
+    \cos\theta & -v \sin\theta \\
+    \sin\theta & v \cos\theta
+\end{pmatrix}}_{T(v, \theta),\ \det T = v}
+\begin{pmatrix} a \\ \omega \end{pmatrix},
+\]
+which is nonsingular if \( v \neq 0 \). Under this assumption,
+\[
+\begin{pmatrix} a \\ \omega \end{pmatrix}
+= T^{-1}(v, \theta)
+  \begin{pmatrix} w_1 \\ w_2 \end{pmatrix}
+=
+\begin{pmatrix}
+    \cos\theta & \sin\theta \\
+    -\dfrac{\sin\theta}{v} & \dfrac{\cos\theta}{v}
+\end{pmatrix}
+\begin{pmatrix} w_1 \\ w_2 \end{pmatrix},
+\]
+and the system becomes \( \ddot{x} = w_1 \),
+\( \ddot{y} = w_2 \). \textbf{Global exponential convergence} of
+\( x, y \) to the desired trajectory is achieved with
+\begin{align}
+    w_1 &= \ddot{x}_d + k_{p,x} (x_d - x) + k_{d,x} (\dot{x}_d - \dot{x}), \\
+    w_2 &= \ddot{y}_d + k_{p,y} (y_d - y) + k_{d,y} (\dot{y}_d - \dot{y}),
+\end{align}
+with \( k_{p,x}, k_{p,y}, k_{d,x}, k_{d,y} > 0 \). Since the original
+flat output is controlled, there is \textbf{no zero dynamics} with
+this approach.
+
+The desired trajectory must be twice differentiable and
+\textbf{persistent}, i.e.\ \( v_d \neq 0 \) always (the singularity is
+structural in nonholonomic systems). The controller is \textbf{dynamic}
+(the velocity \( v \) is the state of the compensator, obtained by
+integrating \( a \)), based on the output error. It needs
+\( \dot{y}_d \) and \( \ddot{y}_d \), and it needs \( x, y \) for the
+error computation and \( \theta \) for the input transformation.
+
+\subsection{Comparison of the Controllers}
+\label{subsec:controller-comparison}
+
+The three controllers have been compared in simulation while tracking
+a circle, a square, and a figure eight. The outcomes:
+\begin{itemize}
+    \item \textbf{Approximate linearization}: only \textbf{local}
+          stability, and only for constant \( v_d, \omega_d \). It
+          converges to zero error on a circle; on a square it produces
+          a new transient at each corner; on a figure eight local
+          stability is not guaranteed, though the observed performance
+          is good.
+    \item \textbf{Static input-output linearization}: the steady-state
+          error norm equals \( b \), because it is the point \( B \)
+          that converges to the desired trajectory, while the contact
+          point stays at distance \( b \) from it. The displaced output
+          provides a \textbf{lookahead} behavior when tracking a
+          square. Reducing \( b \) reduces the steady-state error, but
+          the steering velocity increases, since the term \( 1/b \)
+          appears in \( T^{-1} \).
+    \item \textbf{Dynamic input-output linearization}: zero
+          steady-state error, reasonable velocities, and faster
+          transients (for example at the corners of the square).
+\end{itemize}
+
+\section{Takeaways}
+\label{sec:motion-control-takeaways}
+
+\begin{enumerate}
+    \item Motion control for wheeled mobile robots is designed at the
+          \textbf{kinematic level}: the dynamic model is canceled by
+          the low-level velocity loops.
+    \item In \textbf{trajectory tracking} the desired Cartesian
+          trajectory is mapped to the desired state and inputs via
+          flatness, and a feedback action is added on the state or
+          output error.
+    \item \textbf{Approximate linearization} of the tracking error
+          gives a linear time-varying error dynamics. Local asymptotic
+          stability follows from the indirect Lyapunov method, but
+          only for constant reference inputs, and the controller
+          requires \( v_d \neq 0 \).
+    \item \textbf{Exact input-output linearization} is not possible
+          for the Cartesian position of the unicycle: the decoupling
+          matrix is singular. Two fixes: displace the output along
+          the sagittal axis (static feedback, with zero dynamics and
+          steady-state error proportional to the displacement), or
+          extend the dynamics by treating \( v \) as a state (dynamic
+          feedback, no zero dynamics, requires \( v \neq 0 \)).
+    \item All controllers require a \textbf{persistent} trajectory:
+          the nonholonomic singularity at \( v = 0 \) is structural
+          and cannot be removed by feedback.
+\end{enumerate}
