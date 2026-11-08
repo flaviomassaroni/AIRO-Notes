@@ -1,4 +1,7 @@
-# --- LaTeX build artifacts (globale, tutti i corsi) ---
+# --- Tutto ElectiveAI è escluso (dataset, video, checkpoint enormi) ---
+ElectiveAI/
+
+# --- LaTeX build artifacts (globale per tutto il repo) ---
 *.aux
 *.bbl
 *.bcf
@@ -23,19 +26,6 @@ AMR/amr-notes/chapters_backup_*
 AMR/amr-notes/images/*-eps-converted-to.pdf
 AMR/amr-notes/images/*.ipe
 AMR/amr-notes/images/*.ipe.autosave.ipe
-
-# --- SpatialAI homework: huge binaries ---
-ElectiveAI/SpatialAI/homework2/images/
-ElectiveAI/SpatialAI/homework2/images_2/
-ElectiveAI/SpatialAI/homework2/datasets/*/images/
-ElectiveAI/SpatialAI/homework2/datasets/*/images_2/
-ElectiveAI/SpatialAI/homework2/outputs/
-ElectiveAI/SpatialAI/homework2/renders/
-ElectiveAI/SpatialAI/homework2/*.mp4
-ElectiveAI/SpatialAI/homework2/daConsegnare/
-ElectiveAI/SpatialAI/homework2/database.db
-*.ckpt
-*.tfevents.*
 
 # --- Python ---
 __pycache__/
