@@ -1,0 +1,111 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Preface}{ii}{chapter*.1}%
+\contentsline {chapter}{\numberline {1}Introduction: Applications, Problems, Architectures}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Why Mobile Robots}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Applications}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}The Key Problems of Mobile Robotics}{1}{section.1.3}%
+\contentsline {paragraph}{Why wheeled mobile robots are harder than they look.}{2}{section*.4}%
+\contentsline {section}{\numberline {1.4}Autonomy}{2}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Perception}{2}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Robot Architectures}{2}{section.1.6}%
+\contentsline {subsection}{\numberline {1.6.1}Deliberative Architecture}{2}{subsection.1.6.1}%
+\contentsline {subsection}{\numberline {1.6.2}Reactive Architecture}{3}{subsection.1.6.2}%
+\contentsline {subsection}{\numberline {1.6.3}Hybrid Architectures}{3}{subsection.1.6.3}%
+\contentsline {subsection}{\numberline {1.6.4}Behavior-Based Architecture}{3}{subsection.1.6.4}%
+\contentsline {section}{\numberline {1.7}Course Approach}{4}{section.1.7}%
+\contentsline {chapter}{\numberline {2}Configuration Space}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Motivation: Why Configuration Space?}{5}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Modeling a Robot}{5}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Configuration and Degrees of Freedom}{5}{subsection.2.2.1}%
+\contentsline {section}{\numberline {2.3}The Configuration Space and the Workspace}{6}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Workspace vs Configuration Space}{7}{subsection.2.3.1}%
+\contentsline {section}{\numberline {2.4}Examples}{7}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Point Robot}{7}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Disk Robot}{7}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Robot with Orientation: \( \mathbb {R}^2 \times \mathcal {S}^1 \)}{8}{subsection.2.4.3}%
+\contentsline {subsection}{\numberline {2.4.4}Planar 2-Link Manipulator: \( \mathcal {T}^2 \)}{8}{subsection.2.4.4}%
+\contentsline {subsection}{\numberline {2.4.5}Rigid Body in 3D: \( SE(3) \)}{8}{subsection.2.4.5}%
+\contentsline {section}{\numberline {2.5}Topology of Configuration Space}{8}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}The 2R Planar Manipulator}{8}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Non-Injectivity of the Parameterization}{8}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.3}Restoring Injectivity: the Fundamental Domain}{9}{subsection.2.5.3}%
+\contentsline {subsection}{\numberline {2.5.4}The Remaining Problem: Closeness Is Not Preserved}{9}{subsection.2.5.4}%
+\contentsline {subsection}{\numberline {2.5.5}Gluing the Square: Why \( C \) Is a Torus}{10}{subsection.2.5.5}%
+\contentsline {subsection}{\numberline {2.5.6}Why Topology Matters}{10}{subsection.2.5.6}%
+\contentsline {section}{\numberline {2.6}Distance in the Configuration Space}{11}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Geodesic Distance}{11}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}The Displacement Metric}{12}{subsection.2.6.2}%
+\contentsline {subsection}{\numberline {2.6.3}Control Points}{12}{subsection.2.6.3}%
+\contentsline {section}{\numberline {2.7}C-Obstacles and Free Space}{13}{section.2.7}%
+\contentsline {paragraph}{The point-robot trick.}{13}{section*.11}%
+\contentsline {paragraph}{Path vs.\ trajectory.}{13}{section*.12}%
+\contentsline {section}{\numberline {2.8}Relevance to Motion Planning}{13}{section.2.8}%
+\contentsline {chapter}{\numberline {3}Wheeled Mobile Robots: Mechanics}{14}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Sources of Locomotion}{14}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Static Balance}{14}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Types of Wheels}{15}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Kinematic Structures}{15}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Differential Drive}{15}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Synchro-Drive}{16}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Tricycle and Car-Like}{16}{subsection.3.4.3}%
+\contentsline {section}{\numberline {3.5}The Differential}{16}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Constraints}{17}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}Geometric Constraints}{17}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}Kinematic Constraints}{17}{subsection.3.6.2}%
+\contentsline {subsection}{\numberline {3.6.3}Holonomic vs Nonholonomic Constraints}{18}{subsection.3.6.3}%
+\contentsline {paragraph}{Example: integrable constraint.}{18}{section*.17}%
+\contentsline {paragraph}{Example: nonholonomic constraint.}{18}{section*.18}%
+\contentsline {section}{\numberline {3.7}Kinematic Models}{19}{section.3.7}%
+\contentsline {paragraph}{Driftless property.}{19}{section*.19}%
+\contentsline {paragraph}{Pseudovelocities.}{20}{section*.20}%
+\contentsline {paragraph}{Non-uniqueness of the model.}{20}{section*.21}%
+\contentsline {subsection}{\numberline {3.7.1}Controllability and the Accessibility Rank Condition}{20}{subsection.3.7.1}%
+\contentsline {subsection}{\numberline {3.7.2}The Unicycle Model}{21}{subsection.3.7.2}%
+\contentsline {paragraph}{Controllability.}{21}{section*.22}%
+\contentsline {subsection}{\numberline {3.7.3}The Bicycle Model}{22}{subsection.3.7.3}%
+\contentsline {paragraph}{Rear-wheel drive.}{23}{section*.23}%
+\contentsline {paragraph}{Singularity.}{23}{section*.24}%
+\contentsline {paragraph}{Controllability (rear-wheel drive).}{23}{section*.25}%
+\contentsline {paragraph}{Front-wheel drive.}{23}{section*.26}%
+\contentsline {section}{\numberline {3.8}Chained Form}{24}{section.3.8}%
+\contentsline {subsection}{\numberline {3.8.1}The Unicycle in Chained Form}{25}{subsection.3.8.1}%
+\contentsline {paragraph}{Verification.}{25}{section*.27}%
+\contentsline {subsection}{\numberline {3.8.2}The Bicycle in Chained Form}{25}{subsection.3.8.2}%
+\contentsline {paragraph}{Verification.}{26}{section*.29}%
+\contentsline {section}{\numberline {3.9}Takeaways}{27}{section.3.9}%
+\contentsline {chapter}{\numberline {4}Nonlinear Controllability in Depth}{28}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Scope of This Chapter}{28}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Controllability of Driftless Systems}{28}{section.4.2}%
+\contentsline {paragraph}{Outline of the proof.}{29}{section*.30}%
+\contentsline {paragraph}{Holonomic vs.\ nonholonomic, revisited.}{29}{section*.31}%
+\contentsline {section}{\numberline {4.3}Lie Brackets in Depth}{29}{section.4.3}%
+\contentsline {paragraph}{Algebraic properties.}{29}{section*.32}%
+\contentsline {paragraph}{Example in \( \mathbb {R}^3 \).}{30}{section*.33}%
+\contentsline {section}{\numberline {4.4}Interpretation of the Lie Bracket}{30}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Distributions and Integrability}{31}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Exercises}{32}{section.4.6}%
+\contentsline {paragraph}{Solutions (sketch).}{33}{section*.36}%
+\contentsline {section}{\numberline {4.7}Takeaways}{33}{section.4.7}%
+\contentsline {chapter}{\numberline {5}Path and Trajectory Planning}{34}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Path vs Trajectory}{34}{section.5.1}%
+\contentsline {paragraph}{Example.}{34}{section*.37}%
+\contentsline {section}{\numberline {5.2}The Geometric Model}{35}{section.5.2}%
+\contentsline {paragraph}{Example: unicycle.}{35}{section*.38}%
+\contentsline {section}{\numberline {5.3}Differential Flatness}{36}{section.5.3}%
+\contentsline {paragraph}{The unicycle is flat.}{36}{section*.40}%
+\contentsline {paragraph}{The bicycle is flat.}{37}{section*.42}%
+\contentsline {paragraph}{Flat outputs for chained-form systems.}{37}{section*.43}%
+\contentsline {section}{\numberline {5.4}Path Planning for the Unicycle}{37}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Path Planning for a Chained-Form System}{39}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Takeaways}{39}{section.5.6}%
+\contentsline {chapter}{\numberline {6}Motion Control}{40}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Localizzazione}{41}{chapter.7}%
+\contentsline {chapter}{\numberline {8}Mapping}{42}{chapter.8}%
+\contentsline {chapter}{\numberline {9}SLAM}{43}{chapter.9}%
+\contentsline {chapter}{\numberline {10}Decisioni incertezza}{44}{chapter.10}%
+\contentsline {chapter}{\numberline {11}Laboratorio}{45}{chapter.11}%
+\contentsline {chapter}{\numberline {A}Formulario}{46}{appendix.A}%
+\contentsline {chapter}{\numberline {B}Esercizi}{47}{appendix.B}%
+\contentsline {chapter}{\numberline {C}Codice}{48}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Esempio: EKF SLAM}{48}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Esempio: RRT}{48}{section.C.2}%

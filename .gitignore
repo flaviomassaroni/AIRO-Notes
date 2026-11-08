@@ -1,40 +1,38 @@
-# File temporanei e di ausilio di LaTeX (validi per tutte le sottocartelle)
-*.aux
-*.bbl
-*.bcf
-*.blg
-*.fdb_latexmk
-*.fls
-*.glg
-*.glo
-*.gls
-*.idx
-*.ilg
-*.ind
-*.ist
-*.lof
-*.log
-*.lot
-*.out
-*.run.xml
-*.synctex.gz
-*.toc
+# --- SpatialAI homework: huge binaries, model checkpoints, videos ---
+ElectiveAI/SpatialAI/homework2/images/
+ElectiveAI/SpatialAI/homework2/images_2/
+ElectiveAI/SpatialAI/homework2/datasets/*/images/
+ElectiveAI/SpatialAI/homework2/datasets/*/images_2/
+ElectiveAI/SpatialAI/homework2/outputs/
+ElectiveAI/SpatialAI/homework2/renders/
+ElectiveAI/SpatialAI/homework2/*.mp4
+ElectiveAI/SpatialAI/homework2/daConsegnare/
+ElectiveAI/SpatialAI/homework2/database.db
+*.ckpt
+*.tfevents.*
 
-# Cartella di output di compilazione
-build/
-
-# File di ambiente / editor / SO
+# --- LaTeX build artifacts ---
+MR/amr-notes/build/
+AMR/amr-notes/*.aux
+AMR/amr-notes/*.bbl
+AMR/amr-notes/*.bcf
+AMR/amr-notes/*.blg
+AMR/amr-notes/*.fdb_latexmk
+AMR/amr-notes/*.fls
+AMR/amr-notes/*.idx
+AMR/amr-notes/*.ilg
+AMR/amr-notes/*.ind
+AMR/amr-notes/*.log
+AMR/amr-notes/*.lof
+AMR/amr-notes/*.lot
+AMR/amr-notes/*.out
+AMR/amr-notes/*.run.xml
+AMR/amr-notes/*.synctex.gz
+AMR/amr-notes/*.toc
+AMR/amr-notes/chapters_backup_*
+AMR/amr-notes/images/
+*.bak
+*.tar.gz
 .DS_Store
-Thumbs.db
-.vscode/
-.idea/
 *.swp
-
-# Python
-__pycache__/
-*.pyc
-.python-version
-electiveAI/SpatialAI/homework1/images.zip
-electiveAI/SpatialAI/homework1/images/
-electiveAI/SpatialAI/homework1/images.zip
-/AMR/amr-notes/images/
+*~
