@@ -1,4 +1,30 @@
-# --- SpatialAI homework: huge binaries, model checkpoints, videos ---
+# --- LaTeX build artifacts (globale, tutti i corsi) ---
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.log
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# --- AMR-specific ---
+AMR/amr-notes/build/
+AMR/amr-notes/main.pdf
+AMR/amr-notes/chapters_backup_*
+AMR/amr-notes/images/*-eps-converted-to.pdf
+AMR/amr-notes/images/*.ipe
+AMR/amr-notes/images/*.ipe.autosave.ipe
+
+# --- SpatialAI homework: huge binaries ---
 ElectiveAI/SpatialAI/homework2/images/
 ElectiveAI/SpatialAI/homework2/images_2/
 ElectiveAI/SpatialAI/homework2/datasets/*/images/
@@ -11,28 +37,14 @@ ElectiveAI/SpatialAI/homework2/database.db
 *.ckpt
 *.tfevents.*
 
-# --- LaTeX build artifacts ---
-MR/amr-notes/build/
-AMR/amr-notes/*.aux
-AMR/amr-notes/*.bbl
-AMR/amr-notes/*.bcf
-AMR/amr-notes/*.blg
-AMR/amr-notes/*.fdb_latexmk
-AMR/amr-notes/*.fls
-AMR/amr-notes/*.idx
-AMR/amr-notes/*.ilg
-AMR/amr-notes/*.ind
-AMR/amr-notes/*.log
-AMR/amr-notes/*.lof
-AMR/amr-notes/*.lot
-AMR/amr-notes/*.out
-AMR/amr-notes/*.run.xml
-AMR/amr-notes/*.synctex.gz
-AMR/amr-notes/*.toc
-AMR/amr-notes/chapters_backup_*
-AMR/amr-notes/images/
-*.bak
-*.tar.gz
+# --- Python ---
+__pycache__/
+*.pyc
+.python-version
+
+# --- Editor / OS ---
 .DS_Store
 *.swp
 *~
+*.bak
+*.tar.gz
